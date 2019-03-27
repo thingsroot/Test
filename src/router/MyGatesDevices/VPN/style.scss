@@ -1,0 +1,59 @@
+.VPN{
+    display: flex;
+    .VPNLeft{
+        width:40%;
+        .VPNlist{
+            display: flex;
+            padding:10px 0;
+            >p{
+                display: block;
+                width:30%;
+                min-width: 150px;
+                text-align: right;
+                line-height: 2.3;
+                padding-right: 10px;
+            }
+            >input{
+                flex:1;
+            }
+            >div{
+                flex:1;
+            }
+        }
+        .btn{
+            margin-left: 100px;
+        }
+        .successMessage{
+            width:auto;
+            background: #00c0ef;
+            color:#fff;
+            height: auto;
+            padding: 15px;
+            margin-top: 10px;
+            margin-left: 20px;
+            line-height: 2.5;
+            border-radius: 6px;
+        }
+    }
+    .VPNRight{
+        width:40%;
+        .VPNlist{
+            display: flex;
+            padding:10px 0;
+            >p{
+                display: block;
+                width:30%;
+                min-width: 170px;
+                text-align: right;
+                line-height: 2.3;
+                padding-right: 10px;
+            }
+            >input{
+                flex:1;
+            }
+        }
+    }
+}
+.navbar-link{
+    color:blue;
+}

@@ -1,0 +1,33 @@
+.historywrap{
+    width: 100%;
+    table td{
+        word-wrap:break-word; 
+        text-overflow:ellipsis; 
+        white-space:nowrap; 
+        overflow:hidden; 
+        }
+    .history{
+        display: flex;
+        .historyleft{
+            width: 35%;
+            margin-top: 20px;
+            padding:10px;
+            border-radius: 5px;
+            border-top: 3px solid #eee;
+        }
+        .historyright{
+            flex:1;
+            margin-top: 20px;
+            margin-left: 10px;
+            padding:10px;
+            border-radius: 5px;
+            border-top: 3px solid #eee;
+        }
+        .clickRowStyl{
+            background-color: #B0BED9;
+        }
+        .ant-table-tbody>.clickRowStyl:hover>td{
+            background-color: #B0BED9;
+        }
+    }
+}

@@ -1,0 +1,22 @@
+.MyTemplateDetails{
+  .title{
+    line-height: 50px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: -20px;
+  }
+
+}
+.web{
+  .ant-modal-content {
+    width: 1000px!important;
+    height: 500px!important;
+    margin-left: -500px!important;
+    position: absolute;
+    left: 50%;
+  }
+  .ant-modal-body {
+    width: 1000px!important;
+    height: 390px!important;
+  }
+}

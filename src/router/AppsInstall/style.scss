@@ -1,0 +1,126 @@
+.AppInstall{
+        display: flex;
+        width: 100%;
+        margin-top: 20px;
+        .show{
+            flex:1;
+        }
+}
+pre{
+    background:#eee;
+}
+.installheader{
+    display: flex;
+    justify-content: space-between;
+    padding:10px;
+    .selectlist{
+        display: flex;
+    }
+}
+.show{
+    display: block;
+    margin-top: 15px;
+    margin-left: 20px;
+}
+.hide{
+    display: none;
+}
+.installcontent{
+    display: flex;
+    flex-wrap: wrap;
+    .item{
+        width: 222px;
+        height: 215px;
+        padding: 10px;
+        margin:10px;
+        line-height: 1.5;
+        background-color: #fff;
+        border:1px solid #eee;
+        cursor: pointer;
+        &:hover{
+            box-shadow: 0 1px 3px rgba(34, 25, 25, .4);
+        }
+        img{
+            display: block;
+            height: 96px;
+            width:96px;
+            margin: 0 auto;
+        }
+        .apptitle{
+            margin-top: 25px;
+            padding:10px;
+            background:#f6f6f6;
+            font-size: 12px;
+            font-weight: 600;
+            p:hover{
+                color:#3c8dbc;
+            }
+            div{
+                display: flex;
+                justify-content: space-between;
+                box-sizing: border-box;
+                span{
+                    display: block;
+                    border:1px solid #ccc;
+                    font-size: 14px;
+                    padding: 3px 7px;
+                    border-radius: 5px;
+                    &:hover{
+                        background: #ddd;
+                        border:1px solid #ccc;
+                    }
+                }
+            }
+            .ant-rate li{
+                margin-right: 0px;
+            }
+        }
+    }
+}
+.appsdetail{
+    position: relative;
+    .installbtn{
+        position: absolute;
+        right:80px;
+        top:10px;
+    }
+    .installapp{
+        padding: 15px 0;
+    }
+    .back{
+        position: absolute;
+        right:10px;
+        top:10px;
+        color:blue;
+    }
+    .detail{
+        p{
+            padding: 2px 0;
+        }
+    }
+    .spanStyle{
+        display: inline-block;
+        width: 100px;
+        font-weight: 600;
+    }
+    .sectionName{
+        line-height: 50px;
+    }
+    .display{
+        display: flex;
+    }
+}
+.tableModal{
+    .ant-modal-content {
+        width: 1000px!important;
+        height: 500px!important;
+        margin-left: -500px!important;
+        position: absolute;
+        left: 50%;
+        overflow-y: auto;
+    }
+    .ant-modal-body {
+        width: 1000px!important;
+        height: 390px!important;
+    }
+}
