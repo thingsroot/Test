@@ -134,7 +134,8 @@ class MyGatesAppsInstall extends Component {
                         disabled={record.disabled}
                         onClick={()=>{
                         this.addSingleTemp(record.conf_name, record.description, record.name, record.latest_version)
-                    }}>添加</Button>
+                    }}
+                    >添加</Button>
                 </div>
             )
         }],
@@ -163,7 +164,8 @@ class MyGatesAppsInstall extends Component {
                     onClick={()=>{
                     this.onDelete(`${record.name}`)
                     }
-                }>删除</Button>
+                }
+                >删除</Button>
             )
         }],
         deviceColumns: [],
@@ -587,8 +589,10 @@ class MyGatesAppsInstall extends Component {
                                                             key={key}
                                                             style={this.state.selectSection === 'serial' ? block : none}
                                                         >
-                                                            <p className="sectionName"><span
-                                                                style={{padding: '0 5px'}}>|</span>{v.desc}</p>
+                                                            <p className="sectionName">
+                                                                <span
+                                                                    style={{padding: '0 5px'}}
+                                                                >|</span>{v.desc}</p>
                                                             {
                                                                 serial && serial.length > 0 && serial.map((a, index) => {
                                                                     if (a.type === 'dropdown') {
@@ -598,7 +602,8 @@ class MyGatesAppsInstall extends Component {
                                                                                 key={index}
                                                                             >
                                                                                 <span
-                                                                                    className="spanStyle">{a.desc}</span>
+                                                                                    className="spanStyle"
+                                                                                >{a.desc}</span>
                                                                                 <Select
                                                                                     defaultValue={a.value[0]}
                                                                                     style={{width: 300}}
@@ -606,8 +611,13 @@ class MyGatesAppsInstall extends Component {
                                                                                         this.selectChangeValue(a.name)
                                                                                     }}
                                                                                 >
-                                                                                    {a.value.map(b => <Option
-                                                                                        key={b}>{b}</Option>)}
+                                                                                    {a.value.map(b => {
+                                                                                        return (
+                                                                                            <Option
+                                                                                                key={b}
+                                                                                            >{b}</Option>
+                                                                                        )
+                                                                                    })}
                                                                                 </Select>
                                                                                 <input
                                                                                     ref={a.name}
@@ -623,7 +633,8 @@ class MyGatesAppsInstall extends Component {
                                                                                 key={index}
                                                                             >
                                                                                 <span
-                                                                                    className="spanStyle">{a.desc}</span>
+                                                                                    className="spanStyle"
+                                                                                >{a.desc}</span>
                                                                                 <Checkbox
                                                                                     defaultChecked={a.value}
                                                                                     onChange={
@@ -652,8 +663,10 @@ class MyGatesAppsInstall extends Component {
                                                             key={key}
                                                             style={this.state.selectSection === 'socket' ? block : none}
                                                         >
-                                                            <p className="sectionName"><span
-                                                                style={{padding: '0 5px'}}>|</span>{v.desc}</p>
+                                                            <p className="sectionName">
+                                                                <span
+                                                                    style={{padding: '0 5px'}}
+                                                                >|</span>{v.desc}</p>
                                                             {
                                                                 tcp && tcp.length > 0 && tcp.map((a, index) => {
                                                                     if (a.type === 'boolean') {
@@ -663,7 +676,8 @@ class MyGatesAppsInstall extends Component {
                                                                                 key={index}
                                                                             >
                                                                                 <span
-                                                                                    className="spanStyle">{a.desc}</span>
+                                                                                    className="spanStyle"
+                                                                                >{a.desc}</span>
                                                                                 <Checkbox
                                                                                     defaultChecked={a.value}
                                                                                     onChange={
@@ -687,7 +701,8 @@ class MyGatesAppsInstall extends Component {
                                                                                 key={index}
                                                                             >
                                                                                 <span
-                                                                                    className="spanStyle">{a.desc}</span>
+                                                                                    className="spanStyle"
+                                                                                >{a.desc}</span>
                                                                                 <Input
                                                                                     style={{width: 320}}
                                                                                     name={a.name}
@@ -708,9 +723,14 @@ class MyGatesAppsInstall extends Component {
                                                     )
                                                 } else if (v.name === 'template_section') {
                                                     return (
-                                                        <div id={v.name} key={key}>
-                                                            <p className="sectionName"><span
-                                                                style={{padding: '0 5px'}}>|</span>{v.desc}</p>
+                                                        <div
+                                                            id={v.name}
+                                                            key={key}
+                                                        >
+                                                            <p className="sectionName">
+                                                                <span
+                                                                    style={{padding: '0 5px'}}
+                                                                >|</span>{v.desc}</p>
                                                             <Table
                                                                 rowKey="name"
                                                                 dataSource={showTempList}
@@ -743,14 +763,21 @@ class MyGatesAppsInstall extends Component {
                                                         </div>
                                                     )
                                                 } else if (v.name === 'device_section') {
-                                                    return <div id={v.name} key={key}>
-                                                        <p className="sectionName"><span
-                                                            style={{padding: '0 5px'}}>|</span>{v.desc}</p>
+                                                    return (
+                                                        <div
+                                                            id={v.name}
+                                                            key={key}
+                                                        >
+                                                        <p className="sectionName">
+                                                            <span
+                                                                style={{padding: '0 5px'}}
+                                                            >|</span>{v.desc}</p>
                                                         <EditableTable
                                                             deviceColumns={this.state.deviceColumns}
                                                             deviceSource={this.state.deviceSource}
                                                         />
                                                     </div>
+                                                    )
                                                 }
                                             } else {
                                                 return (

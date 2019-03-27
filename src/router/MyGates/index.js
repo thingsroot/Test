@@ -18,17 +18,18 @@ function getDevicesList (){
             } else {
                 v.data.device_apps_num = 0;
             }
-            console.log(res.message[i].app.data)
+            if (res.message[i].devices.data){
+                v.data.device_devs_num = Object.keys(res.message[i].devices.data).length;
+            } else {
+                v.data.device_devs_num = 0;
+            }
             if (v.data.device_status === 'ONLINE'){
                 v.data.disabled = false;
-                v.data.device_status = <span className="online"><b></b>&nbsp;&nbsp;在线</span>;
                 online.push(v.data)
             } else if (v.data.device_status === 'OFFLINE') {
                 offline.push(v.data)
-                v.data.device_status = <span className="offline"><b></b>&nbsp;&nbsp;离线</span>;
                 v.data.disabled = true;
             } else {
-                v.data.device_status = <span className="notline"><b></b>&nbsp;&nbsp;未连接</span>;
                 v.data.disabled = true;
             }
             data.push(v.data)
@@ -38,7 +39,7 @@ function getDevicesList (){
         }
         this.setState({
             status,
-            data: res.message.data,
+            data,
             loading: false,
             online,
             offline
@@ -105,7 +106,16 @@ class MyGates extends PureComponent {
                 title: '状态',
                 key: 'device_status',
                 dataIndex: 'device_status',
-                width: '80px'
+                width: '80px',
+                render: (record)=>{
+                    if (record === 'ONLINE'){
+                        return <span className="online"><b></b>&nbsp;&nbsp;在线</span>
+                    } else if (record === 'OFFLINE') {
+                        return <span className="offline"><b></b>&nbsp;&nbsp;离线</span>
+                    } else {
+                        return <span className="notline"><b></b>&nbsp;&nbsp;未连接</span>
+                    }
+                }
               }, {
                 title: '应用数',
                 key: 'device_apps_num',
@@ -122,9 +132,13 @@ class MyGates extends PureComponent {
                 width: '23%',
                 render: (text, record, props) => {
                     props
+                    console.log(record, '========================')
                   return (
                       <span>
-                        <Link to={`/MyGatesDevices/${record.device_sn}`}
+                        <Link to={{
+                            pathname: `/MyGatesDevices/${record.sn}`,
+                            state: record
+                        }}
                             disabled={record.disabled}
                         >
                             <Button key="1"
@@ -132,7 +146,10 @@ class MyGates extends PureComponent {
                             >设备</Button>
                         </Link>
                         <Divider type="vertical" />
-                        <Link to={`/MyGatesDevices/${record.device_sn}/AppsList`}
+                        <Link to={{
+                            pathname: `/MyGatesDevices/${record.sn}/AppsList`,
+                            state: record
+                        }}
                             disabled={record.disabled}
                         >
                             <Button key="2"
@@ -181,7 +198,7 @@ class MyGates extends PureComponent {
                                                             }
                                                             bordered
                                                             loading={this.state.loading}
-                                                            rowKey="device_sn"
+                                                            rowKey="sn"
                                                             size="small"
                                                             rowClassName={(record, index) => {
                                                                 let className = 'light-row';
@@ -197,7 +214,7 @@ class MyGates extends PureComponent {
                                                         dataSource={
                                                             offline && offline.length > 0 ? offline : []
                                                         }
-                                                        rowKey="device_sn"
+                                                        rowKey="sn"
                                                         rowClassName={(record, index) => {
                                                             let className = 'light-row';
                                                             if (index % 2 === 1) {
@@ -222,7 +239,7 @@ class MyGates extends PureComponent {
                                                             }
                                                             return className;
                                                         }}
-                                                        rowKey="device_sn"
+                                                        rowKey="sn"
                                                         bordered
                                                         loading={this.state.loading}
                                                         size="small "

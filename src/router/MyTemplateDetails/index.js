@@ -109,7 +109,14 @@ class MyTemplateDetails extends PureComponent {
                             onChange={this.onVersionChange}
                         >
                             {
-                                versionList && versionList.length > 0 && versionList.map((province, key) => <Option value={province} key={key}>{province}</Option>)
+                                versionList && versionList.length > 0 && versionList.map((province, key) => {
+                                    return (
+                                        <Option
+                                            value={province}
+                                            key={key}
+                                        >{province}</Option>
+                                    )
+                                })
                             }
                         </Select>
                         <span style={{paddingLeft: '50px'}}>关联应用：</span>
@@ -139,12 +146,14 @@ class MyTemplateDetails extends PureComponent {
                                 return <tr key={key}>
                                     {
                                         v && v.length > 0 && v.map((w, key)=>{
-                                            return <td
-                                                key={key}
-                                                style={{width: '100px', padding: '10px', whiteSpace: 'nowrap'}}
-                                            >
+                                            return (
+                                                <td
+                                                    key={key}
+                                                    style={{width: '100px', padding: '10px', whiteSpace: 'nowrap'}}
+                                                >
                                                 {w}
                                             </td>
+                                            )
                                         })
                                     }
                                 </tr>

@@ -9,7 +9,10 @@ const FormItem = Form.Item;
 const EditableContext = React.createContext();
 
 const EditableRow = ({ form, index, ...props }) => (
-    <EditableContext.Provider value={form} id={index}>
+    <EditableContext.Provider
+        value={form}
+        id={index}
+    >
         <tr {...props} />
     </EditableContext.Provider>
 );
@@ -286,7 +289,11 @@ class EditableTable extends React.Component {
         });
         return (
             <div>
-                <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
+                <Button
+                    onClick={this.handleAdd}
+                    type="primary"
+                    style={{ marginBottom: 16 }}
+                >
                     添加设备
                 </Button>
                 <Table
