@@ -41,16 +41,22 @@ class MyGatesDevices extends Component {
     }
   }
   sendAjax = (sn) => {
-    http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + sn).then(res=>{
-      this.props.store.appStore.setStatus(res.message)
-      if (Object.keys(res.message.applist).indexOf('ioe_frpc') !== -1){
-        this.setState({VPNflag: true})
-      } else {
-        this.setState({VPNflag: false})
-      }
+    http.get('/api/gateways_read?name=' + sn).then(res=>{
+      this.props.store.appStore.setStatus(res)
+      // if (Object.keys(res).indexOf('ioe_frpc') !== -1){
+      //   this.setState({VPNflag: true})
+      // } else {
+      //   this.setState({VPNflag: false})
+      // }
     })
-    http.get('/api/method/iot_ui.iot_api.devices_list?filter=online').then(res=>{
-      this.props.store.appStore.setGatelist(res.message);
+    http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
+      this.props.store.appStore.setApplen(Object.keys(res).length);
+    })
+    http.get('/api/gateways_dev_len?gateway=' + sn).then(res=>{
+      this.props.store.appStore.setDevlen(res.length);
+    })
+    http.get('/api/gateways_sn').then(res=>{
+      console.log(res)
     })
   }
   showDrawer = () => {

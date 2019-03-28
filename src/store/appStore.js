@@ -13,11 +13,17 @@ class AppStore {
   @action setGatelist (values) {
       this.gateList = [...values];
   }
+  @action setDevlen (value){
+    this.devs_len = value;
+  }
+  @action setApplen (value){
+    this.apps_len = value;
+  }
   @action setStatus (values){
-      this.devs_len = values.devs_len
-      this.apps_len = values.apps_len
-      this.status = {...values.basic}
-      this.config = {...values.config}
+      // this.devs_len = values.devs_len
+      // this.apps_len = values.apps_len
+      this.status = values
+      // this.config = {...values.config}
   }
 
   @action toggleLogin (flag, info = {}) {

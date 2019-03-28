@@ -152,25 +152,28 @@ class AppsList extends Component {
         });
       }
       fetch = (sn) => {
-        http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + sn).then(res=>{
-          this.props.store.appStore.setStatus(res.message)
+        let data = [];
+        http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
+          data = Object.values(res)
+          console.log(data)
+          //this.props.store.appStore.setStatus(res.message)
         })
-        http.get('/api/method/iot_ui.iot_api.gate_applist?sn=' + sn).then((res) => {
-            let data = res.message;
-            data && data.length > 0 && data.map((item)=>{
-              if (item.cloud){
-                item.cloud.icon_image = 'http://cloud.thingsroot.com' + item.cloud.icon_image;
-              }
-              if (item.info.running){
-                  item.info.running = new Date(parseInt(item.info.running) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ')
-              }
-              if (item.info.auto === '1'){
-                  item.info.auto = true
-              } else {
-                  item.info.auto = false
-              }
-              item.sn = item.info.sn;
-          })
+        // http.get('/api/method/iot_ui.iot_api.gate_applist?sn=' + sn).then((res) => {
+        //     let data = res.message;
+        //     data && data.length > 0 && data.map((item)=>{
+        //       if (item.cloud){
+        //         item.cloud.icon_image = 'http://cloud.thingsroot.com' + item.cloud.icon_image;
+        //       }
+        //       if (item.info.running){
+        //           item.info.running = new Date(parseInt(item.info.running) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ')
+        //       }
+        //       if (item.info.auto === '1'){
+        //           item.info.auto = true
+        //       } else {
+        //           item.info.auto = false
+        //       }
+        //       item.sn = item.info.sn;
+        //   })
           const pagination = { ...this.state.pagination };
           // Read total count from server
           // pagination.total = data.totalCount;
@@ -180,7 +183,7 @@ class AppsList extends Component {
             data: data,
             pagination
           });
-        });
+        //});
       }
     render () {
       const { loading } = this.state;

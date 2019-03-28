@@ -60,7 +60,8 @@ class GatesList extends Component {
     state = {
         data: [],
         loading: true,
-        sn: this.props.match.params.sn
+        sn: this.props.match.params.sn,
+        devList: []
     }
     componentDidMount (){
       this.getData(this.state.sn);
@@ -77,24 +78,42 @@ class GatesList extends Component {
       }
     }
     getData (sn){
-      http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-        this.props.store.appStore.setStatus(res.message)
-      })
-      http.get('/api/method/iot_ui.iot_api.gate_devs_list?sn=' + sn ).then(res=>{
+      http.get('/api/gateways_dev_list?gateway=' + sn).then(res=>{
+        console.log(res)
         let data = [];
-        data = res.message;
-        data.map((item)=>{
-            item.ioc = '' + (item.inputs ? item.inputs : '0') + '/' + (item.outputs ? item.outputs : '0') + '/' + (item.commands ? item.commands : '0');
-            if (item.outputs > 0){
-              item.Gate_Sn = this.props.match.params.sn;
-              item.set_data = true
+        if (res.message && res.message.length > 0){
+          res.message.map((item=>{
+            item.meta.ioc = '' + (item.inputs ? item.inputs.length : '0') + '/' + (item.outputs ? Object.keys(item.outputs).length : '0') + '/' + (item.commands ? item.commands.length : '0');
+            if (item.meta.outputs > 0){
+              item.meta.Gate_Sn = this.props.match.params.sn;
+              item.meta.set_data = true
             }
-        })
+            data.push(item.meta);
+          }))
+        }
+        console.log(data)
         this.setState({
-            data,
-            loading: false
+          data,
+          devList: res.message,
+          loading: false
         })
-    })
+        // trhis.props.store.appStore.setStatus(res.message)
+      })
+    //   http.get('/api/method/iot_ui.iot_api.gate_devs_list?sn=' + sn ).then(res=>{
+    //     let data = [];
+    //     data = res.message;
+    //     data.map((item)=>{
+    //         item.ioc = '' + (item.inputs ? item.inputs : '0') + '/' + (item.outputs ? item.outputs : '0') + '/' + (item.commands ? item.commands : '0');
+    //         if (item.outputs > 0){
+    //           item.Gate_Sn = this.props.match.params.sn;
+    //           item.set_data = true
+    //         }
+    //     })
+    //     this.setState({
+    //         data,
+    //         loading: false
+    //     })
+    // })
     }
     render () {
         let { data, loading } = this.state;

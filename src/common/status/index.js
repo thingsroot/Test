@@ -13,7 +13,7 @@ class Status extends Component {
             <div className="statusWrap">
                 <div>
                     <div className="status"></div>
-                    &nbsp; <span className={status.status === 'ONLINE' ? 'online' : 'offline'}>{status.status}</span>
+                    &nbsp; <span className={status.device_status === 'ONLINE' ? 'online' : 'offline'}>{status.device_status}</span>
                 </div>
                 <div>
                     <div className="positon"><span></span></div>
@@ -21,7 +21,7 @@ class Status extends Component {
                 </div>
                 <div>
                     <div className="positon"><span></span></div>
-                    &nbsp;描述: {status.desc}
+                    &nbsp;描述: {status.description}
                 </div>
                 <div>
                     <div className="positon"><span></span></div>
