@@ -10,6 +10,12 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
                 visible, onCancel, onCreate, form
             } = this.props;
             const { getFieldDecorator } = form;
+            const isChecked = (rule, value, callback) => {
+                if (value !== true) {
+                    callback('请您同意使用条款！')
+                }
+                callback();
+            };
             return (
                 <Modal
                     visible={visible}
@@ -30,7 +36,7 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
                             )}
                         </Form.Item>
                         <Form.Item label="上传文件">
-                            {getFieldDecorator('upFile', {
+                            {getFieldDecorator('app_file', {
                                 rules: [{ required: true, message: '请上传文件！' }]
                             })(
                                 <Upload>
@@ -49,9 +55,9 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
                         </Form.Item>
                         <Form.Item>
                             {getFieldDecorator('agreement', {
-                                rules: [{ required: true, message: '请同意使用条款！' }]
+                                rules: [{ validator: isChecked}]
                             })(
-                                <Checkbox>我同意使用条款</Checkbox>
+                                <Checkbox defaultChecked={false}>我同意使用条款</Checkbox>
                             )}
                         </Form.Item>
                     </Form>

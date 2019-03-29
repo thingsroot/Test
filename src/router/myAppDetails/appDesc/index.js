@@ -8,9 +8,9 @@ class AppDesc extends PureComponent {
     };
     componentDidMount (){
         const {name} = this.props;
-        http.postToken('/api/method/app_center.api.app_detail?app=' + name).then(res=>{
+        http.get('/api/applications_desc?name=' + name).then(res=>{
             this.setState({
-                editorContent: res.message.description
+                editorContent: res
             });
             let rendererMD = new marked.Renderer();
             marked.setOptions({

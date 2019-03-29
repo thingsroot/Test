@@ -21,7 +21,7 @@ class AppSettings extends PureComponent {
 
     }
     componentWillUnmount (){
-        clearInterval(window.set)
+
     }
     getFields () {
         let list = [{
@@ -116,13 +116,7 @@ class AppSettings extends PureComponent {
             console.log('Received values of form: ', values);
         });
     };
-    handleReset = () => {
-        this.props.form.resetFields();
-    };
-    toggle = () => {
-        const { expand } = this.state;
-        this.setState({ expand: !expand });
-    };
+
     render () {
         return (
             <div>

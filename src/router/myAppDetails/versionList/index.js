@@ -14,17 +14,32 @@ class VersionList extends PureComponent {
     state = {
         versionList: [],
         visible: false,
-        user: ''
+        maxVersion: 0,
+        user: '',
+        name: ''
     };
     componentDidMount (){
         let {name, user} = this.props;
         this.setState({
-            user: user
+            user: user,
+            name: name
         });
-        http.postToken('/api/method/app_center.api.get_versions?app=' + name + '&beta=1').then(res=>{
-            console.log(res);
+        http.get('/api/applications_versions_list?app=' + name).then(res=>{
+            let arr = res.data;
+            let versions = [];
+            arr && arr.length > 0 && arr.map((v, key)=>{
+                key;
+                console.log(v.version);
+                versions.push(v.version)
+            });
+            console.log(versions);
+            // versions.soft( (a, b)=>{
+            //     return b - a
+            // });
+            console.log(versions);
             this.setState({
-                versionList: res.message
+                versionList: arr,
+                maxVersion: versions[0]
             })
         })
     }
@@ -43,6 +58,16 @@ class VersionList extends PureComponent {
                 return;
             }
             console.log('Received values of form: ', values);
+            let data = {
+                app: this.state.name,
+                version: values.version,
+                comment: values.comment,
+                app_file: values.app_file.file
+            };
+            console.log(data)
+            http.postToken('/api/applications_versions_create', data).then(res=>{
+                console.log(res)
+            });
             form.resetFields();
             console.log(form);
             this.setState({ visible: false });
@@ -73,14 +98,13 @@ class VersionList extends PureComponent {
                 <ul>
                     {
                         data && data.length > 0 && data.map((v, key)=>{
-                                console.log(data);
                                 return <li key={key}>
                                     <div><p>版本号：<span className="fontColor">{v.version}</span>
                                         {
                                             v.meta === 0 ? <span>(正式版)</span> : <span>(测试版)</span>
                                         }
                                     </p></div>
-                                    <div><p>更新时间：<span className="fontColor">{v.creation.substr(0, 19)}</span></p>
+                                    <div><p>更新时间：<span className="fontColor">{v.modified.substr(0, 19)}</span></p>
                                         {
                                             v.meta === 0 ? '' : <a style={this.state.user ? block : none}>发布为正式版本</a>
                                         }
@@ -91,7 +115,7 @@ class VersionList extends PureComponent {
 
                     }
                 </ul>
-                <p style={data.length > 0 ? none : block}>请先上传版本！</p>
+                <p className="empty" style={data.length > 0 ? none : block}>请先上传版本！</p>
             </div>
         );
     }
