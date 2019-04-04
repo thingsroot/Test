@@ -3,6 +3,13 @@ import http from '../../../utils/Server';
 import { Button, message } from 'antd';
 import { Link } from 'react-router-dom';
 
+const block = {
+    display: 'block'
+};
+const none = {
+    display: 'none'
+};
+
 class TemplateList extends PureComponent {
     constructor () {
         super();
@@ -15,9 +22,9 @@ class TemplateList extends PureComponent {
     componentDidMount () {
         let {name} = this.props;
         console.log(name);
-        http.get('/api/method/conf_center.api.list_app_conf?app=' + name + '&start=0&limit=100')
+        http.get('/api/store_configurations_list?app=' + name)
             .then(res=>{
-                console.log(res.message);
+                console.log(res);
                 this.setState({
                     templateList: res.message
                 })
@@ -39,8 +46,6 @@ class TemplateList extends PureComponent {
                 message.success('已复制好，可贴粘');
             })
     };
-    tempLateDetails = ()=>{
-    };
     render () {
         const {templateList, templateContent} = this.state;
         return (
@@ -48,8 +53,8 @@ class TemplateList extends PureComponent {
                 <ul>
                     {
                         templateList && templateList.length > 0 && templateList.map((v, key)=>{
-                            console.log(v);
-                            console.log(key);
+                            // console.log(v);
+                            // console.log(key);
                             return <li key={key}>
                                 <div>
                                     <p>模板名称：<span className="fontColor">{v.conf_name}</span>
@@ -83,9 +88,9 @@ class TemplateList extends PureComponent {
                                 </div>
                             </li>
                         })
-
                     }
                 </ul>
+                <p className="empty" style={templateList.length > 0 ? none : block}>请先上传版本！</p>
             </div>
         );
     }

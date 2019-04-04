@@ -12,24 +12,28 @@ class UserSettings extends PureComponent {
         visible: false
     };
     componentDidMount () {
-        let usr = _getCookie('usr');
         let isAdmin = _getCookie('isAdmin');
+        let user = _getCookie('user_id');
         this.setState({
             isAdmin: isAdmin
         });
-        http.get('/api/method/iot_ui.iot_api.user_company?' + Date.parse(new Date()))
-            .then(res=>{
-                this.setState({
-                    company: res.message.company
-                })
-            });
-        http.get('/api/method/iot_ui.iot_api.userinfo_all?user=' + usr)
-            .then(res=>{
-                console.log(res);
-                this.setState({
-                    info: res.message
-                })
-            })
+        // http.get('/api/method/iot_ui.iot_api.user_company?' + Date.parse(new Date()))
+        //     .then(res=>{
+        //         this.setState({
+        //             company: res.message.company
+        //         })
+        //     });
+        // http.get('/api/method/iot_ui.iot_api.userinfo_all?user=' + usr)
+        //     .then(res=>{
+        //         console.log(res);
+
+        //     })
+        http.get('/api/user_read?name=' + user).then(res=>{
+            console.log(res)
+            // this.setState({
+            //     info: res.data
+            // })
+        })
     }
     showModal = () => {
         this.setState({ visible: true });

@@ -28,19 +28,20 @@ class MyAppDetails extends PureComponent {
         }
     }
     componentDidMount (){
-        let usr = _getCookie('usr');
+        let usr = _getCookie('user_id');
         this.setState({
             user: usr
+        }, ()=>{
+            console.log(this.state.user)
         });
         let app = this.props.match.params.name;
         this.getDetails(app);
     }
     getDetails = (app)=>{
-        http.postToken('/api/method/app_center.api.app_detail?app=' + app).then(res=>{
-            console.log(res.message);
+        http.get('/api/applications_read?name=' + app).then(res=>{
             this.setState({
-                message: res.message,
-                time: res.message.creation.substr(0, 11)
+                message: res.data,
+                time: res.data.modified.substr(0, 11)
             })
         })
     };
@@ -49,9 +50,7 @@ class MyAppDetails extends PureComponent {
     };
     render () {
         const { url } = this.props.match;
-        let message = this.state.message;
-        let time = this.state.time;
-        let user = this.state.user;
+        let { message, time, user } = this.state;
         return (
             <div className="myAppDetails">
                 <div className="header">
@@ -74,7 +73,6 @@ class MyAppDetails extends PureComponent {
                             <span>通讯协议：{message.protocol}</span><br/>
                             <span>适配型号：{message.device_serial}</span>
                             <span>设备厂商：{message.device_supplier}</span>
-
                         </p>
                     </div>
                     <div className="btnGroup">

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Input } from 'antd';
 import { Link } from 'react-router-dom';
-import { _getCookie } from '../../utils/Session';
+// import { _getCookie } from '../../utils/Session';
 import './style.scss';
 import http from '../../utils/Server';
 
@@ -16,17 +16,28 @@ class MyApps extends PureComponent {
 
     componentDidMount (){
         //获取用户信息
-        let usr = _getCookie('usr');
+        // let usr = _getCookie('usr');
         //获取列表
-        http.postToken('/api/method/iot_ui.iot_api.appstore_applist?user=' + usr).then(res=>{
+        // http.postToken('/api/method/iot_ui.iot_api.appstore_applist?user=' + usr).then(res=>{
+        //     console.log(res);
+        //     if (res.message) {
+        //         this.setState({
+        //             appList: res.message,
+        //             backups: res.message
+        //         })
+        //     }
+        // });
+        http.get('/api/applications_list').then(res=>{
             console.log(res);
-            if (res.message) {
+            if (res) {
                 this.setState({
-                    appList: res.message,
-                    backups: res.message
+                    appList: res.data,
+                    backups: res.data
+                }, ()=>{
+                    console.log(this.state.appList)
                 })
             }
-        });
+        })
     }
     tick = (text)=>{
         if (this.timer){
@@ -87,7 +98,7 @@ class MyApps extends PureComponent {
                                 <div className="appInfo">
                                     <p className="appName">{v.app_name}</p>
                                     <p className="info">
-                                        <span>生产日期：{v.creation.substr(0, 11)}</span>
+                                        <span>生产日期：{v.modified.substr(0, 11)}</span>
                                         <span>应用分类：{v.category}</span><br/>
                                         <span>通讯协议：{v.protocol}</span>
                                         <span>设备厂商：{v.device_supplier}</span>
