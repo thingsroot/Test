@@ -90,7 +90,7 @@ class TemplateList extends PureComponent {
                         })
                     }
                 </ul>
-                <p style={templateList.length > 0 ? none : block}>请先上传版本！</p>
+                <p className="empty" style={templateList.length > 0 ? none : block}>请先上传版本！</p>
             </div>
         );
     }

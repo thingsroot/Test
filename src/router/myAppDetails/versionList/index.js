@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import http from '../../../utils/Server';
 import CollectionCreateForm from '../upData';
 
@@ -9,13 +9,19 @@ const block = {
 const none = {
     display: 'none'
 };
+function arrSort (arr) {
+    arr.sort(function (a, b) {
+        return b - a;
+    });
+    return arr;
+}
 
 class VersionList extends PureComponent {
     state = {
         versionList: [],
         visible: false,
-        maxVersion: 0,
         user: '',
+        maxVersion: 0,
         name: ''
     };
     componentDidMount (){
@@ -32,14 +38,10 @@ class VersionList extends PureComponent {
                 console.log(v.version);
                 versions.push(v.version)
             });
-            console.log(versions);
-            // versions.soft( (a, b)=>{
-            //     return b - a
-            // });
-            console.log(versions);
+            arrSort(versions);
             this.setState({
                 versionList: arr,
-                maxVersion: versions[0]
+                maxVersion: versions[0] + 1
             })
         })
     }
@@ -53,6 +55,7 @@ class VersionList extends PureComponent {
 
     handleCreate = () => {
         const form = this.formRef.props.form;
+        console.log(form);
         form.validateFields((err, values) => {
             if (err) {
                 return;
@@ -64,12 +67,17 @@ class VersionList extends PureComponent {
                 comment: values.comment,
                 app_file: values.app_file.file
             };
-            console.log(data)
+            console.log(data);
             http.postToken('/api/applications_versions_create', data).then(res=>{
-                console.log(res)
+                if (res.ok === false) {
+                    message.error('新版本上传失败！');
+                } else {
+                    message.success('新版本上传成功！');
+                    console.log(res)
+                }
+
             });
             form.resetFields();
-            console.log(form);
             this.setState({ visible: false });
         });
     };
@@ -93,6 +101,7 @@ class VersionList extends PureComponent {
                         visible={this.state.visible}
                         onCancel={this.handleCancel}
                         onCreate={this.handleCreate}
+                        maxVersion={this.state.maxVersion}
                     />
                 </div>
                 <ul>

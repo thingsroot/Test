@@ -77,6 +77,7 @@ class Home extends PureComponent {
     };
 
     componentDidMount () {
+        // http.get()
         //饼状图数据
         http.get('api/method/iot_ui.iot_api.device_type_statistics').then(res=>{
             this.setState({
