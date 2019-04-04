@@ -174,40 +174,46 @@ class MyGatesAppsInstall extends Component {
         dataSourceCode: []
     };
     componentDidMount (){
-        http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-            this.props.store.appStore.setStatus(res.message)
-          });
-        http.get('/api/method/app_center.api.app_suppliers').then(res=>{
+        // http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
+        //     this.props.store.appStore.setStatus(res.message)
+        //   });
+        // http.get('/api/method/app_center.api.app_suppliers').then(res=>{
+        //     this.setState({
+        //         vendor: res.message
+        //     })
+        // });
+        // http.get('/api/method/app_center.api.app_protocols').then(res=>{
+        //     this.setState({
+        //         agreement: res.message
+        //     })
+        // });
+        // http.get('/api/method/app_center.api.app_categories').then(res=>{
+        //     this.setState({
+        //         type: res.message
+        //     })
+        // });
+        // http.get('/api/method/iot_ui.iot_api.appslist_bypage?count=100&page=1').then(res=>{
+        //     res.message.result.length > 0 && this.setState({
+        //         data: res.message.result,
+        //         filterdata: res.message.result
+        //     })
+        // });
+        // http.get('/api/method/conf_center.api.list_app_conf_pri?app=APP00000040&limit=100')
+        //     .then(res=>{
+        //         let data = res.message;
+        //         data && data.length > 0 && data.map((v)=>{
+        //             v['disabled'] = false;
+        //         });
+        //         this.setState({
+        //             addTempList: data
+        //         })
+        //     });
+        http.get('/api/store_list').then(res=>{
+            console.log(res)
             this.setState({
-                vendor: res.message
+                data: res.data
             })
-        });
-        http.get('/api/method/app_center.api.app_protocols').then(res=>{
-            this.setState({
-                agreement: res.message
-            })
-        });
-        http.get('/api/method/app_center.api.app_categories').then(res=>{
-            this.setState({
-                type: res.message
-            })
-        });
-        http.get('/api/method/iot_ui.iot_api.appslist_bypage?count=100&page=1').then(res=>{
-            res.message.result.length > 0 && this.setState({
-                data: res.message.result,
-                filterdata: res.message.result
-            })
-        });
-        http.get('/api/method/conf_center.api.list_app_conf_pri?app=APP00000040&limit=100')
-            .then(res=>{
-                let data = res.message;
-                data && data.length > 0 && data.map((v)=>{
-                    v['disabled'] = false;
-                });
-                this.setState({
-                    addTempList: data
-                })
-            });
+        })
         marked.setOptions({
             renderer: new marked.Renderer(),
             gfm: true,
@@ -538,6 +544,7 @@ class MyGatesAppsInstall extends Component {
                             <div style={{display: 'flex' }}>
                                 <img src={'http://cloud.thingsroot.com' + item.icon_image}
                                     alt=""
+                                    style={{width: 128, height: 128}}
                                 />
                                 <div style={{display: 'flex', paddingTop: 20, paddingLeft: 20}}>
                                     <div style={{width: 500}}

@@ -43,21 +43,29 @@ class MyGatesDevices extends Component {
   sendAjax = (sn) => {
     http.get('/api/gateways_read?name=' + sn).then(res=>{
       this.props.store.appStore.setStatus(res)
-      // if (Object.keys(res).indexOf('ioe_frpc') !== -1){
-      //   this.setState({VPNflag: true})
-      // } else {
-      //   this.setState({VPNflag: false})
-      // }
     })
     http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
+      console.log(res)
+      console.log()
+      if (Object.values(res.message).filter(item=> item.device_name === 'ioe_frpc').length > 0){
+        this.setState({VPNflag: true})
+      } else {
+        this.setState({VPNflag: false})
+      }
       this.props.store.appStore.setApplen(Object.keys(res).length);
     })
     http.get('/api/gateways_dev_len?gateway=' + sn).then(res=>{
       this.props.store.appStore.setDevlen(res.length);
     })
-    http.get('/api/gateways_sn').then(res=>{
-      console.log(res)
-    })
+    http.get('/api/gateways_list').then(res=>{
+      const online = [];
+      res.message && res.message.length > 0 && res.message.map((v)=>{
+          if (v.data.device_status === 'ONLINE'){
+              online.push(v.data)
+          }
+      })
+      this.props.store.appStore.setGatelist(online)
+  })
   }
   showDrawer = () => {
     this.setState({
@@ -71,7 +79,7 @@ class MyGatesDevices extends Component {
   }
   setUrl = (sn) => {
     let arr = location.pathname.split('/');
-    arr[2] = sn
+    arr[2] = sn;
     return arr.join('/')
   }
     render () {
@@ -110,14 +118,14 @@ class MyGatesDevices extends Component {
                         return (
                         <Link key={i}
                             to={
-                          this.setUrl(v.device_sn)
+                          this.setUrl(v.sn)
                         }
                         >
                             <li onClick={this.onClose}
-                                className={status.sn === v.device_sn ? 'gateslist gateslistactive' : 'gateslist'}
+                                className={status.sn === v.sn ? 'gateslist gateslistactive' : 'gateslist'}
                             >
                               <span></span>
-                              <p>{v.device_name}</p>
+                              <p>{v.dev_name}</p>
                             </li>
                         </Link>
                         )

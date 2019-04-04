@@ -7,29 +7,29 @@ import Collapses from './Collapses';
 import PropTypes from 'prop-types';
 const columns = [{
     title: '名称',
-    dataIndex: 'inst',
-    key: 'inst',
+    dataIndex: 'meta.inst',
+    key: 'meta.inst',
     sorter: true
   }, {
     title: '描述',
-    dataIndex: 'description',
-    key: 'description',
+    dataIndex: 'meta.description',
+    key: 'meta.description',
     sorter: true
   }, {
     title: 'I/O/C',
-    dataIndex: 'ioc',
-    key: 'ioc',
+    dataIndex: 'meta.ioc',
+    key: 'meta.ioc',
     sorter: true
   }, {
     title: '设备SN',
-    key: 'sn',
-    dataIndex: 'sn',
+    key: 'meta.sn',
+    dataIndex: 'meta.sn',
     width: '30%',
     sorter: true
   }, {
     title: '所属实例',
-    key: 'app_inst',
-    dataIndex: 'app_inst',
+    key: 'meta.app_inst',
+    dataIndex: 'meta.app_inst',
     sorter: true
     }
   //   , {
@@ -88,7 +88,7 @@ class GatesList extends Component {
               item.meta.Gate_Sn = this.props.match.params.sn;
               item.meta.set_data = true
             }
-            data.push(item.meta);
+            data.push(item);
           }))
         }
         console.log(data)
@@ -124,7 +124,7 @@ class GatesList extends Component {
                               data
                           }
                           loading={loading}
-                          rowKey="sn"
+                          rowKey="meta.sn"
                           expandedRowRender={Collapses}
                           expandRowByClick
                       />

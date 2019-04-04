@@ -47,7 +47,7 @@ class AppsList extends Component {
           url: window.location.pathname,
           columns: [{
             title: '',
-            dataIndex: 'cloud.icon_image',
+            dataIndex: 'data.data.icon_image',
             key: 'img',
             width: '100px',
             render: (record)=>{
@@ -59,27 +59,32 @@ class AppsList extends Component {
             }
           }, {
             title: '实例名',
-            dataIndex: 'info.inst',
+            dataIndex: 'device_name',
             sorter: true,
             //render: name => `${name} ${name}`,
             width: '20%'
           }, {
             title: '版本',
-            dataIndex: 'info.version',
-            key: 'info.version'
+            dataIndex: 'version',
+            key: 'version'
           }, {
             title: '设备数',
             dataIndex: 'info.devs_len',
             key: 'info.devs_len'
           }, {
             title: '状态',
-            dataIndex: 'email'
+            dataIndex: 'status',
+            render: record=>{
+              return (
+                <span style={{background: '#00a65a', display: 'inline-block', padding: '1px 5px', borderRadius: '2px', color: '#fff'}}>{record}</span>
+              )
+            }
           }, {
             title: '启动时间',
-            dataIndex: 'info.running'
+            dataIndex: 'running'
           }, {
             title: '开机自启',
-            dataIndex: 'info.auto',
+            dataIndex: 'conf.auto_start',
             render: (props, record, )=>{
                 return (
                 <Switch checkedChildren="ON"
@@ -152,10 +157,23 @@ class AppsList extends Component {
         });
       }
       fetch = (sn) => {
-        let data = [];
+        const pagination = { ...this.state.pagination };
         http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
-          data = Object.values(res)
-          console.log(data)
+          // const keys = Object.keys(res)
+          // const values = Object.values(res)
+          // values.map((item, key)=>{
+          //   if (item.running){
+          //       item.status = 'running';
+          //       item.running = new Date(parseInt(item.running) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ')
+          //   }
+          //   item.device_name = keys[key]
+          // })
+          console.log(res)
+          this.setState({
+            data: res.message,
+            loading: false,
+            pagination
+          })
           //this.props.store.appStore.setStatus(res.message)
         })
         // http.get('/api/method/iot_ui.iot_api.gate_applist?sn=' + sn).then((res) => {
@@ -174,15 +192,10 @@ class AppsList extends Component {
         //       }
         //       item.sn = item.info.sn;
         //   })
-          const pagination = { ...this.state.pagination };
+          
           // Read total count from server
           // pagination.total = data.totalCount;
           // pagination.total = 200;
-          this.setState({
-            loading: false,
-            data: data,
-            pagination
-          });
         //});
       }
     render () {

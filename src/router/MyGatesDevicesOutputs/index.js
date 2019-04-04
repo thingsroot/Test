@@ -51,27 +51,27 @@ class MyGatesDevicesOutputs extends PureComponent {
     }
     componentDidMount (){
         console.log(this.props)
-        if (location.pathname.indexOf('undefined') !== -1){
-            this.props.history.push('/')
-        }
-        http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-            this.props.store.appStore.setStatus(res.message)
-          })
-        http.get(`/api/method/iot_ui.iot_api.gate_device_cfg?sn=${this.props.match.params.sn}&vsn=${this.props.vsn}&_=${new Date() * 1}`).then(res=>{
-            console.log(res);
-            let data = res.message.outputs;
-            data.map((item)=>{
-                if (!item.vt){
-                    item.vt = 'float'
-                }
-            })
-            this.setState({data})
-        })
+        // if (location.pathname.indexOf('undefined') !== -1){
+        //     this.props.history.push('/')
+        // }
+        // http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
+        //     this.props.store.appStore.setStatus(res.message)
+        //   })
+        // http.get(`/api/method/iot_ui.iot_api.gate_device_cfg?sn=${this.props.match.params.sn}&vsn=${this.props.vsn}&_=${new Date() * 1}`).then(res=>{
+        //     console.log(res);
+        //     let data = res.message.outputs;
+        //     data.map((item)=>{
+        //         if (!item.vt){
+        //             item.vt = 'float'
+        //         }
+        //     })
+        //     this.setState({data})
+        // })
     }
     showModal = (record) => {
-        this.setState({record})
         this.setState({
-          visible: true
+            record,
+            visible: true
         });
       }
       inputChange = () => {
@@ -80,23 +80,28 @@ class MyGatesDevicesOutputs extends PureComponent {
       }
       handleOk = () => {
           console.log(this.props.match.params)
-          const { sn, vsn} = this.props.match.params;
+          const { sn } = this.props.match.params;
+          const { vsn } = this.props;
           const { record, value } = this.state;
-          const id = `send_output/${sn}/ ${vsn}/ ${this.state.record.name}/${this.state.value}/${new Date * 1}`
+          const id = `send_output/${sn}/ ${vsn}/ ${this.state.record.name}/${this.state.value}/${new Date() * 1}`
           console.log(this.state.value)
-        http.postToken('/api/method/iot.device_api.send_output', {
-            data: {
-                device: sn,
-                output: record.name,
-                props: 'value',
-                value: value
-            },
-            device: sn,
+        http.postToken('/api/gateways_dev_outputs', {
+            // data: {
+            //     device: sn,
+            //     output: record.name,
+            //     props: 'value',
+            //     value: value
+            // },
+            gateway: sn,
+            name: vsn,
+            output: record.name,
+            prop: 'value',
+            value: value,
             id: id
         }).then(res=>{
             if (res.message === id){
                 setTimeout(() => {
-                    http.get(`/api/method/iot.device_api.get_action_result?id=${encodeURIComponent(res.message)}`).then(res=>{
+                    http.get(`/api/gateways.exec_result?id=${encodeURIComponent(res.message)}`).then(res=>{
                         console.log(res)
                         if (res.message.result === true){
                             message.success('发送成功')
@@ -115,14 +120,14 @@ class MyGatesDevicesOutputs extends PureComponent {
         });
       }
     render () {
-        const { data } = this.state;
+        // const { data } = this.state;
         return (
             <div>
                 {/* <GatesStatus /> */}
                 <Table
                     bordered
                     columns={this.state.columns}
-                    dataSource={data.length > 0 ? data : []}
+                    dataSource={this.props.outputs ? this.props.outputs : []}
                 />
                 <Modal
                     title="数据下置"
@@ -133,7 +138,7 @@ class MyGatesDevicesOutputs extends PureComponent {
                     <p className="flex">点名：
                         <Input
                             disabled
-                            defaultValue={this.state.record.name}
+                            value={this.state.record.name}
                         />
                     </p>
                     <p className="flex">数值：

@@ -217,7 +217,7 @@ class LinkStatus extends Component {
                             <Card title="| 基本信息"
                                 bordered={false}
                                 style={{ width: '100%' }}
-                                loading={loading}
+                                // loading={loading}
                             >
                             <p><b>序列号：</b>{status.sn}</p>
                             <p><b>位置：</b> -- </p>
@@ -228,7 +228,7 @@ class LinkStatus extends Component {
                             <Card title="| 配置信息"
                                 bordered={false}
                                 style={{ width: '100%' }}
-                                loading={loading}
+                                // loading={loading}
                             >
                             <p><b>CPU:</b>{config.cpu}</p>
                             <p><b>内存:</b>{config.ram}</p>

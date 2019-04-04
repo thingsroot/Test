@@ -21,8 +21,20 @@ class Nav extends Component {
         }
     }
       sendAjax = () => {
-        http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-          this.props.store.appStore.setStatus(res.message)
+        // http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
+        //   this.props.store.appStore.setStatus(res.message)
+        // })
+        http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
+          this.props.store.appStore.setStatus(res)
+        })
+        http.get('/api/gateways_list').then(res=>{
+          const online = [];
+          res.message && res.message.length > 0 && res.message.map((v)=>{
+              if (v.data.device_status === 'ONLINE'){
+                  online.push(v.data)
+              }
+          })
+          this.props.store.appStore.setGatelist(online)
         })
         http.get('/api/method/iot_ui.iot_api.devices_list?filter=online').then(res=>{
           this.props.store.appStore.setGatelist(res.message);
@@ -35,6 +47,7 @@ class Nav extends Component {
       }
     render () {
         const { gateList } = this.props.store.appStore;
+        console.log(gateList)
         return (
             <div className="Nav">
                 <ul>
@@ -44,14 +57,14 @@ class Nav extends Component {
                         return (
                         <Link key={i}
                             to={
-                          this.setUrl(v.device_sn)
+                          this.setUrl(v.sn)
                         }
                         >
                             <li onClick={this.onClose}
-                                className={this.props.match.params.sn === v.device_sn ? 'gateslist gateslistactive' : 'gateslist'}
+                                className={this.props.match.params.sn === v.sn ? 'gateslist gateslistactive' : 'gateslist'}
                             >
                               <span></span>
-                              <p>{v.device_name}</p>
+                              <p>{v.dev_name}</p>
                             </li>
                         </Link>
                         )

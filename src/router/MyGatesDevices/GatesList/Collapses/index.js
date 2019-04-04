@@ -21,14 +21,20 @@ class Collapses extends Component {
                         header="数据浏览"
                         key="1"
                     >
-                        <ExpandedRowRender sn={this.props.sn}/>
+                        <ExpandedRowRender
+                            inputs={this.props.inputs}
+                            vsn={this.props.meta.sn}
+                        />
                     </Panel>
                     <Panel
-                        disabled={this.props.outputs > 0 ? false : true}
+                        disabled={this.props.outputs ? false : true}
                         header="数据下置"
                         key="2"
                     >
-                        <MyGatesDevicesOutputs vsn={this.props.sn}/>
+                        <MyGatesDevicesOutputs
+                            outputs={this.props.outputs}
+                            vsn={this.props.meta.sn}
+                        />
                     </Panel>
                 </Collapse>
             </div>
@@ -36,4 +42,4 @@ class Collapses extends Component {
     }
 }
 
-export default Collapses;
+export default Collapses;0
