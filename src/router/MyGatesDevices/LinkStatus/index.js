@@ -28,7 +28,9 @@ class LinkStatus extends Component {
     }
     componentDidMount (){
       this.getData(this.state.sn);
-
+    http.get('/api/gateways_read?name=' + this.state.sn).then(res=>{
+        console.log(res);
+    })
       http.get('/api/method/iot_ui.iot_api.device_event_type_statistics').then(res=>{
         this.setState({
             barData: res.message
@@ -199,7 +201,7 @@ class LinkStatus extends Component {
       }
     render () {
         const { status, config, COV_TTL, DATA_UPLOAD_PERIOD } = this.props.store.appStore;
-        const { loading, flag, update, newdata } = this.state;
+        const {  flag, update, newdata } = this.state;
         return (
             <div>
                 <div className={flag && !update ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
@@ -222,7 +224,7 @@ class LinkStatus extends Component {
                             <p><b>序列号：</b>{status.sn}</p>
                             <p><b>位置：</b> -- </p>
                             <p><b>名称：</b>{status.name}</p>
-                            <p><b>描述：</b>{status.desc}</p>
+                            <p><b>描述：</b>{status.description}</p>
                             <p><b>型号：</b>{status.model ? status.model : 'unknown'}</p>
                             </Card>
                             <Card title="| 配置信息"
@@ -277,7 +279,7 @@ class LinkStatus extends Component {
                                     this.setState({flag: true, update: false})
                                 }}
                             >X</Button>}
-                        loading={loading}
+                        // loading={loading}
                         style={{ width: '100%' }}
                     >
                         <div className="list">

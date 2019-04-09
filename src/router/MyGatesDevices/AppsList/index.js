@@ -5,31 +5,39 @@ import { deviceAppOption } from '../../../utils/Session';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 function confirm (record, sn) {
-  console.log(record);
-  const hide = message.loading('Action in progress..', 0);
-  setTimeout(hide, 2500);
+  console.log(record, sn);
   const data = {
-    data: {
-      inst: record.info.inst,
-      name: record.info.name
-    },
-    device: sn,
-    id: `app_upgrade/${sn}/ ${record.info.inst}/${new Date() * 1}`
-  };
-  http.postToken('/api/method/iot.device_api.app_upgrade', data).then(res=>{
-    if (res.message){
-      setTimeout(() => {
-        http.get(`/api/method/iot.device_api.get_action_result?id=${res.message}`).then(data=>{
-          console.log(data)
-          if (data && data.message.result){
-            message.success('应用更新成功！')
-          } else {
-            message.error('应用更新失败，请重试！')
-          }
-        })
-      }, 2000);
-    }
+    gateway: sn,
+    inst: record.name,
+    id: `app_upgrade/${sn}/ ${record.name}/${new Date() * 1}`
+  }
+  http.postToken('/api/applications_remove', data).then(res=>{
+    console.log(res)
   })
+  // const hide = message.loading('Action in progress..', 0);
+  // setTimeout(hide, 2500);
+  // const data = {
+  //   data: {
+  //     inst: record.info.inst,
+  //     name: record.info.name
+  //   },
+  //   device: sn,
+  //   id: `app_upgrade/${sn}/ ${record.info.inst}/${new Date() * 1}`
+  // };
+  // http.postToken('/api/method/iot.device_api.app_upgrade', data).then(res=>{
+  //   if (res.message){
+  //     setTimeout(() => {
+  //       http.get(`/api/method/iot.device_api.get_action_result?id=${res.message}`).then(data=>{
+  //         console.log(data)
+  //         if (data && data.message.result){
+  //           message.success('应用更新成功！')
+  //         } else {
+  //           message.error('应用更新失败，请重试！')
+  //         }
+  //       })
+  //     }, 2000);
+  //   }
+  // })
 }
 
 function cancel (e) {
@@ -111,7 +119,7 @@ class AppsList extends Component {
                       okText="Yes"
                       cancelText="No"
                   >
-                    <Button>应用升级</Button>
+                    <Button>应用卸载</Button>
                   </Popconfirm>
                 </div>
               )
@@ -168,6 +176,7 @@ class AppsList extends Component {
           //   }
           //   item.device_name = keys[key]
           // })
+          this.props.store.appStore.setApplen(res.message.length)
           console.log(res)
           this.setState({
             data: res.message,
@@ -199,6 +208,7 @@ class AppsList extends Component {
         //});
       }
     render () {
+      console.log(this.state.data, 'data')
       const { loading } = this.state;
         return (
             <div>

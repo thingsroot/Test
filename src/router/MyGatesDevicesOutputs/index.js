@@ -50,23 +50,13 @@ class MyGatesDevicesOutputs extends PureComponent {
           }]
     }
     componentDidMount (){
-        console.log(this.props)
-        // if (location.pathname.indexOf('undefined') !== -1){
-        //     this.props.history.push('/')
-        // }
-        // http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-        //     this.props.store.appStore.setStatus(res.message)
-        //   })
-        // http.get(`/api/method/iot_ui.iot_api.gate_device_cfg?sn=${this.props.match.params.sn}&vsn=${this.props.vsn}&_=${new Date() * 1}`).then(res=>{
-        //     console.log(res);
-        //     let data = res.message.outputs;
-        //     data.map((item)=>{
-        //         if (!item.vt){
-        //             item.vt = 'float'
-        //         }
-        //     })
-        //     this.setState({data})
-        // })
+        const data = this.props.outputs;
+        data.map((item)=>{
+            if (!item.vt){
+                item.vt = 'float'
+            }
+        })
+        this.setState({data})
     }
     showModal = (record) => {
         this.setState({
@@ -86,12 +76,6 @@ class MyGatesDevicesOutputs extends PureComponent {
           const id = `send_output/${sn}/ ${vsn}/ ${this.state.record.name}/${this.state.value}/${new Date() * 1}`
           console.log(this.state.value)
         http.postToken('/api/gateways_dev_outputs', {
-            // data: {
-            //     device: sn,
-            //     output: record.name,
-            //     props: 'value',
-            //     value: value
-            // },
             gateway: sn,
             name: vsn,
             output: record.name,
@@ -99,12 +83,14 @@ class MyGatesDevicesOutputs extends PureComponent {
             value: value,
             id: id
         }).then(res=>{
-            if (res.message === id){
+            if (res.data === id){
                 setTimeout(() => {
-                    http.get(`/api/gateways.exec_result?id=${encodeURIComponent(res.message)}`).then(res=>{
+                    http.get(`/api/gateways_exec_result?id=${encodeURIComponent(res.data)}`).then(res=>{
                         console.log(res)
-                        if (res.message.result === true){
+                        if (res.ok === true){
                             message.success('发送成功')
+                        } else {
+                            message.error('发送失败，请重新发送')
                         }
                     })
                 }, 1000);
@@ -120,14 +106,14 @@ class MyGatesDevicesOutputs extends PureComponent {
         });
       }
     render () {
-        // const { data } = this.state;
+        const { data } = this.state;
         return (
             <div>
                 {/* <GatesStatus /> */}
                 <Table
                     bordered
                     columns={this.state.columns}
-                    dataSource={this.props.outputs ? this.props.outputs : []}
+                    dataSource={data ? data : []}
                 />
                 <Modal
                     title="数据下置"
