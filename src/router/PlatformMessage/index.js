@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react';
 import { Table, Input, Select, Button, message } from 'antd'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import './style.scss'
-import http from '../../utils/Server';
+// import http from '../../utils/Server';
+import axios from 'axios';
 import { _getCookie } from '../../utils/Session';
 const InputGroup = Input.Group;
 const Option = Select.Option;
@@ -19,10 +20,10 @@ const columns = [{
     dataIndex: 'title',
     width: '30%',
     render: (text, record) => (
-        <Link to={`/platformDetails/${record.name}`}
+        <span
             style={record.disposed === 0 ? disposed : posed}
         >{text}
-        </Link>
+        </span>
     )
 }, {
     title: '网关序列号',
@@ -52,8 +53,11 @@ const onChange = (pagination, filters, sorter)=>{
 };
 class PlatformMessage extends PureComponent {
     state = {
+        name: '',
+        category: '',
+        start: 0,
         length: 100,
-        time: '2019-02-22 15:52:00',
+        filters: {},
         tableData: [],
         platformData: [],
         dataSource: [],
@@ -67,9 +71,16 @@ class PlatformMessage extends PureComponent {
             category: 'user',
             name: _getCookie('user_id'),
             start: 0,
-            limit: 100
+            limit: 100,
+            filters: {}
         };
-        console.log(params);
+        this.setState({
+            category: params.category,
+            name: params.name,
+            start: params.start,
+            length: params.limit,
+            filters: params.filters
+        });
         this.getMessageList(params);
     }
     rowSelection = {
@@ -93,9 +104,13 @@ class PlatformMessage extends PureComponent {
                 disposed: 1,
                 activities: arr
             };
-            http.postToken('/api/method/iot.user_api.dispose_device_activities', params).then(res=>{
-                console.log(res);
-            });
+            axios({
+                url: '/api/platform_activities_lists',
+                method: 'GET',
+                params: params
+            }).then(res=>{
+                console.log(res.data)
+            })
         }
     };
     //确认消息
@@ -107,12 +122,18 @@ class PlatformMessage extends PureComponent {
         this.setState({
             loading: true
         });
-        http.get('/api/platform_activities_list', params).then(res=>{
-                console.log(res);
+        axios({
+            url: '/api/platform_activities_lists',
+            method: 'GET',
+            params: params
+        }).then(res=>{
+            if (res.data.ok === true) {
+                let sourceData = res.data.data.list.data;
+                console.log(sourceData);
                 let data = [];
                 let source = [];
-                if (res.message.list) {
-                    res.message.list.map((v)=>{
+                if (sourceData) {
+                    sourceData.map((v)=>{
                         let obj = JSON.parse(v.message);
                         let sub = '';
                         //设备状态
@@ -124,7 +145,6 @@ class PlatformMessage extends PureComponent {
                             }
                             //设备操作
                         } else if (obj && obj.hasOwnProperty('action')){
-                            console.log(1)
                             if (obj.channel === 'app') {
                                 if (obj.action === 'option') {   //开机自启动
                                     if (obj.data.value === 1) {
@@ -241,26 +261,20 @@ class PlatformMessage extends PureComponent {
                     tableData: data,
                     loading: false
                 })
-            })
-            // .catch(err=>{
-            //     err;
-            //     message.error('获取列表失败！');
-            // this.setState({
-            //     platformData: [],
-            //     tableData: [],
-            //     loading: false
-            // })
-            // })
+            } else {
+                message.error('获取消息列表失败！')
+            }
+        });
     };
     //时间戳转换
     timestampToTime = (timestamp)=>{
-        var date = new Date(timestamp);
-        var Y = date.getFullYear() + '-';
-        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
-        var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
-        var h = date.getHours() + ':';
-        var m = (date.getMinutes() < 10 ? '0' + (date.getMinutes()) : date.getMinutes()) + ':';
-        var s = '00';
+        let date = new Date(timestamp);
+        let Y = date.getFullYear() + '-';
+        let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+        let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
+        let h = (date.getHours() < 10 ? '0' + (date.getHours()) : date.getHours()) + ':';
+        let m = (date.getMinutes() < 10 ? '0' + (date.getMinutes()) : date.getMinutes()) + ':';
+        let s = '00';
         return Y + M + D + h + m + s;
     };
     //搜索框改变值
@@ -282,6 +296,7 @@ class PlatformMessage extends PureComponent {
         }, 1000);
     };
     search = (inpVal)=>{
+        console.log(inpVal)
         let text = event.target.value;
         this.tick(text);
         let newData = [];
@@ -299,16 +314,22 @@ class PlatformMessage extends PureComponent {
     //最大记录数
     messageTotal = (value)=>{
         let num = `${value}`;
-        let time = this.state.time;
+        let params = {
+            category: this.state.category,
+            name: this.state.name,
+            start: this.state.start,
+            limit: num,
+            filters: this.state.filters
+        };
         this.setState({
-            length: num
+            length: params.limit
         });
-        this.getMessageList(num, time);
+        this.getMessageList(params);
     };
     //筛选消息类型
     messageChange = (value)=>{
-        let data = [];
         if (`${value}`) {
+            let data = [];
             this.state.tableData.map((v)=>{
                 if (v.operation === `${value}`) {
                     data.push(v);
@@ -317,13 +338,34 @@ class PlatformMessage extends PureComponent {
             this.setState({
                 platformData: data
             })
+        } else {
+            let data = this.state.tableData;
+            this.setState({
+                platformData: data
+            })
         }
     };
     //时间
     messageTime = (value)=>{
-        console.log(value)
-        // let hours = Date.parse(new Date()) - `${value}` * 60 * 60 * 1000;
-        // let time = this.timestampToTime(hours);
+        console.log(value);
+        let hours = Date.parse(new Date()) - `${value}` * 60 * 60 * 1000;
+        let time = this.timestampToTime(hours);
+        let params = {
+            category: this.state.category,
+            name: this.state.name,
+            start: this.state.start,
+            limit: this.state.length,
+            filters: {
+                'creation': [
+                    '>',
+                    time
+                ]
+            }
+        };
+        this.setState({
+            filters: params.filters
+        });
+        this.getMessageList(params);
     };
     render () {
         let selectValue = this.state.selectValue;

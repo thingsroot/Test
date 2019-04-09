@@ -60,7 +60,6 @@ class VersionList extends PureComponent {
             if (err) {
                 return;
             }
-            console.log('Received values of form: ', values);
             let data = {
                 app: this.state.name,
                 version: values.version,
@@ -68,17 +67,18 @@ class VersionList extends PureComponent {
                 app_file: values.app_file.file
             };
             console.log(data);
-            http.postToken('/api/applications_versions_create', data).then(res=>{
+            http.post('/api/applications_versions_create', data).then(res=>{
                 if (res.ok === false) {
                     message.error('新版本上传失败！');
                 } else {
                     message.success('新版本上传成功！');
-                    console.log(res)
+                    console.log(res);
+                    this.setState({ visible: false });
                 }
 
             });
             form.resetFields();
-            this.setState({ visible: false });
+
         });
     };
 
