@@ -3,6 +3,8 @@ import { Table, Input, Select, Button, message } from 'antd'
 import { Link } from 'react-router-dom'
 import './style.scss'
 import http from '../../utils/Server';
+import {_getCookie} from '../../utils/Session';
+import axios from 'axios/index';
 const InputGroup = Input.Group;
 const Option = Select.Option;
 const disposed = {
@@ -62,8 +64,11 @@ const onChange = (pagination, filters, sorter)=>{
 
 class DevicemMessage extends PureComponent {
     state = {
+        category: '',
+        user: '',
+        start: 0,
         length: 100,
-        time: '2019-02-22 15:52:00',
+        filters: {},
         tableData: [],
         platformData: [],
         dataSource: [],
@@ -73,7 +78,21 @@ class DevicemMessage extends PureComponent {
         selectRow: []
     };
     componentDidMount (){
-        this.getMessageList(this.state.length, this.state.time);
+        let params = {
+            category: 'user',
+            name: _getCookie('user_id'),
+            start: 0,
+            limit: 100,
+            filters: {}
+        };
+        this.setState({
+            category: params.category,
+            name: params.name,
+            start: params.start,
+            length: params.limit,
+            filters: params.filters
+        });
+        this.getMessageList(params)
     }
     rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
@@ -106,20 +125,20 @@ class DevicemMessage extends PureComponent {
         message.warning('请您先选择要确认的消息！');
     };
     //获取消息列表
-    getMessageList = (num, time)=>{
+    getMessageList = (params)=>{
         this.setState({
             loading: true
         });
-        console.log(time);
-        http.postToken('/api/method/iot.user_api.device_event?limit=' + num).then(res=>{
-            console.log(res.message)
-            this.setState({
-                loading: true
-            });
+        axios({
+            url: '/api/device_events_list',
+            method: 'GET',
+            params: params
+        }).then(res=>{
+            let sourceData = res.data.data.list.data;
             let data = [];
             let source = [];
-            if (res.message) {
-                res.message.map((v)=>{
+            if (res.data.ok === true) {
+                sourceData.map((v)=>{
                     data.push({
                         title: v.event_info,
                         device: v.event_source,
@@ -131,23 +150,25 @@ class DevicemMessage extends PureComponent {
                     });
                     source.push(v.event_type);
                 });
+            } else {
+                message.error('获取消息列表失败！')
             }
             this.setState({
                 platformData: data,
                 tableData: data,
                 loading: false
             })
-        });
+        })
     };
     //时间戳转换
     timestampToTime = (timestamp)=>{
-        var date = new Date(timestamp);
-        var Y = date.getFullYear() + '-';
-        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
-        var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
-        var h = date.getHours() + ':';
-        var m = (date.getMinutes() < 10 ? '0' + (date.getMinutes()) : date.getMinutes()) + ':';
-        var s = '00';
+        let date = new Date(timestamp);
+        let Y = date.getFullYear() + '-';
+        let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+        let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
+        let h = (date.getHours() < 10 ? '0' + (date.getHours()) : date.getHours()) + ':';
+        let m = (date.getMinutes() < 10 ? '0' + (date.getMinutes()) : date.getMinutes()) + ':';
+        let s = '00';
         return Y + M + D + h + m + s;
     };
     //搜索框改变值
@@ -210,8 +231,25 @@ class DevicemMessage extends PureComponent {
     //时间
     messageTime = (value)=>{
         console.log(`${value}`);
-        // let hours = Date.parse(new Date()) - `${value}` * 60 * 60 * 1000;
-        // let time = this.timestampToTime(hours);
+        let hours = Date.parse(new Date()) - `${value}` * 60 * 60 * 1000;
+        let time = this.timestampToTime(hours);
+        console.log(time)
+        let params = {
+            category: this.state.category,
+            name: this.state.name,
+            start: this.state.start,
+            limit: this.state.length,
+            filters: {
+                'creation': [
+                    '>',
+                    time
+                ]
+            }
+        };
+        this.setState({
+            filters: params.filters
+        });
+        this.getMessageList(params);
     };
 
     render () {
