@@ -3,7 +3,7 @@ import { Card, Button, Switch, message, InputNumber, Icon } from 'antd';
 import { inject, observer} from 'mobx-react';
 import { withRouter, Link } from 'react-router-dom';
 import http from '../../../utils/Server';
-import echarts from 'echarts/lib/echarts';
+// import echarts from 'echarts/lib/echarts';
 import  'echarts/lib/chart/line';
 import  'echarts/lib/chart/pie';
 import 'echarts/lib/component/legend';
@@ -23,105 +23,106 @@ class LinkStatus extends Component {
         COV_TTL: false,
         UOLOAD: false,
         iot_beta: 0,
+        use_beta: 0,
         update: false,
         barData: []
     }
     componentDidMount (){
       this.getData(this.state.sn);
-    http.get('/api/gateways_read?name=' + this.state.sn).then(res=>{
-        console.log(res);
-    })
-      http.get('/api/method/iot_ui.iot_api.device_event_type_statistics').then(res=>{
-        this.setState({
-            barData: res.message
-        }, ()=>{
-            let data1 = [];
-            let data2 = [];
-            let data3 = [];
-            let data4 = [];
-            this.state.barData.map((v) =>{
-                data1.push(v['系统']);
-                data2.push(v['设备']);
-                data3.push(v['通讯']);
-                data4.push(v['数据']);
-            });
-            console.log(data2)
-            let myFaultTypeChart = echarts.init(document.getElementById('CPU'));
-            let memory = echarts.init(document.getElementById('memory'));
-            memory.setOption({
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'shadow'
-                    }
-                },
-                // legend: {
-                //     data: ['系统', '设备', '通讯', '数据']
-                // },
-                xAxis: {
-                    data: ['Mon Fed 11', 'Mon Fed 13', 'Mon Fed 15', 'Mon Fed 17']
-                },
-                yAxis: {},
-                series: [{
-                    name: '系统',
-                    type: 'line',
-                    color: '#37A2DA',
-                    data: data1
-                }, {
-                    name: '设备',
-                    type: 'line',
-                    color: '#67E0E3',
-                    data: data2
-                }, {
-                    name: '通讯',
-                    type: 'line',
-                    color: '#FFDB5C',
-                    data: data3
-                }, {
-                    name: '数据',
-                    type: 'line',
-                    color: '#FF9F7F',
-                    data: data4
-                }]
-            })
-            myFaultTypeChart.setOption({
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'shadow'
-                    }
-                },
-                // legend: {
-                //     data: ['系统', '设备', '通讯', '数据']
-                // },
-                xAxis: {
-                    data: ['Mon Fed 11', 'Mon Fed 13', 'Mon Fed 15', 'Mon Fed 17']
-                },
-                yAxis: {},
-                series: [{
-                    name: '系统',
-                    type: 'line',
-                    color: '#37A2DA',
-                    data: data1
-                }, {
-                    name: '设备',
-                    type: 'line',
-                    color: '#67E0E3',
-                    data: data2
-                }, {
-                    name: '通讯',
-                    type: 'line',
-                    color: '#FFDB5C',
-                    data: data3
-                }, {
-                    name: '数据',
-                    type: 'line',
-                    color: '#FF9F7F',
-                    data: data4
-                }]
-            })
+        http.get('/api/gateways_read?name=' + this.state.sn).then(res=>{
+            console.log(res);
         })
-    })
+        // http.get('/api/method/iot_ui.iot_api.device_event_type_statistics').then(res=>{
+        //     this.setState({
+        //         barData: res.message
+        //     }, ()=>{
+        //         let data1 = [];
+        //         let data2 = [];
+        //         let data3 = [];
+        //         let data4 = [];
+        //         this.state.barData.map((v) =>{
+        //             data1.push(v['系统']);
+        //             data2.push(v['设备']);
+        //             data3.push(v['通讯']);
+        //             data4.push(v['数据']);
+        //         });
+        //         console.log(data2)
+        //         let myFaultTypeChart = echarts.init(document.getElementById('CPU'));
+        //         let memory = echarts.init(document.getElementById('memory'));
+        //         memory.setOption({
+        //             tooltip: {
+        //                 trigger: 'axis',
+        //                 axisPointer: {
+        //                     type: 'shadow'
+        //                 }
+        //             },
+        //             // legend: {
+        //             //     data: ['系统', '设备', '通讯', '数据']
+        //             // },
+        //             xAxis: {
+        //                 data: ['Mon Fed 11', 'Mon Fed 13', 'Mon Fed 15', 'Mon Fed 17']
+        //             },
+        //             yAxis: {},
+        //             series: [{
+        //                 name: '系统',
+        //                 type: 'line',
+        //                 color: '#37A2DA',
+        //                 data: data1
+        //             }, {
+        //                 name: '设备',
+        //                 type: 'line',
+        //                 color: '#67E0E3',
+        //                 data: data2
+        //             }, {
+        //                 name: '通讯',
+        //                 type: 'line',
+        //                 color: '#FFDB5C',
+        //                 data: data3
+        //             }, {
+        //                 name: '数据',
+        //                 type: 'line',
+        //                 color: '#FF9F7F',
+        //                 data: data4
+        //             }]
+        //         })
+        //         myFaultTypeChart.setOption({
+        //             tooltip: {
+        //                 trigger: 'axis',
+        //                 axisPointer: {
+        //                     type: 'shadow'
+        //                 }
+        //             },
+        //             // legend: {
+        //             //     data: ['系统', '设备', '通讯', '数据']
+        //             // },
+        //             xAxis: {
+        //                 data: ['Mon Fed 11', 'Mon Fed 13', 'Mon Fed 15', 'Mon Fed 17']
+        //             },
+        //             yAxis: {},
+        //             series: [{
+        //                 name: '系统',
+        //                 type: 'line',
+        //                 color: '#37A2DA',
+        //                 data: data1
+        //             }, {
+        //                 name: '设备',
+        //                 type: 'line',
+        //                 color: '#67E0E3',
+        //                 data: data2
+        //             }, {
+        //                 name: '通讯',
+        //                 type: 'line',
+        //                 color: '#FFDB5C',
+        //                 data: data3
+        //             }, {
+        //                 name: '数据',
+        //                 type: 'line',
+        //                 color: '#FF9F7F',
+        //                 data: data4
+        //             }]
+        //         })
+        //     })
+        // })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
       if (nextProps.location.pathname !== this.props.location.pathname){
@@ -134,53 +135,67 @@ class LinkStatus extends Component {
       }
     }
     getData (sn){
-      http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-        this.props.store.appStore.setStatus(res.message)
-        http.get('/api/method/app_center.api.get_latest_version?app=freeioe&beta=' + res.message.basic.iot_beta).then(data=>{
-            this.setState({iot_beta: data.message})
-            if (data.message > res.message.config.iot_version){
-                http.get('/api/method/app_center.api.get_versions?app=freeioe&beta=' + res.message.basic.iot_beta).then(req=>{
-                    const data = req.message.filter(item=>item.version > res.message.config.iot_version)
-                    this.setState({newdata: data})
-                })
-            } else {
-                this.setState({newdata: []})
-            }
+        
+        http.get('/api/gateways_beta_read?gateway=' + sn).then(res=>{
+            console.log(res)
+            this.setState({use_beta: res.data.use_beta === 1})
         })
-      })
-      http.get('/api/method/iot_ui.iot_api.gate_devs_list?sn=' + sn ).then(res=>{
-        let data = [];
-        data = res.message;
-        data.map((item)=>{
-            item.ioc = '' + (item.inputs ? item.inputs : '0') + '/' + (item.outputs ? item.outputs : '0') + '/' + (item.commands ? item.commands : '0');
-        })
-        this.setState({
-            data,
-            loading: false
-        })
-    })
+    //   http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
+    //     this.props.store.appStore.setStatus(res.message)
+    //     http.get('/api/method/app_center.api.get_latest_version?app=freeioe&beta=' + res.message.basic.iot_beta).then(data=>{
+    //         this.setState({iot_beta: data.message})
+    //         if (data.message > res.message.config.iot_version){
+    //             http.get('/api/method/app_center.api.get_versions?app=freeioe&beta=' + res.message.basic.iot_beta).then(req=>{
+    //                 const data = req.message.filter(item=>item.version > res.message.config.iot_version)
+    //                 this.setState({newdata: data})
+    //             })
+    //         } else {
+    //             this.setState({newdata: []})
+    //         }
+    //     })
+    //   })
+    //   http.get('/api/method/iot_ui.iot_api.gate_devs_list?sn=' + sn ).then(res=>{
+    //     let data = [];
+    //     data = res.message;
+    //     data.map((item)=>{
+    //         item.ioc = '' + (item.inputs ? item.inputs : '0') + '/' + (item.outputs ? item.outputs : '0') + '/' + (item.commands ? item.commands : '0');
+    //     })
+    //     this.setState({
+    //         data,
+    //         loading: false
+    //     })
+    // })
     }
     setConfig (record, config){
         console.log(record, config)
     }
     setAutoDisabled (record, config){
-        const type = config === 1 ? 'disable' : 'enable';
-        // const success = type === 'disable' ? '开启' : '关闭';
-        // console.log(success)
-        const data = {
-            data: config === 0 ? 1 : 0,
-            device: this.props.match.params.sn,
-            id: `${type}/${this.props.match.params.sn}/${record}/${new Date() * 1}`
-        }
-        http.postToken('/api/method/iot.device_api.sys_enable_' + record, data).then(res=>{
-            http.get('/api/method/iot.device_api.get_action_result?id=' + res.message).then(res=>{
-                if (res.message && res.message.result === true){
-                    message.success( '操作成功')
-                } else {
-                    message.error('操作失败')
-                }
-            })
+        const type = config ? 0 : 1;
+        http.postToken('/api/gateways_' + record + '_enable', {
+            gateway: this.state.sn,
+            beta: type
+        }).then(res=>{
+            console.log(res)
         })
+        const text = type === 0 ? '关闭beta模式成功' : '开启beta模式成功'
+        message.success(text)
+        // const type = config === 1 ? 'disable' : 'enable';
+        // // const success = type === 'disable' ? '开启' : '关闭';
+        // // console.log(success)
+        // const data = {
+        //     data: config === 0 ? 1 : 0,
+        //     device: this.props.match.params.sn,
+        //     id: `${type}/${this.props.match.params.sn}/${record}/${new Date() * 1}`
+        // }
+        // http.postToken('/api/method/iot.device_api.sys_enable_' + record, data).then(res=>{
+        //     http.get('/api/method/iot.device_api.get_action_result?id=' + res.message).then(res=>{
+        //         if (res.message && res.message.result === true){
+        //             message.success( '操作成功')
+        //         } else {
+        //             message.error('操作失败')
+        //         }
+        //     })
+        // })
       }
       restart (url){
           const data = {
@@ -201,7 +216,7 @@ class LinkStatus extends Component {
       }
     render () {
         const { status, config, COV_TTL, DATA_UPLOAD_PERIOD } = this.props.store.appStore;
-        const {  flag, update, newdata } = this.state;
+        const {  flag, update, newdata, use_beta } = this.state;
         return (
             <div>
                 <div className={flag && !update ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
@@ -246,7 +261,7 @@ class LinkStatus extends Component {
                                 }}
                               >发现新版本></Link> : ''}</p>
                             <p><b>公网IP:</b>{config.public_ip}</p>
-                            <p><b>调试模式:</b>{status.iot_beta  === 1 ? '开启' : '关闭'}</p>
+                            <p><b>调试模式:</b>{use_beta ? '开启' : '关闭'}</p>
                             <p><b>数据上传:</b>{config.data_upload === 1 ? '开启' : '关闭'}</p>
                             <p><b>统计上传:</b>{config.stat_upload === 1 ? '开启' : '关闭'}</p>
                             <p><b>日志上传:</b>{config.event_upload}</p>
@@ -289,9 +304,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                defaultChecked={status.iot_beta === 1 ? true : false}
+                                checked={use_beta}
                                 onChange={()=>{
-                                    this.setAutoDisabled('beta', status.iot_beta)
+                                    this.setState({use_beta: !this.state.use_beta})
+                                    this.setAutoDisabled('beta', use_beta)
                                 }}
                             />
                         </div>
@@ -302,7 +318,7 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                defaultChecked={config.data_upload === 1 ? true : false}
+                                // defaultChecked={config.data_upload === 1 ? true : false}
                                 onChange={()=>{
                                     this.setAutoDisabled('data', config.data_upload)
                                 }}
@@ -313,7 +329,7 @@ class LinkStatus extends Component {
                                 变化数据上送间隔（ms） [*程序会重启]
                             </span>
                             <InputNumber
-                                defaultValue={config.data_upload_period}
+                                // defaultValue={config.data_upload_period}
                                 style={{width: 100}}
                                 onChange={this.onChange}
                                 onFocus={()=>{
@@ -327,7 +343,7 @@ class LinkStatus extends Component {
                                 全量数据上送间隔（s） [*程序会重启]
                             </span>
                             <InputNumber
-                                defaultValue={config.data_upload_cov_ttl}
+                                // defaultValue={config.data_upload_cov_ttl}
                                 style={{width: 100}}
                                 onChange={this.onChange}
                                 onFocus={()=>{
@@ -342,7 +358,7 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                defaultChecked={config.stat_upload === 1 ? false : true}
+                               //  defaultChecked={config.stat_upload === 1 ? false : true}
                                 onChange={()=>{
                                     this.setAutoDisabled('stat', config.data_upload)
                                 }}
@@ -355,7 +371,7 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                defaultChecked={config.Net_Manager}
+                                // defaultChecked={config.Net_Manager}
                                 onChange={()=>{
                                     this.setConfig('Net_Manager', config.Net_Manager)
                                 }}
@@ -368,7 +384,7 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                defaultChecked={config.ioe_frpc}
+                               // defaultChecked={config.ioe_frpc}
                                 onChange={()=>{
                                     this.setConfig('ioe_frpc', config.Net_Manager)
                                 }}
@@ -379,7 +395,7 @@ class LinkStatus extends Component {
                                 日志上传等级 [*事件上传的最低等级]
                             </span>
                             <InputNumber
-                                defaultValue={config.event_upload}
+                               // defaultValue={config.event_upload}
                                 max={99}
                                 style={{width: 100}}
                                 onChange={this.onChange}

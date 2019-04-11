@@ -190,9 +190,9 @@ class MyGates extends PureComponent {
         }
     }
     componentDidMount (){
-        http.get('/api/user_csrf_token').then(res=>{
-            console.log(res)
-        })
+        // http.get('/api/user_csrf_token').then(res=>{
+        //     console.log(res)
+        // })
         this.getDevicesList('online')
     }
     onChanges = (type) => {

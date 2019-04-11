@@ -1,15 +1,32 @@
 import React, { Component } from 'react';
-import { Table, Switch, Button, Popconfirm, message } from 'antd';
+import { Table, Switch, Button, Popconfirm, message, Icon } from 'antd';
 import http from '../../../utils/Server';
-import { deviceAppOption } from '../../../utils/Session';
+// import { deviceAppOption } from '../../../utils/Session';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-function confirm (record, sn) {
-  console.log(record, sn);
+function confirm (record, name, type, sn) {
+  console.log(record, name);
+  // name 是应用市场ID
+  // record.device_name 是网关应用名称
+  const update = {
+    gateway: sn,
+    app: name,
+    inst: record.device_name,
+    version: record.latestVersion,
+    conf: {},
+    id: `upgrade/${sn}/${name}/${record.name}/${new Date() * 1}`
+  };
+  if (type === 'update'){
+    console.log(record, name)
+    http.post('/api/gateways_applications_upgrade', update).then(res=>{
+      console.log(res);
+    })
+    return false;
+  }
   const data = {
     gateway: sn,
     inst: record.name,
-    id: `app_upgrade/${sn}/ ${record.name}/${new Date() * 1}`
+    id: `app_upgrade/${sn}/ ${record.device_name}/${new Date() * 1}`
   }
   http.postToken('/api/applications_remove', data).then(res=>{
     console.log(res)
@@ -74,7 +91,30 @@ class AppsList extends Component {
           }, {
             title: '版本',
             dataIndex: 'version',
-            key: 'version'
+            key: 'version',
+            render: (props, record)=>{
+              console.log(record.latestVersion > props, 'tset')
+              if (record.latestVersion > props) {
+                return (
+                  <Popconfirm
+                      title="Are you sure update this task?"
+                      onConfirm={()=>{
+                        confirm(record, record.name, 'update', this.props.match.params.sn)
+                      }}
+                      onCancel={cancel}
+                      okText="Yes"
+                      cancelText="No"
+                  >
+                    <a
+                        href="#"
+                        style={{color: 'blue'}}
+                    >{props}  <Icon type="arrow-up"/></a>
+                  </Popconfirm>
+                )
+              } else {
+                return <span>{props}</span>
+              }
+            }
           }, {
             title: '设备数',
             dataIndex: 'info.devs_len',
@@ -94,10 +134,11 @@ class AppsList extends Component {
             title: '开机自启',
             dataIndex: 'conf.auto_start',
             render: (props, record, )=>{
+              console.log(props, 'props')
                 return (
                 <Switch checkedChildren="ON"
                     unCheckedChildren="OFF"
-                    defaultChecked={props}
+                    defaultChecked={props ? true : false}
                     onChange={()=>{
                       this.setAutoDisabled(record)
                     }}
@@ -141,14 +182,25 @@ class AppsList extends Component {
         }
       }
       setAutoDisabled (record){
+        console.log(record, 'record')
         const { sn } = this.props.match.params;
-        let type = record.info.auto ? 'disabled' : 'enable'
-        let value = record.info.auto ? 0 : 1
-        console.log(record, this)
-        const message = deviceAppOption(record.info.inst, 'auto', value, this.props.store.appStore.status.sn, type, record.sn);
-        if (message !== null){
-          this.fetch(sn)
+        let type = record.auto ? 'stop' : 'start'
+        // let value = record.info.auto ? 0 : 1
+        const data = {
+          gateway: sn,
+          int: record.sn,
+          id: `${type}/${sn}/${record.sn}/${new Date() * 1}`
         }
+        http.post('/api/gateways_applications_' + type, data).then(res=>{
+          console.log(res)
+        })
+        // const message = deviceAppOption(record.info.inst, 'auto', value, this.props.store.appStore.status.sn, type, record.sn);
+        // if (message !== null){
+        //   this.fetch(sn)
+        // }
+        // http.post('/api/gateways_applications_' + type, data).then(res=>{
+        //   console.log(res)
+        // })
       }
       handleTableChange = (pagination, filters, sorter) => {
         const pager = { ...this.state.pagination };
@@ -165,6 +217,10 @@ class AppsList extends Component {
         });
       }
       fetch = (sn) => {
+        http.postToken('/api/gateways_applications_refresh', {
+          gateway: sn,
+          id: `/gateways/refresh/${sn}/${new Date() * 1}`
+        })
         const pagination = { ...this.state.pagination };
         http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
           // const keys = Object.keys(res)
