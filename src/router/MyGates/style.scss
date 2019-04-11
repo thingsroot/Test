@@ -1,6 +1,16 @@
 .light-row{
     background:#f9f9f9;
 }
+.inputs{
+    display: flex;
+    padding: 10px;
+    span{
+        display: block;
+        width: 60px;
+        text-align: center;
+        line-height: 30px;
+    }
+}
 .online{
     color:#3c763d;
     b{
