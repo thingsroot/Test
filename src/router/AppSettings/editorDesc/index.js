@@ -4,9 +4,7 @@ import marked from 'marked';
 import highlight from 'highlight.js';
 import 'simplemde/dist/simplemde.min.css';
 class EditorDesc extends PureComponent {
-
     componentDidMount (){
-        console.log(document.getElementById('editor'))
         this.smde = new SimpleMDE({
             element: document.getElementById('editor').childElementCount,
             autofocus: true,

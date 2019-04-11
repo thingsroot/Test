@@ -53,8 +53,6 @@ class TemplateList extends PureComponent {
                 <ul>
                     {
                         templateList && templateList.length > 0 && templateList.map((v, key)=>{
-                            // console.log(v);
-                            // console.log(key);
                             return <li key={key}>
                                 <div>
                                     <p>模板名称：<span className="fontColor">{v.conf_name}</span>
@@ -90,7 +88,7 @@ class TemplateList extends PureComponent {
                         })
                     }
                 </ul>
-                <p className="empty" style={templateList.length > 0 ? none : block}>请先上传版本！</p>
+                <p className="empty" style={templateList.length > 0 ? none : block}>暂时没有上传模板！</p>
             </div>
         );
     }

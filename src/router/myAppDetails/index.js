@@ -77,7 +77,7 @@ class MyAppDetails extends PureComponent {
                     </div>
                     <div className="btnGroup">
                         <Button style={message.owner === user ? block : none}>
-                            <Link to={`/appSettings/${message.name}`}>
+                            <Link to={`/appSettings/2/${message.name}`}>
                                 <Icon type="setting" />
                                 设置
                             </Link>

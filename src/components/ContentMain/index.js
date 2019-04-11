@@ -14,7 +14,6 @@ const MyGatesDevices = LoadableComponent(()=>import('../../router/MyGatesDevices
 const MyGatesAppsInstall = LoadableComponent(()=>import('../../router/MyGatesAppsInstall'));
 const PlatformMessage = LoadableComponent(()=>import('../../router/PlatformMessage'));
 const DeviceMessage = LoadableComponent(()=>import('../../router/DeviceMessage'));
-const PlatformDetails = LoadableComponent(()=>import('../../router/PlatformDetails'));
 const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHistory'));
 const MyGatesDevicesOutputs = LoadableComponent(()=>import('../../router/MyGatesDevicesOutputs'));
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
@@ -42,7 +41,7 @@ class ContentMain extends PureComponent {
                     component={MyAppDetails}
                 />
                 <PrivateRoute
-                    path="/appSettings/:name"
+                    path="/appSettings/:type/:name"
                     component={AppSettings}
                 />
                 <PrivateRoute
@@ -77,10 +76,7 @@ class ContentMain extends PureComponent {
                     path="/DeviceMessage"
                     component={DeviceMessage}
                 />
-                <PrivateRoute
-                    path="/platformDetails/:name"
-                    component={PlatformDetails}
-                />
+
                 <PrivateRoute
                     path="/BrowsingHistory/:sn/:vsn"
                     component={BrowsingHistory}

@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { Table, Input, Select, Button, message } from 'antd'
-import { Link } from 'react-router-dom'
 import './style.scss'
 import http from '../../utils/Server';
 import {_getCookie} from '../../utils/Session';
@@ -16,52 +15,6 @@ const posed = {
     fontWeight: 'normal'
 };
 
-const columns = [{
-    title: '标题',
-    dataIndex: 'title',
-    width: '25%',
-    render: (text, record) => (
-        <Link to={`/platformDetails/${record.name}`}
-            style={record.disposed === 0 ? disposed : posed}
-        >{text}
-        </Link>
-    )
-}, {
-    title: '网关序列号',
-    dataIndex: 'device',
-    width: '35%',
-    render: (text, record) => (
-        <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-    )
-}, {
-    title: '发生时间',
-    dataIndex: 'creation',
-    width: '20%',
-    render: (text, record) => (
-        <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-    )
-}, {
-    title: '消息类型',
-    dataIndex: 'operation',
-    width: '10%',
-    render: (text, record) => (
-        <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-    )
-}, {
-    title: '消息类型',
-    dataIndex: 'event_level',
-    width: '10%',
-    render: (text, record) => (
-        <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-    )
-}];
-
-//表格onChange
-const onChange = (pagination, filters, sorter)=>{
-    console.log('params', pagination, filters, sorter)
-};
-
-
 class DevicemMessage extends PureComponent {
     state = {
         category: '',
@@ -75,7 +28,46 @@ class DevicemMessage extends PureComponent {
         selectValue: 'title',
         text: '',
         loading: false,
-        selectRow: []
+        selectRow: [],
+        columns: [{
+            title: '标题',
+            dataIndex: 'title',
+            width: '25%',
+            render: (text, record) => (
+                <span
+                    style={record.disposed === 0 ? disposed : posed}
+                >{text}
+                </span>
+            )
+        }, {
+            title: '网关序列号',
+            dataIndex: 'device',
+            width: '35%',
+            render: (text, record) => (
+                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+            )
+        }, {
+            title: '发生时间',
+            dataIndex: 'creation',
+            width: '20%',
+            render: (text, record) => (
+                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+            )
+        }, {
+            title: '消息类型',
+            dataIndex: 'operation',
+            width: '10%',
+            render: (text, record) => (
+                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+            )
+        }, {
+            title: '消息类型',
+            dataIndex: 'event_level',
+            width: '10%',
+            render: (text, record) => (
+                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+            )
+        }]
     };
     componentDidMount (){
         let params = {
@@ -139,11 +131,17 @@ class DevicemMessage extends PureComponent {
             let source = [];
             if (res.data.ok === true) {
                 sourceData.map((v)=>{
+                    let type = '';
+                    if (v.event_type === 'EVENT') {
+                        type = '设备'
+                    } else {
+                        type = v.event_type
+                    }
                     data.push({
                         title: v.event_info,
                         device: v.event_source,
                         creation: v.creation.split('.')[0],
-                        operation: v.event_type,
+                        operation: type,
                         disposed: v.disposed,
                         name: v.name,
                         event_level: v.event_level
@@ -157,6 +155,8 @@ class DevicemMessage extends PureComponent {
                 platformData: data,
                 tableData: data,
                 loading: false
+            }, ()=>{
+                console.log(this.state.tableData)
             })
         })
     };
@@ -203,16 +203,28 @@ class DevicemMessage extends PureComponent {
             this.setState({
                 platformData: newData
             });
+        } else {
+            let data = this.state.tableData;
+            this.setState({
+                platformData: data
+            })
         }
     };
     //最大记录数
     messageTotal = (value)=>{
         let num = `${value}`;
-        let time = this.state.time;
+        let params = {
+            category: this.state.category,
+            name: this.state.name,
+            start: this.state.start,
+            limit: num,
+            filters: this.state.filters
+        };
         this.setState({
-            length: num
+            length: params.limit
         });
-        this.getMessageList(num, time);
+        console.log(params);
+        this.getMessageList(params);
     };
     //筛选消息类型
     messageChange = (value)=>{
@@ -223,6 +235,29 @@ class DevicemMessage extends PureComponent {
                     data.push(v);
                 }
             });
+            this.setState({
+                platformData: data
+            })
+        } else {
+            let data = this.state.tableData;
+            this.setState({
+                platformData: data
+            })
+        }
+    };
+    gradeChange = (value)=>{
+        let data = [];
+        if (`${value}`) {
+            this.state.tableData.map((v)=>{
+                if (v.event_level === parseInt(`${value}`)) {
+                    data.push(v);
+                }
+            });
+            this.setState({
+                platformData: data
+            })
+        } else {
+            let data = this.state.tableData;
             this.setState({
                 platformData: data
             })
@@ -251,20 +286,37 @@ class DevicemMessage extends PureComponent {
         });
         this.getMessageList(params);
     };
+    //表格
+    onChange = (pagination, filters, sorter)=>{
+        console.log('params', pagination, filters, sorter)
+    };
 
     render () {
         let selectValue = this.state.selectValue;
         let selectRow = this.state.selectRow;
         return (
-            <div className="platformMessage">
+            <div className="deviceMessage">
                 <div className="searchBox">
                     <Select defaultValue="消息类型"
                         style={{ width: 120 }}
                         onChange={this.messageChange}
                     >
                         <Option value="">全部消息类型</Option>
-                        <Option value="Action">设备操作</Option>
-                        <Option value="Status">设备消息</Option>
+                        <Option value="通讯">通讯</Option>
+                        <Option value="数据">数据</Option>
+                        <Option value="应用">应用</Option>
+                        <Option value="系统">系统</Option>
+                        <Option value="EVENT">设备</Option>
+                    </Select>
+                    <Select defaultValue="等级"
+                        style={{ width: 120 }}
+                        onChange={this.gradeChange}
+                    >
+                        <Option value="">全部消息类型</Option>
+                        <Option value="1">常规</Option>
+                        <Option value="2">错误</Option>
+                        <Option value="3">警告</Option>
+                        <Option value="99">致命</Option>
                     </Select>
                     <Select defaultValue="记录数"
                         style={{ width: 120 }}
@@ -320,10 +372,10 @@ class DevicemMessage extends PureComponent {
                 </div>
                 <Table
                     rowSelection={this.rowSelection}
-                    columns={columns}
+                    columns={this.state.columns}
                     dataSource={this.state.platformData}
                     loading={this.state.loading}
-                    onChange={onChange}
+                    onChange={this.onChange}
                     rowKey="name"
                 />
             </div>

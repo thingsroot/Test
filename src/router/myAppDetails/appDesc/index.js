@@ -9,6 +9,10 @@ class AppDesc extends PureComponent {
     componentDidMount (){
         const {name} = this.props;
         http.get('/api/applications_desc?name=' + name).then(res=>{
+            console.log(res)
+            if (typeof res === 'object') {
+                res = JSON.stringify(res)
+            }
             this.setState({
                 editorContent: res
             });

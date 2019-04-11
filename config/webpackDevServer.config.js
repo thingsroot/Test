@@ -97,6 +97,14 @@ module.exports = function(proxy, allowedHost) {
         pathRewrite: {
           '^/api/*': '/'
         }
+      },
+      '/home/*': {
+        target: 'http://iot.symgrid.com',
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: {
+          '^/home/*': '/'
+        }
       }
     },
     before (app, server) {

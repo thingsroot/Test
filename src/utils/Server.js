@@ -66,7 +66,7 @@ var post = function (url, data) {
           data: data,
           headers: {
               Accept: 'application/json; charset=utf-8',
-              'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+              'Content-Type': 'application/json; charset=utf-8',
               'dataType': 'json'
           }
       }).then(res=>{

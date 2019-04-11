@@ -79,7 +79,7 @@ class Home extends PureComponent {
     componentDidMount () {
         // http.get()
         //饼状图数据
-        http.get('api/method/iot_ui.iot_api.device_type_statistics').then(res=>{
+        http.get('/home/api/method/iot_ui.iot_api.device_type_statistics').then(res=>{
             this.setState({
                 pieData: res.message
             });
@@ -110,7 +110,7 @@ class Home extends PureComponent {
 
         });
         // 在线数据
-        http.get('api/method/iot_ui.iot_api.device_status_statistics').then(res=>{
+        http.get('/home/api/method/iot_ui.iot_api.device_status_statistics').then(res=>{
             this.setState({
                 timeData: res.message
             });
@@ -172,7 +172,7 @@ class Home extends PureComponent {
             }
         });
         //柱状图数据
-        http.get('api/method/iot_ui.iot_api.device_event_type_statistics').then(res=>{
+        http.get('/home/api/method/iot_ui.iot_api.device_event_type_statistics').then(res=>{
             this.setState({
                 barData: res.message
             });
@@ -240,7 +240,7 @@ class Home extends PureComponent {
             return s ;
         }
         // 前10网关
-        http.get('api/method/iot_ui.iot_api.device_event_count_statistics').then(res=>{
+        http.get('/home/api/method/iot_ui.iot_api.device_event_count_statistics').then(res=>{
             if (res.message) {
                 let data = [];
                 let t = getBeforeDate(0);
@@ -257,7 +257,7 @@ class Home extends PureComponent {
 
         });
         //一周内故障最多的网关
-        http.get('/api/method/iot_ui.iot_api.device_event_count_statistics').then(res=>{
+        http.get('/home/api/method/iot_ui.iot_api.device_event_count_statistics').then(res=>{
             if (res.message) {
                 let data = [];
                 let t = getBeforeDate(0);

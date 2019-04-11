@@ -31,6 +31,7 @@ class VersionList extends PureComponent {
             name: name
         });
         http.get('/api/applications_versions_list?app=' + name).then(res=>{
+            console.log(res)
             let arr = res.data;
             let versions = [];
             arr && arr.length > 0 && arr.map((v, key)=>{
@@ -67,7 +68,7 @@ class VersionList extends PureComponent {
                 app_file: values.app_file.file
             };
             console.log(data);
-            http.post('/api/applications_versions_create', data).then(res=>{
+            http.postToken('/api/applications_versions_create', data).then(res=>{
                 if (res.ok === false) {
                     message.error('新版本上传失败！');
                 } else {

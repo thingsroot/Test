@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
-import { Table, Input, Select, Button, message } from 'antd'
+import { Table, Input, Select, Button, message, Modal } from 'antd'
 // import { Link } from 'react-router-dom'
 import './style.scss'
-// import http from '../../utils/Server';
+import http from '../../utils/Server';
 import axios from 'axios';
 import { _getCookie } from '../../utils/Session';
 const InputGroup = Input.Group;
@@ -15,48 +15,12 @@ const posed = {
     color: 'rgba(0, 0, 0, 0.65)',
     fontWeight: 'normal'
 };
-const columns = [{
-    title: '标题',
-    dataIndex: 'title',
-    width: '30%',
-    render: (text, record) => (
-        <span
-            style={record.disposed === 0 ? disposed : posed}
-        >{text}
-        </span>
-    )
-}, {
-    title: '网关序列号',
-    dataIndex: 'device',
-    width: '35%',
-    render: (text, record) => (
-        <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-    )
-}, {
-    title: '发生时间',
-    dataIndex: 'creation',
-    width: '20%',
-    render: (text, record) => (
-        <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-    )
-}, {
-    title: '消息类型',
-    dataIndex: 'operation',
-    width: '10%',
-    render: (text, record) => (
-        <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-    )
-}];
-//表格onChange
-const onChange = (pagination, filters, sorter)=>{
-    console.log('params', pagination, filters, sorter)
-};
 class PlatformMessage extends PureComponent {
     state = {
         name: '',
         category: '',
         start: 0,
-        length: 100,
+        length: 10,
         filters: {},
         tableData: [],
         platformData: [],
@@ -64,7 +28,41 @@ class PlatformMessage extends PureComponent {
         selectValue: 'title',
         text: '',
         loading: false,
-        selectRow: []
+        selectRow: [],
+        visible: false,
+        columns: [{
+            title: '标题',
+            dataIndex: 'title',
+            width: '30%',
+            render: (text, record) => (
+                <span
+                    style={record.disposed === 0 ? disposed : posed}
+                >
+                    {text}
+                </span>
+            )
+        }, {
+            title: '网关序列号',
+            dataIndex: 'device',
+            width: '35%',
+            render: (text, record) => (
+                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+            )
+        }, {
+            title: '发生时间',
+            dataIndex: 'creation',
+            width: '20%',
+            render: (text, record) => (
+                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+            )
+        }, {
+            title: '消息类型',
+            dataIndex: 'operation',
+            width: '10%',
+            render: (text, record) => (
+                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+            )
+        }]
     };
     componentDidMount (){
         let params = {
@@ -83,6 +81,15 @@ class PlatformMessage extends PureComponent {
         });
         this.getMessageList(params);
     }
+    handleCancel = (e) => {
+        console.log(e);
+        this.setState({
+            visible: false
+        });
+    };
+    onChange = (pagination, filters, sorter)=>{
+        console.log('params', pagination, filters, sorter)
+    };
     rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             console.log(selectedRows);
@@ -95,21 +102,53 @@ class PlatformMessage extends PureComponent {
             name: record.name
         })
     };
+    viewMessage = (name)=>{
+        http.get('/api/activities_message_read?category=' + this.state.category + '&name=' + name).then(res=>{
+            console.log(res);
+            this.setState({
+                visible: true
+            });
+
+        });
+
+        //确认消息接口
+        // let params = {
+        //     category: this.state.category,
+        //     name: name
+        // };
+        // http.post('/api/activities_disponse', params).then(res=>{
+        //     console.log(res.data)
+        // })
+        //过滤数据
+        let data = this.state.tableData;
+        data && data.length > 0 && data.map((v, key)=>{
+            key;
+            if (v.name === name) {
+                v.disposed = 1
+            }
+        });
+        let newData = data.splice(0, this.state.length - 1);
+        this.setState({
+            platformData: newData,
+            tableData: newData
+        });
+        //查看消息详情
+
+
+    };
     //确认消息
     confMessage = (arr)=>{
         if (arr.length === 0) {
             message.warning('请您先选择要确认的消息！');
         } else {
             let params = {
-                disposed: 1,
-                activities: arr
+                // category: this.state.category,
+                name: arr[0].name
             };
-            axios({
-                url: '/api/platform_activities_lists',
-                method: 'GET',
-                params: params
-            }).then(res=>{
+            http.post('/api/activities_disponse', params).then(res=>{
                 console.log(res.data)
+            }).catch(err=>{
+                console.log(err)
             })
         }
     };
@@ -309,6 +348,11 @@ class PlatformMessage extends PureComponent {
             this.setState({
                 platformData: newData
             });
+        } else {
+            let data = this.state.tableData;
+            this.setState({
+                platformData: data
+            })
         }
     };
     //最大记录数
@@ -324,6 +368,7 @@ class PlatformMessage extends PureComponent {
         this.setState({
             length: params.limit
         });
+        console.log(params);
         this.getMessageList(params);
     };
     //筛选消息类型
@@ -367,9 +412,9 @@ class PlatformMessage extends PureComponent {
         });
         this.getMessageList(params);
     };
+
     render () {
-        let selectValue = this.state.selectValue;
-        let selectRow = this.state.selectRow;
+        let { selectValue, selectRow, columns } = this.state;
         return (
             <div className="platformMessage">
                 <div className="searchBox">
@@ -433,13 +478,69 @@ class PlatformMessage extends PureComponent {
                         </InputGroup>
                     </div>
                 </div>
+                <Modal
+                    title="消息详情"
+                    visible={this.state.visible}
+                    onCancel={this.handleCancel}
+                >
+                    {/*<table border="1"*/}
+                    {/*    collspacing="0"*/}
+                    {/*>*/}
+                    {/*    <tr>*/}
+                    {/*        <td>标题</td>*/}
+                    {/*        <td>{this.state.title}</td>*/}
+                    {/*    </tr>*/}
+                    {/*    <tr>*/}
+                    {/*        <td>所属设备序列号</td>*/}
+                    {/*        <td>{this.state.data.device}</td>*/}
+                    {/*    </tr>*/}
+                    {/*    <tr>*/}
+                    {/*        <td>发生时刻设备所属公司</td>*/}
+                    {/*        <td>{this.state.data.owner_company}</td>*/}
+                    {/*    </tr>*/}
+                    {/*    <tr>*/}
+                    {/*        <td>触发用户用户名</td>*/}
+                    {/*        <td>{this.state.data.disposed_by}</td>*/}
+                    {/*    </tr>*/}
+                    {/*    <tr>*/}
+                    {/*        <td>发生时间</td>*/}
+                    {/*        <td>{this.state.data.creation}</td>*/}
+                    {/*    </tr>*/}
+                    {/*    <tr>*/}
+                    {/*        <td>执行结果</td>*/}
+                    {/*        <td>{this.state.data.operation}</td>*/}
+                    {/*    </tr>*/}
+                    {/*    <tr>*/}
+                    {/*        <td>记录类型</td>*/}
+                    {/*        <td>{this.state.data.status === 'Success' ? '成功' : '失败'}</td>*/}
+                    {/*    </tr>*/}
+                    {/*    <tr>*/}
+                    {/*        <td>详细信息</td>*/}
+                    {/*        <td>{this.state.data.message}</td>*/}
+                    {/*    </tr>*/}
+                    {/*    <tr>*/}
+                    {/*        <td>是否确认消息</td>*/}
+                    {/*        <td>{this.state.data.disposed === '1' ? '已确认消息' : '为确认消息'}</td>*/}
+                    {/*    </tr>*/}
+                    {/*    <tr>*/}
+                    {/*        <td>确认消息用户</td>*/}
+                    {/*        <td>{this.state.data.user}</td>*/}
+                    {/*    </tr>*/}
+                    {/*</table>*/}
+                </Modal>
                 <Table
                     rowSelection={this.rowSelection}
                     columns={columns}
                     dataSource={this.state.platformData}
                     loading={this.state.loading}
-                    onChange={onChange}
+                    onChange={this.onChange}
                     rowKey="name"
+                    rowClassName={this.setClassName} //表格行点击高亮
+                    onRow={(record) => {//表格行点击事件
+                        return {
+                            onClick: this.viewMessage.bind(this, record.name)
+                        };
+                    }}
                 />
             </div>
         );
