@@ -88,7 +88,10 @@ class TemplateList extends PureComponent {
                         })
                     }
                 </ul>
-                <p className="empty" style={templateList.length > 0 ? none : block}>暂时没有上传模板！</p>
+                <p
+                    className="empty"
+                    style={templateList.length > 0 ? none : block}
+                >暂时没有上传模板！</p>
             </div>
         );
     }

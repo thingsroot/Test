@@ -5,7 +5,6 @@ import http from '../../../utils/Server';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 function confirm (record, name, type, sn) {
-  console.log(record, name);
   // name 是应用市场ID
   // record.device_name 是网关应用名称
   const update = {
@@ -17,7 +16,6 @@ function confirm (record, name, type, sn) {
     id: `upgrade/${sn}/${name}/${record.name}/${new Date() * 1}`
   };
   if (type === 'update'){
-    console.log(record, name)
     http.post('/api/gateways_applications_upgrade', update).then(res=>{
       console.log(res);
     })
@@ -57,8 +55,7 @@ function confirm (record, name, type, sn) {
   // })
 }
 
-function cancel (e) {
-  console.log(e);
+function cancel () {
   message.error('You have canceled the update');
 }
 @withRouter
@@ -93,7 +90,6 @@ class AppsList extends Component {
             dataIndex: 'version',
             key: 'version',
             render: (props, record)=>{
-              console.log(record.latestVersion > props, 'tset')
               if (record.latestVersion > props) {
                 return (
                   <Popconfirm
@@ -117,8 +113,8 @@ class AppsList extends Component {
             }
           }, {
             title: '设备数',
-            dataIndex: 'info.devs_len',
-            key: 'info.devs_len'
+            dataIndex: 'devs_len',
+            key: 'devs_len'
           }, {
             title: '状态',
             dataIndex: 'status',
@@ -132,15 +128,14 @@ class AppsList extends Component {
             dataIndex: 'running'
           }, {
             title: '开机自启',
-            dataIndex: 'conf.auto_start',
+            dataIndex: 'auto',
             render: (props, record, )=>{
-              console.log(props, 'props')
                 return (
                 <Switch checkedChildren="ON"
                     unCheckedChildren="OFF"
-                    defaultChecked={props ? true : false}
+                    defaultChecked={props === 1 ? true : false}
                     onChange={()=>{
-                      this.setAutoDisabled(record)
+                      this.setAutoDisabled(record, props)
                     }}
                 />)
             }
@@ -168,12 +163,14 @@ class AppsList extends Component {
           }]
       }
       componentDidMount () {
+        // http.get('/api/gateways_app_dev_len?name=da7f421dbd').then(res=>{
+        //   console.log(res)
+        // })
         this.fetch(this.props.match.params.sn);
       }
       UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
         const sn = nextProps.match.params.sn;
-        console.log(sn)
         this.setState({
           loading: true
         }, ()=>{
@@ -181,18 +178,26 @@ class AppsList extends Component {
         })
         }
       }
-      setAutoDisabled (record){
-        console.log(record, 'record')
+      setAutoDisabled (record, props){
         const { sn } = this.props.match.params;
-        let type = record.auto ? 'stop' : 'start'
+        let type = props ? 0 : 1
         // let value = record.info.auto ? 0 : 1
         const data = {
           gateway: sn,
-          int: record.sn,
-          id: `${type}/${sn}/${record.sn}/${new Date() * 1}`
+          inst: record.device_name,
+          option: 'auto',
+          value: type,
+          id: `option/${sn}/${record.sn}/${new Date() * 1}`
         }
-        http.post('/api/gateways_applications_' + type, data).then(res=>{
+        http.post('/api/gateways_applications_option', data).then(res=>{
           console.log(res)
+          if (res.data){
+            setTimeout(() => {
+              http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                console.log(result)
+              })
+            }, 1000);
+          }
         })
         // const message = deviceAppOption(record.info.inst, 'auto', value, this.props.store.appStore.status.sn, type, record.sn);
         // if (message !== null){
@@ -233,7 +238,6 @@ class AppsList extends Component {
           //   item.device_name = keys[key]
           // })
           this.props.store.appStore.setApplen(res.message.length)
-          console.log(res)
           this.setState({
             data: res.message,
             loading: false,
@@ -257,14 +261,12 @@ class AppsList extends Component {
         //       }
         //       item.sn = item.info.sn;
         //   })
-          
           // Read total count from server
           // pagination.total = data.totalCount;
           // pagination.total = 200;
         //});
       }
     render () {
-      console.log(this.state.data, 'data')
       const { loading } = this.state;
         return (
             <div>

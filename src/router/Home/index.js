@@ -280,7 +280,6 @@ class Home extends PureComponent {
                         }
                     }
                 });
-                console.log(data)
                 // data = data.splice(0, 10);
                 // console.log(data);
                 this.setState({

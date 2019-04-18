@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Icon } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
-import http from '../../utils/Server';
+// import http from '../../utils/Server';
 import './style.scss';
 @withRouter
 @inject('store') @observer
@@ -26,9 +26,9 @@ class LeftNav extends Component {
         index: 0
     }
     componentDidMount (){
-        http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-            this.props.store.appStore.setStatus(res.message)
-          })
+        // http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
+        //     this.props.store.appStore.setStatus(res.message)
+        //   })
         const { pathname } = this.props.location;
         if (pathname.indexOf('/AppsList') !== -1){
             this.setState({

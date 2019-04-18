@@ -45,8 +45,6 @@ class MyGatesDevices extends Component {
       this.props.store.appStore.setStatus(res)
     })
     http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
-      console.log(res)
-      console.log()
       if (Object.values(res.message).filter(item=> item.device_name === 'ioe_frpc').length > 0){
         this.setState({VPNflag: true})
       } else {

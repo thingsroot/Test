@@ -125,7 +125,11 @@ class VersionList extends PureComponent {
 
                     }
                 </ul>
-                <p className="empty" style={data.length > 0 ? none : block}>请先上传版本！</p>
+                <p
+                    className="empty"
+                    style={data.length > 0 ? none : block}
+                >请先上传版本！
+                </p>
             </div>
         );
     }

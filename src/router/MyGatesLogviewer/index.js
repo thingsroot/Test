@@ -61,11 +61,11 @@ class MyGatesLogviewer extends Component {
     }
     tick (){
             const data = {
-                data: 60,
-                device: this.props.match.params.sn,
+                duration: 60,
+                name: this.props.match.params.sn,
                 id: `sys_enable_log/${this.props.match.params.sn}/${new Date() * 1}`
             }
-            http.postToken('/api/method/iot.device_api.sys_enable_log', data)
+            http.postToken('/api/gateways_enable_log', data)
     }
     connect = () =>{
             const sn = this.props.match.params.sn;
@@ -73,7 +73,7 @@ class MyGatesLogviewer extends Component {
             connectTimeout: 4000, // 超时时间
             // 认证信息
             clientId: 'webclient-' + makeid(),
-            username: _getCookie('usr'),
+            username: _getCookie('user_id'),
             password: _getCookie('sid'),
             keepAlive: 6000,
             timeout: 3,
@@ -85,6 +85,7 @@ class MyGatesLogviewer extends Component {
       if (!this.state.connected){
           client = mqtt.connect('ws://ioe.thingsroot.com:8083/mqtt', options)
             client.on('connect', ()=>{
+                console.log('连接成功')
                 this.setState({flag: false, connected: true})
                 this.tick()
                 client.subscribe(topic)

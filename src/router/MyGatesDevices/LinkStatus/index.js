@@ -3,6 +3,7 @@ import { Card, Button, Switch, message, InputNumber, Icon } from 'antd';
 import { inject, observer} from 'mobx-react';
 import { withRouter, Link } from 'react-router-dom';
 import http from '../../../utils/Server';
+import axios from 'axios';
 // import echarts from 'echarts/lib/echarts';
 import  'echarts/lib/chart/line';
 import  'echarts/lib/chart/pie';
@@ -14,115 +15,25 @@ import './style.scss';
 @observer
 class LinkStatus extends Component {
     state = {
+        config: {},
         data: [],
         newdata: [],
         loading: true,
         sn: this.props.match.params.sn,
         flag: true,
         DATA_UPLOAD_PERIOD: false,
+        DATA_UPLOAD_PERIOD_VALUE: 0,
         COV_TTL: false,
+        COV_TTL_VALUE: 0,
         UOLOAD: false,
+        UOLOAD_VALUE: 0,
         iot_beta: 0,
         use_beta: 0,
         update: false,
         barData: []
     }
     componentDidMount (){
-      this.getData(this.state.sn);
-        http.get('/api/gateways_read?name=' + this.state.sn).then(res=>{
-            console.log(res);
-        })
-        // http.get('/api/method/iot_ui.iot_api.device_event_type_statistics').then(res=>{
-        //     this.setState({
-        //         barData: res.message
-        //     }, ()=>{
-        //         let data1 = [];
-        //         let data2 = [];
-        //         let data3 = [];
-        //         let data4 = [];
-        //         this.state.barData.map((v) =>{
-        //             data1.push(v['系统']);
-        //             data2.push(v['设备']);
-        //             data3.push(v['通讯']);
-        //             data4.push(v['数据']);
-        //         });
-        //         console.log(data2)
-        //         let myFaultTypeChart = echarts.init(document.getElementById('CPU'));
-        //         let memory = echarts.init(document.getElementById('memory'));
-        //         memory.setOption({
-        //             tooltip: {
-        //                 trigger: 'axis',
-        //                 axisPointer: {
-        //                     type: 'shadow'
-        //                 }
-        //             },
-        //             // legend: {
-        //             //     data: ['系统', '设备', '通讯', '数据']
-        //             // },
-        //             xAxis: {
-        //                 data: ['Mon Fed 11', 'Mon Fed 13', 'Mon Fed 15', 'Mon Fed 17']
-        //             },
-        //             yAxis: {},
-        //             series: [{
-        //                 name: '系统',
-        //                 type: 'line',
-        //                 color: '#37A2DA',
-        //                 data: data1
-        //             }, {
-        //                 name: '设备',
-        //                 type: 'line',
-        //                 color: '#67E0E3',
-        //                 data: data2
-        //             }, {
-        //                 name: '通讯',
-        //                 type: 'line',
-        //                 color: '#FFDB5C',
-        //                 data: data3
-        //             }, {
-        //                 name: '数据',
-        //                 type: 'line',
-        //                 color: '#FF9F7F',
-        //                 data: data4
-        //             }]
-        //         })
-        //         myFaultTypeChart.setOption({
-        //             tooltip: {
-        //                 trigger: 'axis',
-        //                 axisPointer: {
-        //                     type: 'shadow'
-        //                 }
-        //             },
-        //             // legend: {
-        //             //     data: ['系统', '设备', '通讯', '数据']
-        //             // },
-        //             xAxis: {
-        //                 data: ['Mon Fed 11', 'Mon Fed 13', 'Mon Fed 15', 'Mon Fed 17']
-        //             },
-        //             yAxis: {},
-        //             series: [{
-        //                 name: '系统',
-        //                 type: 'line',
-        //                 color: '#37A2DA',
-        //                 data: data1
-        //             }, {
-        //                 name: '设备',
-        //                 type: 'line',
-        //                 color: '#67E0E3',
-        //                 data: data2
-        //             }, {
-        //                 name: '通讯',
-        //                 type: 'line',
-        //                 color: '#FFDB5C',
-        //                 data: data3
-        //             }, {
-        //                 name: '数据',
-        //                 type: 'line',
-        //                 color: '#FF9F7F',
-        //                 data: data4
-        //             }]
-        //         })
-        //     })
-        // })
+      this.getData(this.props.match.params.sn);
     }
     UNSAFE_componentWillReceiveProps (nextProps){
       if (nextProps.location.pathname !== this.props.location.pathname){
@@ -135,88 +46,143 @@ class LinkStatus extends Component {
       }
     }
     getData (sn){
-        
+        http.get('/api/gateways_read?name=' + sn).then(res=>{
+            axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
+                let config = res;
+                if (location.data.regeocode){
+                    config.address = location.data.regeocode.formatted_address;
+                } else {
+                    config.address = '- -';
+                }
+                this.setState({
+                    config,
+                    loading: false,
+                    DATA_UPLOAD_PERIOD_VALUE: config.data_upload_period,
+                    COV_TTL_VALUE: config.data_upload_cov_ttl,
+                    UOLOAD_VALUE: config.event_upload
+                })
+            })
+        })
         http.get('/api/gateways_beta_read?gateway=' + sn).then(res=>{
-            console.log(res)
             this.setState({use_beta: res.data.use_beta === 1})
         })
-    //   http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-    //     this.props.store.appStore.setStatus(res.message)
-    //     http.get('/api/method/app_center.api.get_latest_version?app=freeioe&beta=' + res.message.basic.iot_beta).then(data=>{
-    //         this.setState({iot_beta: data.message})
-    //         if (data.message > res.message.config.iot_version){
-    //             http.get('/api/method/app_center.api.get_versions?app=freeioe&beta=' + res.message.basic.iot_beta).then(req=>{
-    //                 const data = req.message.filter(item=>item.version > res.message.config.iot_version)
-    //                 this.setState({newdata: data})
-    //             })
-    //         } else {
-    //             this.setState({newdata: []})
-    //         }
-    //     })
-    //   })
-    //   http.get('/api/method/iot_ui.iot_api.gate_devs_list?sn=' + sn ).then(res=>{
-    //     let data = [];
-    //     data = res.message;
-    //     data.map((item)=>{
-    //         item.ioc = '' + (item.inputs ? item.inputs : '0') + '/' + (item.outputs ? item.outputs : '0') + '/' + (item.commands ? item.commands : '0');
-    //     })
-    //     this.setState({
-    //         data,
-    //         loading: false
-    //     })
-    // })
     }
     setConfig (record, config){
+        if (!config) {
+            http.post('/api/gateways_applications_install', {
+                gateway: this.props.match.params.sn,
+                inst: record,
+                app: record ===  'Network' ? 'network_uci' : 'frpc',
+                version: 'latest',
+                conf: {
+                    auto_start: true,
+                    enable_web: true
+                },
+                id: `installapp/${this.props.match.params.sn}/${record}/${new Date() * 1}`
+            }).then(res=>{
+                if (res.data){
+                    setTimeout(() => {
+                        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                            console.log(result)
+                            if (result.data.result) {
+                                message.success('开启成功')
+                            }
+                        })
+                    }, 1000);
+                }
+            })
+        } else {
+            http.post('/api/gateways_applications_remove', {
+                gateway: this.props.match.params.sn,
+                inst: record,
+                id: `removeapp/${this.props.match.params.sn}/${record}/${new Date() * 1}`
+            }).then(res=>{
+                if (res.data) {
+                    setTimeout(() => {
+                        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                            console.log(result)
+                            if (result.data.result) {
+                                message.success('关闭成功')
+                            }
+                        })
+                    }, 1000);
+                }
+            })
+        }
         console.log(record, config)
     }
     setAutoDisabled (record, config){
+        console.log(config)
         const type = config ? 0 : 1;
+        const inst = record === 'beta' ? 'beta' : 'enable';
+        const name = record === 'beta' ? 'gateway' : 'name';
         http.postToken('/api/gateways_' + record + '_enable', {
-            gateway: this.state.sn,
-            beta: type
+            [name]: this.state.sn,
+            [inst]: type
         }).then(res=>{
-            console.log(res)
+            if (res.data){
+                http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                     if (result.data.result){
+                        const text = config ? '关闭' + record + '模式成功' : '开启' + record + '模式成功'
+                        message.success(text)
+                     }
+                })
+            }
         })
-        const text = type === 0 ? '关闭beta模式成功' : '开启beta模式成功'
-        message.success(text)
-        // const type = config === 1 ? 'disable' : 'enable';
-        // // const success = type === 'disable' ? '开启' : '关闭';
-        // // console.log(success)
-        // const data = {
-        //     data: config === 0 ? 1 : 0,
-        //     device: this.props.match.params.sn,
-        //     id: `${type}/${this.props.match.params.sn}/${record}/${new Date() * 1}`
-        // }
-        // http.postToken('/api/method/iot.device_api.sys_enable_' + record, data).then(res=>{
-        //     http.get('/api/method/iot.device_api.get_action_result?id=' + res.message).then(res=>{
-        //         if (res.message && res.message.result === true){
-        //             message.success( '操作成功')
-        //         } else {
-        //             message.error('操作失败')
-        //         }
-        //     })
-        // })
       }
       restart (url){
           const data = {
-              data: 1,
-              device: this.props.match.params.sn
+              id: `gateways/${url}/${this.props.match.params.sn}/${new Date() * 1}`,
+              name: this.props.match.params.sn
           }
-          http.postToken('/api/method/iot.device_api.sys_' + url, data).then(res=>{
-              console.log(res)
+          http.postToken('/api/gateways_' + url, data).then(res=>{
+              if (res.ok){
+                  message.success('重启成功，请稍等...')
+              } else {
+                  message.error('重启失败，请重试...')
+              }
           })
       }
-        onChange (value) {
-        console.log('changed', value);
+      changeState  = (name)=> {
+          // const data = Object.assign(this.state.config, {[name]: !this.state.config[name]});
+          const { config } = this.state;
+          console.log(this)
+          const data = Object.assign({}, config, {[name]: !config[name]});
+          console.log(data)
+        this.setState({
+            config: data
+        }, ()=>{
+            console.log(this.state.config)
+        })
       }
-      foucus (name){
-          this.setState({[name]: true}, ()=>{
-            console.log(this.state)
-          })
+        onChange (value, type) {
+            this.setState({[type]: value})
+        console.log('changed', value, type);
+      }
+      buttonOnclick (value, type){
+          console.log(value, type)
+          if (type === 'UOLOAD'){
+              http.post('/api/gateways_enable_event', {
+                  name: this.props.match.params.sn,
+                  min_level: this.state[value],
+                  id: `enable_event/${this.props.match.params.sn}/min${value}/${new Date() * 1}`
+              }).then(res=>{
+                  console.log(res);
+
+              })
+          } else {
+            http.post('/api/gatewyas_cloud_conf', {
+                name: this.props.match.params.sn,
+                data: {
+                    [type]: this.state[value]
+                },
+                id: `set${type}/${this.props.match.params.sn}/min${value}/${new Date() * 1}`
+            })
+          }
       }
     render () {
-        const { status, config, COV_TTL, DATA_UPLOAD_PERIOD } = this.props.store.appStore;
-        const {  flag, update, newdata, use_beta } = this.state;
+        const { status } = this.props.store.appStore;
+        const {  flag, update, config, newdata, use_beta, loading, DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, UOLOAD, UOLOAD_VALUE } = this.state;
         return (
             <div>
                 <div className={flag && !update ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
@@ -234,13 +200,13 @@ class LinkStatus extends Component {
                             <Card title="| 基本信息"
                                 bordered={false}
                                 style={{ width: '100%' }}
-                                // loading={loading}
+                                loading={loading}
                             >
                             <p><b>序列号：</b>{status.sn}</p>
-                            <p><b>位置：</b> -- </p>
-                            <p><b>名称：</b>{status.name}</p>
-                            <p><b>描述：</b>{status.description}</p>
-                            <p><b>型号：</b>{status.model ? status.model : 'unknown'}</p>
+                            <p><b>位置：</b> {config.address} </p>
+                            <p><b>名称：</b>{config.dev_name}</p>
+                            <p><b>描述：</b>{config.description}</p>
+                            <p><b>型号：</b>{config.model ? config.model : 'Q102'}</p>
                             </Card>
                             <Card title="| 配置信息"
                                 bordered={false}
@@ -252,7 +218,7 @@ class LinkStatus extends Component {
                             <p><b>存储:</b>{config.rom}</p>
                             <p><b>操作系统:</b>{config.os}</p>
                             <p><b>核心软件:</b>{config.skynet_version}</p>
-                            <p><b>业务软件:</b>{config.iot_version}{this.state.iot_beta > config.iot_version
+                            <p><b>业务软件:</b>{config.version}{this.state.iot_beta > config.version
                             ? <Link
                                 to="#"
                                 style={{marginLeft: 200}}
@@ -261,9 +227,9 @@ class LinkStatus extends Component {
                                 }}
                               >发现新版本></Link> : ''}</p>
                             <p><b>公网IP:</b>{config.public_ip}</p>
-                            <p><b>调试模式:</b>{use_beta ? '开启' : '关闭'}</p>
-                            <p><b>数据上传:</b>{config.data_upload === 1 ? '开启' : '关闭'}</p>
-                            <p><b>统计上传:</b>{config.stat_upload === 1 ? '开启' : '关闭'}</p>
+                            <p><b>调试模式:</b>{config.use_beta ? '开启' : '关闭'}</p>
+                            <p><b>数据上传:</b>{config.data_upload ? '开启' : '关闭'}</p>
+                            <p><b>统计上传:</b>{config.stat_upload ? '开启' : '关闭'}</p>
                             <p><b>日志上传:</b>{config.event_upload}</p>
                             </Card>
                         </div>
@@ -304,9 +270,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                checked={use_beta}
+                                checked={config.use_beta}
                                 onChange={()=>{
-                                    this.setState({use_beta: !this.state.use_beta})
+                                    //this.setState({use_beta: !this.state.use_beta})
+                                    this.changeState('use_beta');
                                     this.setAutoDisabled('beta', use_beta)
                                 }}
                             />
@@ -318,8 +285,9 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                // defaultChecked={config.data_upload === 1 ? true : false}
+                                checked={config.data_upload}
                                 onChange={()=>{
+                                    this.changeState('data_upload')
                                     this.setAutoDisabled('data', config.data_upload)
                                 }}
                             />
@@ -328,28 +296,67 @@ class LinkStatus extends Component {
                             <span>
                                 变化数据上送间隔（ms） [*程序会重启]
                             </span>
-                            <InputNumber
-                                // defaultValue={config.data_upload_period}
-                                style={{width: 100}}
-                                onChange={this.onChange}
-                                onFocus={()=>{
-                                    this.foucus('DATA_UPLOAD_PERIOD')
-                                }}
-                            />
-                            {DATA_UPLOAD_PERIOD === true ? <Button>保存</Button> : ''}
+                            <div style={{position: 'relative'}}>
+                                <InputNumber
+                                    min={0}
+                                    value={DATA_UPLOAD_PERIOD_VALUE}
+                                    style={{width: 100}}
+                                    onChange={(value)=>{
+                                        this.onChange(value, 'DATA_UPLOAD_PERIOD_VALUE')
+                                    }}
+                                    onFocus={()=>{
+                                        this.setState({DATA_UPLOAD_PERIOD: true})
+                                    }}
+                                />
+                                {
+                                    DATA_UPLOAD_PERIOD
+                                    ? <Button
+                                        style={{
+                                            position: 'absolute',
+                                            right: -70,
+                                            marginLeft: 66,
+                                            top: 9
+                                        }}
+                                        onClick={()=>{
+                                            this.buttonOnclick('DATA_UPLOAD_PERIOD_VALUE', 'DATA_UPLOAD_PERIOD')
+                                        }}
+                                      >保存</Button>
+                                    : ''
+                                }
+                            </div>
                         </div>
                         <div className="list">
                             <span>
                                 全量数据上送间隔（s） [*程序会重启]
                             </span>
-                            <InputNumber
-                                // defaultValue={config.data_upload_cov_ttl}
-                                style={{width: 100}}
-                                onChange={this.onChange}
-                                onFocus={()=>{
-                                    this.foucus('COV_TTL')
-                                }}
-                            /><Button className={COV_TTL ? 'show' : 'hide'}>保存</Button>
+                            <div style={{position: 'relative'}}>
+                                <InputNumber
+                                    value={COV_TTL_VALUE}
+                                    min={0}
+                                    style={{width: 100}}
+                                    onChange={(value)=>{
+                                        this.onChange(value, 'COV_TTL_VALUE')
+                                    }}
+                                    onFocus={()=>{
+                                        this.setState({COV_TTL: true})
+                                    }}
+                                />
+                                {
+                                    COV_TTL
+                                    ? <Button
+                                        style={{
+                                            position: 'absolute',
+                                            right: -70,
+                                            marginLeft: 66,
+                                            top: 9
+                                        }}
+                                        onClick={()=>{
+                                            this.buttonOnclick('COV_TTL_VALUE', 'COV_TTL')
+                                        }}
+                                      >保存</Button>
+                                    : ''
+                                }
+                            </div>
                         </div>
                         <div className="list">
                             <span>
@@ -358,9 +365,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                               //  defaultChecked={config.stat_upload === 1 ? false : true}
+                                checked={config.stat_upload}
                                 onChange={()=>{
-                                    this.setAutoDisabled('stat', config.data_upload)
+                                    this.changeState('stat_upload');
+                                    this.setAutoDisabled('stat', config.stat_upload)
                                 }}
                             />
                         </div>
@@ -371,9 +379,11 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                // defaultChecked={config.Net_Manager}
+                                checked={config.Net_Manager}
                                 onChange={()=>{
-                                    this.setConfig('Net_Manager', config.Net_Manager)
+                                    console.log(this)
+                                    this.changeState('Net_Manager');
+                                    this.setConfig('Network', config.Net_Manager)
                                 }}
                             />
                         </div>
@@ -384,9 +394,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                               // defaultChecked={config.ioe_frpc}
+                                checked={config.p2p_vpn}
                                 onChange={()=>{
-                                    this.setConfig('ioe_frpc', config.Net_Manager)
+                                    this.changeState('p2p_vpn');
+                                    this.setConfig('ioe_frpc', config.p2p_vpn)
                                 }}
                             />
                         </div>
@@ -394,16 +405,34 @@ class LinkStatus extends Component {
                             <span>
                                 日志上传等级 [*事件上传的最低等级]
                             </span>
-                            <InputNumber
-                               // defaultValue={config.event_upload}
-                                max={99}
-                                style={{width: 100}}
-                                onChange={this.onChange}
-                                onFocus={()=>{
-                                    this.foucus('UOLOAD')
-                                }}
-                            />
-                            {/* <Button>保存</Button> */}
+                            <div style={{position: 'relative'}}>
+                                <InputNumber
+                                    value={UOLOAD_VALUE}
+                                    min={0}
+                                    style={{width: 100}}
+                                    onChange={(value)=>{
+                                        this.onChange(value, 'UOLOAD_VALUE')
+                                    }}
+                                    onFocus={()=>{
+                                        this.setState({UOLOAD: true})
+                                    }}
+                                />
+                                {
+                                    UOLOAD
+                                    ? <Button
+                                        style={{
+                                            position: 'absolute',
+                                            right: -70,
+                                            marginLeft: 66,
+                                            top: 9
+                                        }}
+                                        onClick={()=>{
+                                            this.buttonOnclick('UOLOAD_VALUE', 'UOLOAD')
+                                        }}
+                                      >保存</Button>
+                                    : ''
+                                }
+                            </div>
                         </div>
                         <div className="list">
                             <span>

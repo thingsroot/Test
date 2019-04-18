@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 const TabPane = Tabs.TabPane;
 function getDevicesList (){
     http.get('/api/gateways_list').then(res=>{
-        console.log(res)
         const online = [];
         const offline = [];
         const data = [];
@@ -68,7 +67,6 @@ function callback (key){
       http.postToken('/api/gateways_remove', {
         name: record.name
       }).then(res=>{
-          console.log(res)
           if (res.ok){
             message.success('移除网关成功')
         }
@@ -196,7 +194,6 @@ class MyGates extends PureComponent {
         this.getDevicesList('online')
     }
     onChanges = (type) => {
-        console.log(type)
         switch (type){
             case 'sn':
                 this.setState({
@@ -221,7 +218,7 @@ class MyGates extends PureComponent {
           visible: true
         });
       }
-      handleOk = (e) => {
+      handleOk = () => {
           const { sn, name, desc} = this.state;
           const data = {
             'device_name': name,
@@ -229,7 +226,6 @@ class MyGates extends PureComponent {
             'owner_type': 'User',
             'owner_id': sn
           };
-        console.log(e);
         this.setState({
             confirmLoading: true
           }, ()=>{
@@ -244,8 +240,7 @@ class MyGates extends PureComponent {
         });
         }, 2000);
       }
-      handleCancel = (e) => {
-        console.log(e);
+      handleCancel = () => {
         this.setState({
           visible: false
         });
@@ -253,9 +248,11 @@ class MyGates extends PureComponent {
     render (){
         let { data, online, offline, confirmLoading } = this.state;
         return (
-            <div style={{
-                position: 'relative'
-            }}>
+            <div
+                style={{
+                    position: 'relative'
+                }}
+            >
                 <Button
                     type="primary"
                     onClick={this.showModal}

@@ -57,7 +57,8 @@ class AppSettings extends PureComponent {
                                         rules: [{ required: true, message: '不能为空！' }]
                                     })(
                                         <Input type="text"
-                                            style={{width: '240px'}}/>
+                                            style={{width: '240px'}}
+                                        />
                                     )}
                                 </Form.Item>
                             </Col>

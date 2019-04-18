@@ -16,7 +16,6 @@ class CodeStore {
     @observable instName = '123';
     @observable template = [];   //template选项
     @observable dataSource = [];   //templateList
-    
     @action setTemplate (values) {
         this.template = values;
     }
