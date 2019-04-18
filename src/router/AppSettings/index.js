@@ -9,7 +9,6 @@ import http from '../../utils/Server';
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 
-
 function callback (key) {
     console.log(key);
 }
@@ -21,14 +20,30 @@ class AppSettings extends PureComponent {
         message: ''
     };
     componentDidMount (){
-        if (this.props.match.params.type === 2) {
-            http.get('/api/applications_read?name=' + this.props.match.params.app).then(res=>{
-                this.setState({
-                    message: res.data
-                })
-            })
+        let app = this.props.match.params.name;
+        if (app) {
+            this.getDetails(app);
+        } else {
+            this.props.form.setFieldsValue({
+                app_name: '',
+                code_name: '',
+                license_type: ''
+            });
         }
     }
+    getDetails = (app)=>{
+        http.get('/api/applications_read?name=' + app).then(res=>{
+            console.log(res);
+            this.setState({
+                message: res.data
+            });
+            this.props.form.setFieldsValue({
+                app_name: res.data.app_name,
+                code_name: res.data.code_name,
+                license_type: '免费'
+            })
+        })
+    };
     submit = (e)=>{
         e.preventDefault();
         if (this.props.match.params.type === 1) {

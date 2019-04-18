@@ -3,7 +3,14 @@ import SimpleMDE from 'simplemde';
 import marked from 'marked';
 import highlight from 'highlight.js';
 import 'simplemde/dist/simplemde.min.css';
+import {inject, observer} from 'mobx-react';
+
+@inject('store')
+@observer
 class EditorDesc extends PureComponent {
+    state = {
+        text: this.props.store.codeStore.editorContent
+    };
     componentDidMount (){
         this.smde = new SimpleMDE({
             element: document.getElementById('editor').childElementCount,
@@ -29,7 +36,10 @@ class EditorDesc extends PureComponent {
     render () {
         return (
             <div className="editorDesc">
-                <textarea id="editor"> </textarea>
+                <textarea
+                    id="editor"
+                    value={this.state.text}
+                > </textarea>
             </div>
         );
     }

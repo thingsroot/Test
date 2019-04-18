@@ -1,41 +1,40 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import marked from 'marked';
-import http from '../../../utils/Server';
+import {inject, observer} from 'mobx-react';
 
-class AppDesc extends PureComponent {
+@inject('store')
+@observer
+class AppDesc extends Component {
     state = {
         editorContent: ''
     };
     componentDidMount (){
-        const {name} = this.props;
-        http.get('/api/applications_desc?name=' + name).then(res=>{
-            console.log(res)
-            if (typeof res === 'object') {
-                res = JSON.stringify(res)
-            }
-            this.setState({
-                editorContent: res
-            });
-            let rendererMD = new marked.Renderer();
-            marked.setOptions({
-                renderer: rendererMD,
-                gfm: true,
-                tables: true,
-                breaks: false,
-                pedantic: false,
-                sanitize: false,
-                smartLists: true,
-                smartypants: false
-            });//基本设置
-            document.getElementById('editor').innerHTML = marked(this.state.editorContent);
-        });
-
-
+        console.log(this.props)
+        let rendererMD = new marked.Renderer();
+        marked.setOptions({
+            renderer: rendererMD,
+            gfm: true,
+            tables: true,
+            breaks: false,
+            pedantic: false,
+            sanitize: false,
+            smartLists: true,
+            smartypants: true
+        });//基本设置
     }
+
+    componentWillReceiveProps (nextProps, nextContext) {
+        if (nextProps.desc !== nextContext.desc) {
+            this.refs.editor.innerHTML = marked(nextProps.desc);
+        }
+    }
+
     render () {
         return (
             <div className="appDesc">
-                <div id="editor"> </div>
+                <div
+                    ref="editor"
+                > </div>
             </div>
         );
     }

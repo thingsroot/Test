@@ -67,6 +67,7 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-simple-jstree": "^0.2.2",
+    "react-simplemde-editor": "^4.0.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "reqwest": "^2.0.5",

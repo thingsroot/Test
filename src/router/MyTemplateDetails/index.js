@@ -1,81 +1,96 @@
 import React, { PureComponent } from 'react';
 import Papa from 'papaparse';
-import { Select, Button, Upload, Icon, message, Modal } from 'antd';
+import { Select, Button, Upload, Icon, Modal, message } from 'antd';
 import { CSVLink } from 'react-csv';
 import http from '../../utils/Server';
 import './style.scss';
-
 const Dragger = Upload.Dragger;
 const Option = Select.Option;
-const props = {
-    name: 'file',
-    multiple: false,
-    action: '//jsonplaceholder.typicode.com/posts/',
-    onChange (info) {
-        const status = info.file.status;
-        if (status !== 'uploading') {
-            console.log(info.file, info.fileList);
-        }
-        if (status === 'done') {
-            message.success(`${info.file.name} 上传成功.`);
-        } else if (status === 'error') {
-            message.error(`${info.file.name} 上传失败.`);
-        }
-    },
-    onPreview (file) {
-        console.log(file)
-    }
-};
 
 class MyTemplateDetails extends PureComponent {
     constructor () {
         super();
         this.state = {
-            content: '',
-            csvData: '',
-            versionList: [],
-            select: '',
-            confName: '',
-            visible: false
+            conf: '',
+            content: '',  //数据原型
+            csvData: '',  //csv数据
+            versionList: [],   //版本号列表
+            confName: '',    //关联应用名称
+            visible: false,
+            dataList: [],    //版本信息列表
+            file: '',        //文件流
+            previewData: '',  //预览数据原型
+            previewCsvData: '', //预览csv数据
+            maxVersion: ''
         }
     }
     componentDidMount () {
-        let version = this.props.match.params.version;
-        this.getDetails(version);
-        http.get('/api/method/conf_center.api.get_versions?conf=' + this.props.match.params.name)
+        let conf = this.props.match.params.name;
+        this.setState({
+            conf: conf
+        });
+        this.getVersionList(conf);
+    }
+    getVersionList = (conf)=>{
+        http.get('/api/configurations_versions_list?conf=' + conf)
             .then(res=>{
                 let list = [];
-                res.message && res.message.length > 0 && res.message.map((v)=>{
+                res.data && res.data.length > 0 && res.data.map((v)=>{
                     list.push(v.version);
                 });
                 this.setState({
-                    versionList: list
-                })
-
+                    versionList: list,
+                    maxVersion: list[0],
+                    dataList: res.data,
+                    csvData: Papa.parse(res.data[0].data).data
+                });
+                this.getDetails(list[0]);
             });
-        http.get('/api/method/conf_center.api.app_conf_detail?name=' + this.props.match.params.name)
-            .then(res=>{
-                this.setState({
-                    confName: res.message.app_name
-                })
-            })
-    }
+    };
+
     getDetails = (version)=>{
-        http.get('/api/method/conf_center.api.app_conf_data?app=' + this.props.match.params.app +
-            '&conf=' + this.props.match.params.name + '&version=' + version)
-            .then(res=>{
-                let results = Papa.parse(res.message.data);
+        let { dataList } = this.state;
+        dataList && dataList.length > 0 && dataList.map((v, key)=>{
+            key;
+            if (v.version === version) {
+                let results = Papa.parse(v.data);
                 this.setState({
-                    content: res.message.data,
+                    content: v.data,
                     csvData: results.data
                 });
-            });
+            }
+        })
+    };
+
+    fileChang = (info)=>{
+        this.setState({
+            file: info.file.originFileObj
+        });
+        this.openFile(info.file.originFileObj)
+    };
+
+    openFile = (file)=>{
+        let reader = new FileReader();
+        let data1 = '';
+        reader.onload = function () {
+            data1 = this.result;
+        };
+        setTimeout(()=>{
+            this.setState({
+                previewData: data1,
+                previewCsvData: Papa.parse(data1).data
+            })
+        }, 100);
+        reader.readAsText(file);
     };
 
     onVersionChange = (value) => {
-        console.log(value);
+        this.setState({
+            maxVersion: value
+        });
         this.getDetails(value);
     };
+
     showModal = () => {
         this.setState({
             visible: true
@@ -83,10 +98,30 @@ class MyTemplateDetails extends PureComponent {
     };
 
     handleOk = (e) => {
-        console.log(e);
-        this.setState({
-            visible: false
-        });
+        e;
+        let maxVersion = this.state.maxVersion + 1;
+        let params = {
+            name: this.props.match.params.name,
+            version: maxVersion,
+            comment: 'V' + maxVersion,
+            data: this.state.previewData
+        };
+        http.post('/api/configurations_versions_create', params)
+            .then(res=>{
+                res;
+                message.success('上传新版本成功！');
+                setTimeout(()=>{
+                    this.setState({
+                        visible: false,
+                        previewCsvData: []
+                    });
+                }, 500);
+                this.getVersionList(this.state.conf)
+            })
+            .catch(err=>{
+                console.log(err)
+            });
+
     };
 
     handleCancel = (e) => {
@@ -97,14 +132,15 @@ class MyTemplateDetails extends PureComponent {
     };
 
     render () {
-        const {content, csvData, versionList, confName} = this.state;
+        const {content, csvData, versionList, confName, previewCsvData, maxVersion} = this.state;
         return (
             <div className="MyTemplateDetails">
                 <div className="title">
                     <div>
                         <span>版本列表：</span>
+                        {console.log(maxVersion)}
                         <Select
-                            defaultValue={this.props.match.params.version}
+                            value={maxVersion}
                             style={{ width: 220 }}
                             onChange={this.onVersionChange}
                         >
@@ -140,27 +176,27 @@ class MyTemplateDetails extends PureComponent {
                         border="1"
                     >
                         <tbody>
-                    {
-                        csvData && csvData.length > 0 && csvData.map((v, key)=>{
-                            if (v.length > 1) {
-                                return <tr key={key}>
-                                    {
-                                        v && v.length > 0 && v.map((w, key)=>{
-                                            return (
-                                                <td
-                                                    key={key}
-                                                    style={{width: '100px', padding: '10px', whiteSpace: 'nowrap'}}
-                                                >
-                                                {w}
-                                            </td>
-                                            )
-                                        })
+                            {
+                                csvData && csvData.length > 0 && csvData.map((v, key)=>{
+                                    if (v.length > 1) {
+                                        return <tr key={key}>
+                                            {
+                                                v && v.length > 0 && v.map((w, key)=>{
+                                                    return (
+                                                        <td
+                                                            key={key}
+                                                            style={{width: '100px', padding: '10px', whiteSpace: 'nowrap'}}
+                                                        >
+                                                        {w}
+                                                    </td>
+                                                    )
+                                                })
+                                            }
+                                        </tr>
                                     }
-                                </tr>
-                            }
 
-                        })
-                    }
+                                })
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -173,17 +209,52 @@ class MyTemplateDetails extends PureComponent {
                     onCancel={this.handleCancel}
                     wrapClassName={'web'}
                 >
-                    <Dragger
-                        style={{width: '1000px', height: '600px'}}
-                        accept=".csv"
-                        onPreview={this.onPreview}
-                        {...props}
+                    <div style={previewCsvData.length > 0
+                        ? {display: 'none'}
+                        : {width: '100%', height: '390px', display: 'block'}}
                     >
-                        <p className="ant-upload-drag-icon">
-                            <Icon type="inbox" />
-                        </p>
-                        <p className="ant-upload-text">将文件拖拽至此或点击添加</p>
-                    </Dragger>
+                        <Dragger
+                            style={{width: '100%', height: '600px'}}
+                            accept=".csv"
+                            onChange={this.fileChang}
+                        >
+                            <p className="ant-upload-drag-icon">
+                                <Icon type="inbox" />
+                            </p>
+                            <p className="ant-upload-text">将文件拖拽至此或点击添加</p>
+                        </Dragger>
+                    </div>
+                    <div style={previewCsvData.length > 0
+                        ? {width: '100%', height: '390px', overflow: 'auto', display: 'block'}
+                        : {display: 'none'}}
+                    >
+                        <table
+                            style={{minWidth: '100%'}}
+                            border="1"
+                        >
+                            {
+                                previewCsvData && previewCsvData.length > 0 && previewCsvData.map((v, key)=>{
+                                    if (v.length > 1) {
+                                        return <tr key={key}>
+                                            {
+                                                v && v.length > 0 && v.map((w, key)=>{
+                                                    return (
+                                                        <td
+                                                            key={key}
+                                                            style={{width: '100px', padding: '10px', whiteSpace: 'nowrap'}}
+                                                        >
+                                                            {w}
+                                                        </td>
+                                                    )
+                                                })
+                                            }
+                                        </tr>
+                                    }
+
+                                })
+                            }
+                        </table>
+                    </div>
                 </Modal>
             </div>
         );

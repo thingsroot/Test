@@ -13,4 +13,15 @@
   .disposed{
     color: red;
   }
+  .SonTables{
+    ul>li{
+      line-height: 30px;
+      >span{
+        display: inline-block;
+        width: 170px;
+        text-align: right;
+        margin-right: 20px;
+      }
+    }
+  }
 }

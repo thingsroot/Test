@@ -11,8 +11,8 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
             num: '',
             newPassword: ''
         };
-        VerifyPassword = (password)=>{
-            http.post('/api/method/iot_ui.iot_api.verify_password?password=' + password)
+        VerifyPassword = (email)=>{
+            http.post('/api/user_reset_password?email=' + email)
                 .then(res=>{
                     console.log(res)
                 })
@@ -33,21 +33,7 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
                 // 必须总是返回一个 callback，否则 validateFields 无法响应
                 callback();
             };
-            const oldPassword = (rule, value, callback) => {
-                console.log(value);
-                this.setState({
-                    num: value
-                });
 
-                setTimeout(()=>{
-                    http.postToken('/api/method/iot_ui.iot_api.verify_password?password=' + this.state.num)
-                        .catch(err=>{
-                            console.log(err);
-                            callback('请输入正确的旧密码！')
-                        });
-                }, 500)
-
-            };
             return (
                 <Modal
                     visible={visible}
@@ -60,9 +46,7 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
                     <Form layout="vertical">
                         <Form.Item label="旧密码">
                             {getFieldDecorator('oldPassword', {
-                                rules: [{ required: true, message: '不能为空' }, {
-                                    validator: oldPassword
-                                }]
+                                rules: [{ required: true, message: '不能为空' }]
                             })(
                                 <Input type="password"/>
                             )}

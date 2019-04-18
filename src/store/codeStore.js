@@ -16,6 +16,31 @@ class CodeStore {
     @observable instName = '123';
     @observable template = [];   //template选项
     @observable dataSource = [];   //templateList
+
+    @observable platformData = [];   //平台消息
+    @observable tableData = [];   //
+
+    @observable deviceData = [];   //设备消息
+    @observable deviceTableData = [];   //
+
+    @observable versionFile = {};
+
+    @action setVersionFile (values) {
+        this.versionFile = values;
+    }
+
+    @action setDeviceData (values) {
+        this.deviceData = values;
+    }
+    @action setDeviceTableData (values) {
+        this.deviceTableData = values;
+    }
+    @action setPlatformData (values) {
+        this.platformData = values;
+    }
+    @action setTableData (values) {
+        this.tableData = values;
+    }
     @action setTemplate (values) {
         this.template = values;
     }

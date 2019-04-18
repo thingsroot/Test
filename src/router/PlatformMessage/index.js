@@ -1,10 +1,11 @@
-import React, { PureComponent } from 'react';
-import { Table, Input, Select, Button, message, Modal } from 'antd'
-// import { Link } from 'react-router-dom'
+import React, { Component } from 'react';
+import { Table, Input, Select, Button, message } from 'antd'
+import SonTable from './SonTable';
 import './style.scss'
 import http from '../../utils/Server';
 import axios from 'axios';
 import { _getCookie } from '../../utils/Session';
+import {inject, observer} from 'mobx-react';
 const InputGroup = Input.Group;
 const Option = Select.Option;
 const disposed = {
@@ -15,20 +16,22 @@ const posed = {
     color: 'rgba(0, 0, 0, 0.65)',
     fontWeight: 'normal'
 };
-class PlatformMessage extends PureComponent {
+
+@inject('store')
+@observer
+class PlatformMessage extends Component {
     state = {
         name: '',
         category: '',
         start: 0,
         length: 10,
         filters: {},
-        tableData: [],
-        platformData: [],
         dataSource: [],
         selectValue: 'title',
         text: '',
+        platform: [],
         loading: false,
-        selectRow: [],
+        selectedRowKeys: [],
         visible: false,
         columns: [{
             title: '标题',
@@ -81,80 +84,97 @@ class PlatformMessage extends PureComponent {
         });
         this.getMessageList(params);
     }
-    handleCancel = (e) => {
-        console.log(e);
-        this.setState({
-            visible: false
-        });
-    };
     onChange = (pagination, filters, sorter)=>{
         console.log('params', pagination, filters, sorter)
     };
-    rowSelection = {
-        onChange: (selectedRowKeys, selectedRows) => {
-            console.log(selectedRows);
-            this.setState({
-                selectRow: selectedRows
-            })
-        },
-        getCheckboxProps: record => ({
-            disabled: record.name === 'Disabled User', // Column configuration not to be checked
-            name: record.name
-        })
+    onSelectChange = (selectedRowKeys) => {
+        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        this.setState({ selectedRowKeys });
     };
-    viewMessage = (name)=>{
-        http.get('/api/activities_message_read?category=' + this.state.category + '&name=' + name).then(res=>{
-            console.log(res);
-            this.setState({
-                visible: true
-            });
 
-        });
-
-        //确认消息接口
-        // let params = {
-        //     category: this.state.category,
-        //     name: name
-        // };
-        // http.post('/api/activities_disponse', params).then(res=>{
-        //     console.log(res.data)
-        // })
-        //过滤数据
-        let data = this.state.tableData;
-        data && data.length > 0 && data.map((v, key)=>{
-            key;
-            if (v.name === name) {
-                v.disposed = 1
-            }
-        });
-        let newData = data.splice(0, this.state.length - 1);
-        this.setState({
-            platformData: newData,
-            tableData: newData
-        });
-        //查看消息详情
-
-
-    };
     //确认消息
     confMessage = (arr)=>{
         if (arr.length === 0) {
             message.warning('请您先选择要确认的消息！');
         } else {
+            this.setState({
+                loading: true
+            });
             let params = {
-                // category: this.state.category,
-                name: arr[0].name
+                category: this.state.category,
+                activities: arr,
+                disposed: 1
             };
-            http.post('/api/activities_disponse', params).then(res=>{
-                console.log(res.data)
+            http.post('/api/activities_dispose', params).then(res=>{
+                console.log(res);
+                let platform = this.state.platform;
+                console.log(platform);
+                platform && platform.length > 0 && platform.map((w, key)=>{
+                    key;
+                    // console.log(w.name)
+                    arr.map((v, key1)=>{
+                        key1;
+                        // console.log(v, key1);
+                        if (w.name === v) {
+                            w.disposed = 1;
+                            console.log(w.disposed)
+                        }
+                    });
+                });
+                console.log(platform);
+
+                let newData = platform.splice(0, platform.length - 10);
+                this.props.store.codeStore.setPlatformData(newData);
+                this.props.store.codeStore.setTableData(newData);
+                this.setState({
+                    selectedRowKeys: [],
+                    loading: false,
+                    platform: newData
+                }, ()=>{
+                    console.log(this.state.platform)
+                });
             }).catch(err=>{
                 console.log(err)
             })
         }
     };
-    //确认消息
+    //确认全部消息
     confAllMessage = ()=>{
-        message.warning('请您先选择要确认的消息！');
+        this.setState({
+            loading: true
+        });
+        let data = [];
+        let platform = this.state.platform;
+        platform && platform.length > 0 && platform.map((v, key)=>{
+            key;
+            if (v.disposed === 0) {
+                data.push(v.name)
+            }
+        });
+        let params = {
+            category: this.state.category,
+            activities: data,
+            disposed: 1
+        };
+        console.log(params);
+        http.post('/api/activities_dispose', params).then(res=>{
+            console.log(res);
+            platform && platform.length > 0 && platform.map((v, key)=>{
+                key;
+                if (v.disposed === 0) {
+                    v.disposed = 1;
+                }
+            });
+            this.props.store.codeStore.setPlatformData(platform);
+            this.props.store.codeStore.setTableData(platform);
+            this.setState({
+                selectedRowKeys: [],
+                loading: false,
+                platform: platform
+            });
+        }).catch(err=>{
+            console.log(err)
+        })
     };
     //获取消息列表
     getMessageList = (params)=>{
@@ -168,7 +188,6 @@ class PlatformMessage extends PureComponent {
         }).then(res=>{
             if (res.data.ok === true) {
                 let sourceData = res.data.data.list.data;
-                console.log(sourceData);
                 let data = [];
                 let source = [];
                 if (sourceData) {
@@ -236,13 +255,13 @@ class PlatformMessage extends PureComponent {
                                 } else if (obj.action === 'enable/log') {
                                     if (obj.data === '') {
                                         sub = '网关关闭日志上送'
-                                    } else if (obj.data === 120) {
+                                    } else if (obj.data === 60) {
                                         sub = '网关开启日志上送'
                                     }
                                 } else if (obj.action === 'enable/comm') {
-                                    if (obj.data.sec === 0) {
+                                    if (obj.data === 0) {
                                         sub = '网关停止报文上送'
-                                    } else if (obj.data.sec === 120) {
+                                    } else if (obj.data === 60) {
                                         sub = '网关开启报文上送'
                                     }
                                 } else if (obj.action === 'restart') {
@@ -252,9 +271,9 @@ class PlatformMessage extends PureComponent {
                                 } else if (obj.action === 'cloud_conf') {
                                     sub = '网关云中心配置选项更新'
                                 } else if (obj.action === 'enable/data_one_short') {
-                                    if (obj.data.sec === '') {
+                                    if (obj.data === '') {
                                         sub = '网关关闭临时上传数据'
-                                    } else if (obj.data.sec === 120) {
+                                    } else if (obj.data === 60) {
                                         sub = '网关开启临时上传数据'
                                     }
                                 } else if (obj.action === 'ext/upgrade') {
@@ -290,16 +309,22 @@ class PlatformMessage extends PureComponent {
                             creation: v.creation.split('.')[0],
                             operation: v.operation,
                             disposed: v.disposed,
-                            name: v.name
+                            name: v.name,
+                            status: v.status,
+                            message: v.message,
+                            user: v.user
                         });
                         source.push(sub);
                     });
                 }
                 this.setState({
-                    platformData: data,
-                    tableData: data,
-                    loading: false
-                })
+                    loading: false,
+                    platform: data
+                }, ()=>{
+                    console.log(this.state.platform)
+                });
+                this.props.store.codeStore.setPlatformData(data);
+                this.props.store.codeStore.setTableData(data);
             } else {
                 message.error('获取消息列表失败！')
             }
@@ -335,24 +360,23 @@ class PlatformMessage extends PureComponent {
         }, 1000);
     };
     search = (inpVal)=>{
-        console.log(inpVal)
         let text = event.target.value;
         this.tick(text);
-        let newData = [];
-        this.state.tableData.map((v)=>{
-            if (v[inpVal].indexOf(text) !== -1) {
-                newData.push(v)
-            }
-        });
         if (text) {
-            this.setState({
-                platformData: newData
+            let newData = [];
+            let tableData = this.props.store.codeStore.tableData;
+            tableData.map((v)=>{
+                if (v[inpVal].indexOf(text) !== -1) {
+                    newData.push(v)
+                }
             });
-        } else {
-            let data = this.state.tableData;
             this.setState({
-                platformData: data
-            })
+                platform: newData
+            });
+            this.props.store.codeStore.setPlatformData(newData);
+        } else {
+            let data = this.props.store.codeStore.tableData;
+            this.props.store.codeStore.setPlatformData(data);
         }
     };
     //最大记录数
@@ -375,19 +399,22 @@ class PlatformMessage extends PureComponent {
     messageChange = (value)=>{
         if (`${value}`) {
             let data = [];
-            this.state.tableData.map((v)=>{
+            let tableData = this.props.store.codeStore.tableData;
+            tableData.map((v)=>{
                 if (v.operation === `${value}`) {
                     data.push(v);
                 }
             });
             this.setState({
-                platformData: data
-            })
+                platform: data
+            });
+            this.props.store.codeStore.setPlatformData(data)
         } else {
-            let data = this.state.tableData;
+            let data = this.props.store.codeStore.tableData;
+            this.props.store.codeStore.setPlatformData(data);
             this.setState({
-                platformData: data
-            })
+                platform: data
+            });
         }
     };
     //时间
@@ -414,7 +441,12 @@ class PlatformMessage extends PureComponent {
     };
 
     render () {
-        let { selectValue, selectRow, columns } = this.state;
+        let { selectValue, selectedRowKeys, columns, category } = this.state;
+        const { platformData } = this.props.store.codeStore;
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onSelectChange
+        };
         return (
             <div className="platformMessage">
                 <div className="searchBox">
@@ -444,7 +476,7 @@ class PlatformMessage extends PureComponent {
                         <Option value="72">72小时</Option>
                     </Select>
                     <Button onClick={()=>{
-                        this.confMessage(selectRow)
+                        this.confMessage(selectedRowKeys)
                     }}
                     >确认消息</Button>
                     <Button onClick={()=>{
@@ -478,69 +510,15 @@ class PlatformMessage extends PureComponent {
                         </InputGroup>
                     </div>
                 </div>
-                <Modal
-                    title="消息详情"
-                    visible={this.state.visible}
-                    onCancel={this.handleCancel}
-                >
-                    {/*<table border="1"*/}
-                    {/*    collspacing="0"*/}
-                    {/*>*/}
-                    {/*    <tr>*/}
-                    {/*        <td>标题</td>*/}
-                    {/*        <td>{this.state.title}</td>*/}
-                    {/*    </tr>*/}
-                    {/*    <tr>*/}
-                    {/*        <td>所属设备序列号</td>*/}
-                    {/*        <td>{this.state.data.device}</td>*/}
-                    {/*    </tr>*/}
-                    {/*    <tr>*/}
-                    {/*        <td>发生时刻设备所属公司</td>*/}
-                    {/*        <td>{this.state.data.owner_company}</td>*/}
-                    {/*    </tr>*/}
-                    {/*    <tr>*/}
-                    {/*        <td>触发用户用户名</td>*/}
-                    {/*        <td>{this.state.data.disposed_by}</td>*/}
-                    {/*    </tr>*/}
-                    {/*    <tr>*/}
-                    {/*        <td>发生时间</td>*/}
-                    {/*        <td>{this.state.data.creation}</td>*/}
-                    {/*    </tr>*/}
-                    {/*    <tr>*/}
-                    {/*        <td>执行结果</td>*/}
-                    {/*        <td>{this.state.data.operation}</td>*/}
-                    {/*    </tr>*/}
-                    {/*    <tr>*/}
-                    {/*        <td>记录类型</td>*/}
-                    {/*        <td>{this.state.data.status === 'Success' ? '成功' : '失败'}</td>*/}
-                    {/*    </tr>*/}
-                    {/*    <tr>*/}
-                    {/*        <td>详细信息</td>*/}
-                    {/*        <td>{this.state.data.message}</td>*/}
-                    {/*    </tr>*/}
-                    {/*    <tr>*/}
-                    {/*        <td>是否确认消息</td>*/}
-                    {/*        <td>{this.state.data.disposed === '1' ? '已确认消息' : '为确认消息'}</td>*/}
-                    {/*    </tr>*/}
-                    {/*    <tr>*/}
-                    {/*        <td>确认消息用户</td>*/}
-                    {/*        <td>{this.state.data.user}</td>*/}
-                    {/*    </tr>*/}
-                    {/*</table>*/}
-                </Modal>
                 <Table
-                    rowSelection={this.rowSelection}
+                    rowSelection={rowSelection}
                     columns={columns}
-                    dataSource={this.state.platformData}
+                    dataSource={platformData}
                     loading={this.state.loading}
                     onChange={this.onChange}
                     rowKey="name"
-                    rowClassName={this.setClassName} //表格行点击高亮
-                    onRow={(record) => {//表格行点击事件
-                        return {
-                            onClick: this.viewMessage.bind(this, record.name)
-                        };
-                    }}
+                    expandedRowRender={record => <SonTable category={category} data={record}/>}
+                    expandRowByClick
                 />
             </div>
         );

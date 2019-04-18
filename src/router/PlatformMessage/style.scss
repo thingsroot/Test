@@ -13,4 +13,18 @@
   .disposed{
     color: red;
   }
+  //.ant-table-row-expand-icon-cell, .ant-table-expand-icon-th{
+  //  display: none!important;
+  //}
+  .SonTable{
+    ul>li{
+      line-height: 30px;
+      >span{
+        display: inline-block;
+        width: 170px;
+        text-align: right;
+        margin-right: 20px;
+      }
+    }
+  }
 }

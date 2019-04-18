@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Icon, Tabs } from 'antd';
 import './style.scss';
@@ -17,31 +17,35 @@ const block = {
 const none = {
     display: 'none'
 };
-class MyAppDetails extends PureComponent {
-    constructor (){
-        super();
-        this.state = {
-            user: '',
-            message: '',
-            time: '',
-            app: ''
-        }
-    }
+class MyAppDetails extends Component {
+    state = {
+        user: '',
+        message: '',
+        time: '',
+        app: '',
+        desc: '',
+        versionList: [],
+        templateList: []
+    };
     componentDidMount (){
         let usr = _getCookie('user_id');
-        this.setState({
-            user: usr
-        }, ()=>{
-            console.log(this.state.user)
-        });
         let app = this.props.match.params.name;
+        this.setState({
+            user: usr,
+            app: app
+        });
         this.getDetails(app);
     }
     getDetails = (app)=>{
-        http.get('/api/applications_read?name=' + app).then(res=>{
+        http.get('/api/applications_read?app=' + app).then(res=>{
+            console.log(res.data);
             this.setState({
-                message: res.data,
-                time: res.data.modified.substr(0, 11)
+                message: res.data.data.data,
+                desc: res.data.data.data.description,
+                time: res.data.data.data.modified.substr(0, 11),
+                versionList: res.data.versionList.data,
+                versionLatest: res.data.versionLatest.data,
+                templateList: res.data.tempList
             })
         })
     };
@@ -50,7 +54,7 @@ class MyAppDetails extends PureComponent {
     };
     render () {
         const { url } = this.props.match;
-        let { message, time, user } = this.state;
+        let { app, message, time, user, versionLatest, versionList, templateList } = this.state;
         return (
             <div className="myAppDetails">
                 <div className="header">
@@ -97,10 +101,15 @@ class MyAppDetails extends PureComponent {
                             <Link
                                 to={`/myAppDetails/${message.fork_from}`}
                                 onClick={
-                                ()=>{
-                                this.getDetails(message.fork_from);
+                                    ()=>{
+                                        this.getDetails(message.fork_from);
+                                        this.setState({
+                                            app: this.props.match.params.name
+                                        }, ()=>{
+                                            console.log(this.state.app)
+                                        });
+                                    }
                                 }
-                            }
                             >
                                 <Icon type="share-alt" />
                                 分支
@@ -122,7 +131,7 @@ class MyAppDetails extends PureComponent {
                             </Link>}
                         key="1"
                     >
-                        <AppDesc name={this.props.match.params.name}/>
+                        <AppDesc desc={this.state.desc}/>
                     </TabPane>
                     <TabPane
                         tab={
@@ -135,7 +144,9 @@ class MyAppDetails extends PureComponent {
                         key="2"
                     >
                         <VersionList
-                            name={this.props.match.params.name}
+                            app={app}
+                            versionList={versionList}
+                            versionLatest={versionLatest + 1}
                             user={message.owner === user ? true : false}
                         />
                     </TabPane>
@@ -149,7 +160,7 @@ class MyAppDetails extends PureComponent {
                             </Link>}
                         key="3"
                     >
-                        <TemplateList name={this.props.match.params.name} />
+                        <TemplateList templateList={templateList} />
                     </TabPane>
                 </Tabs>
 
