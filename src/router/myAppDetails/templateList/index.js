@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import http from '../../../utils/Server';
 import { Button, message } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
 const block = {
     display: 'block'
@@ -10,27 +10,15 @@ const none = {
     display: 'none'
 };
 
+@withRouter
 class TemplateList extends PureComponent {
     constructor () {
         super();
         this.state = {
-            templateList: [],
             templateContent: ''
         }
     }
 
-    componentDidMount () {
-        let {name} = this.props;
-        console.log(name);
-        http.get('/api/store_configurations_list?app=' + name)
-            .then(res=>{
-                console.log(res);
-                this.setState({
-                    templateList: res.message
-                })
-            })
-
-    }
     copyContent = (app, name, version)=>{
         http.get('/api/method/conf_center.api.app_conf_data?app=' + app +
             '&conf=' + name + '&version=' + version)
@@ -47,7 +35,8 @@ class TemplateList extends PureComponent {
             })
     };
     render () {
-        const {templateList, templateContent} = this.state;
+        const { templateList } = this.props;
+        const { templateContent } = this.state;
         return (
             <div className="templateList">
                 <ul>

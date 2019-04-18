@@ -6,12 +6,13 @@ const style = {
     flexGrow: 1,
     display: 'inline-block',
     paddingBottom: '10px'
-}
+};
 class EditorCode extends PureComponent {
     state = {
         data: '{name: "alice"}'
     };
     render () {
+        const {value1, value2} = this.props;
         return (
             <div
                 className="editorCode"
@@ -29,7 +30,7 @@ class EditorCode extends PureComponent {
                         splits={2}
                         fontSize={18}
                         orientation="beside"
-                        value={['', this.state.data]}
+                        value={[value1, value2]}
                         name="UNIQUE_ID_OF_DIV"
                         editorProps={{$blockScrolling: true}}
                     />

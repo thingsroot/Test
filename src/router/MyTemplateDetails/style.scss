@@ -10,13 +10,16 @@
 .web{
   .ant-modal-content {
     width: 1000px!important;
-    height: 500px!important;
+    height: 540px!important;
     margin-left: -500px!important;
     position: absolute;
     left: 50%;
   }
   .ant-modal-body {
     width: 1000px!important;
-    height: 390px!important;
+    height: 430px!important;
+  }
+  .ant-upload-list-item, .ant-upload-list-item-error{
+    display: none!important;
   }
 }

@@ -1,9 +1,11 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Table, Input, Select, Button, message } from 'antd'
 import './style.scss'
 import http from '../../utils/Server';
 import {_getCookie} from '../../utils/Session';
 import axios from 'axios/index';
+import {inject, observer} from 'mobx-react';
+import SonTables from './SonTables';
 const InputGroup = Input.Group;
 const Option = Select.Option;
 const disposed = {
@@ -15,7 +17,9 @@ const posed = {
     fontWeight: 'normal'
 };
 
-class DevicemMessage extends PureComponent {
+@inject('store')
+@observer
+class DevicemMessage extends Component {
     state = {
         category: '',
         user: '',
@@ -23,12 +27,12 @@ class DevicemMessage extends PureComponent {
         length: 100,
         filters: {},
         tableData: [],
-        platformData: [],
+        deviceData: [],
         dataSource: [],
         selectValue: 'title',
         text: '',
         loading: false,
-        selectRow: [],
+        selectedRowKeys: [],
         columns: [{
             title: '标题',
             dataIndex: 'title',
@@ -70,6 +74,7 @@ class DevicemMessage extends PureComponent {
         }]
     };
     componentDidMount (){
+
         let params = {
             category: 'user',
             name: _getCookie('user_id'),
@@ -84,37 +89,92 @@ class DevicemMessage extends PureComponent {
             length: params.limit,
             filters: params.filters
         });
-        this.getMessageList(params)
+        this.getMessageList(params);
+
+
     }
-    rowSelection = {
-        onChange: (selectedRowKeys, selectedRows) => {
-            console.log(selectedRows);
-            this.setState({
-                selectRow: selectedRows
-            })
-        },
-        getCheckboxProps: record => ({
-            disabled: record.name === 'Disabled User', // Column configuration not to be checked
-            name: record.name
-        })
+    onSelectChange = (selectedRowKeys) => {
+        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        this.setState({ selectedRowKeys });
     };
     //确认消息
     confMessage = (arr)=>{
         if (arr.length === 0) {
             message.warning('请您先选择要确认的消息！');
         } else {
-            let params = {
-                disposed: 1,
-                activities: arr
-            };
-            http.postToken('/api/method/iot.user_api.device_event', params).then(res=>{
-                console.log(res);
+            this.setState({
+                loading: true
             });
+            let params = {
+                category: this.state.category,
+                events: arr,
+                disposed: 1
+            };
+            http.post('/api/events_dispose', params).then(res=>{
+                console.log(res);
+                let deviceData = this.state.deviceData;
+                console.log(deviceData);
+                deviceData && deviceData.length > 0 && deviceData.map((w, key)=>{
+                    key;
+                    arr.map((v, key1)=>{
+                        key1;
+                        if (w.name === v) {
+                            w.disposed = 1
+                        }
+                    });
+                });
+                console.log(deviceData);
+
+                let newData = deviceData.splice(0, deviceData.length);
+                this.props.store.codeStore.setDeviceData(newData);
+                this.props.store.codeStore.setDeviceTableData(newData);
+                this.setState({
+                    selectedRowKeys: [],
+                    loading: false,
+                    deviceData: newData
+                });
+            }).catch(err=>{
+                console.log(err)
+            })
         }
     };
     //确认消息
     confAllMessage = ()=>{
-        message.warning('请您先选择要确认的消息！');
+        this.setState({
+            loading: true
+        });
+        let data = [];
+        let deviceData = this.state.deviceData;
+        deviceData && deviceData.length > 0 && deviceData.map((v, key)=>{
+            key;
+            if (v.disposed === 0) {
+                data.push(v.name)
+            }
+        });
+        let params = {
+            category: this.state.category,
+            events: data,
+            disposed: 1
+        };
+        console.log(params);
+        http.post('/api/events_dispose', params).then(res=>{
+            console.log(res);
+            deviceData && deviceData.length > 0 && deviceData.map((v, key)=>{
+                key;
+                if (v.disposed === 0) {
+                    v.disposed = 1;
+                }
+            });
+            this.props.store.codeStore.setDeviceData(deviceData);
+            this.props.store.codeStore.setDeviceTableData(deviceData);
+            this.setState({
+                selectedRowKeys: [],
+                loading: false,
+                platform: deviceData
+            });
+        }).catch(err=>{
+            console.log(err)
+        })
     };
     //获取消息列表
     getMessageList = (params)=>{
@@ -144,7 +204,9 @@ class DevicemMessage extends PureComponent {
                         operation: type,
                         disposed: v.disposed,
                         name: v.name,
-                        event_level: v.event_level
+                        data: v.event_data,
+                        event_level: v.event_level,
+                        event_type: v.event_type
                     });
                     source.push(v.event_type);
                 });
@@ -152,12 +214,11 @@ class DevicemMessage extends PureComponent {
                 message.error('获取消息列表失败！')
             }
             this.setState({
-                platformData: data,
-                tableData: data,
-                loading: false
-            }, ()=>{
-                console.log(this.state.tableData)
-            })
+                loading: false,
+                deviceData: data
+            });
+            this.props.store.codeStore.setDeviceData(data);
+            this.props.store.codeStore.setDeviceTableData(data)
         })
     };
     //时间戳转换
@@ -193,21 +254,18 @@ class DevicemMessage extends PureComponent {
     search = (inpVal)=>{
         let text = event.target.value;
         this.tick(text);
-        let newData = [];
-        this.state.tableData.map((v)=>{
-            if (v[inpVal].indexOf(text) !== -1) {
-                newData.push(v)
-            }
-        });
         if (text) {
-            this.setState({
-                platformData: newData
+            let newData = [];
+            let deviceTableData = this.props.store.codeStore.deviceTableData;
+            deviceTableData.map((v)=>{
+                if (v[inpVal].indexOf(text) !== -1) {
+                    newData.push(v)
+                }
             });
+            this.props.store.codeStore.setDeviceData(deviceTableData)
         } else {
-            let data = this.state.tableData;
-            this.setState({
-                platformData: data
-            })
+            let data = this.props.store.codeStore.deviceTableData;
+            this.props.store.codeStore.setDeviceData(data)
         }
     };
     //最大记录数
@@ -223,52 +281,54 @@ class DevicemMessage extends PureComponent {
         this.setState({
             length: params.limit
         });
-        console.log(params);
         this.getMessageList(params);
     };
     //筛选消息类型
     messageChange = (value)=>{
         let data = [];
         if (`${value}`) {
-            this.state.tableData.map((v)=>{
+            this.props.store.codeStore.deviceTableData.map((v)=>{
                 if (v.operation === `${value}`) {
                     data.push(v);
                 }
             });
             this.setState({
-                platformData: data
-            })
+                deviceData: data
+            });
+            this.props.store.codeStore.setDeviceData(data);
         } else {
-            let data = this.state.tableData;
+            let data = this.props.store.codeStore.deviceTableData;
             this.setState({
-                platformData: data
-            })
+                deviceData: data
+            });
+            this.props.store.codeStore.setDeviceData(data);
         }
     };
     gradeChange = (value)=>{
         let data = [];
         if (`${value}`) {
-            this.state.tableData.map((v)=>{
+            let deviceTableData = this.props.store.codeStore.deviceTableData;
+            deviceTableData && deviceTableData.length > 0 && deviceTableData.map((v)=>{
                 if (v.event_level === parseInt(`${value}`)) {
                     data.push(v);
                 }
             });
             this.setState({
-                platformData: data
-            })
+                deviceData: data
+            });
+            this.props.store.codeStore.setDeviceData(data);
         } else {
-            let data = this.state.tableData;
+            let data = this.props.store.codeStore.deviceTableData;
             this.setState({
-                platformData: data
-            })
+                deviceData: data
+            });
+            this.props.store.codeStore.setDeviceData(data);
         }
     };
     //时间
     messageTime = (value)=>{
-        console.log(`${value}`);
         let hours = Date.parse(new Date()) - `${value}` * 60 * 60 * 1000;
         let time = this.timestampToTime(hours);
-        console.log(time)
         let params = {
             category: this.state.category,
             name: this.state.name,
@@ -292,8 +352,11 @@ class DevicemMessage extends PureComponent {
     };
 
     render () {
-        let selectValue = this.state.selectValue;
-        let selectRow = this.state.selectRow;
+        let { selectValue, selectedRowKeys, columns, category } = this.state;
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onSelectChange
+        };
         return (
             <div className="deviceMessage">
                 <div className="searchBox">
@@ -306,7 +369,7 @@ class DevicemMessage extends PureComponent {
                         <Option value="数据">数据</Option>
                         <Option value="应用">应用</Option>
                         <Option value="系统">系统</Option>
-                        <Option value="EVENT">设备</Option>
+                        <Option value="设备">设备</Option>
                     </Select>
                     <Select defaultValue="等级"
                         style={{ width: 120 }}
@@ -336,7 +399,7 @@ class DevicemMessage extends PureComponent {
                         <Option value="72">72小时</Option>
                     </Select>
                     <Button onClick={()=>{
-                        this.confMessage(selectRow)
+                        this.confMessage(selectedRowKeys)
                     }}
                     >确认消息</Button>
                     <Button onClick={()=>{
@@ -371,11 +434,14 @@ class DevicemMessage extends PureComponent {
                     </div>
                 </div>
                 <Table
-                    rowSelection={this.rowSelection}
-                    columns={this.state.columns}
-                    dataSource={this.state.platformData}
+                    rowSelection={rowSelection}
+                    columns={columns}
+                    dataSource={this.props.store.codeStore.deviceData}
                     loading={this.state.loading}
                     onChange={this.onChange}
+                    expandedRowRender={record => <SonTables category={category} data={record}/>}
+                    expandRowByClick
+                    rowClassName={this.setClassName} //表格行点击高亮
                     rowKey="name"
                 />
             </div>

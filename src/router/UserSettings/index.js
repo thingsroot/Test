@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import {_getCookie} from '../../utils/Session';
@@ -17,22 +17,19 @@ class UserSettings extends PureComponent {
         this.setState({
             isAdmin: isAdmin
         });
-        // http.get('/api/method/iot_ui.iot_api.user_company?' + Date.parse(new Date()))
-        //     .then(res=>{
-        //         this.setState({
-        //             company: res.message.company
-        //         })
-        //     });
-        // http.get('/api/method/iot_ui.iot_api.userinfo_all?user=' + usr)
-        //     .then(res=>{
-        //         console.log(res);
-
-        //     })
         http.get('/api/user_read?name=' + user).then(res=>{
-            console.log(res)
-            // this.setState({
-            //     info: res.data
-            // })
+            console.log(res);
+            let role = '';
+            let groups = res.data.groups;
+            groups && groups.length > 0 && groups.map((v, key)=>{
+                key;
+                role = v.role;
+            });
+            this.setState({
+                info: res.data,
+                company: res.data.companies[0],
+                isAdmin: role
+            })
         })
     }
     showModal = () => {
@@ -50,9 +47,17 @@ class UserSettings extends PureComponent {
             if (err) {
                 return;
             }
-            console.log('Received values of form: ', values);
-            form.resetFields();
-            this.setState({ visible: false });
+            let data = {
+                old_password: values.oldPassword,
+                new_password: values.password
+            };
+            http.post('/api/user_update_password', data).then(res=>{
+                res;
+                message.success('修改密码成功，请重新登陆！')
+            }).catch(err=>{
+                err;
+                message.success('修改密码失败！')
+            });
         });
     };
 
