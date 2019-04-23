@@ -226,7 +226,7 @@ class LinkStatus extends Component {
                                     this.setState({update: false, flag: false})
                                 }}
                               >发现新版本></Link> : ''}</p>
-                            <p><b>公网IP:</b>{config.public_ip}</p>
+                            {/* <p><b>公网IP:</b>{config.public_ip}</p> */}
                             <p><b>调试模式:</b>{config.use_beta ? '开启' : '关闭'}</p>
                             <p><b>数据上传:</b>{config.data_upload ? '开启' : '关闭'}</p>
                             <p><b>统计上传:</b>{config.stat_upload ? '开启' : '关闭'}</p>

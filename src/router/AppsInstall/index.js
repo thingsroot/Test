@@ -228,7 +228,8 @@ class MyGatesAppsInstall extends Component {
             });
     }
     shouldComponentUpdate (nextProps, nextState){
-        if (nextState.item.description !== undefined){
+        console.log(nextProps, '------', nextState)
+        if (nextState.item.description && nextState.item.description !== null){
             document.getElementById('box').innerHTML = marked(nextState.item.description)
         }
         return true;
@@ -411,6 +412,7 @@ class MyGatesAppsInstall extends Component {
         })
     };
     getConfig = (val)=>{
+        
         let config = JSON.parse(val.conf_template);
         let deviceColumns = [];
         let object = {};
@@ -514,7 +516,7 @@ class MyGatesAppsInstall extends Component {
     };
 
     render () {
-        const { vendor, agreement, type, data, flag, item, detail, showTempLists, serial, tcp,
+        const { data, flag, item, detail, showTempLists, serial, tcp,
             addTempLists, instName, showTempList, config, addTempList} = this.state;
         return (<div>
             <Status />
@@ -612,13 +614,13 @@ class MyGatesAppsInstall extends Component {
                                                                                     className="spanStyle"
                                                                                 >{a.desc}</span>
                                                                                 <Select
-                                                                                    defaultValue={a.value[0]}
+                                                                                    defaultValue={a.value ? a.value[0] : ''}
                                                                                     style={{width: 300}}
                                                                                     onChange={() => {
                                                                                         this.selectChangeValue(a.name)
                                                                                     }}
                                                                                 >
-                                                                                    {a.value.map(b => {
+                                                                                    {a.value && a.value.length > 0 && a.value.map(b => {
                                                                                         return (
                                                                                             <Option
                                                                                                 key={b}
@@ -629,7 +631,7 @@ class MyGatesAppsInstall extends Component {
                                                                                 <input
                                                                                     ref={a.name}
                                                                                     type="hidden"
-                                                                                    value={a.value[0]}
+                                                                                    value={a.value ? a.value[0] : ''}
                                                                                 />
                                                                             </div>
                                                                         )
@@ -795,15 +797,15 @@ class MyGatesAppsInstall extends Component {
                                                         <div style={{lineHeight: '50px'}}>
                                                             <span className="spanStyle">{v.desc}：</span>
                                                             <Select
-                                                                defaultValue={v.value[0]}
+                                                                defaultValue={v.value ? v.value[0] : ''}
                                                                 style={{width: 300}}
                                                                 onChange={this.protocolChange}
                                                             >
-                                                                {v.value.map(w => <Option key={w}>{w}</Option>)}
+                                                                {v.value && v.value.length > 0 && v.value.map(w => <Option key={w}>{w}</Option>)}
                                                             </Select>
                                                             <input
                                                                 type="hidden"
-                                                                value={v.value[0]}
+                                                                value={v.value ? v.value[0] : ''}
                                                                 ref={v.name}
                                                             />
                                                         </div>
@@ -864,7 +866,7 @@ class MyGatesAppsInstall extends Component {
                     </div>
                     <div className={flag ? 'show' : 'hide'}>
                         <div className="installheader">
-                           <div className="selectlist">
+                           {/* <div className="selectlist">
                                <div>
                                    设备厂商:
                                    <Select defaultValue="设备厂商"
@@ -943,7 +945,7 @@ class MyGatesAppsInstall extends Component {
                                                }
                                    </Select>
                                </div>
-                           </div>
+                           </div> */}
                            <div className="searchlist">
                                <Search
                                    key="33"

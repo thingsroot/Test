@@ -75,7 +75,7 @@ class BrowsingHistory extends Component {
         console.log('params:', params);
         this.setState({ loading: true });
         axios({
-          url: `/api/method/iot_ui.iot_api.gate_device_data_array?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&_=${new Date() * 1}`,
+          url: `/api/gateways_dev_data?gateway=${this.props.match.params.sn}&name=${this.props.match.params.vsn}&_=${new Date() * 1}`,
           method: 'get',
           data: {
             results: 10,
@@ -83,18 +83,18 @@ class BrowsingHistory extends Component {
           },
           type: 'json'
         }).then((data) => {
-            console.log(data.data.message)
-            data.data.message.map((val, ind)=>{
+            console.log(data)
+            data.data.data.map((val, ind)=>{
                 val.id = ind;
             })
           const pagination = { ...this.state.pagination };
           // Read total count from server
-          // pagination.total = data.totalCount;
-          // pagination.total = 200;
+          pagination.total = data.totalCount;
+          pagination.total = 200;
           this.setState({
             loading: false,
-            data: data.data.message,
-            filterdata: data.data.message,
+            data: data.data.data,
+            filterdata: data.data.data,
             pagination
           });
         });
@@ -116,7 +116,7 @@ class BrowsingHistory extends Component {
                 } else {
                   record.vt = 'float';
                 }
-                  axios(`/api/method/iot_ui.iot_api.taghisdata?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=${record.name}&vt=${record.vt || 'float'}&time_condition=time > now() - ${scope}&value_method=${way}&group_time_span=${domain}&_=1551251898530`, {
+                  axios(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=${record.name}&vt=${record.vt || 'float'}&time_condition=time > now() - ${scope}&value_method=${way}&group_time_span=${domain}&_=1551251898530`, {
                     method: 'get',
                     headers: {
                         Accept: 'application/json, text/javascript, */*; q=0.01'

@@ -166,6 +166,13 @@ class AppsList extends Component {
         // http.get('/api/gateways_app_dev_len?name=da7f421dbd').then(res=>{
         //   console.log(res)
         // })
+        http.post('/api/gateways_applications_start', {
+          gateway: this.props.match.params.sn,
+          inst: 'ioe_frpc',
+          id: `start${this.props.match.params.sn}/ioe_frpc/${new Date() * 1}`
+        }).then(res=>{
+            http.get('/api/gateways_exec_result?id=' + res.data)
+        })
         this.fetch(this.props.match.params.sn);
       }
       UNSAFE_componentWillReceiveProps (nextProps){

@@ -83,8 +83,8 @@ var form = function (url, data) {
             method: 'post',
             data: data,
             headers: {
-                Accept: 'application/x-www-form-urlencoded',
-                'Content-Type': 'application/x-www-form-urlencoded',
+                Accept: 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Content-Type': false,
                 'dataType': 'json'
             }
         }).then(res=>{

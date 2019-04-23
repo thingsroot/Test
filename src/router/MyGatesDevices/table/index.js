@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-// import echarts from 'echarts/lib/echarts';
+import echarts from 'echarts/lib/echarts';
 import  'echarts/lib/chart/line';
 import  'echarts/lib/chart/pie';
 import 'echarts/lib/component/legend';
@@ -13,15 +13,15 @@ import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
 import './style.scss';
 let myFaultTypeChart;
-// function getMin (i, date){
-//   let Dates = new Date(date - i * 60000)
-//   let min = Dates.getMinutes();
-//   if (min < 10){
-//     return '0' + min
-//   } else {
-//     return min;
-//   }
-// }
+function getMin (i, date){
+  let Dates = new Date(date - i * 60000)
+  let min = Dates.getMinutes();
+  if (min < 10){
+    return '0' + min
+  } else {
+    return min;
+  }
+}
   class ExpandedRowRender extends PureComponent {
     state = {
       data: [],
@@ -133,16 +133,56 @@ let myFaultTypeChart;
       } else {
         record.vt = 'float';
       }
-      // const data = {
-      //   sn: this.props.match.params.sn,
-      //   vsn: this.props.sn,
-      //   name: record.name,
-      //   vt: record.vt,
-      //   time_condition: 'time > now() - 1h',
-      //   value_method: 'raw',
-      //   group_time_span: '1h',
-      //   _: new Date() * 1
-      // }
+      const data = {
+        sn: this.props.match.params.sn,
+        vsn: this.props.vsn,
+        name: record.name,
+        vt: record.vt,
+        time_condition: 'time > now() - 1h',
+        value_method: 'raw',
+        group_time_span: '1h',
+        _: new Date() * 1
+      }
+      http.get(`/api/gateways_historical_data?sn=${data.sn}&vsn=${data.vsn}&tag=${data.name}&vt=${data.vt}&time_condition=time > now() - 10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+        console.log(res)
+        const { myCharts } = this.refs;
+        let data = [];
+        const date = new Date() * 1;
+        for (var i = 0;i < 10;i++){
+          data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
+        }
+        console.log(name)
+        if (res.message && res.message.length > 0) {
+          myFaultTypeChart = echarts.init(myCharts);
+          myFaultTypeChart.setOption({
+              tooltip: {
+                  trigger: 'axis',
+                  axisPointer: {
+                      type: 'cross'
+                  }
+              },
+              xAxis: {
+                  data: data
+              },
+              yAxis: {},
+              series: [
+                {
+                  name: '数值',
+                  type: 'line',
+                  color: '#37A2DA',
+                  data: res.message
+                }
+              ]
+          });
+        } else {
+          console.log(myCharts)
+          myCharts.style.textAlin = 'center'
+          myCharts.innerHTML = '暂未获取到数据'
+        }
+
+        
+      })
+      
       // http.get(`/api/method/iot_ui.iot_api.taghisdata?sn=${data.sn}&vsn=${data.vsn}&tag=${data.name}&vt=${data.vt}&time_condition=time > now() - 10m&value_method=raw&group_time_span=10m&_=1551251898530`).then((res)=>{
       //   const { myCharts } = this.refs;
       //   let data = [];
@@ -180,13 +220,17 @@ let myFaultTypeChart;
         visible: false
       });
       this.props.history.push(`/BrowsingHistory/${record.sn}/${record.vsn}`)
-      myFaultTypeChart.dispose();
+      if (myFaultTypeChart) {
+        myFaultTypeChart.dispose();
+      }
     }
     handleCancel = () => {
       this.setState({
         visible: false
       });
-      myFaultTypeChart.dispose();
+      if (myFaultTypeChart) {
+        myFaultTypeChart.dispose();
+      }
     }
     render () {
       return (
@@ -219,7 +263,7 @@ let myFaultTypeChart;
             <div
                 id="faultTypeMain"
                 ref="myCharts"
-                style={{width: 472, height: 250}}
+                style={{width: 472, height: 250, textAlign: 'center', fontSize: 30}}
             ></div>
           </Modal>
         </div>

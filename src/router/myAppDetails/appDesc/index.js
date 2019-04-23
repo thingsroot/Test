@@ -23,7 +23,7 @@ class AppDesc extends Component {
         });//基本设置
     }
 
-    componentWillReceiveProps (nextProps, nextContext) {
+    UNSAFE_componentWillReceiveProps (nextProps, nextContext){
         if (nextProps.desc !== nextContext.desc) {
             this.refs.editor.innerHTML = marked(nextProps.desc);
         }
