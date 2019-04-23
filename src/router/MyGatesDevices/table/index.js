@@ -56,7 +56,6 @@ function getMin (i, date){
               ]
     }
     componentDidMount (){
-      console.log(this.props)
       myFaultTypeChart = null;
       if (myFaultTypeChart && myFaultTypeChart.dispose) {
         myFaultTypeChart.dispose();
@@ -64,7 +63,6 @@ function getMin (i, date){
       const { sn } = this.props.match.params;
       const { vsn } = this.props;
       http.get('/api/gateway_devf_data?gateway=' + sn + '&name=' + vsn).then(res=>{
-        console.log(res)
         let data = res.data;
         data && data.length > 0 && data.map((item, ind)=>{
           item.sn = sn;
@@ -124,7 +122,6 @@ function getMin (i, date){
       // })
     }
     showModal = (record) => {
-      console.log(record)
       this.setState({
         visible: true,
         record
@@ -138,7 +135,7 @@ function getMin (i, date){
       }
       const data = {
         sn: this.props.match.params.sn,
-        vsn: this.props.sn,
+        vsn: this.props.vsn,
         name: record.name,
         vt: record.vt,
         time_condition: 'time > now() - 1h',
@@ -146,7 +143,8 @@ function getMin (i, date){
         group_time_span: '1h',
         _: new Date() * 1
       }
-      http.get(`/api/method/iot_ui.iot_api.taghisdata?sn=${data.sn}&vsn=${data.vsn}&tag=${data.name}&vt=${data.vt}&time_condition=time > now() - 10m&value_method=raw&group_time_span=10m&_=1551251898530`).then((res)=>{
+      http.get(`/api/gateways_historical_data?sn=${data.sn}&vsn=${data.vsn}&tag=${data.name}&vt=${data.vt}&time_condition=time > now() - 10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+        console.log(res)
         const { myCharts } = this.refs;
         let data = [];
         const date = new Date() * 1;
@@ -154,7 +152,8 @@ function getMin (i, date){
           data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
         }
         console.log(name)
-        myFaultTypeChart = echarts.init(myCharts);
+        if (res.message && res.message.length > 0) {
+          myFaultTypeChart = echarts.init(myCharts);
           myFaultTypeChart.setOption({
               tooltip: {
                   trigger: 'axis',
@@ -175,7 +174,45 @@ function getMin (i, date){
                 }
               ]
           });
+        } else {
+          console.log(myCharts)
+          myCharts.style.textAlin = 'center'
+          myCharts.innerHTML = '暂未获取到数据'
+        }
+
+        
       })
+      
+      // http.get(`/api/method/iot_ui.iot_api.taghisdata?sn=${data.sn}&vsn=${data.vsn}&tag=${data.name}&vt=${data.vt}&time_condition=time > now() - 10m&value_method=raw&group_time_span=10m&_=1551251898530`).then((res)=>{
+      //   const { myCharts } = this.refs;
+      //   let data = [];
+      //   const date = new Date() * 1;
+      //   for (var i = 0;i < 10;i++){
+      //     data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
+      //   }
+      //   console.log(name)
+      //   myFaultTypeChart = echarts.init(myCharts);
+      //     myFaultTypeChart.setOption({
+      //         tooltip: {
+      //             trigger: 'axis',
+      //             axisPointer: {
+      //                 type: 'cross'
+      //             }
+      //         },
+      //         xAxis: {
+      //             data: data
+      //         },
+      //         yAxis: {},
+      //         series: [
+      //           {
+      //             name: '数值',
+      //             type: 'line',
+      //             color: '#37A2DA',
+      //             data: res.message
+      //           }
+      //         ]
+      //     });
+      // })
     }
     handleOk = () => {
       const {record} = this.state;
@@ -183,17 +220,19 @@ function getMin (i, date){
         visible: false
       });
       this.props.history.push(`/BrowsingHistory/${record.sn}/${record.vsn}`)
-      myFaultTypeChart.dispose();
+      if (myFaultTypeChart) {
+        myFaultTypeChart.dispose();
+      }
     }
-    handleCancel = (e) => {
-      console.log(e);
+    handleCancel = () => {
       this.setState({
         visible: false
       });
-      myFaultTypeChart.dispose();
+      if (myFaultTypeChart) {
+        myFaultTypeChart.dispose();
+      }
     }
     render () {
-      console.log(this.props.inputs)
       return (
         <div>
           <Table
@@ -224,7 +263,7 @@ function getMin (i, date){
             <div
                 id="faultTypeMain"
                 ref="myCharts"
-                style={{width: 472, height: 250}}
+                style={{width: 472, height: 250, textAlign: 'center', fontSize: 30}}
             ></div>
           </Modal>
         </div>

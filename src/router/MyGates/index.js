@@ -7,32 +7,33 @@ import { Link } from 'react-router-dom';
 const TabPane = Tabs.TabPane;
 function getDevicesList (){
     http.get('/api/gateways_list').then(res=>{
-        console.log(res)
         const online = [];
         const offline = [];
         const data = [];
         res.message && res.message.length > 0 && res.message.map((v, i)=>{
-            v.data.last_updated = v.data.modified.slice(0, -7);
-            if (res.message[i].app.data){
-                v.data.device_apps_num = Object.keys(res.message[i].app.data).length;
-            } else {
-                v.data.device_apps_num = 0;
+            if (v.data) {
+                v.data.last_updated = v.data.modified.slice(0, -7);
+                if (res.message[i].app.data){
+                    v.data.device_apps_num = Object.keys(res.message[i].app.data).length;
+                } else {
+                    v.data.device_apps_num = 0;
+                }
+                if (res.message[i].devices.data){
+                    v.data.device_devs_num = Object.keys(res.message[i].devices.data).length;
+                } else {
+                    v.data.device_devs_num = 0;
+                }
+                if (v.data.device_status === 'ONLINE'){
+                    v.data.disabled = false;
+                    online.push(v.data)
+                } else if (v.data.device_status === 'OFFLINE') {
+                    offline.push(v.data)
+                    v.data.disabled = true;
+                } else {
+                    v.data.disabled = true;
+                }
+                data.push(v.data)
             }
-            if (res.message[i].devices.data){
-                v.data.device_devs_num = Object.keys(res.message[i].devices.data).length;
-            } else {
-                v.data.device_devs_num = 0;
-            }
-            if (v.data.device_status === 'ONLINE'){
-                v.data.disabled = false;
-                online.push(v.data)
-            } else if (v.data.device_status === 'OFFLINE') {
-                offline.push(v.data)
-                v.data.disabled = true;
-            } else {
-                v.data.disabled = true;
-            }
-            data.push(v.data)
         })
         if (status === 'online'){
             this.props.store.appStore.setGatelist(res.message);
@@ -68,7 +69,6 @@ function callback (key){
       http.postToken('/api/gateways_remove', {
         name: record.name
       }).then(res=>{
-          console.log(res)
           if (res.ok){
             message.success('移除网关成功')
         }
@@ -196,7 +196,6 @@ class MyGates extends PureComponent {
         this.getDevicesList('online')
     }
     onChanges = (type) => {
-        console.log(type)
         switch (type){
             case 'sn':
                 this.setState({
@@ -221,7 +220,7 @@ class MyGates extends PureComponent {
           visible: true
         });
       }
-      handleOk = (e) => {
+      handleOk = () => {
           const { sn, name, desc} = this.state;
           const data = {
             'device_name': name,
@@ -229,7 +228,6 @@ class MyGates extends PureComponent {
             'owner_type': 'User',
             'owner_id': sn
           };
-        console.log(e);
         this.setState({
             confirmLoading: true
           }, ()=>{
@@ -244,8 +242,7 @@ class MyGates extends PureComponent {
         });
         }, 2000);
       }
-      handleCancel = (e) => {
-        console.log(e);
+      handleCancel = () => {
         this.setState({
           visible: false
         });
@@ -253,9 +250,11 @@ class MyGates extends PureComponent {
     render (){
         let { data, online, offline, confirmLoading } = this.state;
         return (
-            <div style={{
-                position: 'relative'
-            }}>
+            <div
+                style={{
+                    position: 'relative'
+                }}
+            >
                 <Button
                     type="primary"
                     onClick={this.showModal}

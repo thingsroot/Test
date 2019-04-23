@@ -42,7 +42,7 @@ var get = function (url, params) {
         data: params,
         headers: {
             Accept: 'application/json; charset=utf-8',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+            'Content-Type': 'application/json; charset=utf-8',
             'dataType': 'json',
             'X-Frappe-CSRF-Token': _getCookie('T&R_auth_token') || ''
         }
@@ -83,8 +83,8 @@ var form = function (url, data) {
             method: 'post',
             data: data,
             headers: {
-                Accept: 'application/x-www-form-urlencoded; charset=utf-8',
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                Accept: 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Content-Type': false,
                 'dataType': 'json'
             }
         }).then(res=>{

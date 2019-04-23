@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Select, Button, Icon, Table, message } from 'antd';
 import { withRouter } from 'react-router-dom';
-//import http from '../../../utils/Server';
+import http from '../../../utils/Server';
 import { apply_AccessKey } from '../../../utils/Session';
 import './style.scss';
 const Option = Select.Option;
@@ -38,7 +38,8 @@ class VPN extends Component {
         this.check_gate_isbusy()
         let auth_code;
         apply_AccessKey().then(res=>{
-            auth_code = res;
+            auth_code = res.data;
+            console.log(auth_code)
             this.setState({auth_code})
         });
         this.timer = setInterval(() => {
@@ -345,7 +346,19 @@ class VPN extends Component {
                             disabled
                             style={{marginRight: 15}}
                         />
-                        <Button disabled={flag}><Icon type="sync"/></Button>
+                        <Button
+                            disabled={flag}
+                            onClick={()=>{
+                                console.log('33333333333333333333333')
+                                http.post('/api/gateways_applications_start', {
+                                    gateway: this.props.match.params.sn,
+                                    inst: 'ioe_frpc',
+                                    id: `start${this.props.match.params.sn}/ioe_frpc/${new Date() * 1}`
+                                }).then(res=>{
+                                    http.get('/api/gateways_exec_result?id=' + res.data)
+                                })
+                            }}
+                        ><Icon type="sync"/></Button>
                     </div>
                     <div className="VPNlist">
                         <p>传输协议：</p>

@@ -177,8 +177,12 @@ class AppSettings extends Component {
                                     {getFieldDecorator('app_name', { initialValue: settingData.appName }, {
                                         rules: [{ required: true, message: '不能为空！' }]
                                     })(
+<<<<<<< HEAD
                                         <Input
                                             type="text"
+=======
+                                        <Input type="text"
+>>>>>>> 4a99987aefb531df0a7235ac5cfa906b69b1046c
                                             style={{width: '240px'}}
                                         />
                                     )}

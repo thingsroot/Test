@@ -79,7 +79,6 @@ class GatesList extends Component {
     }
     getData (sn){
       http.get('/api/gateways_dev_list?gateway=' + sn).then(res=>{
-        console.log(res)
         let data = [];
         if (res.message && res.message.length > 0){
           res.message.map((item=>{
@@ -91,7 +90,6 @@ class GatesList extends Component {
             data.push(item);
           }))
         }
-        console.log(data)
         this.setState({
           data,
           devList: res.message,
@@ -124,7 +122,7 @@ class GatesList extends Component {
                               data
                           }
                           loading={loading}
-                          rowKey="meta.sn"
+                          rowKey="sn"
                           expandedRowRender={Collapses}
                           expandRowByClick
                       />

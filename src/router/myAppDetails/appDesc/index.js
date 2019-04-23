@@ -24,7 +24,11 @@ class AppDesc extends Component {
         });//基本设置
     }
 
+<<<<<<< HEAD
     UNSAFE_componentWillReceiveProps (nextProps, nextContext) {
+=======
+    UNSAFE_componentWillReceiveProps (nextProps, nextContext){
+>>>>>>> 4a99987aefb531df0a7235ac5cfa906b69b1046c
         if (nextProps.desc !== nextContext.desc) {
             this.setState({
                 desc: nextProps.desc

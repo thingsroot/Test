@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {Modal, Form, Input, Checkbox, Upload, Icon, Button, message} from 'antd';
-import http from '../../../utils/Server';
+// import http from '../../../utils/Server';
+import reqwest from 'reqwest';
 const { TextArea } = Input;
 const CollectionCreateForm = Form.create()(
     class extends Component {
@@ -11,31 +12,57 @@ const CollectionCreateForm = Form.create()(
         handleCreate = () => {
             const { fileList } = this.state;
             const formData = new FormData();
+            console.log(fileList)
             fileList.forEach((file) => {
                 formData.append('app_file', file);
             });
+            console.log(formData)
             const form = this.props.form;
-            console.log(this);
             form.validateFields((err, values) => {
                 if (err) {
                     return;
                 }
+                console.log(values)
                 formData.append('app', this.props.app);
                 formData.append('version', values.version);
                 formData.append('comment', values.comment);
-                http.form('/api/applications_versions_create', formData).then(res=>{
-                    if (res.ok === false) {
-                        message.error('新版本上传失败！');
-                    } else {
-                        message.success('新版本上传成功！');
-                        console.log(res);
-                        this.setState({ visible: false });
+                console.log(formData.get('app_file'))
+                    
+                reqwest({
+                    url: '/api/applications_versions_create',
+                    method: 'post',
+                    processData: false,
+                    data: formData,
+                    success: () => {
+                        
+                      this.setState({
+                        fileList: [],
+                        uploading: false
+                      });
+                      message.success('upload successfully.');
+                    },
+                    error: () => {
+                      this.setState({
+                        uploading: false
+                      });
+                      message.error('upload failed.');
                     }
-                });
+                  });
+
+                // http.form('/api/api/v1/applications.versions.create', formData).then(res=>{
+                //     if (res.ok === false) {
+                //         message.error('新版本上传失败！');
+                //     } else {
+                //         message.success('新版本上传成功！');
+                //         console.log(res);
+                //         this.setState({ visible: false });
+                //     }
+                // });
                 form.resetFields();
             });
         };
         render () {
+            console.log(this)
             const {
                 visible, onCancel, form, versionLatest
             } = this.props;
@@ -48,6 +75,7 @@ const CollectionCreateForm = Form.create()(
                 callback();
             };
             const props = {
+                action: '/api/api/v1/applications.versions.create',
                 onRemove: (file) => {
                     this.setState((state) => {
                         const index = state.fileList.indexOf(file);
@@ -86,6 +114,9 @@ const CollectionCreateForm = Form.create()(
                             )}
                         </Form.Item>
                         <Form.Item label="上传文件">
+                            {
+                                console.log(props)
+                            }
                             {getFieldDecorator('app_file', {
                                 rules: [{ required: true, message: '请上传文件！' }]
                             })(

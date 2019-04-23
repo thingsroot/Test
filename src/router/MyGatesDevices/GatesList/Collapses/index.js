@@ -4,18 +4,17 @@ import { withRouter } from 'react-router-dom';
 import ExpandedRowRender from '../../table';
 import MyGatesDevicesOutputs from '../../../MyGatesDevicesOutputs';
 const Panel = Collapse.Panel;
-function callback (key) {
-    console.log(key);
-  }
+// function callback (key) {
+//     console.log(key);
+//   }
 @withRouter
 class Collapses extends Component {
     render () {
-        console.log(this.props)
         return (
             <div>
                 <Collapse
                     defaultActiveKey={['1']}
-                    onChange={callback}
+                    // onChange={callback}
                 >
                     <Panel
                         header="数据浏览"
@@ -27,7 +26,7 @@ class Collapses extends Component {
                         />
                     </Panel>
                     <Panel
-                        disabled={this.props.outputs ? false : true}
+                        disabled={this.props.outputs && Object.keys(this.props.outputs).length > 0 ? false : true}
                         header="数据下置"
                         key="2"
                     >
