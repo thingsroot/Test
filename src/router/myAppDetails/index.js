@@ -25,13 +25,14 @@ class MyAppDetails extends Component {
         app: '',
         desc: '',
         versionList: [],
-        templateList: []
+        templateList: [],
+        myList: []
     };
     componentDidMount (){
-        let usr = _getCookie('user_id');
+        let user = _getCookie('user_id');
         let app = this.props.match.params.name;
         this.setState({
-            user: usr,
+            user: user,
             app: app
         });
         this.getDetails(app);
@@ -47,14 +48,23 @@ class MyAppDetails extends Component {
                 versionLatest: res.data.versionLatest.data,
                 templateList: res.data.tempList
             })
-        })
+        });
+        http.get('/api/user_configuration_list?app=' + app)
+            .then(res=>{
+                console.log(res.message);
+                this.setState({
+                    myList: res.message
+                }, ()=>{
+                    console.log(this.state.myList)
+                })
+            })
     };
     callback = (key)=>{
         console.log(key);
     };
     render () {
         const { url } = this.props.match;
-        let { app, message, time, user, versionLatest, versionList, templateList } = this.state;
+        let { app, message, time, user, versionLatest, versionList, templateList, myList } = this.state;
         return (
             <div className="myAppDetails">
                 <div className="header">
@@ -160,7 +170,11 @@ class MyAppDetails extends Component {
                             </Link>}
                         key="3"
                     >
-                        <TemplateList templateList={templateList} />
+                        <TemplateList
+                            templateList={templateList}
+                            myList={myList}
+                            app={app}
+                        />
                     </TabPane>
                 </Tabs>
 

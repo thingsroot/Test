@@ -6,7 +6,8 @@ import {inject, observer} from 'mobx-react';
 @observer
 class AppDesc extends Component {
     state = {
-        editorContent: ''
+        editorContent: '',
+        desc: ''
     };
     componentDidMount (){
         console.log(this.props)
@@ -23,8 +24,13 @@ class AppDesc extends Component {
         });//基本设置
     }
 
-    componentWillReceiveProps (nextProps, nextContext) {
+    UNSAFE_componentWillReceiveProps (nextProps, nextContext) {
         if (nextProps.desc !== nextContext.desc) {
+            this.setState({
+                desc: nextProps.desc
+            }, ()=>{
+                console.log(this.state.desc)
+            })
             this.refs.editor.innerHTML = marked(nextProps.desc);
         }
     }

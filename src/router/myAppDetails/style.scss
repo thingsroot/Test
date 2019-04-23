@@ -75,19 +75,32 @@
     }
   }
   .templateList{
-    >ul{
+    ul{
       padding: 10px 0;
       >li{
+        float: left;
         padding: 10px 0;
+        margin: 0 20px;
+        width: 46%;
+        border-bottom: 1px solid #cccccc;
         >div{
           width: 100%;
           line-height: 30px;
           display: flex;
           justify-content: space-between;
           >p{
-            color: #999999;
-            .fontColor{
-              color: #333;
+             color: #999999;
+             .fontColor{
+               color: #333;
+             }
+           }
+          >div{
+            width: 100%;
+            position: relative;
+            >p{
+              position: absolute;
+              right: 0;
+              bottom: 0;
             }
           }
         }

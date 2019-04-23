@@ -1,12 +1,17 @@
 import React, { PureComponent } from 'react';
-import { Input } from 'antd';
+import { Input, Button } from 'antd';
 import { Link } from 'react-router-dom';
-// import { _getCookie } from '../../utils/Session';
 import './style.scss';
 import http from '../../utils/Server';
 
 const Search = Input.Search;
 
+const block = {
+    display: 'block'
+};
+const none = {
+    display: 'none'
+};
 
 class MyApps extends PureComponent {
     state = {
@@ -15,18 +20,6 @@ class MyApps extends PureComponent {
     };
 
     componentDidMount (){
-        //获取用户信息
-        // let usr = _getCookie('usr');
-        //获取列表
-        // http.postToken('/api/method/iot_ui.iot_api.appstore_applist?user=' + usr).then(res=>{
-        //     console.log(res);
-        //     if (res.message) {
-        //         this.setState({
-        //             appList: res.message,
-        //             backups: res.message
-        //         })
-        //     }
-        // });
         http.get('/api/applications_list').then(res=>{
             console.log(res);
             if (res) {
@@ -77,13 +70,20 @@ class MyApps extends PureComponent {
         return (
             <div className="myApps">
                 <div className="searchApp">
+                    <Button
+                        type="primary"
+                        style={{margin: '0 20px'}}
+                    >
+                        <Link to={'/appSettings/1'}>创建新应用</Link>
+                    </Button>
+
                     <Search
                         placeholder="输入应用名称"
                         onChange={this.searchApp}
                         style={{ width: 300 }}
                     />
                 </div>
-                <ul>
+                <ul style={appList && appList.length > 0 ? block : none}>
                     {
                         appList && appList.length > 0 && appList.map((v, key)=>{
                             return <li key={key}>
@@ -108,8 +108,14 @@ class MyApps extends PureComponent {
                         })
                     }
                 </ul>
+                <div
+                    className="empty"
+                    style={appList.length > 0 ? none : block}
+                >
+                    暂时没有应用！
+                </div>
             </div>
-        );
+        )
     }
 }
 export default MyApps;

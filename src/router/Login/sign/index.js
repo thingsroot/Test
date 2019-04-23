@@ -23,7 +23,16 @@ class Sign extends PureComponent {
                             const content = item.slice(item.indexOf('=') + 1)
                             console.log(name, '=', content)
                             _setCookie(name, content)
-                        })
+                        });
+                        http.get('/api/developers_read', {name: _getCookie('user_id')})
+                            .then(res=>{
+                                console.log(res.data);
+                                if (res.data.enabled === 1) {
+                                    _setCookie('is_developer', '1')
+                                } else {
+                                    _setCookie('is_ddeveloper', '0')
+                                }
+                            });
                         _setCookie('T&R_auth_token', res.data.data.csrf_token)
                         message.success('登录成功，正在跳转', 1).then(()=>{
                             if (_getCookie('T&R_auth_token') !== null ){

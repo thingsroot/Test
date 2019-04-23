@@ -1,47 +1,29 @@
-import React, { PureComponent } from 'react';
-import SimpleMDE from 'simplemde';
-import marked from 'marked';
-import highlight from 'highlight.js';
-import 'simplemde/dist/simplemde.min.css';
+import React, { Component } from 'react';
+import SimpleMDE from 'react-simplemde-editor';
+import 'easymde/dist/easymde.min.css';
 import {inject, observer} from 'mobx-react';
 
 @inject('store')
 @observer
-class EditorDesc extends PureComponent {
-    state = {
-        text: this.props.store.codeStore.editorContent
+class EditorDesc extends Component {
+
+    handleChange = (value)=>{
+        this.props.store.codeStore.setDescription(value);
+        console.log(value)
     };
-    componentDidMount (){
-        this.smde = new SimpleMDE({
-            element: document.getElementById('editor').childElementCount,
-            autofocus: true,
-            autosave: true,
-            previewRender: function (plainText) {
-                return marked(plainText, {
-                    renderer: new marked.Renderer(),
-                    gfm: true,
-                    pedantic: false,
-                    sanitize: false,
-                    tables: true,
-                    breaks: true,
-                    smartLists: true,
-                    smartypants: true,
-                    highlight: function (code) {
-                        return highlight.highlightAuto(code).value;
-                    }
-                });
-            }
-        })
-    }
+
     render () {
         return (
-            <div className="editorDesc">
-                <textarea
-                    id="editor"
-                    value={this.state.text}
-                > </textarea>
-            </div>
-        );
+            <SimpleMDE
+                id="your-custom-id"
+                value={this.props.store.codeStore.settingData.description}
+                options={{
+                    autofocus: true,
+                    spellChecker: false
+                }}
+                onChange={this.handleChange}
+            />
+        )
     }
 }
 

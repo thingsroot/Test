@@ -45,6 +45,10 @@ class ContentMain extends PureComponent {
                     component={AppSettings}
                 />
                 <PrivateRoute
+                    path="/appSettings/:type"
+                    component={AppSettings}
+                />
+                <PrivateRoute
                     path="/AppEditorCode/:app/:name"
                     component={AppEditorCode}
                 />

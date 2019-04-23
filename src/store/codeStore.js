@@ -23,10 +23,54 @@ class CodeStore {
     @observable deviceData = [];   //设备消息
     @observable deviceTableData = [];   //
 
-    @observable versionFile = {};
+    @observable versionVisible = false;   //版本列表的form表单visible
+    @observable templateVisible = false;  //模板列表的form表单visible
+    @observable copyVisible = false;  //复制模板列表的form表单visible
+    @observable copyData = {};  //复制模板列表的form表单默认值
 
-    @action setVersionFile (values) {
-        this.versionFile = values;
+    @observable description = '';//创建修改应用时markdown的值
+    @observable configuration = '';     //配置面板
+    @observable predefined = '';        //预定义
+
+    @observable settingData = {
+        appName: '',
+        codeName: '',
+        licenseType: '免费',
+        description: '',
+        confTemplate: '',
+        preConfiguration: ''
+    };
+
+    @action setSettingData (values) {
+        this.settingData = values;
+    }
+
+    @action setConfiguration (values) {
+        this.configuration = values;
+    }
+
+    @action setPredefined (values) {
+        this.predefined = values;
+    }
+
+    @action setDescription (values) {
+        this.description = values;
+    }
+
+    @action setCopyVisible (values) {
+        this.copyVisible = values;
+    }
+
+    @action setCopyData (values) {
+        this.copyData = values;
+    }
+
+    @action setVersionVisible (values) {
+        this.versionVisible = values;
+    }
+
+    @action setTemplateVisible (values) {
+        this.templateVisible = values;
     }
 
     @action setDeviceData (values) {

@@ -12,9 +12,10 @@ const CollectionCreateForm = Form.create()(
             const { fileList } = this.state;
             const formData = new FormData();
             fileList.forEach((file) => {
-                formData.append('files[]', file);
+                formData.append('app_file', file);
             });
             const form = this.props.form;
+            console.log(this);
             form.validateFields((err, values) => {
                 if (err) {
                     return;

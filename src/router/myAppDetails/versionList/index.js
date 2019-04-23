@@ -27,9 +27,9 @@ class VersionList extends PureComponent {
         this.setState({ visible: false });
     };
 
-    saveFormRef = (formRef) => {
-        this.formRef = formRef;
-    };
+    // saveFormRef = (formRef) => {
+    //     this.formRef = formRef;
+    // };
     render () {
         let { versionList, versionLatest, app } = this.props;
         return (
@@ -42,7 +42,7 @@ class VersionList extends PureComponent {
                         上传新版本
                     </Button>
                     <CollectionCreateForm
-                        wrappedComponentRef={this.saveFormRef}
+                        // wrappedComponentRef={this.saveFormRef}
                         visible={this.state.visible}
                         onCancel={this.handleCancel}
                         // onCreate={this.handleCreate}

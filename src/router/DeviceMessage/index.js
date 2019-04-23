@@ -439,7 +439,12 @@ class DevicemMessage extends Component {
                     dataSource={this.props.store.codeStore.deviceData}
                     loading={this.state.loading}
                     onChange={this.onChange}
-                    expandedRowRender={record => <SonTables category={category} data={record}/>}
+                    expandedRowRender={record =>
+                        <SonTables
+                            category={category}
+                            data={record}
+                        />
+                    }
                     expandRowByClick
                     rowClassName={this.setClassName} //表格行点击高亮
                     rowKey="name"

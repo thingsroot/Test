@@ -6,6 +6,14 @@ import http from '../../utils/Server';
 import './style.scss';
 const Dragger = Upload.Dragger;
 const Option = Select.Option;
+const none = {
+    display: 'none'
+};
+const block = {
+    display: 'block',
+    maxHeight: '560px',
+    overflow: 'auto'
+};
 
 class MyTemplateDetails extends PureComponent {
     constructor () {
@@ -21,7 +29,7 @@ class MyTemplateDetails extends PureComponent {
             file: '',        //文件流
             previewData: '',  //预览数据原型
             previewCsvData: '', //预览csv数据
-            maxVersion: ''
+            maxVersion: 0
         }
     }
     componentDidMount () {
@@ -35,16 +43,19 @@ class MyTemplateDetails extends PureComponent {
         http.get('/api/configurations_versions_list?conf=' + conf)
             .then(res=>{
                 let list = [];
+                console.log(res);
                 res.data && res.data.length > 0 && res.data.map((v)=>{
                     list.push(v.version);
                 });
-                this.setState({
-                    versionList: list,
-                    maxVersion: list[0],
-                    dataList: res.data,
-                    csvData: Papa.parse(res.data[0].data).data
-                });
-                this.getDetails(list[0]);
+                if (list.length > 0) {
+                    this.setState({
+                        versionList: list,
+                        maxVersion: list[0],
+                        dataList: res.data,
+                        csvData: Papa.parse(res.data[0].data).data
+                    });
+                    this.getDetails(list[0]);
+                }
             });
     };
 
@@ -140,6 +151,7 @@ class MyTemplateDetails extends PureComponent {
                         <span>版本列表：</span>
                         {console.log(maxVersion)}
                         <Select
+                            disabled={versionList.length > 0 ? false : true}
                             value={maxVersion}
                             style={{ width: 220 }}
                             onChange={this.onVersionChange}
@@ -159,9 +171,14 @@ class MyTemplateDetails extends PureComponent {
                         <span>{confName}</span>
                     </div>
                     <div>
-                        <Button onClick={this.showModal}>上传新版本</Button>
+                        <Button
+                            onClick={this.showModal}
+                        >上传新版本</Button>
                         <span style={{padding: '10px'}}></span>
-                        <Button type="primary">
+                        <Button
+                            type="primary"
+                            disabled={versionList.length > 0 ? false : true}
+                        >
                             <CSVLink data={content}>下载到本地</CSVLink>
                         </Button>
 
@@ -169,7 +186,7 @@ class MyTemplateDetails extends PureComponent {
                 </div>
                 <div
                     className="main"
-                    style={{maxHeight: '560px', overflow: 'auto'}}
+                    style={versionList.length > 0 ? block : none}
                 >
                     <table
                         style={{minWidth: '100%'}}
@@ -199,6 +216,11 @@ class MyTemplateDetails extends PureComponent {
                             }
                         </tbody>
                     </table>
+                </div>
+                <div
+                    style={versionList.length > 0 ? none : block}
+                >
+                    <p className="empty">当前模板未包含数据</p>
                 </div>
                 <Modal
                     title="上传新版本"

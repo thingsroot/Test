@@ -1,18 +1,29 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { split as SplitEditor} from 'react-ace';
 import 'brace/mode/java';
 import 'brace/theme/github';
+import {inject, observer} from 'mobx-react';
 const style = {
     flexGrow: 1,
     display: 'inline-block',
     paddingBottom: '10px'
 };
-class EditorCode extends PureComponent {
+
+@inject('store')
+@observer
+class EditorCode extends Component {
     state = {
         data: '{name: "alice"}'
     };
+
+    onChange = (value)=>{
+        console.log(value);
+        this.props.store.codeStore.setConfiguration(value[0]);
+        this.props.store.codeStore.setPredefined(value[1])
+    };
+
     render () {
-        const {value1, value2} = this.props;
+        const { settingData } = this.props.store.codeStore;
         return (
             <div
                 className="editorCode"
@@ -25,18 +36,17 @@ class EditorCode extends PureComponent {
                     </p>
                     <SplitEditor
                         style={{width: '100%'}}
-                        mode="json"
+                        mode="java"
                         theme="github"
                         splits={2}
                         fontSize={18}
                         orientation="beside"
-                        value={[value1, value2]}
+                        value={[settingData.preConfiguration, settingData.confTemplate]}
                         name="UNIQUE_ID_OF_DIV"
+                        onChange={this.onChange}
                         editorProps={{$blockScrolling: true}}
                     />
-                    {
-                        console.log(this.state.data)
-                    }
+
                 </div>
             </div>
         );
