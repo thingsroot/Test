@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import {Modal, Form, Input, Checkbox, Upload, Icon, Button, message} from 'antd';
 // import http from '../../../utils/Server';
 import reqwest from 'reqwest';
+import {inject, observer} from 'mobx-react';
 const { TextArea } = Input;
 const CollectionCreateForm = Form.create()(
+    @inject('store')
+    @observer
     class extends Component {
         state = {
             fileList: [],
@@ -12,40 +15,35 @@ const CollectionCreateForm = Form.create()(
         handleCreate = () => {
             const { fileList } = this.state;
             const formData = new FormData();
-            console.log(fileList)
             fileList.forEach((file) => {
                 formData.append('app_file', file);
             });
-            console.log(formData)
             const form = this.props.form;
             form.validateFields((err, values) => {
                 if (err) {
                     return;
                 }
-                console.log(values)
                 formData.append('app', this.props.app);
                 formData.append('version', values.version);
                 formData.append('comment', values.comment);
-                console.log(formData.get('app_file'))
-                    
                 reqwest({
                     url: '/api/applications_versions_create',
                     method: 'post',
                     processData: false,
                     data: formData,
                     success: () => {
-                        
                       this.setState({
                         fileList: [],
                         uploading: false
                       });
-                      message.success('upload successfully.');
+                      message.success('上传成功.');
+                      this.props.store.codeStore.setVersionVisible(false)
                     },
                     error: () => {
                       this.setState({
                         uploading: false
                       });
-                      message.error('upload failed.');
+                      message.error('上传失败.');
                     }
                   });
 
@@ -62,7 +60,7 @@ const CollectionCreateForm = Form.create()(
             });
         };
         render () {
-            console.log(this)
+            console.log(this);
             const {
                 visible, onCancel, form, versionLatest
             } = this.props;

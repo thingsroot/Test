@@ -213,7 +213,7 @@ class MyGatesAppsInstall extends Component {
             this.setState({
                 data: res.data
             })
-        })
+        });
         marked.setOptions({
             renderer: new marked.Renderer(),
             gfm: true,
@@ -228,7 +228,7 @@ class MyGatesAppsInstall extends Component {
             });
     }
     shouldComponentUpdate (nextProps, nextState){
-        console.log(nextProps, '------', nextState)
+        console.log(nextProps, '------', nextState);
         if (nextState.item.description && nextState.item.description !== null){
             document.getElementById('box').innerHTML = marked(nextState.item.description)
         }
@@ -269,7 +269,7 @@ class MyGatesAppsInstall extends Component {
                 }
             }, ()=>{
                 this.setFilter()
-            })
+            });
             return
         }
         this.setState({
@@ -317,7 +317,7 @@ class MyGatesAppsInstall extends Component {
                 }
             }, ()=>{
                 this.setFilter()
-            })
+            });
             return
         }
         this.setState({
@@ -412,37 +412,76 @@ class MyGatesAppsInstall extends Component {
         })
     };
     getConfig = (val)=>{
-        
         let config = JSON.parse(val.conf_template);
         let deviceColumns = [];
-        let object = {};
+        let tableName = [];  //存放表名
+        let dataSource = {};
         config && config.length > 0 && config.map((v, key)=>{
             key;
             if (v.name === 'device_section') {
+                let tableNameData = {};
                 v.child.map((w, key1)=>{
+                    console.log('......................')
+                    console.log(w.name);
+                    tableNameData[w.name] = [];
                     key1;
+                    let arr = [];
                     w.cols.map((i, key2)=>{
                         key2;
-                        console.log(i);
-                        deviceColumns.push({
+                        arr.push({
                             key: key2,
                             name: i.name,
                             desc: i.desc,
                             type: i.type
                         });
+                    });
+                    tableName.push(w.name);
+                    deviceColumns.push({
+                        [w.name]: arr
                     })
-
                 });
+                this.props.store.codeStore.setAllTableData(tableNameData);
+                console.log(this.props.store.codeStore.allTableData)
             }
         });
-        console.log(deviceColumns)
+        //设置store存储数据
+        tableName && tableName.length > 0 && tableName.map((w)=>{
+            dataSource[w] = [];
+        });
+        this.props.store.codeStore.setDataSource(dataSource);
+        let columnsArr = [];
+        deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
+            key;
+            let data = [];
+            let name = tableName[key];
+            v[name].map((w, indexW)=>{
+                data.push({
+                    key: indexW,
+                    id: w.type,
+                    title: w.desc,
+                    dataIndex: w.name,
+                    editable: true
+                });
+            });
+            data.push({
+                title: '操作',
+                dataIndex: 'key',
+                render: () => (
+                    <Button>删除</Button>
+                )
+            });
+            columnsArr.push({[tableName[key]]: data})
+        });
+        let obj = {};
+        columnsArr.map((item)=>{
+            obj[Object.keys(item)] = Object.values(item)
+        });
         this.setState({
             flag: false,
             item: val,
             detail: true,
             config: config,
-            object: object,
-            deviceColumns: deviceColumns
+            deviceColumns: obj
         })
     };
     checkedChange = (refName)=>{
@@ -452,54 +491,54 @@ class MyGatesAppsInstall extends Component {
         this.refs[refName].value = event.target.innerText
     };
 
-    getData = ()=>{
-        const { tcp, serial, showTempList, selectSection } = this.state;
-        let sourceCodeData = {
-            protocol: this.refs.protocol.value,
-            Link_type: this.refs.Link_type.value
-        };
-        let data = [];
-        let showList = [];
-        if (selectSection === 'socket') {
-            tcp.map((v, key)=>{
-                key;
-                data.push({
-                    [v.name]: this.refs[v.name].value
-                })
-            });
-            sourceCodeData['socket'] = data;
-        } else if (selectSection === 'serial') {
-            serial.map((v, key)=>{
-                key;
-                data.push({
-                    [v.name]: this.refs[v.name].value
-                })
-            });
-            sourceCodeData['serial'] = data;
-        }
-        showTempList.length > 0 && showTempList.map((v, key)=>{
-            key;
-            showList.push({
-                name: v.conf_name,
-                desc: v.description,
-                id: v.name,
-                ver: v.latest_version
-            })
-        });
-        sourceCodeData['tpls'] = showList;
-        const { dataSource } = this.props.store.codeStore;
-        if (dataSource.length > 0) {
-            dataSource.map((v)=>{
-                console.log(v);
-                delete v['key']
-            });
-            sourceCodeData['devs'] = this.props.store.codeStore.dataSource
-        }
-        console.log(sourceCodeData);
-        this.setState({
-            dataSourceCode: JSON.stringify(sourceCodeData)
-        });
-    };
+    // getData = ()=>{
+    //     const { tcp, serial, showTempList, selectSection } = this.state;
+    //     let sourceCodeData = {
+    //         protocol: this.refs.protocol.value,
+    //         Link_type: this.refs.Link_type.value
+    //     };
+    //     let data = [];
+    //     let showList = [];
+    //     if (selectSection === 'socket') {
+    //         tcp.map((v, key)=>{
+    //             key;
+    //             data.push({
+    //                 [v.name]: this.refs[v.name].value
+    //             })
+    //         });
+    //         sourceCodeData['socket'] = data;
+    //     } else if (selectSection === 'serial') {
+    //         serial.map((v, key)=>{
+    //             key;
+    //             data.push({
+    //                 [v.name]: this.refs[v.name].value
+    //             })
+    //         });
+    //         sourceCodeData['serial'] = data;
+    //     }
+    //     showTempList.length > 0 && showTempList.map((v, key)=>{
+    //         key;
+    //         showList.push({
+    //             name: v.conf_name,
+    //             desc: v.description,
+    //             id: v.name,
+    //             ver: v.latest_version
+    //         })
+    //     });
+    //     sourceCodeData['tpls'] = showList;
+    //     const { dataSource } = this.props.store.codeStore;
+    //     if (dataSource.length > 0) {
+    //         dataSource.map((v)=>{
+    //             console.log(v);
+    //             delete v['key']
+    //         });
+    //         sourceCodeData['devs'] = this.props.store.codeStore.dataSource
+    //     }
+    //     console.log(sourceCodeData);
+    //     this.setState({
+    //         dataSourceCode: JSON.stringify(sourceCodeData)
+    //     });
+    // };
     submitData = ()=>{
         this.getData();
     };
@@ -507,7 +546,7 @@ class MyGatesAppsInstall extends Component {
         key;
         if (this.state.config && this.state.config.length > 0) {
             console.log('不可编辑');
-            this.getData();
+            // this.getData();
         } else {
             console.log('可编辑')
             this.props.store.codeStore.setReadOnly(true);
@@ -587,7 +626,7 @@ class MyGatesAppsInstall extends Component {
                                     <span>{instName}</span>
                                 </p>
                                 <div>
-                                    {console.log(config)}
+
                                     {
                                         config && config.length > 0 && config.map((v, key) => {
                                             if (v.type === 'section') {
@@ -777,14 +816,23 @@ class MyGatesAppsInstall extends Component {
                                                             id={v.name}
                                                             key={key}
                                                         >
-                                                        <p className="sectionName">
-                                                            <span
-                                                                style={{padding: '0 5px'}}
-                                                            >|</span>{v.desc}</p>
-                                                        <EditableTable
-                                                            deviceColumns={this.state.deviceColumns}
-                                                            deviceSource={this.state.deviceSource}
-                                                        />
+                                                            {
+                                                                v.child.map((w, index)=>{
+                                                                    return (
+                                                                        <div id={w.name} key={index}>
+                                                                            <p className="sectionName"><span
+                                                                                style={{padding: '0 5px'}}>|</span>{w.desc}</p>
+                                                                            <EditableTable
+                                                                                tableName={w.name}
+                                                                                deviceColumns={this.state.deviceColumns[w.name]}
+                                                                            />
+                                                                            {console.log(this.state.deviceColumns)}
+                                                                        </div>
+                                                                    )
+                                                                })
+                                                            }
+                                                            {console.log(this.state.deviceColumns)}
+                                                            {console.log(this.state.deviceColumns.tcp_devices)}
                                                     </div>
                                                     )
                                                 }

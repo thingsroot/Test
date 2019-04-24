@@ -96,7 +96,6 @@ class TemplateList extends Component {
         const { templateContent } = this.state;
         return (
             <div className="templateList">
-<<<<<<< HEAD
                 <Button
                     type="primary"
                     onClick={this.showModal}
@@ -249,50 +248,6 @@ class TemplateList extends Component {
                         </p>
                     </TabPane>
                 </Tabs>
-=======
-                <ul>
-                    {
-                        templateList && templateList.length > 0 && templateList.map((v, key)=>{
-                            return <li key={key}>
-                                <div>
-                                    <p>模板名称：<span className="fontColor">{v.conf_name}</span>
-                                    </p>
-                                </div>
-                                <div>
-                                    <p>描述：<span className="fontColor">{v.description}</span></p>
-                                </div>
-                                <div>
-                                    <p>版本号：<span className="fontColor">{v.latest_version}</span>
-                                        <Button>
-                                            <Link
-                                                to={`/myTemplateDetails/${v.app}/${v.name}/${v.latest_version}`}
-                                            >
-                                                查看
-                                            </Link>
-                                        </Button>
-                                        <Button
-                                            onClick={
-                                                () => {
-                                                    this.copyContent(v.app, v.name, v.latest_version)
-                                                }
-                                            }
-                                        >复制</Button>
-                                        <input
-                                            id="templateContent"
-                                            type="hidden"
-                                            value={templateContent}
-                                        />
-                                    </p>
-                                </div>
-                            </li>
-                        })
-                    }
-                </ul>
-                <p
-                    className="empty"
-                    style={templateList.length > 0 ? none : block}
-                >暂时没有上传模板！</p>
->>>>>>> 4a99987aefb531df0a7235ac5cfa906b69b1046c
             </div>
         );
     }

@@ -14,22 +14,18 @@ const none = {
 @observer
 class VersionList extends PureComponent {
     state = {
-        visible: false,
         user: '',
         name: ''
     };
 
     showModal = () => {
-        this.setState({ visible: true });
+        this.props.store.codeStore.setVersionVisible(true)
     };
 
     handleCancel = () => {
-        this.setState({ visible: false });
+        this.props.store.codeStore.setVersionVisible(false)
     };
 
-    // saveFormRef = (formRef) => {
-    //     this.formRef = formRef;
-    // };
     render () {
         let { versionList, versionLatest, app } = this.props;
         return (
@@ -42,10 +38,8 @@ class VersionList extends PureComponent {
                         上传新版本
                     </Button>
                     <CollectionCreateForm
-                        // wrappedComponentRef={this.saveFormRef}
-                        visible={this.state.visible}
+                        visible={this.props.store.codeStore.versionVisible}
                         onCancel={this.handleCancel}
-                        // onCreate={this.handleCreate}
                         versionLatest={versionLatest}
                         app={app}
                     />
