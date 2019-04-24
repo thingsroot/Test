@@ -4,12 +4,22 @@ import { inject, observer} from 'mobx-react';
 import { withRouter, Link } from 'react-router-dom';
 import http from '../../../utils/Server';
 import axios from 'axios';
-// import echarts from 'echarts/lib/echarts';
+import echarts from 'echarts/lib/echarts';
 import  'echarts/lib/chart/line';
 import  'echarts/lib/chart/pie';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/tooltip';
 import './style.scss';
+
+function getMin (i, date) {
+    let Dates = new Date(date - i * 60000)
+    let min = Dates.getMinutes();
+    if (min < 10){
+      return '0' + min
+    } else {
+      return min;
+    }
+  }
 @withRouter
 @inject('store')
 @observer
@@ -46,6 +56,67 @@ class LinkStatus extends Component {
       }
     }
     getData (sn){
+
+        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+            let data = [];
+            const date = new Date() * 1;
+            for (var i = 0;i < 10;i++){
+            data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
+            }
+            let myCharts = this.refs.cpu
+            let myFaultTypeChart = echarts.init(myCharts);
+            myFaultTypeChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                xAxis: {
+                    data: data
+                },
+                yAxis: {},
+                series: [
+                  {
+                    name: '数值',
+                    type: 'line',
+                    color: '#37A2DA',
+                    data: res.message
+                  }
+                ]
+            });
+
+        })
+        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+            let data = [];
+            const date = new Date() * 1;
+            for (var i = 0;i < 10;i++){
+            data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
+            }
+            let myCharts = this.refs.mem
+            let myFaultTypeChart = echarts.init(myCharts);
+            myFaultTypeChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                xAxis: {
+                    data: data
+                },
+                yAxis: {},
+                series: [
+                  {
+                    name: '数值',
+                    type: 'line',
+                    color: '#37A2DA',
+                    data: res.message
+                  }
+                ]
+            });
+
+        })
         http.get('/api/gateways_read?name=' + sn).then(res=>{
             axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
                 let config = res;
@@ -65,6 +136,17 @@ class LinkStatus extends Component {
         })
         http.get('/api/gateways_beta_read?gateway=' + sn).then(res=>{
             this.setState({use_beta: res.data.use_beta === 1})
+        })
+        http.get('/api/applications_versions_latest').then(res=>{
+            console.log(res)
+            this.setState({
+                iot_beta: res.data
+            })
+        })
+        http.get('/api/applications_versions_list?app=FreeIOE').then(res=>{
+            this.setState({
+                newdata: res.data
+            })
         })
     }
     setConfig (record, config){
@@ -240,6 +322,7 @@ class LinkStatus extends Component {
                             <div
                                 style={{height: 280, width: 700}}
                                 id="CPU"
+                                ref="cpu"
                             ></div>
                         </Card>
                         <Card className="border">
@@ -247,6 +330,7 @@ class LinkStatus extends Component {
                             <div
                                 style={{height: 280, width: 700}}
                                 id="memory"
+                                ref="mem"
                             ></div>
                         </Card>
                     </div>
@@ -476,18 +560,18 @@ class LinkStatus extends Component {
                                         </div>
                                     </div>
                                     {
-                                        config.iot_version < this.state.iot_beta
+                                        config.version < this.state.iot_beta
                                         ? <Button
                                             onClick={()=>{
                                                 console.log(this.state.data)
                                                 const data = {
-                                                    data: {
-                                                        no_ack: 1
-                                                    },
-                                                    device: this.props.match.params.sn,
+                                                    gateway: this.props.match.params.sn,
+                                                    app: 'FreeIoe',
+                                                    inst: 'FreeIOE Core',
+                                                    version: this.state.iot_beta,
                                                     id: `sys_upgrade/${this.props.match.params.sn}/ ${new Date() * 1}`
                                                 }
-                                                http.postToken('/api/method/iot.device_api.sys_upgrade', data).then(res=>{
+                                                http.postToken('/api/gateways_applications_upgrade', data).then(res=>{
                                                     console.log(res)
                                                 })
                                             }}

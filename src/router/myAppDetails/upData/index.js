@@ -26,6 +26,7 @@ const CollectionCreateForm = Form.create()(
                 formData.append('app', this.props.app);
                 formData.append('version', values.version);
                 formData.append('comment', values.comment);
+
                 reqwest({
                     url: '/api/applications_versions_create',
                     method: 'post',

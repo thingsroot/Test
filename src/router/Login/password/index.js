@@ -15,7 +15,13 @@ class Password extends PureComponent {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                http.post('/apis/api/method/frappe.core.doctype.user.user.update_password?key=' + getParam('key')  + '&new_password=' + values.password).then(res=>{
+                const data = {
+                    new_password: values.password,
+                    logout_all_sessions: 0,
+                    key: getParam('key'),
+                    old_password: ''
+                }
+                http.post('/api/user_update_password', data).then(res=>{
                     if (res.message) {
                         if (res.home_page === '/desk' && res.message === '/desk') {
                             message.success(res.full_name + '重置密码成功' + '2秒后返回控制台', 2).then(()=>{

@@ -1,12 +1,18 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Icon } from 'antd';
+import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
 @withRouter
 @inject('store')
 @observer
 class Status extends Component {
+    componentDidMount (){
+        http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
+            this.props.store.appStore.setStatus(res)
+          })
+    }
     render () {
         const { status } = this.props.store.appStore;
         return (

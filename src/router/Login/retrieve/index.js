@@ -9,20 +9,20 @@ class Retrieve extends PureComponent {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             console.log(values)
+            const data = {
+                email: values.password
+            }
             if (!err) {
-                http.post('/apis/api/method/frappe.core.doctype.user.user.reset_password?user=' + values.password).then(res=>{
-                    if (res.message) {
-                        if (res.message === 'not found') {
+                http.post('/api/user_reset_password', data).then(res=>{
+                    console.log(res)
+                    if (res.error) {
+                        if (res.error === 'user_not_found') {
                             message.info('用户不存在')
                         }
                     }
-                    if (res._server_messages){
-                        var ret = JSON.parse(res._server_messages)[0];
-                        if (ret !== ''){
-                            ret = JSON.parse(ret);
-                        }
-                        if (ret.message){
-                            message.info('申请重置成功，' + ret.message + '<br>' + '登录邮箱' + values.password + '完成密码重置')
+                    if (res.ok){
+                        if (res.info === 'password_reset_email_sent'){
+                            message.info('申请重置成功，请登录邮箱' + values.password + '完成密码重置')
                         }
                     }
                 }).catch(function (error){

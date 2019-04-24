@@ -119,9 +119,15 @@ class AppsList extends Component {
             title: '状态',
             dataIndex: 'status',
             render: record=>{
-              return (
-                <span style={{background: '#00a65a', display: 'inline-block', padding: '1px 5px', borderRadius: '2px', color: '#fff'}}>{record}</span>
-              )
+              if (record === 'running'){
+                return (
+                  <span style={{background: '#00a65a', display: 'inline-block', padding: '1px 5px', borderRadius: '2px', color: '#fff'}}>{record}</span>
+                )
+              } else {
+                return (
+                  <span style={{background: '#f39c12', display: 'inline-block', padding: '1px 5px', borderRadius: '2px', color: '#fff'}}>{record}</span>
+                )
+              }
             }
           }, {
             title: '启动时间',

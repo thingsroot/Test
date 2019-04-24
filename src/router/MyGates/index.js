@@ -4,6 +4,7 @@ import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input } from 
 import './style.scss';
 import { inject } from 'mobx-react';
 import { Link } from 'react-router-dom';
+import { _getCookie } from '../../utils/Session';
 const TabPane = Tabs.TabPane;
 function getDevicesList (){
     http.get('/api/gateways_list').then(res=>{
@@ -35,6 +36,7 @@ function getDevicesList (){
                 data.push(v.data)
             }
         })
+        console.log(data)
         if (status === 'online'){
             this.props.store.appStore.setGatelist(res.message);
         }
@@ -223,16 +225,21 @@ class MyGates extends PureComponent {
       handleOk = () => {
           const { sn, name, desc} = this.state;
           const data = {
+            'name': sn,
             'device_name': name,
             'description': desc,
             'owner_type': 'User',
-            'owner_id': sn
+            'owner_id': _getCookie('user_id')
           };
         this.setState({
             confirmLoading: true
           }, ()=>{
               http.postToken('/api/gateways_create', data).then(res=>{
-                  console.log(res);
+                  if (res.ok) {
+                    message.success('绑定成功')
+                  } else {
+                    message.error(res.error)
+                  }
               })
           });
         setTimeout(() => {

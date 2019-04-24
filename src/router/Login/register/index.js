@@ -10,14 +10,19 @@ class Register extends PureComponent {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             console.log(values)
+            const data = {
+                email: values.email,
+                full_name: values.username
+            }
             if (!err) {
-                http.post(`/?cmd=frappe.core.doctype.user.user.sign_up&email=${values.email}&full_name=${values.username}&redirect_to=`).then(res=>{
-                    if (res.message){
-                        if (res.message[0] === 0){
-                            message.info('此用户' + res.message[1])
+                http.post('/api/user_create', data).then(res=>{
+                    console.log(res)
+                    if (res.ok){
+                        if (res.result === 0){
+                            message.info('此用户' + res.info)
                         }
-                        if (res.message[0] === 1){
-                            message.info('注册成功，' + res.message[1] + '登录邮箱' + values.email + '完成注册')
+                        if (res.result === 1){
+                            message.info('注册成功，' + res.info + '登录邮箱' + values.email + '完成注册')
                         }
                     }
                 })
