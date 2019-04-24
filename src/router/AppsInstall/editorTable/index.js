@@ -9,7 +9,10 @@ const FormItem = Form.Item;
 const EditableContext = React.createContext();
 
 const EditableRow = ({ form, index, ...props }) => (
-    <EditableContext.Provider value={form} id={index}>
+    <EditableContext.Provider
+        value={form}
+        id={index}
+    >
         <tr {...props} />
     </EditableContext.Provider>
 );
