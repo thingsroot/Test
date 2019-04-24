@@ -39,7 +39,6 @@ class VPN extends Component {
         let auth_code;
         apply_AccessKey().then(res=>{
             auth_code = res.data;
-            console.log(auth_code)
             this.setState({auth_code})
         });
         this.timer = setInterval(() => {
@@ -84,7 +83,6 @@ class VPN extends Component {
         })
     }
     setIp = ()=>{
-        console.log(event.target.value);
         this.setState({virtualIp: event.target.value})
     }
     getStatus = ()=>{
@@ -96,7 +94,12 @@ class VPN extends Component {
                 Authorization: 'Bearer 123123123'
             }
         }).then(res => {
-            return res.json();
+            console.log(res)
+            if (res.ok){
+                return res.json();
+            } else {
+                return false;
+            }
         }).then(json => {
             console.log(json)
             if (this.state.result !== json){
@@ -117,7 +120,11 @@ class VPN extends Component {
                 gate_sn: this.props.match.params.sn
             })
         }).then(res=>{
-            return res.json();
+            if (res.ok){
+                return res.json();
+            } else {
+                return false;
+            }
         }).then(res=>{
             this.setState({gateStatus: res.message})
         })
@@ -132,6 +139,7 @@ class VPN extends Component {
         }).then(res => {
             return res.json();
         }).then(json => {
+            console.log(json)
             let arr = [];
             for (var key in json){
                 if (json[key] === 'RUNNING' && this.state.toggleFlag){
@@ -148,7 +156,7 @@ class VPN extends Component {
             }
             return json;
         }).catch(err => {
-            err;
+            console.log(err)
             this.setState({flag: true})
         })
 
@@ -238,6 +246,7 @@ class VPN extends Component {
                     Authorization: 'Bearer 123123123'
                 }
             }).then(res => {
+                console.log(res)
                 return res.json();
             }).then(() => {
                 setTimeout(() => {
@@ -254,7 +263,8 @@ class VPN extends Component {
                         console.log(json)
                         this.setState({result: json})
                     }).catch(err => {
-                        console.log('请求错误', err);
+                        console.log(err)
+                        return false;
                     })
 
                 }, 5000);
