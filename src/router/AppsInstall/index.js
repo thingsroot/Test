@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { Select, Input, Rate, Icon, Button, Tabs, Table, Modal, Checkbox } from 'antd';
 import { inject, observer} from 'mobx-react';
 import Status from '../../common/status';
@@ -48,126 +48,6 @@ class MyGatesAppsInstall extends Component {
         object: {},
         editingKey: '',
         selectSection: 'socket',   //socket :false     serial: true
-        tcp: [
-            {
-                'name': 'ip',
-                'desc': 'IP地址',
-                'type': 'text'
-            },
-            {
-                'name': 'port',
-                'desc': '端口',
-                'type': 'number',
-                'value': 502
-            },
-            {
-                'name': 'nodelay',
-                'desc': 'Nodelay',
-                'type': 'boolean',
-                'value': true
-            }
-        ],
-        serial: [
-            {
-                'name': 'tty',
-                'desc': '端口',
-                'type': 'dropdown',
-                'value': ['ttymcx0', 'ttymcx1']
-            },
-            {
-                'name': 'baudrate',
-                'desc': '波特率',
-                'type': 'dropdown',
-                'value': [4800, 9600, 115200, 19200]
-            },
-            {
-                'name': 'stop_bits',
-                'desc': '停止位',
-                'type': 'dropdown',
-                'value': [1, 2]
-            },
-            {
-                'name': 'data_bits',
-                'desc': '数据位',
-                'type': 'dropdown',
-                'value': [8, 7]
-            },
-            {
-                'name': 'flow_control',
-                'desc': '流控',
-                'type': 'boolean',
-                'value': false
-            },
-            {
-                'name': 'parity',
-                'desc': '校验',
-                'type': 'dropdown',
-                'value': ['None', 'Even', 'Odd']
-            }
-        ],
-        addTempLists: [{
-            title: '名称',
-            dataIndex: 'conf_name',
-            key: 'conf_name',
-            render: text => <a href="javascript:;">{text}</a>
-        }, {
-            title: '描述',
-            dataIndex: 'description',
-            key: 'description'
-        }, {
-            title: '模板ID',
-            dataIndex: 'name',
-            key: 'name'
-        }, {
-            title: '版本',
-            key: 'latest_version',
-            dataIndex: 'latest_version'
-        }, {
-            title: '操作',
-            render: (record) => (
-                <div>
-                    <Button>
-                        <Link to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}>查看</Link>
-                    </Button>
-                    <span style={{padding: '0 5px'}}> </span>
-                    <Button
-                        disabled={record.disabled}
-                        onClick={()=>{
-                        this.addSingleTemp(record.conf_name, record.description, record.name, record.latest_version)
-                    }}
-                    >添加</Button>
-                </div>
-            )
-        }],
-        showTempLists: [{
-            title: '名称',
-            dataIndex: 'conf_name',
-            key: 'conf_name',
-            render: text => <a href="javascript:;">{text}</a>
-        }, {
-            title: '描述',
-            dataIndex: 'description',
-            key: 'description'
-        }, {
-            title: '模板ID',
-            dataIndex: 'name',
-            key: 'name'
-        }, {
-            title: '版本',
-            key: 'latest_version',
-            dataIndex: 'latest_version'
-        }, {
-            title: '操作',
-            key: 'app',
-            render: (record) => (
-                <Button
-                    onClick={()=>{
-                    this.onDelete(`${record.name}`)
-                    }
-                }
-                >删除</Button>
-            )
-        }],
         deviceColumns: [],
         deviceSource: [],
         SourceCode: [],
@@ -411,6 +291,11 @@ class MyGatesAppsInstall extends Component {
             addTempList: addTempList
         })
     };
+
+    deteteData = (record)=>{
+        console.log(record)
+    };
+
     getConfig = (val)=>{
         let config = JSON.parse(val.conf_template);
         let deviceColumns = [];
@@ -462,17 +347,19 @@ class MyGatesAppsInstall extends Component {
                     editable: true
                 });
             });
+            console.log(data);
             data.push({
                 title: '操作',
                 dataIndex: 'key',
-                render: () => (
-                    <Button
-                        onClick={(record)=>{
-                            console.log(111);
-                            this.deteteTableData(record)
-                        }}
-                    >delete</Button>
-                )
+                render: () => {
+                    return (
+                        <a
+                            onClick={()=>{
+                                 console.log('okokok')
+                            }}
+                        >delete</a>
+                    )
+                }
             });
             columnsArr.push({[tableName[key]]: data})
         });
@@ -489,10 +376,6 @@ class MyGatesAppsInstall extends Component {
         }, ()=>{
             console.log(this.state.deviceColumns)
         })
-    };
-
-    deteteTableData = (record)=>{
-        console.log(record)
     };
 
     checkedChange = (refName)=>{

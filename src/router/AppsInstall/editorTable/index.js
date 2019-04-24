@@ -223,7 +223,6 @@ class EditableTable extends React.Component {
     handleAdd = (name) => {    //okokok
         const { dataSource } = this.state;
         let allTableData = this.props.store.codeStore.allTableData;
-
         let deviceColumns = this.props.deviceColumns[0];
         const newData = {};
         deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
@@ -263,6 +262,7 @@ class EditableTable extends React.Component {
         let name = this.props.tableName;
         const { dataSource } = this.state;
         const deviceColumns = this.props.deviceColumns[0];
+        console.log(deviceColumns)
         let components = {
             body: {
                 row: EditableFormRow,
