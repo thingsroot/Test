@@ -179,10 +179,7 @@ function getMin (i, date){
           myCharts.style.textAlin = 'center'
           myCharts.innerHTML = '暂未获取到数据'
         }
-
-        
       })
-      
       // http.get(`/api/method/iot_ui.iot_api.taghisdata?sn=${data.sn}&vsn=${data.vsn}&tag=${data.name}&vt=${data.vt}&time_condition=time > now() - 10m&value_method=raw&group_time_span=10m&_=1551251898530`).then((res)=>{
       //   const { myCharts } = this.refs;
       //   let data = [];

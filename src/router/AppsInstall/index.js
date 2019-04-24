@@ -412,7 +412,6 @@ class MyGatesAppsInstall extends Component {
         })
     };
     getConfig = (val)=>{
-        
         let config = JSON.parse(val.conf_template);
         let deviceColumns = [];
         let object = {};
@@ -544,10 +543,17 @@ class MyGatesAppsInstall extends Component {
                         <h2 style={{borderBottom: '1px solid #ccc', padding: 10}}>{item.app_name}</h2>
                         <div className={detail ? 'show' : 'hide'}>
                             <div style={{display: 'flex' }}>
-                                <img src={'http://cloud.thingsroot.com' + item.icon_image}
-                                    alt=""
-                                    style={{width: 128, height: 128}}
-                                />
+                            {
+                                console.log(item)
+                            }
+                                {
+                                    item.icon_image
+                                    ? <img src={'http://ioe.thingsroot.com/' + item.icon_image}
+                                        alt=""
+                                        style={{width: 128, height: 128}}
+                                      />
+                                    : ''
+                                }
                                 <div style={{display: 'flex', paddingTop: 20, paddingLeft: 20}}>
                                     <div style={{width: 500}}
                                         className="detail"
@@ -964,7 +970,7 @@ class MyGatesAppsInstall extends Component {
                                        <div key={ind}
                                            className="item"
                                        >
-                                           <img src={`http://cloud.thingsroot.com${val.icon_image}`}
+                                           <img src={`http://ioe.thingsroot.com/${val.icon_image}`}
                                                alt="logo"
                                                onClick={()=>{
                                                    this.getConfig(val)
@@ -982,6 +988,8 @@ class MyGatesAppsInstall extends Component {
                                                            flag: false,
                                                            detail: false,
                                                            item: val
+                                                       }, ()=>{
+                                                           console.log(val)
                                                        })
                                                    }}
                                                    ><Icon type="cloud-download" /></span>

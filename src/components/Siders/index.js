@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Menu, Icon } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 const maxSider = {
     width: '200px',
     height: '100%',
@@ -15,11 +15,41 @@ const minSider = {
     zIndex: 1999,
     transition: 'background 0.3s, left 0.2s'
 }
+@withRouter
 class Siders extends PureComponent {
     constructor (props){
         super(props)
         this.state = {
-            collapsed: this.props.collapsed
+            collapsed: this.props.collapsed,
+            key: '1'
+        }
+    }
+    UNSAFE_componentWillMount () {
+        const { pathname } = this.props.location;
+        if (pathname.indexOf('/Home') !== -1){
+            this.setState({
+                key: '1'
+            })
+        } else if (pathname.indexOf('/MyGates') !== -1 || pathname.indexOf('/AppsInstall') !== -1) {
+            this.setState({
+                key: '2'
+            })
+        } else if (pathname.indexOf('/MyApps') !== -1) {
+            this.setState({
+                key: '3'
+            })
+        } else if (pathname.indexOf('/PlatformMessage') !== -1) {
+            this.setState({
+                key: '4'
+            })
+        } else if (pathname.indexOf('/DeviceMessage') !== -1) {
+            this.setState({
+                key: '5'
+            })
+        } else {
+            this.setState({
+                key: '1'
+            })
         }
     }
     UNSAFE_componentWillReceiveProps (props){
@@ -49,8 +79,11 @@ class Siders extends PureComponent {
                 }
                 <Menu theme="dark"
                     mode="inline"
-                    defaultSelectedKeys={['1']}
+                    defaultSelectedKeys={[this.state.key]}
                 >
+                {
+                    console.log(this.state.key)
+                }
                     <Menu.Item key="1">
                     <Link to="/Home">
                         <Icon

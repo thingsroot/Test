@@ -27,14 +27,12 @@ const CollectionCreateForm = Form.create()(
                 formData.append('version', values.version);
                 formData.append('comment', values.comment);
                 console.log(formData.get('app_file'))
-                    
                 reqwest({
                     url: '/api/applications_versions_create',
                     method: 'post',
                     processData: false,
                     data: formData,
                     success: () => {
-                        
                       this.setState({
                         fileList: [],
                         uploading: false

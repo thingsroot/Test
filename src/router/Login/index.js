@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
 import './login.scss'
 import Background from '../../assets/images/background.png';
 import Sign from './sign'
@@ -16,10 +16,11 @@ var sectionStyle = {
     backgroundImage: `url(${Background})`,
     backgroundSize: '100% 100%'
 };
-
-export default class Login extends PureComponent {
+@withRouter
+class Login extends PureComponent {
 
     render () {
+        console.log(this.props.match)
         const { path } = this.props.match;
         return (
             <div className="login"
@@ -52,8 +53,11 @@ export default class Login extends PureComponent {
                                 component={Password}
                                 exact
                             />
+                            {
+                                console.log(path)
+                            }
                             <Redirect
-                                from={path}
+                                from={'/login'}
                                 to={`${path}/sign`}
                             />
                         </Switch>
@@ -63,3 +67,4 @@ export default class Login extends PureComponent {
         );
     }
 }
+export default Login;

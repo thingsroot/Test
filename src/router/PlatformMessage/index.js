@@ -517,14 +517,6 @@ class PlatformMessage extends Component {
                     loading={this.state.loading}
                     onChange={this.onChange}
                     rowKey="name"
-<<<<<<< HEAD
-                    expandedRowRender={record =>
-                        <SonTable
-                            category={category}
-                            data={record}
-                        />
-                        }
-=======
                     expandedRowRender={record => {
                         return (
                             <SonTable
@@ -533,7 +525,6 @@ class PlatformMessage extends Component {
                             />
                         )
                     }}
->>>>>>> 4a99987aefb531df0a7235ac5cfa906b69b1046c
                     expandRowByClick
                 />
             </div>

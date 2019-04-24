@@ -36,9 +36,9 @@ class Nav extends Component {
           })
           this.props.store.appStore.setGatelist(online)
         })
-        http.get('/api/method/iot_ui.iot_api.devices_list?filter=online').then(res=>{
-          this.props.store.appStore.setGatelist(res.message);
-        })
+        // http.get('/api/method/iot_ui.iot_api.devices_list?filter=online').then(res=>{
+        //   this.props.store.appStore.setGatelist(res.message);
+        // })
       }
       setUrl = (sn) => {
         let arr = location.pathname.split('/');
