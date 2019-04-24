@@ -826,9 +826,14 @@ class MyGatesAppsInstall extends Component {
                                                             {
                                                                 v.child.map((w, index)=>{
                                                                     return (
-                                                                        <div id={w.name} key={index}>
-                                                                            <p className="sectionName"><span
-                                                                                style={{padding: '0 5px'}}>|</span>{w.desc}</p>
+                                                                        <div
+                                                                            id={w.name}
+                                                                            key={index}
+                                                                        >
+                                                                            <p className="sectionName">
+                                                                                <span
+                                                                                    style={{padding: '0 5px'}}
+                                                                                >|</span>{w.desc}</p>
                                                                             <EditableTable
                                                                                 tableName={w.name}
                                                                                 deviceColumns={this.state.deviceColumns[w.name]}
