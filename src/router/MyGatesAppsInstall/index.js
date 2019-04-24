@@ -15,7 +15,7 @@ class AdvancedSearchForm extends PureComponent {
     state = {
         expand: false,
         a: 1
-    }
+    };
     componentDidMount (){
         this.smde = new SimpleMDE({
             element: document.getElementById('editor').childElementCount,

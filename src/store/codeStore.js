@@ -16,6 +16,7 @@ class CodeStore {
     @observable instName = '123';
     @observable template = [];   //template选项
     @observable dataSource = [];   //templateList
+    @observable allTableData = [];   //表格数据
 
     @observable platformData = [];   //平台消息
     @observable tableData = [];   //
@@ -43,6 +44,10 @@ class CodeStore {
 
     @action setSettingData (values) {
         this.settingData = values;
+    }
+
+    @action setAllTableData (values) {
+        this.allTableData = values;
     }
 
     @action setConfiguration (values) {

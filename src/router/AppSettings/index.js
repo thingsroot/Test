@@ -25,7 +25,7 @@ class AppSettings extends Component {
             uid: '-1',
             name: 'xxx.png',
             // status: 'done',
-            url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+            url: 'http://cloud.thingsroot.com/assets/app_center/img/logo.png'
         }],
         imageUrl: '',
         previewImage: '',
@@ -33,7 +33,7 @@ class AppSettings extends Component {
     };
     componentDidMount (){
         let app = this.props.match.params.name;
-        if (app !== 'undefined') {
+        if (app) {
             console.log(app);
             this.getDetails(app);
         }
@@ -87,7 +87,8 @@ class AppSettings extends Component {
                 if (this.props.match.params.type === '1') {
                     http.post('/api/applications_create', params).then(res=>{
                         if (res.ok === true) {
-                            message.success('应用创建成功！')
+                            message.success('应用创建成功！');
+                            window.location.href = '/myApps'
                         } else {
                             message.error('应用创建失败！')
                         }
