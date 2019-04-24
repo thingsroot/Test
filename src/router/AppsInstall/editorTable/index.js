@@ -16,7 +16,6 @@ const EditableRow = ({ form, index, ...props }) => (
         <tr {...props} />
     </EditableContext.Provider>
 );
-console.log(EditableRow)
 const EditableFormRow = Form.create()(EditableRow);
 @withRouter
 @inject('store')
@@ -52,8 +51,6 @@ class EditableCell extends React.Component {
     templateChange = (val)=>{
         this.setState({
             template: val
-        }, ()=>{
-            console.log(this.state.template)
         })
     }
 
@@ -69,14 +66,11 @@ class EditableCell extends React.Component {
             handleSave,
             ...restProps
         } = this.props;
-        console.log(this.props)
         index;
         handleSave;
+        editable;
         return (
             <td {...restProps}>
-                {
-                    console.log(editable)
-                }
                 {
                     id !== 'template' ? (
                         <EditableContext.Consumer>
@@ -85,7 +79,6 @@ class EditableCell extends React.Component {
                                 return (
                                     editing ? (
                                         <FormItem style={{ margin: 0 }}>
-                                            {console.log(dataIndex, record)}
                                             {form.getFieldDecorator(dataIndex, {
 
                                                 rules: [{
@@ -190,49 +183,42 @@ class EditableTable extends React.Component {
         this.setState({
             dataSource: dataSource
         });
-        console.log(this.props.deviceSource);
-        let deviceColumns = this.props.deviceColumns;
-        let data = [];
-        console.log(deviceColumns);
-        deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
-            key;
-            console.log(key);
-            data.push({
-                key: this.props.tableName + key,
-                id: v.type,
-                title: v.desc,
-                dataIndex: v.name,
-                editable: true
-            });
-        });
-        data.push({
-            title: '操作',
-            dataIndex: 'key',
-            render: (record) => {
-                return (
-                    <Button onClick={() => this.handleDelete(record.key)}>删除</Button>
-                )
-            }
-        });
-        console.log(data);
-        this.setState({
-            deviceColumns: data
-        })
+        // let deviceColumns = this.props.deviceColumns;
+        // let data = [];
+        // deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
+        //     key;
+        //     data.push({
+        //         key: this.props.tableName + key,
+        //         id: v.type,
+        //         title: v.desc,
+        //         dataIndex: v.name,
+        //         editable: true
+        //     });
+        // });
+        // data.push({
+        //     title: '操作',
+        //     dataIndex: 'key',
+        //     render: (record) => {
+        //         return (
+        //             <Button onClick={() => this.handleDelete(record.key)}>删除</Button>
+        //         )
+        //     }
+        // });
+        // this.setState({
+        //     deviceColumns: data
+        // })
     }
 
-    handleDelete = (key) => {
-        console.log(key);
-        const dataSource = this.state.dataSource;
-        console.log(dataSource);
-        let data = [];
-        dataSource.map((v)=>{
-            console.log(v);
-            if (v.key !== key) {
-                data.push(v)
-            }
-        });
-        this.setState({ dataSource: data});
-    };
+    // handleDelete = (key) => {
+    //     const dataSource = this.state.dataSource;
+    //     let data = [];
+    //     dataSource.map((v)=>{
+    //         if (v.key !== key) {
+    //             data.push(v)
+    //         }
+    //     });
+    //     this.setState({ dataSource: data});
+    // };
 
     handleAdd = (name) => {    //okokok
         const { dataSource } = this.state;
@@ -242,7 +228,6 @@ class EditableTable extends React.Component {
         const newData = {};
         deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
             key;
-            console.log(v.dataIndex);  //key
             if (v.dataIndex !== 'key') {
                 newData[v.dataIndex] = 1;
             } else {
@@ -253,10 +238,8 @@ class EditableTable extends React.Component {
                 }
             }
         });
-        console.log(newData)
         dataSource.push(newData);
         allTableData[name] = dataSource;
-        console.log(this.props.store.codeStore.allTableData)
     };
 
     handleSave = (row, name) => {
@@ -272,7 +255,6 @@ class EditableTable extends React.Component {
         }, ()=>{
             let allTableData = this.props.store.codeStore.allTableData;
             allTableData[name] = this.state.dataSource;
-            console.log(this.props.store.codeStore.allTableData)
         });
 
     };
@@ -281,7 +263,6 @@ class EditableTable extends React.Component {
         let name = this.props.tableName;
         const { dataSource } = this.state;
         const deviceColumns = this.props.deviceColumns[0];
-        console.log(deviceColumns)
         let components = {
             body: {
                 row: EditableFormRow,
@@ -310,9 +291,7 @@ class EditableTable extends React.Component {
                         }
                     };
                 }
-
             });
-            console.log(columns)
         }
         return (
             <div>

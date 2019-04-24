@@ -421,8 +421,6 @@ class MyGatesAppsInstall extends Component {
             if (v.name === 'device_section') {
                 let tableNameData = {};
                 v.child.map((w, key1)=>{
-                    console.log('......................')
-                    console.log(w.name);
                     tableNameData[w.name] = [];
                     key1;
                     let arr = [];
@@ -451,6 +449,7 @@ class MyGatesAppsInstall extends Component {
         this.props.store.codeStore.setDataSource(dataSource);
         let columnsArr = [];
         deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
+            console.log(Object.keys(v))
             key;
             let data = [];
             let name = tableName[key];
@@ -467,7 +466,12 @@ class MyGatesAppsInstall extends Component {
                 title: '操作',
                 dataIndex: 'key',
                 render: () => (
-                    <Button>删除</Button>
+                    <Button
+                        onClick={(record)=>{
+                            console.log(111);
+                            this.deteteTableData(record)
+                        }}
+                    >delete</Button>
                 )
             });
             columnsArr.push({[tableName[key]]: data})
@@ -482,8 +486,15 @@ class MyGatesAppsInstall extends Component {
             detail: true,
             config: config,
             deviceColumns: obj
+        }, ()=>{
+            console.log(this.state.deviceColumns)
         })
     };
+
+    deteteTableData = (record)=>{
+        console.log(record)
+    };
+
     checkedChange = (refName)=>{
         this.refs[refName].value = event.target.checked
     };
