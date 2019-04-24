@@ -39,6 +39,7 @@ class DevicemMessage extends Component {
             width: '25%',
             render: (text, record) => (
                 <span
+                    className="cursor"
                     style={record.disposed === 0 ? disposed : posed}
                 >{text}
                 </span>

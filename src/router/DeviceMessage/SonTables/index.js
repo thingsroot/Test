@@ -11,9 +11,10 @@ class SonTables extends React.Component {
         arr.push(name);
         let data = {
             category: this.props.category,
-            events: name,
+            events: arr,
             disposed: 1
         };
+        console.log(data)
         http.post('/api/events_dispose', data).then(res=>{
             console.log(res)
         });

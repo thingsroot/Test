@@ -28,6 +28,9 @@ class CodeStore {
     @observable templateVisible = false;  //模板列表的form表单visible
     @observable copyVisible = false;  //复制模板列表的form表单visible
     @observable copyData = {};  //复制模板列表的form表单默认值
+    @observable versionList = [];   //版本列表
+    @observable versionLatest = [];   //最新版本
+    @observable templateList = [];   //模板列表
 
     @observable description = '';//创建修改应用时markdown的值
     @observable configuration = '';     //配置面板
@@ -41,6 +44,18 @@ class CodeStore {
         confTemplate: '',
         preConfiguration: ''
     };
+
+    @action setTemplateList (values) {
+        this.templateList = values;
+    }
+
+    @action setVersionList (values) {
+        this.versionList = values;
+    }
+
+    @action setVersionLatest (values) {
+        this.versionLatest = values;
+    }
 
     @action setSettingData (values) {
         this.settingData = values;

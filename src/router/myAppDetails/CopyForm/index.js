@@ -31,6 +31,9 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                     if (res.ok === false) {
                         message.error('新版本上传失败！');
                     } else {
+                        let list = this.props.store.codeStore.templateList;
+                        list.unshift(res.data);
+                        this.props.store.codeStore.setTemplateList(list)
                         if (this.props.store.codeStore.copyData.version !== 0) {
                             let params = {
                                 name: conf_name,

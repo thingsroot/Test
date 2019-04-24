@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Input, Button } from 'antd';
+import { Input, Button, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import './style.scss';
 import http from '../../utils/Server';
@@ -16,7 +16,8 @@ const none = {
 class MyApps extends PureComponent {
     state = {
         appList: [],
-        backups: []
+        backups: [],
+        loading: true
     };
 
     componentDidMount (){
@@ -24,10 +25,9 @@ class MyApps extends PureComponent {
             console.log(res);
             if (res) {
                 this.setState({
+                    loading: false,
                     appList: res.data,
                     backups: res.data
-                }, ()=>{
-                    console.log(this.state.appList)
                 })
             }
         })
@@ -69,6 +69,9 @@ class MyApps extends PureComponent {
         const appList = this.state.appList;
         return (
             <div className="myApps">
+                <div style={{lineHeight: '300px', textAlign: 'center'}}>
+                    <Spin spinning={this.state.loading}/>
+                </div>
                 <div className="searchApp">
                     <Button
                         type="primary"

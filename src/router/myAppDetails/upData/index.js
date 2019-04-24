@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import {Modal, Form, Input, Checkbox, Upload, Icon, Button, message} from 'antd';
-// import http from '../../../utils/Server';
+import { withRouter } from 'react-router-dom';
+import http from '../../../utils/Server';
 import reqwest from 'reqwest';
 import {inject, observer} from 'mobx-react';
 const { TextArea } = Input;
 const CollectionCreateForm = Form.create()(
     @inject('store')
     @observer
+    @withRouter
     class extends Component {
         state = {
             fileList: [],
@@ -38,7 +40,11 @@ const CollectionCreateForm = Form.create()(
                         uploading: false
                       });
                       message.success('上传成功.');
-                      this.props.store.codeStore.setVersionVisible(false)
+                      this.props.store.codeStore.setVersionVisible(false);
+                      http.get('/api/versions_list?app=' + this.props.match.params.name).then(res=>{
+                          this.props.store.codeStore.setVersionList(res.data);
+                      });
+                      this.props.store.codeStore.setVersionLatest(this.props.store.codeStore.versionLatest + 1);
                     },
                     error: () => {
                       this.setState({
@@ -47,23 +53,13 @@ const CollectionCreateForm = Form.create()(
                       message.error('上传失败.');
                     }
                   });
-
-                // http.form('/api/api/v1/applications.versions.create', formData).then(res=>{
-                //     if (res.ok === false) {
-                //         message.error('新版本上传失败！');
-                //     } else {
-                //         message.success('新版本上传成功！');
-                //         console.log(res);
-                //         this.setState({ visible: false });
-                //     }
-                // });
                 form.resetFields();
             });
         };
         render () {
             console.log(this);
             const {
-                visible, onCancel, form, versionLatest
+                visible, onCancel, form
             } = this.props;
             const { fileList } = this.state;
             const { getFieldDecorator } = form;
@@ -104,7 +100,7 @@ const CollectionCreateForm = Form.create()(
                 >
                     <Form layout="vertical">
                         <Form.Item label="版本">
-                            {getFieldDecorator('version', { initialValue: versionLatest }, {
+                            {getFieldDecorator('version', { initialValue: this.props.store.codeStore.versionLatest + 1 }, {
                                 rules: [{ required: true, message: '新版本号大于旧版本号！' }]
                             })(
                                 <Input type="number"

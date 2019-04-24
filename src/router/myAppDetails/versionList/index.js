@@ -27,7 +27,8 @@ class VersionList extends PureComponent {
     };
 
     render () {
-        let { versionList, versionLatest, app } = this.props;
+        let { app } = this.props;
+        let { versionList } = this.props.store.codeStore;
         return (
             <div className="versionList">
                 <div>
@@ -40,7 +41,6 @@ class VersionList extends PureComponent {
                     <CollectionCreateForm
                         visible={this.props.store.codeStore.versionVisible}
                         onCancel={this.handleCancel}
-                        versionLatest={versionLatest}
                         app={app}
                     />
                 </div>

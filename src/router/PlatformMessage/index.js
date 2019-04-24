@@ -39,6 +39,7 @@ class PlatformMessage extends Component {
             width: '30%',
             render: (text, record) => (
                 <span
+                    className="cursor"
                     style={record.disposed === 0 ? disposed : posed}
                 >
                     {text}
@@ -94,6 +95,7 @@ class PlatformMessage extends Component {
 
     //确认消息
     confMessage = (arr)=>{
+        console.log(arr)
         if (arr.length === 0) {
             message.warning('请您先选择要确认的消息！');
         } else {
@@ -105,6 +107,7 @@ class PlatformMessage extends Component {
                 activities: arr,
                 disposed: 1
             };
+            console.log(arr)
             http.post('/api/activities_dispose', params).then(res=>{
                 console.log(res);
                 let platform = this.state.platform;

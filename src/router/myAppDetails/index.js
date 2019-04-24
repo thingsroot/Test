@@ -7,6 +7,7 @@ import VersionList from './versionList';
 import TemplateList from './templateList';
 import AppDesc from './appDesc';
 import {_getCookie} from '../../utils/Session';
+import {inject, observer} from 'mobx-react';
 
 const TabPane = Tabs.TabPane;
 const block = {
@@ -17,6 +18,9 @@ const block = {
 const none = {
     display: 'none'
 };
+
+@inject('store')
+@observer
 class MyAppDetails extends Component {
     state = {
         user: '',
@@ -24,9 +28,7 @@ class MyAppDetails extends Component {
         time: '',
         app: '',
         desc: '',
-        versionList: [],
-        templateList: [],
-        myList: []
+        templateList: []
     };
     componentDidMount (){
         let user = _getCookie('user_id');
@@ -39,24 +41,18 @@ class MyAppDetails extends Component {
     }
     getDetails = (app)=>{
         http.get('/api/applications_read?app=' + app).then(res=>{
-            console.log(res.data);
             this.setState({
                 message: res.data.data.data,
                 desc: res.data.data.data.description,
                 time: res.data.data.data.modified.substr(0, 11),
-                versionList: res.data.versionList.data,
-                versionLatest: res.data.versionLatest.data,
                 templateList: res.data.tempList
-            })
+            });
+            this.props.store.codeStore.setVersionList(res.data.versionList.data);
+            this.props.store.codeStore.setVersionLatest(res.data.versionLatest.data)
         });
         http.get('/api/user_configuration_list?app=' + app)
             .then(res=>{
-                console.log(res.message);
-                this.setState({
-                    myList: res.message
-                }, ()=>{
-                    console.log(this.state.myList)
-                })
+                this.props.store.codeStore.setTemplateList(res.message)
             })
     };
     callback = (key)=>{
@@ -64,7 +60,7 @@ class MyAppDetails extends Component {
     };
     render () {
         const { url } = this.props.match;
-        let { app, message, time, user, versionLatest, versionList, templateList, myList } = this.state;
+        let { app, message, time, user, templateList } = this.state;
         return (
             <div className="myAppDetails">
                 <div className="header">
@@ -115,8 +111,6 @@ class MyAppDetails extends Component {
                                         this.getDetails(message.fork_from);
                                         this.setState({
                                             app: this.props.match.params.name
-                                        }, ()=>{
-                                            console.log(this.state.app)
                                         });
                                     }
                                 }
@@ -155,8 +149,6 @@ class MyAppDetails extends Component {
                     >
                         <VersionList
                             app={app}
-                            versionList={versionList}
-                            versionLatest={versionLatest + 1}
                             user={message.owner === user ? true : false}
                         />
                     </TabPane>
@@ -172,7 +164,6 @@ class MyAppDetails extends Component {
                     >
                         <TemplateList
                             templateList={templateList}
-                            myList={myList}
                             app={app}
                         />
                     </TabPane>

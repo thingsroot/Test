@@ -30,8 +30,9 @@ const MyTemplateForm = Form.create({ name: 'template_form' })(
                         message.error('新版本上传失败！');
                     } else {
                         message.success('新版本上传成功！');
-                        console.log(res);
-                        this.setState({ visible: false });
+                        let list = this.props.store.codeStore.templateList;
+                        list.unshift(res.data);
+                        this.props.store.codeStore.setTemplateList(list)
                     }
 
                 });
@@ -47,6 +48,7 @@ const MyTemplateForm = Form.create({ name: 'template_form' })(
             const {
                 visible, onCancel, form
             } = this.props;
+            console.log(this.props.store.codeStore.templateList)
             const { getFieldDecorator } = form;
             return (
                 <Modal

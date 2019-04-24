@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { Button, message } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
-import {_getCookie} from '../../utils/Session';
+import {_getCookie, _setCookie} from '../../utils/Session';
 import ResetPasswordCreateForm from './resetPassword';
 class UserSettings extends PureComponent {
     state = {
@@ -53,7 +53,10 @@ class UserSettings extends PureComponent {
             };
             http.post('/api/user_update_password', data).then(res=>{
                 res;
-                message.success('修改密码成功，请重新登陆！')
+                message.success('修改密码成功，请重新登陆！', 1.5).then(()=>{
+                    location.href = '/';
+                })
+                _setCookie('T&R_auth_token', '');
             }).catch(err=>{
                 err;
                 message.success('修改密码失败！')

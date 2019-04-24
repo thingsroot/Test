@@ -11,11 +11,17 @@ class SonTable extends React.Component {
         arr.push(name);
         let params = {
             category: this.props.category,
-            activities: name,
+            activities: arr,
             disposed: 1
         };
+        console.log(params);
+        // http.post('/api/activities_dispose', params).then(res=>{
+        //     console.log(res.data)
+        // });
         http.post('/api/activities_dispose', params).then(res=>{
-            console.log(res.data)
+            console.log(res);
+        }).catch(err=>{
+            console.log(err)
         });
         //过滤数据
         let data = this.props.store.codeStore.tableData;

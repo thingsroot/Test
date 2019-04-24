@@ -32,19 +32,14 @@ class TemplateList extends Component {
             owner_type: owner_type,
             version: version
         };
-        console.log(data);
         if (version !== 0) {
             http.get('/api/configurations_version_read?conf=' + conf + '&version=' + version)
                 .then(res=>{
-                    console.log(res.message[0].data);
                     data['data'] = res.message[0].data;
-                    console.log(data);
                     this.props.store.codeStore.setCopyData(data);
-                    console.log(this.props.store.codeStore.copyData)
                 })
         } else {
             this.props.store.codeStore.setCopyData(data);
-            console.log(this.props.store.codeStore.copyData)
         }
 
         this.props.store.codeStore.setCopyVisible(true);
@@ -92,7 +87,8 @@ class TemplateList extends Component {
     };
 
     render () {
-        const { templateList, myList, app } = this.props;
+        const { templateList, app } = this.props;
+        let myList = this.props.store.codeStore.templateList;
         const { templateContent } = this.state;
         return (
             <div className="templateList">
@@ -158,7 +154,6 @@ class TemplateList extends Component {
                                                         style={{height: '26px', cursor: 'pointer'}}
                                                         onClick={
                                                             () => {
-                                                                console.log(v.name)
                                                                 this.copyContent(v.name, v.conf_name, v.description, v.latest_version, v.public, v.owner_type)
                                                             }
                                                         }
