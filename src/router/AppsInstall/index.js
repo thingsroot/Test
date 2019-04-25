@@ -51,45 +51,69 @@ class MyGatesAppsInstall extends Component {
         deviceColumns: [],
         deviceSource: [],
         SourceCode: [],
-        dataSourceCode: []
+        dataSourceCode: [],
+        tcp: [
+            {
+                'name': 'ip',
+                'desc': 'IP地址',
+                'type': 'text'
+            },
+            {
+                'name': 'port',
+                'desc': '端口',
+                'type': 'number',
+                'value': 502
+            },
+            {
+                'name': 'nodelay',
+                'desc': 'Nodelay',
+                'type': 'boolean',
+                'value': true
+            }
+        ],
+        serial: [
+            {
+                'name': 'tty',
+                'desc': '端口',
+                'type': 'dropdown',
+                'value': ['ttymcx0', 'ttymcx1']
+            },
+            {
+                'name': 'baudrate',
+                'desc': '波特率',
+                'type': 'dropdown',
+                'value': [4800, 9600, 115200, 19200]
+            },
+            {
+                'name': 'stop_bits',
+                'desc': '停止位',
+                'type': 'dropdown',
+                'value': [1, 2]
+            },
+            {
+                'name': 'data_bits',
+                'desc': '数据位',
+                'type': 'dropdown',
+                'value': [8, 7]
+            },
+            {
+                'name': 'flow_control',
+                'desc': '流控',
+                'type': 'boolean',
+                'value': false
+            },
+            {
+                'name': 'parity',
+                'desc': '校验',
+                'type': 'dropdown',
+                'value': ['None', 'Even', 'Odd']
+            }
+        ],
+        keys: []
     };
     componentDidMount (){
-        // http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-        //     this.props.store.appStore.setStatus(res.message)
-        //   });
-        // http.get('/api/method/app_center.api.app_suppliers').then(res=>{
-        //     this.setState({
-        //         vendor: res.message
-        //     })
-        // });
-        // http.get('/api/method/app_center.api.app_protocols').then(res=>{
-        //     this.setState({
-        //         agreement: res.message
-        //     })
-        // });
-        // http.get('/api/method/app_center.api.app_categories').then(res=>{
-        //     this.setState({
-        //         type: res.message
-        //     })
-        // });
-        // http.get('/api/method/iot_ui.iot_api.appslist_bypage?count=100&page=1').then(res=>{
-        //     res.message.result.length > 0 && this.setState({
-        //         data: res.message.result,
-        //         filterdata: res.message.result
-        //     })
-        // });
-        // http.get('/api/method/conf_center.api.list_app_conf_pri?app=APP00000040&limit=100')
-        //     .then(res=>{
-        //         let data = res.message;
-        //         data && data.length > 0 && data.map((v)=>{
-        //             v['disabled'] = false;
-        //         });
-        //         this.setState({
-        //             addTempList: data
-        //         })
-        //     });
         http.get('/api/store_list').then(res=>{
-            console.log(res)
+            console.log(res);
             this.setState({
                 data: res.data
             })
@@ -108,7 +132,6 @@ class MyGatesAppsInstall extends Component {
             });
     }
     shouldComponentUpdate (nextProps, nextState){
-        console.log(nextProps, '------', nextState);
         if (nextState.item.description && nextState.item.description !== null){
             document.getElementById('box').innerHTML = marked(nextState.item.description)
         }
@@ -238,7 +261,6 @@ class MyGatesAppsInstall extends Component {
         })
     };
     protocolChange = (val)=>{   //通讯
-        console.log(val);
         if (val === 'serial') {
             this.setState({
                 selectSection: 'serial'
@@ -292,16 +314,19 @@ class MyGatesAppsInstall extends Component {
         })
     };
 
-    deteteData = (record)=>{
-        console.log(record)
-    };
-
     getConfig = (val)=>{
-        let config = JSON.parse(val.conf_template);
+        let config = [];
+        if (val.conf_template) {
+            let con = val.conf_template.replace(/[\r\n]/g, '');
+            let cons = con.replace(/\s+/g, '');
+            config = JSON.parse(cons);
+        }
         let deviceColumns = [];
         let tableName = [];  //存放表名
         let dataSource = {};
+        let keys = [];
         config && config.length > 0 && config.map((v, key)=>{
+            keys.push(v.name);
             key;
             if (v.name === 'device_section') {
                 let tableNameData = {};
@@ -324,9 +349,9 @@ class MyGatesAppsInstall extends Component {
                     })
                 });
                 this.props.store.codeStore.setAllTableData(tableNameData);
-                console.log(this.props.store.codeStore.allTableData)
             }
         });
+        console.log(keys);
         //设置store存储数据
         tableName && tableName.length > 0 && tableName.map((w)=>{
             dataSource[w] = [];
@@ -334,7 +359,6 @@ class MyGatesAppsInstall extends Component {
         this.props.store.codeStore.setDataSource(dataSource);
         let columnsArr = [];
         deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
-            console.log(Object.keys(v))
             key;
             let data = [];
             let name = tableName[key];
@@ -347,20 +371,6 @@ class MyGatesAppsInstall extends Component {
                     editable: true
                 });
             });
-            console.log(data);
-            data.push({
-                title: '操作',
-                dataIndex: 'key',
-                render: () => {
-                    return (
-                        <a
-                            onClick={()=>{
-                                 console.log('okokok')
-                            }}
-                        >delete</a>
-                    )
-                }
-            });
             columnsArr.push({[tableName[key]]: data})
         });
         let obj = {};
@@ -372,11 +382,14 @@ class MyGatesAppsInstall extends Component {
             item: val,
             detail: true,
             config: config,
-            deviceColumns: obj
-        }, ()=>{
-            console.log(this.state.deviceColumns)
+            deviceColumns: obj,
+            keys: keys
         })
     };
+
+    inputChange = (refName)=>{
+        this.refs[refName].value = event.target.value
+    }
 
     checkedChange = (refName)=>{
         this.refs[refName].value = event.target.checked
@@ -385,31 +398,39 @@ class MyGatesAppsInstall extends Component {
         this.refs[refName].value = event.target.innerText
     };
 
-    // getData = ()=>{
-    //     const { tcp, serial, showTempList, selectSection } = this.state;
-    //     let sourceCodeData = {
+    getData = ()=>{
+        const { tcp, serial, selectSection, keys } = this.state;
+        console.log(keys)
+        keys.map(item=>{
+            if (this.refs[item] !== 'undefined') {
+                console.log(this.refs[item])
+            }
+        });
+        let sourceCodeData = {
     //         protocol: this.refs.protocol.value,
     //         Link_type: this.refs.Link_type.value
-    //     };
-    //     let data = [];
-    //     let showList = [];
-    //     if (selectSection === 'socket') {
-    //         tcp.map((v, key)=>{
-    //             key;
-    //             data.push({
-    //                 [v.name]: this.refs[v.name].value
-    //             })
-    //         });
-    //         sourceCodeData['socket'] = data;
-    //     } else if (selectSection === 'serial') {
-    //         serial.map((v, key)=>{
-    //             key;
-    //             data.push({
-    //                 [v.name]: this.refs[v.name].value
-    //             })
-    //         });
-    //         sourceCodeData['serial'] = data;
-    //     }
+        };
+
+        let data = [];
+        // let showList = [];
+        if (selectSection === 'socket') {
+            tcp.map((v, key)=>{
+                key;
+                data.push({
+                    [v.name]: this.refs[v.name].value
+                })
+            });
+            sourceCodeData['socket'] = data;
+        } else if (selectSection === 'serial') {
+            serial.map((v, key)=>{
+                key;
+                data.push({
+                    [v.name]: this.refs[v.name].value
+                })
+            });
+            sourceCodeData['serial'] = data;
+        }
+        console.log(sourceCodeData)
     //     showTempList.length > 0 && showTempList.map((v, key)=>{
     //         key;
     //         showList.push({
@@ -432,7 +453,7 @@ class MyGatesAppsInstall extends Component {
     //     this.setState({
     //         dataSourceCode: JSON.stringify(sourceCodeData)
     //     });
-    // };
+    };
     submitData = ()=>{
         this.getData();
     };
@@ -440,9 +461,9 @@ class MyGatesAppsInstall extends Component {
         key;
         if (this.state.config && this.state.config.length > 0) {
             console.log('不可编辑');
-            // this.getData();
+            this.getData();
         } else {
-            console.log('可编辑')
+            console.log('可编辑');
             this.props.store.codeStore.setReadOnly(true);
         }
 
@@ -477,9 +498,6 @@ class MyGatesAppsInstall extends Component {
                         <h2 style={{borderBottom: '1px solid #ccc', padding: 10}}>{item.app_name}</h2>
                         <div className={detail ? 'show' : 'hide'}>
                             <div style={{display: 'flex' }}>
-                            {
-                                console.log(item)
-                            }
                                 {
                                     item.icon_image
                                     ? <img src={'http://ioe.thingsroot.com/' + item.icon_image}
@@ -520,9 +538,12 @@ class MyGatesAppsInstall extends Component {
                                     <span className="spanStyle">实例名：</span>
                                     <Input
                                         type="text"
+                                        ref="inst"
                                         style={{width: '300px'}}
                                         defaultValue={instName}
-                                        onChange={this.setInstName}
+                                        onChange={()=>{
+                                            this.inputChange('inst')
+                                        }}
                                     />
                                     <span>{instName}</span>
                                 </p>
@@ -654,9 +675,12 @@ class MyGatesAppsInstall extends Component {
                                                                                 >{a.desc}</span>
                                                                                 <Input
                                                                                     style={{width: 320}}
-                                                                                    name={a.name}
+                                                                                    ref={a.name}
                                                                                     type={a.type}
                                                                                     defaultValue={a.value}
+                                                                                    onChange={()=>{
+                                                                                        this.inputChange(a.name)
+                                                                                    }}
                                                                                 />
                                                                                 <input
                                                                                     ref={a.name}
@@ -690,8 +714,9 @@ class MyGatesAppsInstall extends Component {
                                                             <Button
                                                                 onClick={this.templateShow}
                                                                 style={{margin: '10px 0'}}
+                                                                disabled={addTempList && addTempList.length > 0 ? false : true}
                                                             >
-                                                                添加模板
+                                                                {addTempList && addTempList.length > 0 ? '添加模板' : '此应用下暂时没有模板'}
                                                             </Button>
                                                             <Modal
                                                                 title="添加模板"
@@ -732,17 +757,14 @@ class MyGatesAppsInstall extends Component {
                                                                                 tableName={w.name}
                                                                                 deviceColumns={this.state.deviceColumns[w.name]}
                                                                             />
-                                                                            {console.log(this.state.deviceColumns)}
                                                                         </div>
                                                                     )
                                                                 })
                                                             }
-                                                            {console.log(this.state.deviceColumns)}
-                                                            {console.log(this.state.deviceColumns.tcp_devices)}
                                                     </div>
                                                     )
                                                 }
-                                            } else {
+                                            } else if (v.type === 'dropdown') {
                                                 return (
                                                     <div
                                                         id={v.name}
@@ -760,6 +782,23 @@ class MyGatesAppsInstall extends Component {
                                                             <input
                                                                 type="hidden"
                                                                 value={v.value ? v.value[0] : ''}
+                                                                ref={v.name}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            } else if (v.type === 'text' || v.type === 'number') {
+                                                return (
+                                                    <div
+                                                        id={v.name}
+                                                        key={key}
+                                                    >
+                                                        <div style={{lineHeight: '50px'}}>
+                                                            <span className="spanStyle">{v.desc}：</span>
+                                                            <Input
+                                                                style={{width: '300px'}}
+                                                                type={v.type}
+                                                                value={v.value}
                                                                 ref={v.name}
                                                             />
                                                         </div>
@@ -792,9 +831,12 @@ class MyGatesAppsInstall extends Component {
                                         <span className="spanStyle">实例名：</span>
                                         <Input
                                             type="text"
+                                            ref="inst"
                                             style={{width: '300px'}}
                                             defaultValue={instName}
-                                            onChange={this.setInstName}
+                                            onChange={()=>{
+                                                this.inputChange('inst')
+                                            }}
                                         />
                                     </p>
                                     <p style={{lineHeight: '40px'}}>
@@ -807,8 +849,7 @@ class MyGatesAppsInstall extends Component {
                                     mode="java"
                                     theme="github"
                                     onChange={this.onChange}
-                                    // value={this.state.item.pre_configuration}
-                                    value={JSON.stringify(this.state.dataSourceCode) === '[]' ? this.state.item.pre_configuration : JSON.stringify(this.state.dataSourceCode)}
+                                    value={this.state.item.pre_configuration === null ? '{}' : this.state.item.pre_configuration}
                                     fontSize={16}
                                     readOnly={this.props.store.codeStore.readOnly}
                                     name="UNIQUE_ID_OF_DIV"
@@ -936,8 +977,6 @@ class MyGatesAppsInstall extends Component {
                                                            flag: false,
                                                            detail: false,
                                                            item: val
-                                                       }, ()=>{
-                                                           console.log(val)
                                                        })
                                                    }}
                                                    ><Icon type="cloud-download" /></span>

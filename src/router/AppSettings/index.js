@@ -46,8 +46,8 @@ class AppSettings extends Component {
                 codeName: res.data.code_name,
                 licenseType: '免费',
                 description: res.data.description,
-                confTemplate: res.data.conf_template,
-                preConfiguration: res.data.pre_configuration
+                confTemplate: res.data.pre_configuration,
+                preConfiguration: res.data.conf_template
             };
             console.log(settingData);
             this.props.store.codeStore.setSettingData(settingData);
@@ -75,8 +75,8 @@ class AppSettings extends Component {
                     code_name: values.code_name,
                     license_type: 'Open',
                     description: description,
-                    conf_template: predefined,
-                    pre_configuration: configuration
+                    conf_template: configuration,
+                    pre_configuration: predefined
                 };
                 if (configuration) {
                     params['has_conf_template'] = 1
