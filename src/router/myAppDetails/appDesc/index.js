@@ -30,7 +30,7 @@ class AppDesc extends Component {
                 desc: nextProps.desc
             }, ()=>{
                 console.log(this.state.desc)
-            })
+            });
             this.refs.editor.innerHTML = marked(nextProps.desc);
         }
     }

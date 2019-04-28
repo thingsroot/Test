@@ -22,9 +22,13 @@ const MyTemplateForm = Form.create({ name: 'template_form' })(
                     description: values.description,
                     type: 'Configuration',
                     public: values.public,
-                    owner_type: values.owner_type,
-                    owner_id: _getCookie('user_id')
+                    owner_type: values.owner_type
                 };
+                if (params.owner_type === 'User') {
+                    params['owner_id'] = _getCookie('user_id')
+                } else {
+                    params['owner_id'] = this.props.store.codeStore.groupName
+                }
                 http.post('/api/configurations_create', params).then(res=>{
                     if (res.ok === false) {
                         message.error('新版本上传失败！');
@@ -34,7 +38,6 @@ const MyTemplateForm = Form.create({ name: 'template_form' })(
                         list.unshift(res.data);
                         this.props.store.codeStore.setTemplateList(list)
                     }
-
                 });
 
                 setTimeout(()=>{

@@ -31,10 +31,11 @@ class MyCode extends Component {
     }
     //获取文件内容
     getContent = ()=>{
-        http.get('/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_content&id=' + this.props.store.codeStore.fileName)
+        http.get('/home/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_content&id=' + this.props.store.codeStore.fileName)
             .then(res=>{
                 this.props.store.codeStore.setEditorContent(res.content);
                 this.props.store.codeStore.setNewEditorContent(res.content);
+                console.log(this.props.store.codeStore.editorContent)
             })
     };
     setContent = (newValue)=>{

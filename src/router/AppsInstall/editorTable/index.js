@@ -1,33 +1,30 @@
 import React from 'react';
 import {
     Table,
-    // Input,
+    Input,
     Button, Form, Select
 } from 'antd';
-import { inject, observer} from 'mobx-react';
 import {withRouter} from 'react-router-dom';
-const Option = Select.Option;
+import {inject, observer} from 'mobx-react';
+
 const FormItem = Form.Item;
 const EditableContext = React.createContext();
+const Option = Select.Option;
 
-const EditableRow = ({ form, index, ...props }) => (
-    <EditableContext.Provider
-        value={form}
-        id={index}
-    >
+const EditableRow = ({ form, ...props }) => (
+    <EditableContext.Provider value={form}>
+        {/*{console.log(index)}*/}
         <tr {...props} />
     </EditableContext.Provider>
 );
+
 const EditableFormRow = Form.create()(EditableRow);
 @withRouter
 @inject('store')
 @observer
 class EditableCell extends React.Component {
     state = {
-        editing: false,
-        columns: [],
-        dataSource: [],
-        template: []
+        editing: false
     };
 
     toggleEdit = () => {
@@ -37,7 +34,7 @@ class EditableCell extends React.Component {
                 // this.input.focus();
             }
         });
-    };
+    }
 
     save = (e) => {
         const { record, handleSave } = this.props;
@@ -46,15 +43,17 @@ class EditableCell extends React.Component {
                 return;
             }
             this.toggleEdit();
-
             handleSave({ ...record, ...values });
         });
     };
-    templateChange = (val)=>{
-        this.setState({
-            template: val
-        })
-    }
+
+    selectSave = (e)=>{
+        const { record, handleSave } = this.props;
+        let values = e.key;
+        record.tpl = values;
+        this.toggleEdit();
+        handleSave({ ...record, values });
+    };
 
     render () {
         const { editing } = this.state;
@@ -64,84 +63,48 @@ class EditableCell extends React.Component {
             dataIndex,
             title,
             record,
-            index,
-            handleSave,
+            // index,
+            // handleSave,
             ...restProps
         } = this.props;
-        index;
-        handleSave;
-        editable;
         return (
             <td {...restProps}>
-                {
-                    id !== 'template' ? (
-                        <EditableContext.Consumer>
-                            {(form) => {
-                                this.form = form;
-                                return (
-                                    editing ? (
-                                        <FormItem style={{ margin: 0 }}>
-                                            {
-                                            //     form.getFieldDecorator(dataIndex, {
-                                            //     rules: [{
-                                            //         required: true,
-                                            //         message: `${title} is required.`
-                                            //     }],
-                                            //     initialValue: record ? record[dataIndex] : []
-
-                                            // }
-                                            // )(
-                                            //     <Input
-                                            //         ref={node => (this.input = node)}
-                                            //         onPressEnter={this.save}
-                                            //         onBlur={this.save}
-                                            //         type={id}
-                                            //     />
-                                            // )
-                                            }
-
-                                        </FormItem>
-                                    ) : (
-                                        <div
-                                            className="editable-cell-value-wrap"
-                                            style={{ paddingRight: 24 }}
-                                            onClick={this.toggleEdit}
-                                        >
-                                            {restProps.children}
-                                        </div>
-                                    )
-                                );
-                            }}
-                        </EditableContext.Consumer>
-                    ) :  (
-                        <EditableContext.Consumer>
-                            {(form) => {
-                                this.form = form;
-                                return (
-                                    editing ? (
-                                        <FormItem style={{ margin: 0 }}>
-                                            {form.getFieldDecorator(dataIndex, {
-                                                rules: [{
-                                                    required: true,
-                                                    message: `${title} is required.`
-                                                }],
-                                                initialValue: record[dataIndex]
-                                            })(
-                                                <div>
-                                                    <input
+                {editable ? (
+                    <EditableContext.Consumer>
+                        {(form) => {
+                            this.form = form;
+                            return (
+                                editing ? (
+                                    <FormItem style={{ margin: 0 }}>
+                                        {form.getFieldDecorator(dataIndex, {
+                                            rules: [{
+                                                required: true,
+                                                message: `${title} is required.`
+                                            }],
+                                            initialValue: record[dataIndex]
+                                        })(
+                                            id !== 'template'
+                                            ? <Input
+                                                ref={node => (this.input = node)}
+                                                onPressEnter={this.save}
+                                                onBlur={this.save}
+                                              />
+                                            : <div>
+                                                    <Input
                                                         type="hidden"
                                                         ref={node => (this.input = node)}
                                                         onChange={this.save}
                                                         value={this.state.template}
                                                     />
-                                                    <Select defaultValue="请选择模板">
+                                                    <Select
+                                                        defaultValue="请选择模板"
+                                                        style={{width: '95%'}}
+                                                    >
                                                         {this.props.store.codeStore.template.map((w)=>{
                                                             return (
                                                                 <Option
                                                                     key={w}
-                                                                    onClick={()=>{
-                                                                        this.templateChange(w)
-                                                                    }}
+                                                                    onClick={this.selectSave}
                                                                 >
                                                                     {w}
                                                                 </Option>
@@ -149,27 +112,25 @@ class EditableCell extends React.Component {
                                                         })}
                                                     </Select>
                                                 </div>
-
-                                            )}
-                                        </FormItem>
-                                    ) : (
-                                        <div
-                                            className="editable-cell-value-wrap"
-                                            style={{ paddingRight: 24 }}
-                                            onClick={this.toggleEdit}
-                                        >
-                                            {restProps.children}
-                                        </div>
-                                    )
-                                );
-                            }}
-                        </EditableContext.Consumer>
-                    )}
+                                        )}
+                                    </FormItem>
+                                ) : (
+                                    <div
+                                        className="editable-cell-value-wrap"
+                                        style={{ paddingRight: 24 }}
+                                        onClick={this.toggleEdit}
+                                    >
+                                        {restProps.children}
+                                    </div>
+                                )
+                            );
+                        }}
+                    </EditableContext.Consumer>
+                ) : restProps.children}
             </td>
         );
     }
 }
-@withRouter
 @inject('store')
 @observer
 class EditableTable extends React.Component {
@@ -177,75 +138,42 @@ class EditableTable extends React.Component {
         super(props);
         this.state = {
             dataSource: [],
-            count: 0,
-            tableColumns: [],
-            example: {}
+            count: 0
         };
     }
-    componentDidMount () {
-        let dataSource = this.props.store.codeStore.allTableData[this.props.tableName];
+
+    handleDelete = (key, name) => {
+        const dataSource = [...this.state.dataSource];
         this.setState({
-            dataSource: dataSource
+            dataSource: dataSource.filter(item => item.key !== key)
+        }, ()=>{
+            let allTableData = this.props.store.codeStore.allTableData;
+            allTableData[name] = this.state.dataSource;
+            console.log(allTableData)
         });
-        // let deviceColumns = this.props.deviceColumns;
-        // let data = [];
-        // deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
-        //     key;
-        //     data.push({
-        //         key: this.props.tableName + key,
-        //         id: v.type,
-        //         title: v.desc,
-        //         dataIndex: v.name,
-        //         editable: true
-        //     });
-        // });
-        // data.push({
-        //     title: '操作',
-        //     dataIndex: 'key',
-        //     render: (record) => {
-        //         return (
-        //             <Button onClick={() => this.handleDelete(record.key)}>删除</Button>
-        //         )
-        //     }
-        // });
-        // this.setState({
-        //     deviceColumns: data
-        // })
-    }
+    };
 
-    // handleDelete = (key) => {
-    //     const dataSource = this.state.dataSource;
-    //     let data = [];
-    //     dataSource.map((v)=>{
-    //         if (v.key !== key) {
-    //             data.push(v)
-    //         }
-    //     });
-    //     this.setState({ dataSource: data});
-    // };
-
-    handleAdd = (name) => {    //okokok
-        const { dataSource } = this.state;
-        let allTableData = this.props.store.codeStore.allTableData;
+    handleAdd = (name) => {
+        const { count, dataSource } = this.state;
         let deviceColumns = this.props.deviceColumns[0];
         const newData = {};
-        deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
-            key;
-            if (v.dataIndex !== 'key') {
-                newData[v.dataIndex] = 1;
-            } else {
-                if (dataSource.length === 0) {
-                    newData['key'] = 0
-                } else {
-                    newData['key'] = dataSource.length
-                }
-            }
+        deviceColumns.map(item => {
+            newData[item.dataIndex] = '1';
         });
-        dataSource.push(newData);
-        allTableData[name] = dataSource;
+        newData['key'] = count;
+        this.setState({
+            dataSource: [...dataSource, newData],
+            count: count + 1
+        }, ()=>{
+            let allTableData = this.props.store.codeStore.allTableData;
+            allTableData[name] = this.state.dataSource;
+            console.log(allTableData)
+        });
     };
 
     handleSave = (row, name) => {
+        console.log(row)
+        console.log(name)
         const newData = [...this.state.dataSource];
         const index = newData.findIndex(item => row.key === item.key);
         const item = newData[index];
@@ -256,64 +184,78 @@ class EditableTable extends React.Component {
         this.setState({
             dataSource: newData
         }, ()=>{
+            console.log(this.state.dataSource)
             let allTableData = this.props.store.codeStore.allTableData;
             allTableData[name] = this.state.dataSource;
         });
-
     };
 
     render () {
-        let name = this.props.tableName;
         const { dataSource } = this.state;
-        const deviceColumns = this.props.deviceColumns[0];
-        console.log(deviceColumns)
-        let components = {
+        const name = this.props.tableName;
+        const components = {
             body: {
                 row: EditableFormRow,
                 cell: EditableCell
             }
         };
-        let columns = [];
-        if (deviceColumns && deviceColumns.length > 0){
-            columns = deviceColumns.map(item => {
-                if (!item.editable) {
-                    return item;
-                } else {
-                    return {
-                        ...item,
-                        onCell: (record) => {
-                            return ({
-                                record,
-                                id: item.id,
-                                editable: item.editable,
-                                dataIndex: item.dataIndex,
-                                title: item.title,
-                                handleSave: (row)=>{
-                                    this.handleSave(row, this.props.tableName)
-                                }
-                            })
-                        }
-                    };
-                }
-            });
+        let deviceColumns = this.props.deviceColumns[0];
+        let arr = [];
+        deviceColumns.map(item => {
+            arr.push(item.dataIndex);
+        });
+        if (arr.indexOf('key') === -1) {
+            deviceColumns.push({
+                title: '操作',
+                dataIndex: 'key',
+                render: (text, record) => (
+                    this.state.dataSource.length >= 1
+                        ? (
+                            <Button
+                                type="primary"
+                                href="javascript:;"
+                                onClick={()=>{
+                                    this.handleDelete(record.key, name)
+                                }}
+                            >删除</Button>
+                        ) : null
+                )
+            })
         }
+        const columns = deviceColumns.map((col) => {
+            if (!col.editable) {
+                return col;
+            }
+            return {
+                ...col,
+                onCell: record => ({
+                    record,
+                    id: col.id,
+                    editable: col.editable,
+                    dataIndex: col.dataIndex,
+                    title: col.title,
+                    handleSave: (row)=>{
+                        this.handleSave(row, name)
+                    }
+                })
+            };
+        });
         return (
             <div>
                 <Button
                     onClick={()=>{
-                        this.handleAdd(name)
-                    }}
+                    this.handleAdd(name)
+                }}
                     type="primary"
                     style={{ marginBottom: 16 }}
                 >
-                    添加设备
+                    添加行
                 </Button>
                 <Table
                     components={components}
                     rowClassName={() => 'editable-row'}
                     bordered
-                    pagination={false}
-                    dataSource={dataSource && dataSource.length > 0 ? dataSource : []}
+                    dataSource={dataSource}
                     columns={columns}
                 />
             </div>
@@ -321,3 +263,4 @@ class EditableTable extends React.Component {
     }
 }
 export default EditableTable;
+

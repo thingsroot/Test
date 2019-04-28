@@ -64,12 +64,12 @@ class AppEditorCode extends Component {
             app: app
         });
         //设备应用和平台应用对比
-        http.get('/api/method/app_center.editor.editor_worksapce_version?app=' + app)
+        http.get('/home/api/method/app_center.editor.editor_worksapce_version?app=' + app)
             .then(res=>{
                 let worksapceVersion = res.message;
                 // console.log(worksapceVersion);
                 if (worksapceVersion && worksapceVersion !== 'undefined') {
-                    http.get('/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
+                    http.get('/home/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
                             let lastVersion = data.message;
                             // console.log(lastVersion);
@@ -89,7 +89,7 @@ class AppEditorCode extends Component {
                         });
                     //http
                 } else {
-                    http.get('/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
+                    http.get('/home/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
                             if (data.message === 'undefined') {
                                 //工作区为空，不显示title（title还没写）
@@ -100,7 +100,7 @@ class AppEditorCode extends Component {
                                 })
                             } else if (typeof data.message === 'number' ) {
                                 //初始化工作区域到最新版本
-                                http.get('/api/method/app_center.editor.editor_init?app=' + app + '&version=' + data.message)
+                                http.get('/home/api/method/app_center.editor.editor_init?app=' + app + '&version=' + data.message)
                                     .then(res=>{
                                         let initVersion = res.message;
                                         // console.log(initVersion);
@@ -123,10 +123,10 @@ class AppEditorCode extends Component {
                 }
             });
         //应用版本列表
-        http.get('/api/method/app_center.api.get_versions?app=' + app + '&beta=1')
+        http.get('/home/api/method/app_center.api.get_versions?app=' + app + '&beta=1')
             .then(res=>{
                 let data = [];
-                res.message.map((v)=>{
+                res.message && res.message.length > 0 && res.message.map((v)=>{
                     data.push(v.version)
                 });
                 data.sort(function (a, b) {

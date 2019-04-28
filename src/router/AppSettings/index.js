@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import {Form, Row, Col, Input, Button, Select, Tabs, Icon, message, Upload } from 'antd';
+import {Form, Row, Col, Input, Button, Select, Tabs, message } from 'antd';
 import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
 import {inject, observer} from 'mobx-react';
 import {_getCookie} from '../../utils/Session';
+import reqwest from 'reqwest';
 
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
@@ -21,37 +22,33 @@ class AppSettings extends Component {
     state = {
         expand: false,
         message: '',
-        fileList: [{
-            uid: '-1',
-            name: 'xxx.png',
-            // status: 'done',
-            url: 'http://cloud.thingsroot.com/assets/app_center/img/logo.png'
-        }],
-        imageUrl: '',
+        imgSrc: '',
         previewImage: '',
-        previewVisible: false
+        previewVisible: false,
+        imageUrl: ''
     };
     componentDidMount (){
         let app = this.props.match.params.name;
         if (app) {
-            console.log(app);
             this.getDetails(app);
         }
     }
+
     getDetails = (app)=>{
         http.get('/api/applications_details?name=' + app).then(res=>{
-            console.log(res.data);
             let settingData = {
                 appName: res.data.app_name,
                 codeName: res.data.code_name,
                 licenseType: '免费',
                 description: res.data.description,
-                confTemplate: res.data.conf_template,
-                preConfiguration: res.data.pre_configuration
+                confTemplate: res.data.pre_configuration,
+                preConfiguration: res.data.conf_template
             };
-            console.log(settingData);
+            this.props.store.codeStore.setDescription(res.data.description)
             this.props.store.codeStore.setSettingData(settingData);
-            console.log(this.props.store.codeStore.settingData);
+            this.setState({
+                imgSrc: 'http://cloud.thingsroot.com' + res.data.icon_image
+            })
         })
     };
 
@@ -59,35 +56,39 @@ class AppSettings extends Component {
         const { description, configuration, predefined } = this.props.store.codeStore;
         e.preventDefault();
         if (_getCookie('is_developer') === '1') {
-            const { fileList } = this.state;
-            const formData = new FormData();
-            fileList.forEach((file) => {
-                formData.append('icon_image', file);
-            });
-            console.log(formData);
             this.props.form.validateFields((err, values) => {
                 if (err) {
                     return;
                 }
-                console.log(values);
                 let params = {
                     app_name: values.app_name,
                     code_name: values.code_name,
                     license_type: 'Open',
                     description: description,
-                    conf_template: predefined,
-                    pre_configuration: configuration
+                    conf_template: configuration,
+                    pre_configuration: predefined
                 };
                 if (configuration) {
                     params['has_conf_template'] = 1
                 } else {
                     params['has_conf_template'] = 0
                 }
-
                 if (this.props.match.params.type === '1') {
                     http.post('/api/applications_create', params).then(res=>{
                         if (res.ok === true) {
-                            message.success('应用创建成功！');
+                            let formData = new FormData();
+                            formData.append('name', res.data.name);
+                            formData.append('file', this.state.imageUrl);
+                            reqwest({
+                                url: '/api/applications_icon',
+                                method: 'post',
+                                processData: false,
+                                data: formData,
+                                success: (res) => {
+                                    res;
+                                    message.success('应用创建成功！');
+                                }
+                            });
                             window.location.href = '/myApps'
                         } else {
                             message.error('应用创建失败！')
@@ -95,10 +96,21 @@ class AppSettings extends Component {
                     })
                 } else {
                     params['name'] = this.props.match.params.name;
-                    console.log(params);
                     http.post('/api/applications_update', params).then(res=>{
                         if (res.ok === true) {
-                            message.success('应用已更新！')
+                            let formData = new FormData();
+                            formData.append('name', params.name);
+                            formData.append('file', this.state.imageUrl);
+                            reqwest({
+                                url: '/api/applications_icon',
+                                method: 'post',
+                                processData: false,
+                                data: formData,
+                                success: (res) => {
+                                    res;
+                                    message.success('应用已更新！')
+                                }
+                            });
                         } else {
                             message.error('应用更新失败！')
                         }
@@ -110,51 +122,17 @@ class AppSettings extends Component {
         }
     };
 
-    // beforeUpload = (file)=>{
-    //     console.log(file)
-    //     console.log(file.type)
-    //     console.log(file.size)
-    //     const isJPG = file.type === 'image/jpeg' || 'image/png';
-    //     if (!isJPG) {
-    //         message.error('只能上传jpg/png格式的图片!');
-    //     }
-    //     const isLt2M = file.size / 1024 / 1024 < 2;
-    //     if (!isLt2M) {
-    //         message.error('图片必须小于2MB!');
-    //     }
-    //     this.setState({
-    //         img: file
-    //     });
-    //     return false;
-    // };
-
-    // getBase64 = (img, callback)=>{
-    //     const reader = new FileReader();
-    //     reader.addEventListener('load', () => callback(reader.result));
-    //     reader.readAsDataURL(img);
-    // };
-
-    // handlePreview = (file) => {
-    //     this.setState({
-    //         previewImage: file.url || file.thumbUrl,
-    //         previewVisible: true
-    //     });
-    // };
-
-    handleChange = ({ fileList }) => this.setState({ fileList });
-
-    // handleCancel = () => this.setState({ previewVisible: false })
+    iconChange = (e)=>{
+        let tmppath = URL.createObjectURL(e.target.files[0]);
+        this.setState({
+            imageUrl: e.target.files[0],
+            imgSrc: tmppath
+        })
+    };
 
     render () {
         const { getFieldDecorator } = this.props.form;
         const { settingData } = this.props.store.codeStore;
-        const { fileList } = this.state;
-        const uploadButton = (
-            <div>
-                <Icon type="plus" />
-                <div className="ant-upload-text">Upload</div>
-            </div>
-        );
         return (
             <div>
                 <Form
@@ -163,14 +141,23 @@ class AppSettings extends Component {
                 >
                     <Row gutter={24}>
                         <Col span={3}>
-                            <Upload
-                                action=""
-                                listType="picture-card"
-                                fileList={fileList}
-                                onChange={this.handleChange}
-                            >
-                                {fileList.length >= 1 ? null : uploadButton}
-                            </Upload>
+                            <div style={{height: '130px'}}>
+                                <label htmlFor="icon_file">
+                                    <img
+                                        ref="img"
+                                        src={this.state.imgSrc}
+                                        title="点击切换图片"
+                                        id="icon_img1"
+                                        style={{width: '100px', height: '100px'}}
+                                    />
+                                    <Input
+                                        type="file"
+                                        id="icon_file"
+                                        style={{display: 'none'}}
+                                        onChange={this.iconChange}
+                                    />
+                                </label>
+                            </div>
                         </Col>
                         <Col span={21}>
                             <Col span={8}>

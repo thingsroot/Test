@@ -36,6 +36,8 @@ class CodeStore {
     @observable configuration = '';     //配置面板
     @observable predefined = '';        //预定义
 
+    @observable groupName = '';
+
     @observable settingData = {
         appName: '',
         codeName: '',
@@ -44,6 +46,10 @@ class CodeStore {
         confTemplate: '',
         preConfiguration: ''
     };
+
+    @action setGroupName (values) {
+        this.groupName = values;
+    }
 
     @action setTemplateList (values) {
         this.templateList = values;

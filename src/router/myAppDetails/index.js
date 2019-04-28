@@ -28,7 +28,9 @@ class MyAppDetails extends Component {
         time: '',
         app: '',
         desc: '',
-        templateList: []
+        templateList: [],
+        groupName: '',
+        onLine: []
     };
     componentDidMount (){
         let user = _getCookie('user_id');
@@ -38,6 +40,9 @@ class MyAppDetails extends Component {
             app: app
         });
         this.getDetails(app);
+        http.get('/api/user_groups_list').then(res=>{
+            this.props.store.codeStore.setGroupName(res.data[0].name)
+        });
     }
     getDetails = (app)=>{
         http.get('/api/applications_read?app=' + app).then(res=>{
@@ -53,6 +58,18 @@ class MyAppDetails extends Component {
         http.get('/api/user_configuration_list?app=' + app)
             .then(res=>{
                 this.props.store.codeStore.setTemplateList(res.message)
+            });
+        http.get('/api/gateways_list')
+            .then(res=>{
+                const online = [];
+                res.message && res.message.length > 0 && res.message.map((v)=>{
+                    if (v.data.device_status === 'ONLINE'){
+                        online.push(v.data)
+                    }
+                });
+                this.setState({
+                    onLine: online[0].sn
+                })
             })
     };
     callback = (key)=>{
@@ -99,9 +116,18 @@ class MyAppDetails extends Component {
                             </Link>
 
                         </Button>
-                        <Button style={{margin: '0 10px'}}>
-                            <Icon type="download" />
-                            下载
+                        <Button
+                            style={{margin: '0 10px'}}
+                            onClick={()=>{
+                                console.log(`/AppsInstall/${this.state.onLine}/${message.name}/2`)
+                            }}
+                        >
+                            <Link
+                                to={`/AppsInstall/${this.state.onLine}/${message.name}/2`}
+                            >
+                                <Icon type="download" />
+                                下载
+                            </Link>
                         </Button>
                         <Button style={message.fork_from ? block : none}>
                             <Link
