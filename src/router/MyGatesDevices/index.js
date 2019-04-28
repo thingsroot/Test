@@ -12,6 +12,7 @@ const GatesList = LoadableComponent(()=>import('./GatesList'));
 const AppsList = LoadableComponent(()=>import('./AppsList'));
 const LinkStatus = LoadableComponent(()=>import('./LinkStatus'));
 const VPN  = LoadableComponent(()=>import('./VPN'));
+const Vserial = LoadableComponent(()=>import('./Vserial'));
 @withRouter
 @inject('store')
 @observer
@@ -45,7 +46,6 @@ class MyGatesDevices extends Component {
       this.props.store.appStore.setStatus(res)
     })
     http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
-      console.log(res)
       if (Object.values(res.message).filter(item=> item.device_name === 'ioe_frpc').length > 0){
         this.setState({VPNflag: true})
       } else {
@@ -145,6 +145,9 @@ class MyGatesDevices extends Component {
                       />
                       <PrivateRoute path={`${path}/VPN`}
                           component={VPN}
+                      />
+                      <PrivateRoute path={`${path}/Vserial`}
+                          component={Vserial}
                       />
                       <Redirect from={path}
                           to={`${path}/GatesList`}

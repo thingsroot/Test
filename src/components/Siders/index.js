@@ -81,9 +81,6 @@ class Siders extends PureComponent {
                     mode="inline"
                     defaultSelectedKeys={[this.state.key]}
                 >
-                {
-                    console.log(this.state.key)
-                }
                     <Menu.Item key="1">
                     <Link to="/Home">
                         <Icon

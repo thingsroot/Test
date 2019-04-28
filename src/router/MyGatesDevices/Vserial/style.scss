@@ -1,0 +1,23 @@
+.selectWrap{
+    display: flex;
+    flex-wrap: wrap;
+    .selectChild{
+        display: flex;
+        width: 33%;
+        padding:5px 20px;
+        >p{
+            min-width: 50px;
+            line-height:2;
+            text-align: right;
+        }
+        >div{
+            margin-left: 20px;
+            flex: 1;
+        }
+    }
+}
+.wrapper{
+    margin-top: 10px;
+    border-top: 2px solid #ccc;
+    border-radius: 3px;
+}

@@ -1,6 +1,8 @@
 import React from 'react';
 import {
-    Table, Input, Button, Form, Select
+    Table,
+    // Input,
+    Button, Form, Select
 } from 'antd';
 import { inject, observer} from 'mobx-react';
 import {withRouter} from 'react-router-dom';
@@ -32,7 +34,7 @@ class EditableCell extends React.Component {
         const editing = !this.state.editing;
         this.setState({ editing }, () => {
             if (editing) {
-                this.input.focus();
+                // this.input.focus();
             }
         });
     };
@@ -79,22 +81,24 @@ class EditableCell extends React.Component {
                                 return (
                                     editing ? (
                                         <FormItem style={{ margin: 0 }}>
-                                            {form.getFieldDecorator(dataIndex, {
+                                            {
+                                            //     form.getFieldDecorator(dataIndex, {
+                                            //     rules: [{
+                                            //         required: true,
+                                            //         message: `${title} is required.`
+                                            //     }],
+                                            //     initialValue: record ? record[dataIndex] : []
 
-                                                rules: [{
-                                                    required: true,
-                                                    message: `${title} is required.`
-                                                }],
-                                                initialValue: record ? record[dataIndex] : []
-
-                                            })(
-                                                <Input
-                                                    ref={node => (this.input = node)}
-                                                    onPressEnter={this.save}
-                                                    onBlur={this.save}
-                                                    type={id}
-                                                />
-                                            )}
+                                            // }
+                                            // )(
+                                            //     <Input
+                                            //         ref={node => (this.input = node)}
+                                            //         onPressEnter={this.save}
+                                            //         onBlur={this.save}
+                                            //         type={id}
+                                            //     />
+                                            // )
+                                            }
 
                                         </FormItem>
                                     ) : (
@@ -297,7 +301,7 @@ class EditableTable extends React.Component {
             <div>
                 <Button
                     onClick={()=>{
-                    this.handleAdd(name)
+                        this.handleAdd(name)
                     }}
                     type="primary"
                     style={{ marginBottom: 16 }}

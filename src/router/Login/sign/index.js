@@ -22,13 +22,17 @@ class Sign extends PureComponent {
                             const name = item.slice(0, item.indexOf('='))
                             const content = item.slice(item.indexOf('=') + 1)
                             console.log(name, '=', content)
-                            _setCookie(name, content)
+                            _setCookie(name, content, 24)
                         });
-                        http.get('/api/developers_read', {name: _getCookie('user_id')})
+                        http.get('/api/developers_read?name=' + _getCookie('user_id'))
                             .then(res=>{
                                 console.log(res.data);
-                                if (res.data.enabled === 1) {
-                                    _setCookie('is_developer', '1')
+                                if (!res.error) {
+                                    if (res.data.enabled === 1) {
+                                        _setCookie('is_developer', '1')
+                                    } else {
+                                        _setCookie('is_ddeveloper', '0')
+                                    }
                                 } else {
                                     _setCookie('is_ddeveloper', '0')
                                 }
