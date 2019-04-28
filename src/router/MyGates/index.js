@@ -36,7 +36,7 @@ function getDevicesList (){
                 data.push(v.data)
             }
         })
-        console.log(data)
+        console.log(data);
         if (status === 'online'){
             this.props.store.appStore.setGatelist(res.message);
         }

@@ -69,9 +69,7 @@ class MyApps extends PureComponent {
         const appList = this.state.appList;
         return (
             <div className="myApps">
-                <div style={{lineHeight: '300px', textAlign: 'center'}}>
-                    <Spin spinning={this.state.loading}/>
-                </div>
+
                 <div className="searchApp">
                     <Button
                         type="primary"
@@ -86,7 +84,10 @@ class MyApps extends PureComponent {
                         style={{ width: 300 }}
                     />
                 </div>
-                <ul style={appList && appList.length > 0 ? block : none}>
+                <div style={{lineHeight: '300px', textAlign: 'center'}}>
+                    <Spin spinning={this.state.loading}/>
+                </div>
+                <ul style={appList && appList.length > 0 || this.state.loading === false ? block : none}>
                     {
                         appList && appList.length > 0 && appList.map((v, key)=>{
                             return <li key={key}>
@@ -113,7 +114,7 @@ class MyApps extends PureComponent {
                 </ul>
                 <div
                     className="empty"
-                    style={appList.length > 0 ? none : block}
+                    style={this.state.loading ? block : none}
                 >
                     暂时没有应用！
                 </div>

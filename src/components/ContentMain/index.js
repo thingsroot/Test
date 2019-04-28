@@ -90,7 +90,7 @@ class ContentMain extends PureComponent {
                     component={MyGatesDevicesOutputs}
                 />
                 <PrivateRoute
-                    path="/AppsInstall/:sn"
+                    path="/AppsInstall/:sn/:app/:type"
                     component={AppsInstall}
                 />
                 <PrivateRoute

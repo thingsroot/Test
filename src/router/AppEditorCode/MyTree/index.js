@@ -52,12 +52,12 @@ class MyTree extends Component {
         }
     }
     getTree = ()=>{
-        http.get('/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + '#')
+        http.get('/home/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + '#')
             .then(res=>{
                 let resData = res;
                 resData.map((v)=>{
                     if (v.children) {
-                        http.get('/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + v.id)
+                        http.get('/home/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + v.id)
                             .then(res=>{
                                 v['childrenData'] = res;
                                 let data = format(resData);

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
-import { Select, Input, Rate, Icon, Button, Tabs, Table, Modal, Checkbox } from 'antd';
+import { withRouter, Link } from 'react-router-dom';
+import { Select, Input, Rate, Icon, Button, Tabs, Table, Modal, Checkbox, message, notification  } from 'antd';
 import { inject, observer} from 'mobx-react';
 import Status from '../../common/status';
 import http from '../../utils/Server';
@@ -10,12 +10,19 @@ import 'highlight.js/styles/github.css';
 import './style.scss';
 import Nav from './Nav';
 import AceEditor from 'react-ace';
-import 'brace/mode/java';
+import 'brace/mode/json';
 import 'brace/theme/github';
 import EditableTable from './editorTable';
 const TabPane = Tabs.TabPane;
 const Search = Input.Search;
 const Option = Select.Option;
+const openNotification = (title, message) => {
+    notification.open({
+        message: 'title',
+        description: message,
+        placement: 'buttonRight'
+    });
+};
 const block = {
     display: 'block'
 };
@@ -27,6 +34,7 @@ const none = {
 @observer
 class MyGatesAppsInstall extends Component {
     state = {
+        app: '',
         vendor: [],
         agreement: [],
         type: [],
@@ -52,11 +60,76 @@ class MyGatesAppsInstall extends Component {
         deviceSource: [],
         SourceCode: [],
         dataSourceCode: [],
+        errorMessage: '',
+        addTempLists: [{
+            title: '名称',
+            dataIndex: 'conf_name',
+            key: 'conf_name',
+            render: text => <a href="javascript:;">{text}</a>
+        }, {
+            title: '描述',
+            dataIndex: 'description',
+            key: 'description'
+        }, {
+            title: '模板ID',
+            dataIndex: 'name',
+            key: 'name'
+        }, {
+            title: '版本',
+            key: 'latest_version',
+            dataIndex: 'latest_version'
+        }, {
+            title: '操作',
+            render: (record) => (
+                <div>
+                    <Button>
+                        <Link to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}>查看</Link>
+                    </Button>
+                    <span style={{padding: '0 5px'}}> </span>
+                    <Button
+                        disabled={record.disabled}
+                        onClick={()=>{
+                            this.addSingleTemp(record.conf_name, record.description, record.name, record.latest_version)
+                        }}
+                    >添加</Button>
+                </div>
+            )
+        }],
+        showTempLists: [{
+            title: '名称',
+            dataIndex: 'conf_name',
+            key: 'conf_name',
+            render: text => <a href="javascript:;">{text}</a>
+        }, {
+            title: '描述',
+            dataIndex: 'description',
+            key: 'description'
+        }, {
+            title: '模板ID',
+            dataIndex: 'name',
+            key: 'name'
+        }, {
+            title: '版本',
+            key: 'latest_version',
+            dataIndex: 'latest_version'
+        }, {
+            title: '操作',
+            key: 'app',
+            render: (record) => (
+                <Button
+                    onClick={()=>{
+                        this.onDelete(`${record.name}`)
+                    }
+                    }
+                >删除</Button>
+            )
+        }],
         tcp: [
             {
                 'name': 'ip',
                 'desc': 'IP地址',
-                'type': 'text'
+                'type': 'text',
+                'value': '192.168.1.132'
             },
             {
                 'name': 'port',
@@ -109,145 +182,58 @@ class MyGatesAppsInstall extends Component {
                 'value': ['None', 'Even', 'Odd']
             }
         ],
-        keys: []
+        keys: [],
+        configuration: ''
     };
     componentDidMount (){
-        http.get('/api/store_list').then(res=>{
-            console.log(res);
-            this.setState({
-                data: res.data
-            })
-        });
-        marked.setOptions({
-            renderer: new marked.Renderer(),
-            gfm: true,
-            tables: true,
-            breaks: false,
-            pedantic: false,
-            sanitize: false,
-            smartLists: true,
-            smartypants: false,
-            xhtml: false,
-            highlight: (code) =>  highlight.highlightAuto(code).value // 这段代码
+        if (this.props.match.params.type === '1') {
+            http.get('/api/store_list').then(res=>{
+                this.setState({
+                    data: res.data
+                })
             });
+            marked.setOptions({
+                renderer: new marked.Renderer(),
+                gfm: true,
+                tables: true,
+                breaks: false,
+                pedantic: false,
+                sanitize: false,
+                smartLists: true,
+                smartypants: false,
+                xhtml: false,
+                highlight: (code) =>  highlight.highlightAuto(code).value // 这段代码
+            });
+        } else if (this.props.match.params.type === '2') {
+            http.get('/api/applications_details?name=' + this.props.match.params.app).then(res=>{
+                console.log(res.data);
+                this.getConfig(res.data)
+            })
+
+        }
+
     }
+
     shouldComponentUpdate (nextProps, nextState){
         if (nextState.item.description && nextState.item.description !== null){
             document.getElementById('box').innerHTML = marked(nextState.item.description)
         }
         return true;
     }
-    setFilter (){
-        let { filterdata, filter } = this.state;
-        let newdata = [];
-            if (filter.vendor === '' && filter.type !== '' && filter.agreement !== ''){
-                newdata = filterdata.filter((item)=>item.protocol === filter.agreement && item.category === filter.type)
-            } else if (filter.agreement === '' && filter.vendor !== '' && filter.type !== ''){
-                newdata = filterdata.filter((item)=>item.device_supplier === filter.vendor && item.category === filter.type)
-            } else if (filter.type === '' && filter.agreement !== '' && filter.vendor !== ''){
-                newdata = filterdata.filter((item)=>item.device_supplier === filter.vendor && item.protocol === filter.agreement)
-            } else if (filter.vendor === '' && filter.agreement === '' && filter.type !== ''){
-                newdata = filterdata.filter((item)=>item.category === filter.type)
-            } else if (filter.vendor === '' && filter.type === '' && filter.agreement !== ''){
-                newdata = filterdata.filter((item)=>item.protocol === filter.agreement)
-            } else if (filter.type === '' && filter.agreement === '' && filter.vendor !== ''){
-                newdata = filterdata.filter((item)=>item.device_supplier === filter.vendor)
-            } else if (filter.vendor !== '' && filter.type !== '' && filter.agreement !== ''){
-                newdata = filterdata.filter((item)=>item.protocol === filter.agreement && item.device_supplier === filter.vendor && item.category === filter.type)
-            } else {
-                newdata = filterdata
-            }
-        this.setState({
-            data: newdata
-        })
-    }
-    handleChangevendor () {
-        const value = event.target.innerHTML
-        if (value === '全部'){
-            this.setState({
-                filter: {
-                    vendor: '',
-                    agreement: this.state.filter.agreement,
-                    type: this.state.filter.type
-                }
-            }, ()=>{
-                this.setFilter()
-            });
-            return
-        }
-        this.setState({
-            filter: {
-                vendor: value,
-                agreement: this.state.filter.agreement,
-                type: this.state.filter.type
-            }
-        }, ()=>{
-            this.setFilter()
-        })
-    }
-    handleChangeagreement () {
-        const value = event.target.innerHTML
-        if (value === '全部'){
-            this.setState({
-                filter: {
-                    vendor: this.state.filter.vendor,
-                    agreement: '',
-                    type: this.state.filter.type
-                }
-            }, ()=>{
-                this.setFilter()
-            });
-            return
-        }
-        this.setState({
-            filter: {
-                vendor: this.state.filter.vendor,
-                agreement: value,
-                type: this.state.filter.type
-            }
-        }, ()=>{
-            this.setFilter()
-        })
-    }
-    handleChangetype () {
-        const value = event.target.innerHTML
-        if (value === '全部'){
-            this.setState({
-                filter: {
-                    vendor: this.state.filter.vendor,
-                    agreement: this.state.filter.agreement,
-                    type: ''
-                }
-            }, ()=>{
-                this.setFilter()
-            });
-            return
-        }
-        this.setState({
-            filter: {
-                vendor: this.state.filter.vendor,
-                agreement: this.state.filter.agreement,
-                type: value
-            }
-        }, ()=>{
-            this.setFilter()
-        })
-    }
+
     searchApp (value){
         let { filterdata } = this.state;
         let newdata = [];
-        newdata = filterdata.filter((item)=>item.app_name.indexOf(value) !== -1)
+        newdata = filterdata.filter((item)=>item.app_name.indexOf(value) !== -1);
         this.setState({
             data: newdata
         })
     }
-    setInstName = ()=>{
-        this.setState({
-            instName: event.target.value
-        });
-    };  //实例名
+
     onChange = (newValue)=>{
-        this.props.store.codeStore.setEditorValue(newValue)
+        this.setState({
+            configuration: newValue
+        })
     };
     //添加模板
     templateShow = ()=>{
@@ -255,11 +241,13 @@ class MyGatesAppsInstall extends Component {
             isTemplateShow: true
         });
     };
+
     handleCancelAddTempList = ()=>{
         this.setState({
             isTemplateShow: false
         })
     };
+
     protocolChange = (val)=>{   //通讯
         if (val === 'serial') {
             this.setState({
@@ -297,6 +285,7 @@ class MyGatesAppsInstall extends Component {
             template: template
         })
     };
+
     onDelete =  (name)=>{
         let dataSource = this.state.showTempList;
         dataSource.splice(name, 1);//index为获取的索引，后面的 1 是删除几行
@@ -314,6 +303,52 @@ class MyGatesAppsInstall extends Component {
         })
     };
 
+    inst = ()=>{
+        let sn = this.props.match.params.sn;
+        http.post('/api/gateways_applications_refresh', {
+            gateway: sn,
+            id: 'refresh' + sn
+        }).then(res=>{
+            if (res.ok === true) {
+                http.get('/api/gateways_applications_list?gateway=' + sn).then(res=>{
+                    if (res.ok === true) {
+                        let names = Object.keys(res.data);
+                        names && names.length > 0 && names.map(item=>{
+                            if (item === this.refs.inst.value) {
+                                this.setState({
+                                    errorMessage: '实例名已存在'
+                                })
+                            } else {
+                                this.setState({
+                                    errorMessage: ''
+                                })
+                            }
+                        })
+
+                    }
+                })
+            }
+        })
+    };
+
+    instBlur = ()=>{
+        if (this.refs.inst.value === '' || this.refs.inst.value === undefined) {
+            this.setState({
+                errorMessage: '实例名不能为空'
+            })
+        } else {
+            this.setState({
+                errorMessage: ''
+            })
+        }
+    };
+
+    instChange = ()=>{
+        this.refs.inst.value = event.target.value;
+        setTimeout(this.inst, 1000)
+
+    };
+
     getConfig = (val)=>{
         let config = [];
         if (val.conf_template) {
@@ -326,7 +361,7 @@ class MyGatesAppsInstall extends Component {
         let dataSource = {};
         let keys = [];
         config && config.length > 0 && config.map((v, key)=>{
-            keys.push(v.name);
+            keys.push(v);
             key;
             if (v.name === 'device_section') {
                 let tableNameData = {};
@@ -351,7 +386,6 @@ class MyGatesAppsInstall extends Component {
                 this.props.store.codeStore.setAllTableData(tableNameData);
             }
         });
-        console.log(keys);
         //设置store存储数据
         tableName && tableName.length > 0 && tableName.map((w)=>{
             dataSource[w] = [];
@@ -377,93 +411,142 @@ class MyGatesAppsInstall extends Component {
         columnsArr.map((item)=>{
             obj[Object.keys(item)] = Object.values(item)
         });
+        http.get('/api/application_configurations_list?app=' + val.name + '&conf_type=Template').then(res=>{
+            this.setState({
+                addTempList: res.data
+            })
+        });
         this.setState({
             flag: false,
             item: val,
+            configuration: val.pre_configuration,
             detail: true,
             config: config,
             deviceColumns: obj,
-            keys: keys
-        })
+            keys: keys,
+            app: val.name
+        });
+        if (this.props.match.params.type === '2') {
+            this.setState({
+                flag: false,
+                detail: false
+            })
+        }
     };
 
     inputChange = (refName)=>{
         this.refs[refName].value = event.target.value
-    }
+    };
 
     checkedChange = (refName)=>{
         this.refs[refName].value = event.target.checked
     };
+
     selectChangeValue = (refName)=>{
         this.refs[refName].value = event.target.innerText
     };
 
     getData = ()=>{
         const { tcp, serial, selectSection, keys } = this.state;
-        console.log(keys)
-        keys.map(item=>{
-            if (this.refs[item] !== 'undefined') {
-                console.log(this.refs[item])
+        let sourceCodeData = {};
+        sourceCodeData['inst'] = this.refs['inst'].value;
+        keys.map((item, key)=>{
+            key;
+            if (item.name === 'Link_type') {
+                let data = [];
+                if (selectSection === 'socket') {
+                    tcp.map((v, key)=>{
+                        key;
+                        data.push({
+                            [v.name]: this.refs[v.name].value === undefined ? v.value : this.refs[v.name].value
+                        })
+                    });
+                    sourceCodeData['socket'] = data;
+                } else if (selectSection === 'serial') {
+                    serial.map((v, key)=>{
+                        key;
+                        if (v.value[0] === undefined) {
+                            data.push({
+                                [v.name]: this.refs[v.name].value === undefined ? v.value : this.refs[v.name].value
+                            })
+                        } else {
+                            data.push({
+                                [v.name]: this.refs[v.name].value === undefined ? v.value[0] : this.refs[v.name].value
+                            })
+                        }
+                    });
+                    sourceCodeData['serial'] = data;
+                }
+            } else if (item.type === 'table') {
+                sourceCodeData[item.name] = this.props.store.codeStore.allTableData;
+            } else if (item.type === 'templates') {
+                sourceCodeData[item.name] = {};
+            } else if (item.type === 'dropdown') {
+                sourceCodeData[item.name] = this.refs[item.name].value === undefined ? item.value[0] : this.refs[item.name].value;
+            } else if (item.type === 'number' || item.type === 'text') {
+                sourceCodeData[item.name] = this.refs[item.name].value === undefined ? item.value : this.refs[item.name].value
             }
         });
-        let sourceCodeData = {
-    //         protocol: this.refs.protocol.value,
-    //         Link_type: this.refs.Link_type.value
-        };
-
-        let data = [];
-        // let showList = [];
-        if (selectSection === 'socket') {
-            tcp.map((v, key)=>{
-                key;
-                data.push({
-                    [v.name]: this.refs[v.name].value
-                })
-            });
-            sourceCodeData['socket'] = data;
-        } else if (selectSection === 'serial') {
-            serial.map((v, key)=>{
-                key;
-                data.push({
-                    [v.name]: this.refs[v.name].value
-                })
-            });
-            sourceCodeData['serial'] = data;
-        }
-        console.log(sourceCodeData)
-    //     showTempList.length > 0 && showTempList.map((v, key)=>{
-    //         key;
-    //         showList.push({
-    //             name: v.conf_name,
-    //             desc: v.description,
-    //             id: v.name,
-    //             ver: v.latest_version
-    //         })
-    //     });
-    //     sourceCodeData['tpls'] = showList;
-    //     const { dataSource } = this.props.store.codeStore;
-    //     if (dataSource.length > 0) {
-    //         dataSource.map((v)=>{
-    //             console.log(v);
-    //             delete v['key']
-    //         });
-    //         sourceCodeData['devs'] = this.props.store.codeStore.dataSource
-    //     }
-    //     console.log(sourceCodeData);
-    //     this.setState({
-    //         dataSourceCode: JSON.stringify(sourceCodeData)
-    //     });
+        this.setState({
+            configuration: JSON.stringify(sourceCodeData)
+        })
     };
+
     submitData = ()=>{
         this.getData();
+        const { configuration, app } = this.state;
+        let sn = this.props.match.params.sn;
+        let version = 0;
+        openNotification('提交任务成功', '网关' + sn + '安装' + this.refs.inst.value + '应用.');
+        http.get('/api/applications_versions_latest?app=' + app).then(res=>{
+            version = res.data;
+            if (version <= 0) {
+                message.error('应用暂时没有版本，无法安装！')
+            } else {
+                let params = {
+                    gateway: sn,
+                    inst: this.refs.inst.value,
+                    app: app,
+                    version: version,
+                    conf: configuration,
+                    id: 'app_install/' + sn + '/' + this.refs.inst.value + '/' + app
+                };
+                if (this.refs.inst.value === '' || this.refs.inst.value === undefined) {
+                    message.error('实例名不能为空！')
+                }
+                http.post('/api/gateways_applications_install', params).then(res=>{
+                    let max = 18000;
+                    let min = 0;
+                    if (res.ok === true) {
+                        if (min > max) {
+                            openNotification('安装应用' + this.refs.inst.value + '失败', '安装超时.')
+                        } else {
+                            let timer = setInterval(()=>{
+                                min += 5000;
+                                setTimeout(()=>{
+                                    http.get('/api/gateways_exec_result?id=' + res.data.data)
+                                        .then(res=>{
+                                            if (res.data.result === true) {
+                                                openNotification('安装应用' + this.refs.inst.value + '成功', '' + res.data.id);
+                                                clearInterval(timer);
+                                            }
+                                        })
+                                }, 1000)
+                            }, 5000)
+                        }
+                    } else {
+                        openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
+                    }
+                })
+            }
+        });
     };
+
     callback = (key)=>{
         key;
         if (this.state.config && this.state.config.length > 0) {
-            console.log('不可编辑');
             this.getData();
         } else {
-            console.log('可编辑');
             this.props.store.codeStore.setReadOnly(true);
         }
 
@@ -531,24 +614,22 @@ class MyGatesAppsInstall extends Component {
                         <Tabs onChange={this.callback}
                             type="card"
                         >
+                            <p style={{lineHeight: '50px'}}>
+                                <span className="spanStyle">实例名：</span>
+                                <Input
+                                    type="text"
+                                    ref="inst"
+                                    style={{width: '300px'}}
+                                    defaultValue={instName}
+                                    onChange={this.instChange}
+                                    onBlur={this.instBlur}
+                                />
+                                <span className="error">{this.state.errorMessage}</span>
+                            </p>
                             <TabPane tab="配置面板"
                                 key="1"
                             >
-                                <p style={{lineHeight: '50px'}}>
-                                    <span className="spanStyle">实例名：</span>
-                                    <Input
-                                        type="text"
-                                        ref="inst"
-                                        style={{width: '300px'}}
-                                        defaultValue={instName}
-                                        onChange={()=>{
-                                            this.inputChange('inst')
-                                        }}
-                                    />
-                                    <span>{instName}</span>
-                                </p>
                                 <div>
-
                                     {
                                         config && config.length > 0 && config.map((v, key) => {
                                             if (v.type === 'section') {
@@ -589,7 +670,7 @@ class MyGatesAppsInstall extends Component {
                                                                                         )
                                                                                     })}
                                                                                 </Select>
-                                                                                <input
+                                                                                <Input
                                                                                     ref={a.name}
                                                                                     type="hidden"
                                                                                     value={a.value ? a.value[0] : ''}
@@ -614,7 +695,7 @@ class MyGatesAppsInstall extends Component {
                                                                                     }
                                                                                 >
                                                                                 </Checkbox>
-                                                                                <input
+                                                                                <Input
                                                                                     ref={a.name}
                                                                                     type="hidden"
                                                                                     value={a.value}
@@ -657,7 +738,7 @@ class MyGatesAppsInstall extends Component {
                                                                                     }
                                                                                 >
                                                                                 </Checkbox>
-                                                                                <input
+                                                                                <Input
                                                                                     ref={a.name}
                                                                                     type="hidden"
                                                                                     value={a.value}
@@ -673,6 +754,7 @@ class MyGatesAppsInstall extends Component {
                                                                                 <span
                                                                                     className="spanStyle"
                                                                                 >{a.desc}</span>
+
                                                                                 <Input
                                                                                     style={{width: 320}}
                                                                                     ref={a.name}
@@ -682,11 +764,6 @@ class MyGatesAppsInstall extends Component {
                                                                                         this.inputChange(a.name)
                                                                                     }}
                                                                                 />
-                                                                                <input
-                                                                                    ref={a.name}
-                                                                                    type="hidden"
-                                                                                    value={a.value}
-                                                                                />
                                                                             </div>
                                                                         )
                                                                     }
@@ -694,76 +771,76 @@ class MyGatesAppsInstall extends Component {
                                                             }
                                                         </div>
                                                     )
-                                                } else if (v.name === 'template_section') {
-                                                    return (
-                                                        <div
-                                                            id={v.name}
-                                                            key={key}
-                                                        >
-                                                            <p className="sectionName">
+                                                }
+                                            } else if (v.type === 'templates') {
+                                                return (
+                                                    <div
+                                                        id={v.name}
+                                                        key={key}
+                                                    >
+                                                        <p className="sectionName">
                                                                 <span
                                                                     style={{padding: '0 5px'}}
                                                                 >|</span>{v.desc}</p>
+                                                        <Table
+                                                            rowKey="name"
+                                                            dataSource={showTempList}
+                                                            columns={showTempLists}
+                                                            pagination={false}
+                                                            style={showTempList.length > 0 ? block : none}
+                                                        />
+                                                        <Button
+                                                            onClick={this.templateShow}
+                                                            style={{margin: '10px 0'}}
+                                                            disabled={addTempList && addTempList.length > 0 ? false : true}
+                                                        >
+                                                            {addTempList && addTempList.length > 0 ? '添加模板' : '此应用下暂时没有模板'}
+                                                        </Button>
+                                                        <Modal
+                                                            title="添加模板"
+                                                            visible={this.state.isTemplateShow}
+                                                            onOk={this.handleCancelAddTempList}
+                                                            onCancel={this.handleCancelAddTempList}
+                                                            wrapClassName={'tableModal'}
+                                                            okText="确定"
+                                                            cancelText="取消"
+                                                        >
                                                             <Table
                                                                 rowKey="name"
-                                                                dataSource={showTempList}
-                                                                columns={showTempLists}
+                                                                dataSource={addTempList ? addTempList : []}
+                                                                columns={addTempLists}
                                                                 pagination={false}
-                                                                style={showTempList.length > 0 ? block : none}
                                                             />
-                                                            <Button
-                                                                onClick={this.templateShow}
-                                                                style={{margin: '10px 0'}}
-                                                                disabled={addTempList && addTempList.length > 0 ? false : true}
-                                                            >
-                                                                {addTempList && addTempList.length > 0 ? '添加模板' : '此应用下暂时没有模板'}
-                                                            </Button>
-                                                            <Modal
-                                                                title="添加模板"
-                                                                visible={this.state.isTemplateShow}
-                                                                onOk={this.handleCancelAddTempList}
-                                                                onCancel={this.handleCancelAddTempList}
-                                                                wrapClassName={'tableModal'}
-                                                                okText="确定"
-                                                                cancelText="取消"
-                                                            >
-                                                                <Table
-                                                                    rowKey="name"
-                                                                    dataSource={addTempList ? addTempList : []}
-                                                                    columns={addTempLists}
-                                                                    pagination={false}
-                                                                />
-                                                            </Modal>
-                                                        </div>
-                                                    )
-                                                } else if (v.name === 'device_section') {
-                                                    return (
-                                                        <div
-                                                            id={v.name}
-                                                            key={key}
-                                                        >
-                                                            {
-                                                                v.child.map((w, index)=>{
-                                                                    return (
-                                                                        <div
-                                                                            id={w.name}
-                                                                            key={index}
-                                                                        >
-                                                                            <p className="sectionName">
+                                                        </Modal>
+                                                    </div>
+                                                )
+                                            } else if ( v.type === 'table') {
+                                                return (
+                                                    <div
+                                                        id={v.name}
+                                                        key={key}
+                                                    >
+                                                        {
+                                                            v.child.map((w, index)=>{
+                                                                return (
+                                                                    <div
+                                                                        id={w.name}
+                                                                        key={index}
+                                                                    >
+                                                                        <p className="sectionName">
                                                                                 <span
                                                                                     style={{padding: '0 5px'}}
                                                                                 >|</span>{w.desc}</p>
-                                                                            <EditableTable
-                                                                                tableName={w.name}
-                                                                                deviceColumns={this.state.deviceColumns[w.name]}
-                                                                            />
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            }
+                                                                        <EditableTable
+                                                                            tableName={w.name}
+                                                                            deviceColumns={this.state.deviceColumns[w.name]}
+                                                                        />
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
                                                     </div>
-                                                    )
-                                                }
+                                                )
                                             } else if (v.type === 'dropdown') {
                                                 return (
                                                     <div
@@ -779,7 +856,7 @@ class MyGatesAppsInstall extends Component {
                                                             >
                                                                 {v.value && v.value.length > 0 && v.value.map(w => <Option key={w}>{w}</Option>)}
                                                             </Select>
-                                                            <input
+                                                            <Input
                                                                 type="hidden"
                                                                 value={v.value ? v.value[0] : ''}
                                                                 ref={v.name}
@@ -798,8 +875,11 @@ class MyGatesAppsInstall extends Component {
                                                             <Input
                                                                 style={{width: '300px'}}
                                                                 type={v.type}
-                                                                value={v.value}
+                                                                defaultValue={v.value === undefined ? '' : v.value}
                                                                 ref={v.name}
+                                                                onChange={()=>{
+                                                                    this.inputChange(v.name)
+                                                                }}
                                                             />
                                                         </div>
                                                     </div>
@@ -818,27 +898,12 @@ class MyGatesAppsInstall extends Component {
                                             textAlign: 'center'
                                         }}
                                     >此应用不支持配置界面 请使用JSON格式配置</p>
-
-
                                 </div>
-
                             </TabPane>
                             <TabPane tab="JSON源码"
                                 key="2"
                             >
                                 <div className="editorInfo">
-                                    <p style={{lineHeight: '50px'}}>
-                                        <span className="spanStyle">实例名：</span>
-                                        <Input
-                                            type="text"
-                                            ref="inst"
-                                            style={{width: '300px'}}
-                                            defaultValue={instName}
-                                            onChange={()=>{
-                                                this.inputChange('inst')
-                                            }}
-                                        />
-                                    </p>
                                     <p style={{lineHeight: '40px'}}>
                                         编辑器状态：
                                         <span>{this.props.store.codeStore.readOnly ? '不可编辑' : '可编辑'}</span>
@@ -846,101 +911,21 @@ class MyGatesAppsInstall extends Component {
                                 </div>
                                 <AceEditor
                                     style={{width: '100%'}}
-                                    mode="java"
+                                    mode="json"
                                     theme="github"
                                     onChange={this.onChange}
-                                    value={this.state.item.pre_configuration === null ? '{}' : this.state.item.pre_configuration}
+                                    value={this.state.configuration === null ? '{}' : this.state.configuration}
                                     fontSize={16}
                                     readOnly={this.props.store.codeStore.readOnly}
                                     name="UNIQUE_ID_OF_DIV"
                                 />
-                                <Button onClick={this.submitData}>提交</Button>
                             </TabPane>
                         </Tabs>
+                            <Button onClick={this.submitData}>提交</Button>
                         </div>
                     </div>
                     <div className={flag ? 'show' : 'hide'}>
                         <div className="installheader">
-                           {/* <div className="selectlist">
-                               <div>
-                                   设备厂商:
-                                   <Select defaultValue="设备厂商"
-                                       style={{ width: 120 }}
-                                       onChange={()=>{
-                                           this.handleChangevendor()
-                                       }}
-                                       size="small"
-                                       key="44"
-                                   >
-                                       <Option
-                                           value="全部"
-                                           key="99"
-                                       >全部</Option>
-                                               {
-                                                   vendor && vendor.length > 0 && vendor.map((val, ind) => {
-                                                       return (
-                                                           <Option
-                                                               value={val.name}
-                                                               key={ind}
-                                                           >{val.name}</Option>
-                                                       )
-                                                   })
-                                               }
-                                           </Select>
-                               </div>
-                               <div>
-                                   通讯协议:
-                                   <Select defaultValue="通讯协议"
-                                       style={{ width: 120 }}
-                                       onChange={()=>{
-                                           this.handleChangeagreement()
-                                       }}
-                                       size="small"
-                                       key="11"
-                                   >
-                                       <Option
-                                           value="全部"
-                                           key="99"
-                                       >全部</Option>
-                                               {
-                                                   agreement && agreement.length > 0 && agreement.map((val, ind) => {
-                                                       return (
-                                                           <Option
-                                                               value={val.name}
-                                                               key={ind}
-                                                           >{val.name}</Option>
-                                                       )
-                                                   })
-                                               }
-                                           </Select>
-                               </div>
-                               <div>
-                                   应用类型:
-                                   <Select defaultValue="应用类型"
-                                       style={{ width: 120 }}
-                                       onChange={()=>{
-                                           this.handleChangetype()
-                                       }}
-                                       size="small"
-                                       key="22"
-                                   >
-                                       <Option
-                                           value="全部"
-                                           key="99"
-                                       >全部</Option>
-                                               {
-                                                   type && type.length > 0 && type.map((val, ind) => {
-                                                        return (
-                                                           <Option
-                                                               value={val.name}
-                                                               key={ind}
-                                                           >{val.name}</Option>
-                                                       )
-                                                   })
-                                               }
-                                   </Select>
-                               </div>
-                           </div> */}
                            <div className="searchlist">
                                <Search
                                    key="33"

@@ -43,7 +43,7 @@ class Status extends Component {
                     {
                         this.props.location.pathname.indexOf('/AppsInstall') === -1
                         ? <div>
-                            <Link to={`/AppsInstall/${this.props.match.params.sn}`}>
+                            <Link to={`/AppsInstall/${this.props.match.params.sn}/app/1`}>
                                 安装新应用
                             </Link>
                         </div>

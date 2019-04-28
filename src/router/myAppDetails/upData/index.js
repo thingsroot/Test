@@ -19,6 +19,7 @@ const CollectionCreateForm = Form.create()(
             const formData = new FormData();
             fileList.forEach((file) => {
                 formData.append('app_file', file);
+                console.log(file)
             });
             const form = this.props.form;
             form.validateFields((err, values) => {
@@ -28,7 +29,6 @@ const CollectionCreateForm = Form.create()(
                 formData.append('app', this.props.app);
                 formData.append('version', values.version);
                 formData.append('comment', values.comment);
-
                 reqwest({
                     url: '/api/applications_versions_create',
                     method: 'post',

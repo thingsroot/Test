@@ -7,6 +7,7 @@ import {inject, observer} from 'mobx-react';
 
 const FormItem = Form.Item;
 const EditableContext = React.createContext();
+const Option = Select.Option;
 
 const EditableRow = ({ form, ...props }) => (
     <EditableContext.Provider value={form}>
@@ -42,7 +43,15 @@ class EditableCell extends React.Component {
             this.toggleEdit();
             handleSave({ ...record, ...values });
         });
-    }
+    };
+
+    selectSave = (e)=>{
+        const { record, handleSave } = this.props;
+        let values = e.key;
+        record.tpl = values;
+        this.toggleEdit();
+        handleSave({ ...record, values });
+    };
 
     render () {
         const { editing } = this.state;
@@ -56,9 +65,6 @@ class EditableCell extends React.Component {
             // handleSave,
             ...restProps
         } = this.props;
-        console.log(id)
-        console.log('------------------')
-        console.log(editable)
         return (
             <td {...restProps}>
                 {editable ? (
@@ -80,22 +86,23 @@ class EditableCell extends React.Component {
                                                 ref={node => (this.input = node)}
                                                 onPressEnter={this.save}
                                                 onBlur={this.save}
-                                            />
+                                              />
                                             : <div>
-                                                    <input
+                                                    <Input
                                                         type="hidden"
                                                         ref={node => (this.input = node)}
                                                         onChange={this.save}
                                                         value={this.state.template}
                                                     />
-                                                    <Select defaultValue="请选择模板">
+                                                    <Select
+                                                        defaultValue="请选择模板"
+                                                        style={{width: '95%'}}
+                                                    >
                                                         {this.props.store.codeStore.template.map((w)=>{
                                                             return (
                                                                 <Option
                                                                     key={w}
-                                                                    onClick={()=>{
-                                                                        this.templateChange(w)
-                                                                    }}
+                                                                    onClick={this.selectSave}
                                                                 >
                                                                     {w}
                                                                 </Option>
@@ -163,6 +170,8 @@ class EditableTable extends React.Component {
     };
 
     handleSave = (row, name) => {
+        console.log(row)
+        console.log(name)
         const newData = [...this.state.dataSource];
         const index = newData.findIndex(item => row.key === item.key);
         const item = newData[index];
@@ -173,9 +182,9 @@ class EditableTable extends React.Component {
         this.setState({
             dataSource: newData
         }, ()=>{
+            console.log(this.state.dataSource)
             let allTableData = this.props.store.codeStore.allTableData;
             allTableData[name] = this.state.dataSource;
-            console.log(allTableData)
         });
     };
 
