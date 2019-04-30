@@ -4,6 +4,7 @@ import http from '../../../utils/Server';
 // import { deviceAppOption } from '../../../utils/Session';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
+import { exec_result } from '../../../utils/Session';
 function confirm (record, name, type, sn) {
   console.log(record, name, type, sn)
   // name 是应用市场ID
@@ -19,6 +20,7 @@ function confirm (record, name, type, sn) {
   if (type === 'update'){
     http.post('/api/gateways_applications_upgrade', update).then(res=>{
       console.log(res);
+      exec_result(res.data)
     })
     return false;
   }
@@ -29,6 +31,7 @@ function confirm (record, name, type, sn) {
   }
   http.postToken('/api/gateways_applications_remove', data).then(res=>{
     console.log(res)
+    exec_result(res.data)
   })
   // const hide = message.loading('Action in progress..', 0);
   // setTimeout(hide, 2500);
@@ -178,7 +181,7 @@ class AppsList extends Component {
           inst: 'ioe_frpc',
           id: `start${this.props.match.params.sn}/ioe_frpc/${new Date() * 1}`
         }).then(res=>{
-            http.get('/api/gateways_exec_result?id=' + res.data)
+          exec_result(res.data)
         })
         this.fetch(this.props.match.params.sn);
       }
@@ -206,11 +209,7 @@ class AppsList extends Component {
         http.post('/api/gateways_applications_option', data).then(res=>{
           console.log(res)
           if (res.data){
-            setTimeout(() => {
-              http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                console.log(result)
-              })
-            }, 1000);
+            exec_result(res.data)
           }
         })
         // const message = deviceAppOption(record.info.inst, 'auto', value, this.props.store.appStore.status.sn, type, record.sn);
@@ -239,6 +238,8 @@ class AppsList extends Component {
         http.postToken('/api/gateways_applications_refresh', {
           gateway: sn,
           id: `/gateways/refresh/${sn}/${new Date() * 1}`
+        }).then(res=>{
+          exec_result(res.data)
         })
         const pagination = { ...this.state.pagination };
         http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{

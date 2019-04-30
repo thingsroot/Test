@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Input, Select, Button, Icon, Table, message } from 'antd';
 import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
-import { apply_AccessKey } from '../../../utils/Session';
+import { apply_AccessKey, exec_result } from '../../../utils/Session';
 import './style.scss';
 const Option = Select.Option;
 const columns = [{
@@ -361,7 +361,7 @@ class VPN extends Component {
                                     inst: 'ioe_frpc',
                                     id: `start${this.props.match.params.sn}/ioe_frpc/${new Date() * 1}`
                                 }).then(res=>{
-                                    http.get('/api/gateways_exec_result?id=' + res.data)
+                                    exec_result(res.data)
                                 })
                             }}
                         ><Icon type="sync"/></Button>

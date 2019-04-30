@@ -3,6 +3,7 @@ import { withRouter } from 'react-router';
 import { inject, observer} from 'mobx-react';
 import http from '../../utils/Server';
 import { Table, Button, Modal, Input, message } from 'antd';
+import { exec_result } from '../../utils/Session';
 //import GatesStatus from '../../common/GatesStatus';
 import './style.scss';
 @withRouter
@@ -73,7 +74,7 @@ class MyGatesDevicesOutputs extends PureComponent {
           const { sn } = this.props.match.params;
           const { vsn } = this.props;
           const { record, value } = this.state;
-          const id = `send_output/${sn}/ ${vsn}/ ${this.state.record.name}/${this.state.value}/${new Date() * 1}`
+          const id = `send_output/${sn}/${vsn}/${this.state.record.name}/${this.state.value}/${new Date() * 1}`
           console.log(this.state.value)
         http.postToken('/api/gateways_dev_outputs', {
             gateway: sn,
@@ -84,16 +85,19 @@ class MyGatesDevicesOutputs extends PureComponent {
             id: id
         }).then(res=>{
             if (res.data === id){
-                setTimeout(() => {
-                    http.get(`/api/gateways_exec_result?id=${encodeURIComponent(res.data)}`).then(res=>{
-                        console.log(res)
-                        if (res.ok === true){
-                            message.success('发送成功')
-                        } else {
-                            message.error('发送失败，请重新发送')
-                        }
-                    })
-                }, 1000);
+                // setTimeout(() => {
+                //     http.get(`/api/gateways_exec_result?id=${encodeURIComponent(res.data)}`).then(res=>{
+                //         console.log(res)
+                //         if (res.ok === true){
+                //             message.success('发送成功')
+                //         } else {
+                //             message.error('发送失败，请重新发送')
+                //         }
+                //     })
+                // }, 1000);
+                exec_result(id)
+            } else {
+                message.error('提交错误')
             }
         })
         this.setState({

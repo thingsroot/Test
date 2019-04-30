@@ -10,6 +10,7 @@ import  'echarts/lib/chart/pie';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/tooltip';
 import './style.scss';
+import { exec_result } from '../../../utils/Session';
 
 function getMin (i, date) {
     let Dates = new Date(date - i * 60000)
@@ -163,14 +164,15 @@ class LinkStatus extends Component {
                 id: `installapp/${this.props.match.params.sn}/${record}/${new Date() * 1}`
             }).then(res=>{
                 if (res.data){
-                    setTimeout(() => {
-                        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                            console.log(result)
-                            if (result.data.result) {
-                                message.success('开启成功')
-                            }
-                        })
-                    }, 1000);
+                    exec_result(res.data)
+                    // setTimeout(() => {
+                    //     http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                    //         console.log(result)
+                    //         if (result.data.result) {
+                    //             message.success('开启成功')
+                    //         }
+                    //     })
+                    // }, 1000);
                 }
             })
         } else {
@@ -180,14 +182,15 @@ class LinkStatus extends Component {
                 id: `removeapp/${this.props.match.params.sn}/${record}/${new Date() * 1}`
             }).then(res=>{
                 if (res.data) {
-                    setTimeout(() => {
-                        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                            console.log(result)
-                            if (result.data.result) {
-                                message.success('关闭成功')
-                            }
-                        })
-                    }, 1000);
+                    exec_result(res.data)
+                    // setTimeout(() => {
+                    //     http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                    //         console.log(result)
+                    //         if (result.data.result) {
+                    //             message.success('关闭成功')
+                    //         }
+                    //     })
+                    // }, 1000);
                 }
             })
         }
@@ -203,12 +206,7 @@ class LinkStatus extends Component {
             [inst]: type
         }).then(res=>{
             if (res.data){
-                http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                     if (result.data.result){
-                        const text = config ? '关闭' + record + '模式成功' : '开启' + record + '模式成功'
-                        message.success(text)
-                     }
-                })
+                exec_result(res.data)
             }
         })
       }
@@ -249,7 +247,7 @@ class LinkStatus extends Component {
                   min_level: this.state[value],
                   id: `enable_event/${this.props.match.params.sn}/min${value}/${new Date() * 1}`
               }).then(res=>{
-                  console.log(res);
+                  exec_result(res.data)
 
               })
           } else {
@@ -259,6 +257,8 @@ class LinkStatus extends Component {
                     [type]: this.state[value]
                 },
                 id: `set${type}/${this.props.match.params.sn}/min${value}/${new Date() * 1}`
+            }).then(res=>{
+                exec_result(res.data)
             })
           }
       }
@@ -572,7 +572,7 @@ class LinkStatus extends Component {
                                                     id: `sys_upgrade/${this.props.match.params.sn}/ ${new Date() * 1}`
                                                 }
                                                 http.postToken('/api/gateways_applications_upgrade', data).then(res=>{
-                                                    console.log(res)
+                                                    exec_result(res.data)
                                                 })
                                             }}
                                           >升级更新</Button> : <Button>检查更新</Button>
