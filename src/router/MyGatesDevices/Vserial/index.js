@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { Select, Table, Button } from 'antd';
-import Logviewer from '../../MyGatesLogviewer';
-import { _getCookie } from '../../../utils/Session';
+import { Button, Select, Table } from 'antd';
 import mqtt from 'mqtt';
+import React, { Component } from 'react';
+import { _getCookie } from '../../../utils/Session';
+import Logviewer from '../../MyGatesLogviewer';
 import './style.scss';
 const Option = Select.Option;
 const cloums = [
@@ -62,7 +62,9 @@ class Vserial extends Component {
         DataBits: '8',
         Check: 'NONE',
         flag: true,
+        connect_flag: false,
         logFlag: false,
+        message: {},
         cloum: [
             {
                 title: '串口参数',
@@ -118,19 +120,11 @@ class Vserial extends Component {
                 }
             }
         ],
-        data: [{
-            parame: '',
-            status: '已关闭',
-            open: '',
-            address: 'thingsroot.com:26969',
-            connectStatus: 'DISCONNECTED',
-            serialPort: '0/0',
-            network: '0/0'
-        }]
+        data: []
     }
-    componentDidMount (){
-        this.connect();
-    }
+    // componentDidMount (){
+
+    // }
     connect = () =>{
         const sn = this.props.match.params.sn;
         const options = {
@@ -146,17 +140,42 @@ class Vserial extends Component {
         onFailure: error
   }
 //   const topic = sn + '/log';
-  const topic = 'v1/vspc/api/RESULT';
+  const topic = 'v1/vspc/#';
   if (!this.state.connected){
       client = mqtt.connect('ws://127.0.0.1:7884/mqtt', options)
         client.on('connect', ()=>{
             console.log('连接成功')
+            this.setState({
+                connect_flag: true
+            })
             // this.setState({connected: true})
             // this.tick()
             client.subscribe(topic)
         })
         client.on('message', (topic, message)=>{
-            console.log(message)
+
+            if (message && message.length > 0){
+                // console.log(JSON.parse(message.toString()))
+                if (this.state.message !== message.toString()){
+                    const newMessage = JSON.parse(message.toString());
+                    console.log(newMessage)
+                    const data = [{
+                        parame: '',
+                        status: '已关闭',
+                        open: '',
+                        address: '' + newMessage.host + newMessage.port,
+                        connectStatus: newMessage.peer_state,
+                        serialPort: newMessage.recv_count + '/' + newMessage.send_count,
+                        network: newMessage.peer_recv_count + '/' + newMessage.peer_send_count
+                    }]
+                    this.setState({
+                        message: newMessage,
+                        data: data
+                    }, ()=>{
+                        console.log(this.state.data)
+                    })
+                }
+            }
             if (this.state.data && this.state.data.length < 1000){
                 // let data = this.state.data;
                 // const newmessage = JSON.parse(message.toString());
@@ -190,11 +209,12 @@ class Vserial extends Component {
         })
     }
     render () {
-        const { SerialPort, flag, logFlag } = this.state;
+        const { SerialPort, flag, logFlag, message } = this.state;
+        console.log(message)
         return (
             <div>
                 <div className="wrapper">
-                    <p>虚拟串口服务关联网关：<span>------</span></p>
+                    <p>虚拟串口服务关联网关：<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
                     <div>
                         {
                             flag
@@ -203,14 +223,17 @@ class Vserial extends Component {
                                     this.setState({
                                         flag: false
                                     })
+                                    this.connect();
                                 }}
                               >开启</Button>
                             : <Button
                                 type="danger"
                                 onClick={()=>{
                                     this.setState({
-                                        flag: true
+                                        flag: true,
+                                        data: []
                                     })
+                                    client.unsubscribe('v1/vspc/#')
                                 }}
                               >停止</Button>
                         }

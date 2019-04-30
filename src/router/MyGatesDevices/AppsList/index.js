@@ -5,6 +5,7 @@ import http from '../../../utils/Server';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 function confirm (record, name, type, sn) {
+  console.log(record, name, type, sn)
   // name 是应用市场ID
   // record.device_name 是网关应用名称
   const update = {
@@ -22,11 +23,11 @@ function confirm (record, name, type, sn) {
     return false;
   }
   const data = {
-    gateway: sn,
-    inst: record.name,
-    id: `app_upgrade/${sn}/ ${record.device_name}/${new Date() * 1}`
+    gateway: name,
+    inst: record.device_name,
+    id: `app_upgrade/${name}/ ${record.device_name}/${new Date() * 1}`
   }
-  http.postToken('/api/applications_remove', data).then(res=>{
+  http.postToken('/api/gateways_applications_remove', data).then(res=>{
     console.log(res)
   })
   // const hide = message.loading('Action in progress..', 0);
@@ -93,7 +94,7 @@ class AppsList extends Component {
               if (record.latestVersion > props) {
                 return (
                   <Popconfirm
-                      title="Are you sure update this task?"
+                      title={'Are you sure you want to update this task to ' + record.latestVersion + '?'}
                       onConfirm={()=>{
                         confirm(record, record.name, 'update', this.props.match.params.sn)
                       }}

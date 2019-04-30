@@ -78,8 +78,10 @@ class VPN extends Component {
             if (json.br_lan_ipv4 !== undefined){
                 this.setState({ip: json.br_lan_ipv4})
             }
-        }).catch(err => {
-            console.log('请求错误', err);
+        }).catch((err) => {
+            if (err){
+                return false;
+            }
         })
     }
     setIp = ()=>{
@@ -94,14 +96,12 @@ class VPN extends Component {
                 Authorization: 'Bearer 123123123'
             }
         }).then(res => {
-            console.log(res)
             if (res.ok){
                 return res.json();
             } else {
                 return false;
             }
         }).then(json => {
-            console.log(json)
             if (this.state.result !== json){
                 this.setState({result: {...json}}, ()=>{
                     this.setState()
@@ -139,7 +139,6 @@ class VPN extends Component {
         }).then(res => {
             return res.json();
         }).then(json => {
-            console.log(json)
             let arr = [];
             for (var key in json){
                 if (json[key] === 'RUNNING' && this.state.toggleFlag){
@@ -156,8 +155,9 @@ class VPN extends Component {
             }
             return json;
         }).catch(err => {
-            console.log(err)
-            this.setState({flag: true})
+            if (err){
+                this.setState({flag: true})
+            }
         })
 
         fetch('/apis/cloudstatus', {
@@ -169,7 +169,6 @@ class VPN extends Component {
         }).then(res=>{
             return res.json()
         }).then(res=>{
-            console.log(res)
             if (this.state.chouldstatus !== res[`${this.props.match.params.sn}_${this.state.model}`]){
                 this.setState({chouldstatus: res[`${this.props.match.params.sn}_${this.state.model}`]})
             }
@@ -246,7 +245,6 @@ class VPN extends Component {
                     Authorization: 'Bearer 123123123'
                 }
             }).then(res => {
-                console.log(res)
                 return res.json();
             }).then(() => {
                 setTimeout(() => {
@@ -260,11 +258,11 @@ class VPN extends Component {
                     }).then(res => {
                         return res.json();
                     }).then(json => {
-                        console.log(json)
                         this.setState({result: json})
                     }).catch(err => {
-                        console.log(err)
-                        return false;
+                        if (err) {
+                            return false;
+                        }
                     })
 
                 }, 5000);
@@ -292,7 +290,6 @@ class VPN extends Component {
     }
     render () {
         const { flag, result, chouldstatus } = this.state;
-        console.log(message)
         return (
             <div className="VPN">
                 <div className="VPNLeft">
@@ -359,7 +356,6 @@ class VPN extends Component {
                         <Button
                             disabled={flag}
                             onClick={()=>{
-                                console.log('33333333333333333333333')
                                 http.post('/api/gateways_applications_start', {
                                     gateway: this.props.match.params.sn,
                                     inst: 'ioe_frpc',

@@ -192,7 +192,8 @@ class MyGatesAppsInstall extends Component {
         if (this.props.match.params.type === '1') {
             http.get('/api/store_list').then(res=>{
                 this.setState({
-                    data: res.data
+                    data: res.data,
+                    filterdata: res.data
                 })
             });
             marked.setOptions({

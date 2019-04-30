@@ -4,27 +4,26 @@ import { Link, withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 // import http from '../../utils/Server';
 import './style.scss';
+const MyIcon = Icon.createFromIconfontCN({
+    scriptUrl: '//at.alicdn.com/t/font_1163855_qf16uefhcsb.js'
+})
 @withRouter
 @inject('store') @observer
 class LeftNav extends Component {
     state = {
         list: [
             {
-                icon: 'table',
+                icon: 'profile',
                 text: '设备列表',
                 href: '/GatesList'
             }, {
-                icon: 'table',
+                icon: 'appstore',
                 text: '应用列表',
                 href: '/AppsList'
             }, {
-                icon: 'table',
+                icon: 'database',
                 text: '网关状态',
                 href: '/LinkStatus'
-            }, {
-                icon: 'table',
-                text: '远程编程-串口',
-                href: '/Vserial'
             }
         ],
         index: 0
@@ -41,6 +40,10 @@ class LeftNav extends Component {
         } else if (pathname.indexOf('/LinkStatus') !== -1){
             this.setState({
                 index: 2
+            });
+        } else if (pathname.indexOf('/VPN') !== -1){
+            this.setState({
+                index: '4'
             });
         }
     }
@@ -82,17 +85,28 @@ class LeftNav extends Component {
                     <p>扩展功能</p>
                     <ul>
                         {
-                            this.props.vpnflag
-                            ? <Link to={`${url}/VPN`}>
-                            <li
-                                className={index === 3 ? 'active' : ''}
-                                key="3"
+                            this.vserialflag
+                            ? <Link to={`${url}/Vserial`}
+                                key="4"
                                 onClick={()=>{
-                                    this.setState({index: 3})
+                                this.setIndex('3')
                                 }}
-                            >VPN通道</li>
-                        </Link>
+                              >
+                                <li
+                                    className={index === '3' ? 'active' : ''}
+                                ><MyIcon type="icon-tiaoshi"/>&nbsp;&nbsp;远程编程-串口</li></Link>
                         : ''
+                        }
+                        {
+                            this.props.vpnflag
+                            ? <Link to={`${url}/VPN`}
+                                key="4"
+                                onClick={()=>{
+                                    this.setIndex('4')
+                                }}
+                              >
+                              <li className={index === '4' ? 'active' : ''}><MyIcon type="icon-tiaoshi"/>&nbsp;&nbsp;VPN通道</li></Link>
+                            : ''
                         }
                     </ul>
                 </div>
