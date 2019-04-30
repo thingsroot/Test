@@ -113,10 +113,14 @@ class MyApps extends PureComponent {
                     }
                 </ul>
                 <div
-                    className="empty"
-                    style={this.state.loading ? block : none}
+                    style={this.state.loading ? none : block}
                 >
-                    暂时没有应用！
+                    <p
+                        className="empty"
+                        style={appList.length === 0 ? block : none}
+                    >
+                        暂时没有应用！
+                    </p>
                 </div>
             </div>
         )

@@ -19,6 +19,7 @@ class EditorCode extends Component {
     onChange = (value)=>{
         console.log(value);
         this.props.store.codeStore.setConfiguration(value[0]);
+        console.log(this.props.store.codeStore.configuration);
         this.props.store.codeStore.setPredefined(value[1])
     };
 

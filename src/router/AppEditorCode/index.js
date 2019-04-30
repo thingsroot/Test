@@ -11,8 +11,9 @@ const { TextArea } = Input;
 const confirm = Modal.confirm;
 function format (list) {
     let data = [];
-    for (var i = 0; i < list.length; i++){
+    for (let i = 0; i < list.length; i++){
         if (list[i].children){
+            console.log(list[i]);
             if (list[i].childrenData){
                 data.push({
                     title: list[i].text,
@@ -23,6 +24,7 @@ function format (list) {
                 })
             }
         } else {
+            console.log(list[i])
             data.push({
                 title: list[i].text,
                 key: list[i].id,
@@ -31,6 +33,7 @@ function format (list) {
             })
         }
     }
+    console.log(data)
     return data;
 }
 
@@ -67,12 +70,10 @@ class AppEditorCode extends Component {
         http.get('/home/api/method/app_center.editor.editor_worksapce_version?app=' + app)
             .then(res=>{
                 let worksapceVersion = res.message;
-                // console.log(worksapceVersion);
                 if (worksapceVersion && worksapceVersion !== 'undefined') {
                     http.get('/home/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
                             let lastVersion = data.message;
-                            // console.log(lastVersion);
                             if (worksapceVersion !== lastVersion) {
                                 //提示当前工作区是会基于worksapceVersion，当前的最新版本为latest_version（弹框）
                                 this.info('版本提示', '当前工作区是会基于版本    ' + worksapceVersion + '，当前的最新版本为    ' + lastVersion + '.');
@@ -103,7 +104,6 @@ class AppEditorCode extends Component {
                                 http.get('/home/api/method/app_center.editor.editor_init?app=' + app + '&version=' + data.message)
                                     .then(res=>{
                                         let initVersion = res.message;
-                                        // console.log(initVersion);
                                         this.setState({
                                             version: initVersion
                                         });
@@ -187,7 +187,7 @@ class AppEditorCode extends Component {
         this.setState({
             visible: false
         });
-        let url = '/api/method/app_center.editor.editor_revert';
+        let url = '/home/api/method/app_center.editor.editor_revert';
         http.postToken(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
             .then(res=>{
                 this.props.store.codeStore.change();
@@ -196,13 +196,17 @@ class AppEditorCode extends Component {
     };//重置版本结束
     //保存文件
     saveFile = ()=>{
+        console.log(this.props.store.codeStore.newEditorContent)
         if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent) {
             message.warning('文件未改动！')
         } else {
-            let url = '/api/method/app_center.editor.editor';
-            http.postToken(url + '?app=' + this.state.app +
-                '&operation=set_content&id=' + this.props.store.codeStore.fileName +
-                '&text=' + this.props.store.codeStore.newEditorContent)
+            let params = {
+                app: this.state.app,
+                operation: 'set_content',
+                id: this.props.store.codeStore.fileName,
+                text: this.props.store.codeStore.newEditorContent
+            };
+            http.post('/home/api/method/app_center.editor.editor', params)
                 .then(res=>{
                     console.log(res);
                     message.success('文件保存成功！')
@@ -234,7 +238,7 @@ class AppEditorCode extends Component {
         })
     };
     newVersion = ()=>{
-        http.postToken('/api/method/app_center.editor.editor_release?app=' + this.state.app +
+        http.postToken('/home/api/method/app_center.editor.editor_release?app=' + this.state.app +
             '&operation=set_content&version=' + this.state.newVersion +
             '&comment=' + this.state.comment)
             .then(res=>{
@@ -249,12 +253,12 @@ class AppEditorCode extends Component {
     };
 
     getTreeData = ()=>{
-        http.get('/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_node&id=' + '#')
+        http.get('/home/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_node&id=' + '#')
             .then(res=>{
                 let resData = res;
                 resData.map((v)=>{
                     if (v.children) {
-                        http.get('/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_node&id=' + v.id)
+                        http.get('/home/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_node&id=' + v.id)
                             .then(res=>{
                                 v['childrenData'] = res;
                                 let data = format(resData);
@@ -270,7 +274,7 @@ class AppEditorCode extends Component {
     addFile = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
         if (this.props.store.codeStore.addFileName !== '') {
-            let url = '/api/method/app_center.editor.editor';
+            let url = '/home/api/method/app_center.editor.editor';
             http.get(url + '?app=' + this.state.app + '&operation=create_node&type=file&id=' +
                 myFolder + '&text=' + this.props.store.codeStore.addFileName)
                 .then(res=>{
@@ -323,7 +327,7 @@ class AppEditorCode extends Component {
     addFolder = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
         if (this.props.store.codeStore.addFolderName !== '') {
-            let url = '/api/method/app_center.editor.editor';
+            let url = '/home/api/method/app_center.editor.editor';
             http.get(url + '?app=' + this.state.app + '&operation=create_node&type=folder&id=' +
                 myFolder + '&text=' + this.props.store.codeStore.addFolderName)
                 .then(res=>{
@@ -339,7 +343,7 @@ class AppEditorCode extends Component {
         const pro = ()=>{
             return new Promise((resolve, reject) => {
                 let myFolder = this.props.store.codeStore.myFolder[0];
-                let url = '/api/method/app_center.editor.editor';
+                let url = '/home/api/method/app_center.editor.editor';
                 http.get(url + '?app=' + this.state.app + '&operation=delete_node&type=folder&id=' + myFolder)
                     .then(res=>{
                         if (res){
@@ -402,7 +406,7 @@ class AppEditorCode extends Component {
     editorFile = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
         if (this.state.editorFileName !== '') {
-            let url = '/api/method/app_center.editor.editor';
+            let url = '/home/api/method/app_center.editor.editor';
             http.get(url + '?app=' + this.state.app + '&operation=rename_node&type=folder&id=' +
                 myFolder + '&text=' + this.state.editorFileName)
                 .then(res=>{
