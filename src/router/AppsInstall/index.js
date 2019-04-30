@@ -932,7 +932,8 @@ class MyGatesAppsInstall extends Component {
                                 </div>
                                 <div
                                     style={this.state.error ? block : none}
-                                    className="message">
+                                    className="message"
+                                >
                                     数据错误，请使用JSON格式配置！
                                 </div>
                                 <div style={config && config.length > 0 ? none : block}>

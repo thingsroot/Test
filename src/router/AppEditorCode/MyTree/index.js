@@ -88,12 +88,22 @@ class MyTree extends Component {
     renderTreeNodes = data => data.map((item) => {
         if (item.children) {
             return (
-                <TreeNode title={item.title} key={item.key} dataRef={item}>
+                <TreeNode
+                    title={item.title}
+                    key={item.key}
+                    dataRef={item}
+                >
                     {this.renderTreeNodes(item.children)}
                 </TreeNode>
             );
         }
-        return <TreeNode {...item} dataRef={item} key={item.key}/>;
+        return (
+            <TreeNode
+                {...item}
+                dataRef={item}
+                key={item.key}
+            />
+        )
     });
 
     getTree = (resData)=>{
@@ -106,29 +116,9 @@ class MyTree extends Component {
                         resolve(resData);
                         console.log(resData)
                     }
-                    // resData.map((v)=>{
-                    //     if (v.children) {
-                    //         let path = '/home/api/method/app_center.editor.editor';
-                    //         //第一遍
-                    //         http.get(path + '?app=' + this.props.match.params.app + '&operation=get_node&id=' + v.id)
-                    //             .then(res=>{
-                    //                 v['childrenData'] = res;
-                    //                 console.log(resData);
-                    //                 if (resData.length > 0) {
-                    //                     resolve(resData);
-                    //                     console.log(resData)
-                    //                 }
-                    //             });
-                    //     }
-                    // });
                 });
         })
     };
-
-    // console.log(resData);
-    // let data = format(resData);
-    // console.log(data);
-    // this.props.store.codeStore.setTreeData(data)
 
     onExpand = (expandedKeys) => {
         this.setState({
@@ -137,6 +127,7 @@ class MyTree extends Component {
         });
 
     };
+
     onSelect = (selectedKeys, info) => {
         this.setState({ selectedKeys }, ()=>{
             this.props.store.codeStore.setFileName(this.state.selectedKeys);
