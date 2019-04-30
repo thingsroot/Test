@@ -42,11 +42,9 @@ class MyCode extends Component {
 
     setContent = (newValue)=>{
         this.props.store.codeStore.setNewEditorContent(newValue);
-        console.log(this.props.store.codeStore.newEditorContent);
     };
 
     onChange = (newValue)=>{
-        console.log(newValue)
         this.setContent(newValue[0]);
     };
     // blur = ()=>{

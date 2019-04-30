@@ -95,7 +95,6 @@ class DevicemMessage extends Component {
 
     }
     onSelectChange = (selectedRowKeys) => {
-        console.log('selectedRowKeys changed: ', selectedRowKeys);
         this.setState({ selectedRowKeys });
     };
     //确认消息
@@ -112,9 +111,8 @@ class DevicemMessage extends Component {
                 disposed: 1
             };
             http.post('/api/events_dispose', params).then(res=>{
-                console.log(res);
+                res;
                 let deviceData = this.state.deviceData;
-                console.log(deviceData);
                 deviceData && deviceData.length > 0 && deviceData.map((w, key)=>{
                     key;
                     arr.map((v, key1)=>{
@@ -124,8 +122,6 @@ class DevicemMessage extends Component {
                         }
                     });
                 });
-                console.log(deviceData);
-
                 let newData = deviceData.splice(0, deviceData.length);
                 this.props.store.codeStore.setDeviceData(newData);
                 this.props.store.codeStore.setDeviceTableData(newData);
@@ -157,9 +153,8 @@ class DevicemMessage extends Component {
             events: data,
             disposed: 1
         };
-        console.log(params);
         http.post('/api/events_dispose', params).then(res=>{
-            console.log(res);
+            res;
             deviceData && deviceData.length > 0 && deviceData.map((v, key)=>{
                 key;
                 if (v.disposed === 0) {
@@ -235,7 +230,6 @@ class DevicemMessage extends Component {
     };
     //搜索框改变值
     getSelect = (text)=>{
-        console.log(text);
         this.setState({
             selectValue: text
         })
@@ -247,8 +241,6 @@ class DevicemMessage extends Component {
         this.timer = setTimeout(() => {
             this.setState({
                 text: text
-            }, ()=>{
-                console.log(this.state.text)
             })
         }, 1000);
     };

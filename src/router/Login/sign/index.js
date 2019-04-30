@@ -15,18 +15,15 @@ class Sign extends PureComponent {
                     username: values.userName,
                     password: values.password
                 }).then(res=>{
-                    console.log(res)
                     if (res.statusText === 'OK') {
                         const Cookie = res.headers['set-cookie'];
                         Cookie.map(item=>{
                             const name = item.slice(0, item.indexOf('='))
                             const content = item.slice(item.indexOf('=') + 1)
-                            console.log(name, '=', content)
                             _setCookie(name, content, 24)
                         });
                         http.get('/api/developers_read?name=' + _getCookie('user_id'))
                             .then(res=>{
-                                console.log(res.data);
                                 if (!res.error) {
                                     if (res.data.enabled === 1) {
                                         _setCookie('is_developer', '1')
@@ -45,7 +42,6 @@ class Sign extends PureComponent {
                         })
                     }
                 }).catch(function (error){
-                    console.log(error)
                     if (error){
                         message.info('账号密码错误，请重新输入')
                     }
@@ -54,7 +50,6 @@ class Sign extends PureComponent {
         });
     }
     render () {
-        console.log(this.props)
         const { getFieldDecorator } = this.props.form;
         return (
             <div>

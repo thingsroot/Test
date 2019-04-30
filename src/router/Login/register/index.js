@@ -9,14 +9,12 @@ class Register extends PureComponent {
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            console.log(values)
             const data = {
                 email: values.email,
                 full_name: values.username
             }
             if (!err) {
                 http.post('/api/user_create', data).then(res=>{
-                    console.log(res)
                     if (res.ok){
                         if (res.result === 0){
                             message.info('此用户' + res.info)

@@ -82,7 +82,12 @@ class MyAppDetails extends Component {
             <div className="myAppDetails">
                 <div className="header">
                     <span><Icon type="appstore" />{message.app_name}</span>
-                    <span><Icon type="rollback" /></span>
+                    <span
+                        onClick={()=>{
+                            window.location.href = '/myApps'
+                        }}
+                    >
+                    <Icon type="rollback"/></span>
                 </div>
                 <div className="details">
                     <div className="appImg">

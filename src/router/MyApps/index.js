@@ -22,7 +22,6 @@ class MyApps extends PureComponent {
 
     componentDidMount (){
         http.get('/api/applications_list').then(res=>{
-            console.log(res);
             if (res) {
                 this.setState({
                     loading: false,

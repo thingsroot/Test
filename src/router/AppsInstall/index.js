@@ -210,7 +210,6 @@ class MyGatesAppsInstall extends Component {
             });
         } else if (this.props.match.params.type === '2') {
             http.get('/api/applications_details?name=' + this.props.match.params.app).then(res=>{
-                console.log(res.data);
                 this.getConfig(res.data)
             })
 
@@ -219,8 +218,6 @@ class MyGatesAppsInstall extends Component {
     }
 
     shouldComponentUpdate (nextProps, nextState){
-        console.log(nextProps, nextState);
-
         if (nextState.item.description && nextState.item.description !== null){
             document.getElementById('box').innerHTML = marked(nextState.item.description)
         }
@@ -355,13 +352,10 @@ class MyGatesAppsInstall extends Component {
     };
 
     getConfig = (val)=>{
-        console.log(this.state.activeKey)
         this.setState({
             error: false,
             configuration: '',
             activeKey: '1'
-        }, ()=>{
-            console.log(this.state.activeKey)
         });
         let config = [];
         if (val.conf_template) {
@@ -387,7 +381,6 @@ class MyGatesAppsInstall extends Component {
                 })
             }
             if (v.child === undefined) {
-                console.log('数据错误');
                 this.setState({
                     error: true
                 })

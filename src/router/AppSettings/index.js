@@ -108,7 +108,8 @@ class AppSettings extends Component {
                                 data: formData,
                                 success: (res) => {
                                     res;
-                                    message.success('应用已更新！')
+                                    message.success('应用已更新！');
+                                    window.location.href = '/myApps'
                                 }
                             });
                         } else {

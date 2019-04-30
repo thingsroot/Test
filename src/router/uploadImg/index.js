@@ -16,7 +16,6 @@ class UploadImg extends PureComponent {
     handleCancel = () => this.setState({ previewVisible: false });
 
     handlePreview = (file) => {
-        console.log(file)
         this.setState({
             previewImage: file.url || file.thumbUrl,
             previewVisible: true
@@ -24,7 +23,6 @@ class UploadImg extends PureComponent {
     };
 
     handleChange = ({ fileList }) => {
-        console.log(fileList)
         this.setState({ fileList });
     }
 

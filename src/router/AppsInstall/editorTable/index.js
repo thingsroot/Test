@@ -13,7 +13,6 @@ const Option = Select.Option;
 
 const EditableRow = ({ form, ...props }) => (
     <EditableContext.Provider value={form}>
-        {/*{console.log(index)}*/}
         <tr {...props} />
     </EditableContext.Provider>
 );
@@ -149,7 +148,6 @@ class EditableTable extends React.Component {
         }, ()=>{
             let allTableData = this.props.store.codeStore.allTableData;
             allTableData[name] = this.state.dataSource;
-            console.log(allTableData)
         });
     };
 
@@ -167,13 +165,10 @@ class EditableTable extends React.Component {
         }, ()=>{
             let allTableData = this.props.store.codeStore.allTableData;
             allTableData[name] = this.state.dataSource;
-            console.log(allTableData)
         });
     };
 
     handleSave = (row, name) => {
-        console.log(row)
-        console.log(name)
         const newData = [...this.state.dataSource];
         const index = newData.findIndex(item => row.key === item.key);
         const item = newData[index];
@@ -184,7 +179,6 @@ class EditableTable extends React.Component {
         this.setState({
             dataSource: newData
         }, ()=>{
-            console.log(this.state.dataSource)
             let allTableData = this.props.store.codeStore.allTableData;
             allTableData[name] = this.state.dataSource;
         });

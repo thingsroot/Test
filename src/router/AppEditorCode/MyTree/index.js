@@ -49,7 +49,6 @@ class MyTree extends Component {
         this.getTree(resData);
         this.getTree(resData).then((res)=>{
             let data = format(res);
-            console.log(data);
             this.props.store.codeStore.setTreeData(data)
         })
     }
@@ -58,9 +57,7 @@ class MyTree extends Component {
             let resData = [];
             this.getTree(resData);
             this.getTree(resData).then((resData)=>{
-                console.log(resData);
                 let data = format(resData);
-                console.log(data);
                 this.props.store.codeStore.setTreeData(data)
             })
         }
@@ -103,42 +100,20 @@ class MyTree extends Component {
                 dataRef={item}
                 key={item.key}
             />
-        );
+        )
     });
 
     getTree = (resData)=>{
-        return new Promise((resolve, reject)=>{
-            console.log(resolve, reject);
+        return new Promise((resolve)=>{
             http.get('/home/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + '#')
                 .then(res=>{
                     resData = res;
                     if (resData.length > 0) {
                         resolve(resData);
-                        console.log(resData)
                     }
-                    // resData.map((v)=>{
-                    //     if (v.children) {
-                    //         let path = '/home/api/method/app_center.editor.editor';
-                    //         //第一遍
-                    //         http.get(path + '?app=' + this.props.match.params.app + '&operation=get_node&id=' + v.id)
-                    //             .then(res=>{
-                    //                 v['childrenData'] = res;
-                    //                 console.log(resData);
-                    //                 if (resData.length > 0) {
-                    //                     resolve(resData);
-                    //                     console.log(resData)
-                    //                 }
-                    //             });
-                    //     }
-                    // });
                 });
         })
     };
-
-    // console.log(resData);
-    // let data = format(resData);
-    // console.log(data);
-    // this.props.store.codeStore.setTreeData(data)
 
     onExpand = (expandedKeys) => {
         this.setState({
@@ -147,6 +122,7 @@ class MyTree extends Component {
         });
 
     };
+
     onSelect = (selectedKeys, info) => {
         this.setState({ selectedKeys }, ()=>{
             this.props.store.codeStore.setFileName(this.state.selectedKeys);

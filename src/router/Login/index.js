@@ -20,7 +20,6 @@ var sectionStyle = {
 class Login extends PureComponent {
 
     render () {
-        console.log(this.props.match)
         const { path } = this.props.match;
         return (
             <div className="login"
@@ -53,9 +52,6 @@ class Login extends PureComponent {
                                 component={Password}
                                 exact
                             />
-                            {
-                                console.log(path)
-                            }
                             <Redirect
                                 from={'/login'}
                                 to={`${path}/sign`}
