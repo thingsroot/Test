@@ -1,6 +1,8 @@
 import React from 'react';
 import {
-    Table, Input, Button, Form, Select
+    Table,
+    Input,
+    Button, Form, Select
 } from 'antd';
 import {withRouter} from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
@@ -29,7 +31,7 @@ class EditableCell extends React.Component {
         const editing = !this.state.editing;
         this.setState({ editing }, () => {
             if (editing) {
-                this.input.focus();
+                // this.input.focus();
             }
         });
     }

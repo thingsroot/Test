@@ -18,7 +18,7 @@ export function _getCookie (name) {
 }
 
 export function _setCookie (name, value, expire) {
-  let date = new Date()
+  let date = new Date();
   date.setDate(date.getDate() + expire)
   document.cookie =  name + '=' + value + '; path=/' +
     (expire ? ';expires=' + date.toGMTString() : '')

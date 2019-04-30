@@ -21,6 +21,10 @@ class LeftNav extends Component {
                 icon: 'table',
                 text: '网关状态',
                 href: '/LinkStatus'
+            }, {
+                icon: 'table',
+                text: '远程编程-串口',
+                href: '/Vserial'
             }
         ],
         index: 0
