@@ -2,6 +2,13 @@ import React, { Component } from 'react';
 import marked from 'marked';
 import {inject, observer} from 'mobx-react';
 
+const block = {
+    display: 'block'
+};
+const none = {
+    display: 'none'
+}
+
 @inject('store')
 @observer
 class AppDesc extends Component {
@@ -10,7 +17,6 @@ class AppDesc extends Component {
         desc: ''
     };
     componentDidMount (){
-        console.log(this.props)
         let rendererMD = new marked.Renderer();
         marked.setOptions({
             renderer: rendererMD,
@@ -28,8 +34,6 @@ class AppDesc extends Component {
         if (nextProps.desc !== nextContext.desc) {
             this.setState({
                 desc: nextProps.desc
-            }, ()=>{
-                console.log(this.state.desc)
             });
             this.refs.editor.innerHTML = marked(nextProps.desc);
         }
@@ -39,8 +43,15 @@ class AppDesc extends Component {
         return (
             <div className="appDesc">
                 <div
+                    style={this.state.desc !== '' ? block : none}
                     ref="editor"
                 > </div>
+                <div
+                    className="empty"
+                    style={this.state.desc !== '' ? none : block}
+                >
+                    暂时没有描述！
+                </div>
             </div>
         );
     }

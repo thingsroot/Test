@@ -18,7 +18,6 @@ class UserSettings extends PureComponent {
             isAdmin: isAdmin
         });
         http.get('/api/user_read?name=' + user).then(res=>{
-            console.log(res);
             let role = '';
             let groups = res.data.groups;
             groups && groups.length > 0 && groups.map((v, key)=>{
@@ -42,7 +41,6 @@ class UserSettings extends PureComponent {
 
     handleCreate = () => {
         const form = this.formRef.props.form;
-        console.log(form);
         form.validateFields((err, values) => {
             if (err) {
                 return;

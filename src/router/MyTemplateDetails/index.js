@@ -43,7 +43,6 @@ class MyTemplateDetails extends PureComponent {
         http.get('/api/configurations_versions_list?conf=' + conf)
             .then(res=>{
                 let list = [];
-                console.log(res);
                 res.data && res.data.length > 0 && res.data.map((v)=>{
                     list.push(v.version);
                 });
@@ -135,8 +134,7 @@ class MyTemplateDetails extends PureComponent {
 
     };
 
-    handleCancel = (e) => {
-        console.log(e);
+    handleCancel = () => {
         this.setState({
             visible: false
         });
@@ -149,7 +147,6 @@ class MyTemplateDetails extends PureComponent {
                 <div className="title">
                     <div>
                         <span>版本列表：</span>
-                        {console.log(maxVersion)}
                         <Select
                             disabled={versionList.length > 0 ? false : true}
                             value={maxVersion}

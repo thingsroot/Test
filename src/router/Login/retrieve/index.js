@@ -8,13 +8,11 @@ class Retrieve extends PureComponent {
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            console.log(values)
             const data = {
                 email: values.password
             }
             if (!err) {
                 http.post('/api/user_reset_password', data).then(res=>{
-                    console.log(res)
                     if (res.error) {
                         if (res.error === 'user_not_found') {
                             message.info('用户不存在')

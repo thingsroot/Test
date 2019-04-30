@@ -51,7 +51,6 @@ const MyTemplateForm = Form.create({ name: 'template_form' })(
             const {
                 visible, onCancel, form
             } = this.props;
-            console.log(this.props.store.codeStore.templateList)
             const { getFieldDecorator } = form;
             return (
                 <Modal

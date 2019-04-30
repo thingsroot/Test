@@ -357,7 +357,6 @@ class Home extends PureComponent {
                         <div id="gatesMain"
                             style={{width: '97%', height: 300}}
                         >  </div>
-                        {console.log(this.state.pieData)}
                         <div className="tips"
                             style={this.state.pieData !== undefined ? hide : show}
                         >

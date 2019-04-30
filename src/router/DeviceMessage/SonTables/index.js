@@ -14,13 +14,11 @@ class SonTables extends React.Component {
             events: arr,
             disposed: 1
         };
-        console.log(data)
         http.post('/api/events_dispose', data).then(res=>{
             console.log(res)
         });
         //过滤数据
         let deviceTableData = this.props.store.codeStore.deviceTableData;
-        console.log(deviceTableData)
         deviceTableData && deviceTableData.length > 0 && deviceTableData.map((v, key)=>{
             key;
             if (v.name === name) {

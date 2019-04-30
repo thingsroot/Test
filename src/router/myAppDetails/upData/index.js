@@ -19,7 +19,6 @@ const CollectionCreateForm = Form.create()(
             const formData = new FormData();
             fileList.forEach((file) => {
                 formData.append('app_file', file);
-                console.log(file)
             });
             const form = this.props.form;
             form.validateFields((err, values) => {
@@ -57,7 +56,6 @@ const CollectionCreateForm = Form.create()(
             });
         };
         render () {
-            console.log(this);
             const {
                 visible, onCancel, form
             } = this.props;
@@ -109,9 +107,6 @@ const CollectionCreateForm = Form.create()(
                             )}
                         </Form.Item>
                         <Form.Item label="上传文件">
-                            {
-                                console.log(props)
-                            }
                             {getFieldDecorator('app_file', {
                                 rules: [{ required: true, message: '请上传文件！' }]
                             })(
