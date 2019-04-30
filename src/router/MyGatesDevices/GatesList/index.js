@@ -8,29 +8,29 @@ import PropTypes from 'prop-types';
 const columns = [{
     title: '名称',
     dataIndex: 'meta.inst',
-    key: 'meta.inst',
-    sorter: true
+    key: 'meta.inst'
+    // sorter: true
   }, {
     title: '描述',
     dataIndex: 'meta.description',
-    key: 'meta.description',
-    sorter: true
+    key: 'meta.description'
+    // sorter: true
   }, {
     title: 'I/O/C',
     dataIndex: 'meta.ioc',
-    key: 'meta.ioc',
-    sorter: true
+    key: 'meta.ioc'
+    // sorter: true
   }, {
     title: '设备SN',
     key: 'meta.sn',
     dataIndex: 'meta.sn',
-    width: '30%',
-    sorter: true
+    width: '30%'
+    // sorter: true
   }, {
     title: '所属实例',
     key: 'meta.app_inst',
-    dataIndex: 'meta.app_inst',
-    sorter: true
+    dataIndex: 'meta.app_inst'
+    // sorter: true
     }
   //   , {
   //   title: 'Action',
@@ -117,7 +117,8 @@ class GatesList extends Component {
         let { data, loading } = this.state;
         return (
             <div>
-                      <Table columns={columns}
+                      <Table
+                          columns={columns}
                           dataSource={
                               data
                           }

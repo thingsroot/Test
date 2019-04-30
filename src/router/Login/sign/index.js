@@ -37,7 +37,7 @@ class Sign extends PureComponent {
                                     _setCookie('is_ddeveloper', '0')
                                 }
                             });
-                        _setCookie('T&R_auth_token', res.data.data.csrf_token)
+                        _setCookie('T&R_auth_token', res.data.data.csrf_token, 1)
                         message.success('登录成功，正在跳转', 1).then(()=>{
                             if (_getCookie('T&R_auth_token') !== null ){
                                 this.props.history.push('/')

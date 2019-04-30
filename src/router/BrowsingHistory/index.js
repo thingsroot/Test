@@ -50,8 +50,8 @@ class BrowsingHistory extends Component {
         detail: [],
         defaultvalue: '--',
         way: 'raw',
-        domain: '1h',
-        scope: '15m'
+        domain: '5m',
+        scope: '1h'
       };
       componentDidMount () {
         this.fetch();
@@ -90,12 +90,14 @@ class BrowsingHistory extends Component {
           const pagination = { ...this.state.pagination };
           // Read total count from server
           pagination.total = data.totalCount;
-          pagination.total = 200;
+          // pagination.total = 200;
           this.setState({
             loading: false,
             data: data.data.data,
             filterdata: data.data.data,
             pagination
+          }, ()=>{
+            console.log(this.state)
           });
         });
       }
@@ -160,7 +162,7 @@ class BrowsingHistory extends Component {
           default: '';
         }
       }
-      searchVariable (){
+      searchVariable = () =>{
         if (this.state.filterdata && this.state.filterdata.length > 0){
           let value = event.target.value;
           let data = this.state.filterdata.filter((item)=>item.name.indexOf(value) !== -1)
