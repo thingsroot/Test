@@ -9,7 +9,7 @@ import highlight from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import './style.scss';
 import Nav from './Nav';
-import AceEditor from 'react-ace';
+import { split as SplitEditor} from 'react-ace';
 import 'brace/mode/json';
 import 'brace/theme/github';
 import EditableTable from './editorTable';
@@ -34,6 +34,7 @@ const none = {
 @observer
 class MyGatesAppsInstall extends Component {
     state = {
+        error: false,
         app: '',
         vendor: [],
         agreement: [],
@@ -183,8 +184,10 @@ class MyGatesAppsInstall extends Component {
             }
         ],
         keys: [],
-        configuration: ''
+        configuration: '',
+        activeKey: '1'
     };
+
     componentDidMount (){
         if (this.props.match.params.type === '1') {
             http.get('/api/store_list').then(res=>{
@@ -215,6 +218,8 @@ class MyGatesAppsInstall extends Component {
     }
 
     shouldComponentUpdate (nextProps, nextState){
+        console.log(nextProps, nextState);
+
         if (nextState.item.description && nextState.item.description !== null){
             document.getElementById('box').innerHTML = marked(nextState.item.description)
         }
@@ -232,7 +237,7 @@ class MyGatesAppsInstall extends Component {
 
     onChange = (newValue)=>{
         this.setState({
-            configuration: newValue
+            configuration: newValue[0]
         })
     };
     //添加模板
@@ -346,10 +351,17 @@ class MyGatesAppsInstall extends Component {
     instChange = ()=>{
         this.refs.inst.value = event.target.value;
         setTimeout(this.inst, 1000)
-
     };
 
     getConfig = (val)=>{
+        console.log(this.state.activeKey)
+        this.setState({
+            error: false,
+            configuration: '',
+            activeKey: '1'
+        }, ()=>{
+            console.log(this.state.activeKey)
+        });
         let config = [];
         if (val.conf_template) {
             let con = val.conf_template.replace(/[\r\n]/g, '');
@@ -363,9 +375,25 @@ class MyGatesAppsInstall extends Component {
         config && config.length > 0 && config.map((v, key)=>{
             keys.push(v);
             key;
+            if (v.type !== 'templates' ||
+                v.type !== 'table' ||
+                v.type !== 'text' ||
+                v.type !== 'number' ||
+                v.type !== 'dropdown'
+            ) {
+                this.setState({
+                    error: true
+                })
+            }
+            if (v.child === undefined) {
+                console.log('数据错误');
+                this.setState({
+                    error: true
+                })
+            }
             if (v.name === 'device_section') {
                 let tableNameData = {};
-                v.child.map((w, key1)=>{
+                v.child && v.child.length && v.child.map((w, key1)=>{
                     tableNameData[w.name] = [];
                     key1;
                     let arr = [];
@@ -543,7 +571,15 @@ class MyGatesAppsInstall extends Component {
     };
 
     callback = (key)=>{
-        key;
+        if (key === '1') {
+            this.setState({
+                activeKey: '1'
+            })
+        } else {
+            this.setState({
+                activeKey: '2'
+            })
+        }
         if (this.state.config && this.state.config.length > 0) {
             this.getData();
         } else {
@@ -560,7 +596,8 @@ class MyGatesAppsInstall extends Component {
                 <div className="AppInstall">
                     <Nav />
                     <div className={flag ? 'hide appsdetail' : 'show appsdetail'}>
-                    <Button className="installbtn"
+                    <Button
+                        className="installbtn"
                         type="primary"
                         onClick={()=>{
                             this.setState({detail: !detail})
@@ -570,7 +607,8 @@ class MyGatesAppsInstall extends Component {
                             detail ? '安装到网关' : '查看应用描述'
                         }
                     </Button>
-                        <Icon type="rollback"
+                        <Icon
+                            type="rollback"
                             className="back"
                             onClick={()=>{
                                 this.setState({
@@ -611,7 +649,9 @@ class MyGatesAppsInstall extends Component {
                             </div>
                         </div>
                         <div className={detail ? 'installapp hide' : 'installapp show'}>
-                        <Tabs onChange={this.callback}
+                        <Tabs
+                            defaultActiveKey={this.state.activeKey}
+                            onChange={this.callback}
                             type="card"
                         >
                             <p style={{lineHeight: '50px'}}>
@@ -629,7 +669,9 @@ class MyGatesAppsInstall extends Component {
                             <TabPane tab="配置面板"
                                 key="1"
                             >
-                                <div>
+                                <div
+                                    style={this.state.error ? none : block}
+                                >
                                     {
                                         config && config.length > 0 && config.map((v, key) => {
                                             if (v.type === 'section') {
@@ -821,7 +863,7 @@ class MyGatesAppsInstall extends Component {
                                                         key={key}
                                                     >
                                                         {
-                                                            v.child.map((w, index)=>{
+                                                            v.child && v.child.length > 0 && v.child.map((w, index)=>{
                                                                 return (
                                                                     <div
                                                                         id={w.name}
@@ -888,17 +930,21 @@ class MyGatesAppsInstall extends Component {
                                         })
                                     }
                                 </div>
+                                <div
+                                    style={this.state.error ? block : none}
+                                    className="message">
+                                    数据错误，请使用JSON格式配置！
+                                </div>
                                 <div style={config && config.length > 0 ? none : block}>
                                     <p
-                                        style={{
-                                            winth: '100%',
-                                            lineHeight: '100px',
-                                            fontSize: '22px',
-                                            fontWeight: 600,
-                                            textAlign: 'center'
-                                        }}
+                                        className="message"
                                     >此应用不支持配置界面 请使用JSON格式配置</p>
                                 </div>
+                                <Button
+                                    type="primary"
+                                    style={config && config.length > 0 ? block : none}
+                                    onClick={this.submitData}
+                                >提交</Button>
                             </TabPane>
                             <TabPane tab="JSON源码"
                                 key="2"
@@ -909,19 +955,26 @@ class MyGatesAppsInstall extends Component {
                                         <span>{this.props.store.codeStore.readOnly ? '不可编辑' : '可编辑'}</span>
                                     </p>
                                 </div>
-                                <AceEditor
+                                <SplitEditor
                                     style={{width: '100%'}}
                                     mode="json"
                                     theme="github"
+                                    splits={1}
+                                    autoFocus="true"
                                     onChange={this.onChange}
-                                    value={this.state.configuration === null ? '{}' : this.state.configuration}
+                                    value={[this.state.configuration === null ? '{}' : this.state.configuration]}
                                     fontSize={16}
                                     readOnly={this.props.store.codeStore.readOnly}
                                     name="UNIQUE_ID_OF_DIV"
+                                    editorProps={{$blockScrolling: true}}
                                 />
+                                <Button
+                                    type="primary"
+                                    onClick={this.submitData}
+                                >提交</Button>
                             </TabPane>
                         </Tabs>
-                            <Button onClick={this.submitData}>提交</Button>
+
                         </div>
                     </div>
                     <div className={flag ? 'show' : 'hide'}>

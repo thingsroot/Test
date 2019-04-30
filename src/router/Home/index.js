@@ -67,11 +67,29 @@ const weekColumns = [{
     className: 'thWidth',
     key: 'today'
 }];
+function getMin (i, date){
+    let Dates = new Date(date - i * 60000);
+    let min = Dates.getMinutes();
+    if (min < 10){
+        return '0' + min
+    } else {
+        return min;
+    }
+}
+
+function compare (property){
+    return function (a, b) {
+        let value1 = a[property];
+        let value2 = b[property];
+        return value2 - value1;
+    }
+}
+
 class Home extends PureComponent {
     state = {
         todayData: [],
         weekData: [],
-        pieData: {},
+        pieData: [],
         barData: [],
         timeData: []
     };
@@ -104,10 +122,7 @@ class Home extends PureComponent {
                         ]
                     }]
                 });
-            } else {
-                console.log('空')
             }
-
         });
         // 在线数据
         http.get('/home/api/method/iot_ui.iot_api.device_status_statistics').then(res=>{
@@ -122,36 +137,25 @@ class Home extends PureComponent {
                     offline.push(v.offline);
                 });
                 let myOnlineChart = echarts.init(document.getElementById('onlineMain'));
+                let data = [];
+                const date = new Date() * 1;
+                for (var i = 0;i < 143;i++){
+                    data.unshift(new Date(date - (i * 90 * 60000)).getHours() + ':' + getMin(i, date));
+                }
                 myOnlineChart.setOption({
                     tooltip: {
-                        trigger: 'axis'
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross'
+                        }
                     },
                     xAxis: {
-                        type: 'time',
-                        axisLabel: {
-                            rotate: 50,
-                            interval: 0
-                        }
+                        data: data
                     },
-                    yAxis: {
-                        type: 'value',
-                        scale: true,
-                        boundaryGap: ['20%', '20%']
-                    },
-                    toolbox: {
-                        left: 'center',
-                        feature: {
-                            dataZoom: {
-                                yAxisIndex: 'none'
-                            },
-                            restore: {},
-                            saveAsImage: {}
-                        }
-                    },
+                    yAxis: {},
                     series: [{
                         name: 'Online',
                         type: 'line',
-                        smooth: true,
                         data: online,
                         lineStyle: {
                             color: '#50a3ba'
@@ -160,15 +164,12 @@ class Home extends PureComponent {
                         {
                             name: 'Offline',
                             type: 'line',
-                            smooth: true,
                             data: offline,
                             lineStyle: {
                                 color: '#eac736'
                             }
                         }]
                 });
-            } else {
-                console.log('timeData:空')
             }
         });
         //柱状图数据
@@ -224,8 +225,6 @@ class Home extends PureComponent {
                         data: data4
                     }]
                 });
-            } else {
-                console.log('barData: 空')
             }
         });
 
@@ -250,6 +249,7 @@ class Home extends PureComponent {
                     }
                 });
                 data = data.splice(0, 10);
+                data.sort(compare('today'));
                 this.setState({
                     todayData: data
                 })
@@ -280,8 +280,8 @@ class Home extends PureComponent {
                         }
                     }
                 });
-                // data = data.splice(0, 10);
-                // console.log(data);
+                data = data.splice(0, 10);
+                data.sort(compare('total'));
                 this.setState({
                     weekData: data
                 })
@@ -302,8 +302,8 @@ class Home extends PureComponent {
                     >
                         <p>在线统计</p>
                         <div id="onlineMain"
-                            style={{width: '92%',
-                            height: 400}}
+                            style={{width: '97%',
+                            height: 300}}
                         >  </div>
                         <div className="tips"
                             style={this.state.timeData && this.state.timeData.length > 0 ? hide : show}
@@ -355,10 +355,11 @@ class Home extends PureComponent {
                     >
                         <p>网关型号统计</p>
                         <div id="gatesMain"
-                            style={{width: '92%', height: 400}}
+                            style={{width: '97%', height: 300}}
                         >  </div>
+                        {console.log(this.state.pieData)}
                         <div className="tips"
-                            style={JSON.stringify(this.state.pieData) !== '{}' ? hide : show}
+                            style={this.state.pieData !== undefined ? hide : show}
                         >
                             暂时没有数据
                         </div>
@@ -368,7 +369,7 @@ class Home extends PureComponent {
                     >
                         <p>故障类型统计</p>
                         <div id="faultTypeMain"
-                            style={{width: '92%', height: 400}}
+                            style={{width: '97%', height: 300}}
                         >  </div>
                         <div className="tips"
                             style={this.state.barData && this.state.barData.length > 0 ? hide : show}

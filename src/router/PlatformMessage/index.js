@@ -89,13 +89,11 @@ class PlatformMessage extends Component {
         console.log('params', pagination, filters, sorter)
     };
     onSelectChange = (selectedRowKeys) => {
-        console.log('selectedRowKeys changed: ', selectedRowKeys);
         this.setState({ selectedRowKeys });
     };
 
     //确认消息
     confMessage = (arr)=>{
-        console.log(arr)
         if (arr.length === 0) {
             message.warning('请您先选择要确认的消息！');
         } else {
@@ -107,25 +105,18 @@ class PlatformMessage extends Component {
                 activities: arr,
                 disposed: 1
             };
-            console.log(arr)
             http.post('/api/activities_dispose', params).then(res=>{
-                console.log(res);
+                res;
                 let platform = this.state.platform;
-                console.log(platform);
                 platform && platform.length > 0 && platform.map((w, key)=>{
                     key;
-                    // console.log(w.name)
                     arr.map((v, key1)=>{
                         key1;
-                        // console.log(v, key1);
                         if (w.name === v) {
                             w.disposed = 1;
-                            console.log(w.disposed)
                         }
                     });
                 });
-                console.log(platform);
-
                 let newData = platform.splice(0, platform.length - 10);
                 this.props.store.codeStore.setPlatformData(newData);
                 this.props.store.codeStore.setTableData(newData);
@@ -133,8 +124,6 @@ class PlatformMessage extends Component {
                     selectedRowKeys: [],
                     loading: false,
                     platform: newData
-                }, ()=>{
-                    console.log(this.state.platform)
                 });
             }).catch(err=>{
                 console.log(err)
@@ -159,9 +148,8 @@ class PlatformMessage extends Component {
             activities: data,
             disposed: 1
         };
-        console.log(params);
         http.post('/api/activities_dispose', params).then(res=>{
-            console.log(res);
+            res;
             platform && platform.length > 0 && platform.map((v, key)=>{
                 key;
                 if (v.disposed === 0) {
@@ -323,8 +311,6 @@ class PlatformMessage extends Component {
                 this.setState({
                     loading: false,
                     platform: data
-                }, ()=>{
-                    console.log(this.state.platform)
                 });
                 this.props.store.codeStore.setPlatformData(data);
                 this.props.store.codeStore.setTableData(data);
@@ -357,8 +343,6 @@ class PlatformMessage extends Component {
         this.timer = setTimeout(() => {
             this.setState({
                 text: text
-            }, ()=>{
-                console.log(this.state.text)
             })
         }, 1000);
     };
@@ -395,7 +379,6 @@ class PlatformMessage extends Component {
         this.setState({
             length: params.limit
         });
-        console.log(params);
         this.getMessageList(params);
     };
     //筛选消息类型
@@ -422,7 +405,6 @@ class PlatformMessage extends Component {
     };
     //时间
     messageTime = (value)=>{
-        console.log(value);
         let hours = Date.parse(new Date()) - `${value}` * 60 * 60 * 1000;
         let time = this.timestampToTime(hours);
         let params = {
