@@ -77,49 +77,6 @@ function getMin (i, date){
           flag: false
         })
       })
-      // http.get('/api/method/iot_ui.iot_api.gate_device_data_array?sn=' + sn + '&vsn=' + this.props.sn).then(res=>{
-      //   console.log(res)
-      //   let data = res.message;
-      //   data && data.length > 0 && data.map((item, ind)=>{
-      //     item.sn = sn;
-      //     item.vsn = this.props.sn;
-      //     item.key = ind;
-      //     if (item.vt === null){
-      //       item.vt = 'float';
-      //     }
-      //   })
-      //     this.setState({
-      //       data,
-      //       record: {},
-      //       flag: false,
-      //       columns: [
-      //         { title: '类型', dataIndex: 'vt', key: 'vt' },
-      //         { title: '名称', dataIndex: 'name', key: 'name' },
-      //         { title: '描述', dataIndex: 'desc', key: 'desc'},
-      //         { title: '单位', dataIndex: 'upgradeNum', key: 'upgradeNum' },
-      //         { title: '数值', dataIndex: 'pv', key: 'pv', render (text) {
-      //           return (<span title={text}>{text}</span>)
-      //         }},
-      //         { title: '时间', dataIndex: 'tm', key: 'tm' },
-      //         { title: '质量戳', dataIndex: 'q', key: 'q' },
-      //         {
-      //           title: '操作',
-      //           dataIndex: 'operation',
-      //           key: 'operation',
-      //           render: (record, props) => {
-      //             return (
-      //               <span className="table-operation">
-      //                 <Button onClick={()=>{
-      //                   this.showModal(props)
-      //                 }}
-      //                 >浏览数据</Button>
-      //               </span>
-      //             )
-      //           }
-      //         }
-      //       ]
-      //     })
-      // })
     }
     showModal = (record) => {
       this.setState({

@@ -75,7 +75,6 @@ class MyGatesDevicesOutputs extends PureComponent {
           const { vsn } = this.props;
           const { record, value } = this.state;
           const id = `send_output/${sn}/${vsn}/${this.state.record.name}/${this.state.value}/${new Date() * 1}`
-          console.log(this.state.value)
         http.postToken('/api/gateways_dev_outputs', {
             gateway: sn,
             name: vsn,
@@ -85,16 +84,6 @@ class MyGatesDevicesOutputs extends PureComponent {
             id: id
         }).then(res=>{
             if (res.data === id){
-                // setTimeout(() => {
-                //     http.get(`/api/gateways_exec_result?id=${encodeURIComponent(res.data)}`).then(res=>{
-                //         console.log(res)
-                //         if (res.ok === true){
-                //             message.success('发送成功')
-                //         } else {
-                //             message.error('发送失败，请重新发送')
-                //         }
-                //     })
-                // }, 1000);
                 exec_result(id)
             } else {
                 message.error('提交错误')

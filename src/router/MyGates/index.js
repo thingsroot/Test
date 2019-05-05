@@ -36,7 +36,6 @@ function getDevicesList (){
                 data.push(v.data)
             }
         })
-        console.log(data);
         if (status === 'online'){
             this.props.store.appStore.setGatelist(res.message);
         }
@@ -50,22 +49,23 @@ function getDevicesList (){
     })
 }
 function callback (key){
-    switch (key) {
-        case '1':
-                this.setState({loading: true})
-                this.getDevicesList('online')
-            break;
-        case '2':
-                this.setState({loading: true})
-                this.getDevicesList('offline')
-            break;
-        case '3':
-                this.setState({loading: true})
-                this.getDevicesList('all')
-            break;
-        default:
-            break;
-    }
+    key;
+    // switch (key) {
+    //     case '1':
+    //             this.setState({loading: true})
+    //             this.getDevicesList('online')
+    //         break;
+    //     case '2':
+    //             this.setState({loading: true})
+    //             this.getDevicesList('offline')
+    //         break;
+    //     case '3':
+    //             this.setState({loading: true})
+    //             this.getDevicesList('all')
+    //         break;
+    //     default:
+    //         break;
+    // }
 }
   function confirm (record) {
       http.postToken('/api/gateways_remove', {

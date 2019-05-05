@@ -64,10 +64,16 @@ class GatesList extends Component {
         devList: []
     }
     componentDidMount (){
-      this.getData(this.state.sn);
+      this.timer = setInterval(() => {
+        this.getData(this.state.sn);
+      }, 3000);
     }
     UNSAFE_componentWillReceiveProps (nextProps){
       if (nextProps.location.pathname !== this.props.location.pathname){
+        clearInterval(this.timer)
+        this.timer = setInterval(() => {
+          this.getData(this.state.sn);
+        }, 3000);
         const sn = nextProps.match.params.sn;
         this.setState({
             sn,
@@ -77,26 +83,29 @@ class GatesList extends Component {
         });
       }
     }
+    componentWillUnmount (){
+      clearInterval(this.timer)
+    }
     getData (sn){
-      http.get('/api/gateways_dev_list?gateway=' + sn).then(res=>{
-        let data = [];
-        if (res.message && res.message.length > 0){
-          res.message.map((item=>{
-            item.meta.ioc = '' + (item.inputs ? item.inputs.length : '0') + '/' + (item.outputs ? Object.keys(item.outputs).length : '0') + '/' + (item.commands ? item.commands.length : '0');
-            if (item.meta.outputs > 0){
-              item.meta.Gate_Sn = this.props.match.params.sn;
-              item.meta.set_data = true
-            }
-            data.push(item);
-          }))
-        }
-        this.setState({
-          data,
-          devList: res.message,
-          loading: false
+        http.get('/api/gateways_dev_list?gateway=' + sn).then(res=>{
+          let data = [];
+          if (res.message && res.message.length > 0){
+            res.message.map((item=>{
+              item.meta.ioc = '' + (item.inputs ? item.inputs.length : '0') + '/' + (item.outputs ? Object.keys(item.outputs).length : '0') + '/' + (item.commands ? item.commands.length : '0');
+              if (item.meta.outputs > 0){
+                item.meta.Gate_Sn = this.props.match.params.sn;
+                item.meta.set_data = true
+              }
+              data.push(item);
+            }))
+          }
+          this.setState({
+            data,
+            devList: res.message,
+            loading: false
+          })
+          // trhis.props.store.appStore.setStatus(res.message)
         })
-        // trhis.props.store.appStore.setStatus(res.message)
-      })
     //   http.get('/api/method/iot_ui.iot_api.gate_devs_list?sn=' + sn ).then(res=>{
     //     let data = [];
     //     data = res.message;
