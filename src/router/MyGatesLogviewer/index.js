@@ -1,31 +1,32 @@
 import React, { Component } from 'react';
 import { withRouter} from 'react-router-dom';
 import { _getCookie } from '../../utils/Session';
-import { Table, Button, Alert } from 'antd';
+import { Button, Alert, Input } from 'antd';
+const Search = Input.Search;
 import http from '../../utils/Server';
 import mqtt from 'mqtt';
 
 let client;
-const columns = [{
-    title: '时间',
-    dataIndex: 'time',
-    key: 'timer',
-    width: '200px'
-  }, {
-    title: '类型',
-    dataIndex: 'info',
-    key: 'info',
-    width: '100px'
-  }, {
-    title: '实例ID',
-    dataIndex: 'id',
-    key: 'id',
-    width: '100px'
-  }, {
-    title: '内容',
-    dataIndex: 'content',
-    key: 'content'
-  }];
+// const columns = [{
+//     title: '时间',
+//     dataIndex: 'time',
+//     key: 'timer',
+//     width: '200px'
+//   }, {
+//     title: '类型',
+//     dataIndex: 'info',
+//     key: 'info',
+//     width: '100px'
+//   }, {
+//     title: '实例ID',
+//     dataIndex: 'id',
+//     key: 'id',
+//     width: '100px'
+//   }, {
+//     title: '内容',
+//     dataIndex: 'content',
+//     key: 'content'
+//   }];
   function getLocalTime (nS) {
     return new Date(parseInt(nS) * 1000).toLocaleString();
  }
@@ -93,17 +94,18 @@ class MyGatesLogviewer extends Component {
             client.on('message', (topic, message)=>{
                 if (this.state.data && this.state.data.length < 1000){
                     console.log(this.state.data.length)
-                    let data = this.state.data;
+                    //let data = this.state.data;
                     const newmessage = JSON.parse(message.toString());
-                    const obj = {
-                    key: new Date() * 1 + Math.random() * 1000,
-                    info: newmessage[0],
-                    time: getLocalTime(newmessage[1]),
-                    id: newmessage[2].split(']:')[0] + ']',
-                    content: newmessage[2].split(']:')[1]
-                    }
-                    data.unshift(obj)
-                    this.setState(data)
+                    const obj = `
+                    <tr>
+                        <th padding='10px'>${getLocalTime(newmessage[1])}</th>
+                        <th>${newmessage[0]}</th>
+                        <th>${newmessage[2].split(']:')[0] + ']'}</th>
+                        <th>${newmessage[2].split(']:')[1]}</th>
+                    </tr>
+                    `
+                    console.log(obj)
+                   this.refs.tbody.innerHTML = obj +  this.refs.tbody.innerHTML
                 } else {
                     client.unsubscribe(topic)
                     this.setState({flag: true, maxNum: true})
@@ -120,6 +122,7 @@ class MyGatesLogviewer extends Component {
         this.setState({maxNum: false})
     }
     render () {
+        console.log('1')
         return (
             <div>
                     {
@@ -143,6 +146,7 @@ class MyGatesLogviewer extends Component {
                             this.setState({data: []})
                         }}
                     >清除</Button>
+                    <Search />
                     <div>当前日志数量：{this.state.data && this.state.data.length}</div>
                 {
                     this.state.maxNum
@@ -155,7 +159,30 @@ class MyGatesLogviewer extends Component {
                       />
                     : ''
                 }
-                <Table
+                <div ref="table">
+                    <table
+                        style={{width: '100%', padding: '8px'}}
+                        border="1"
+                    >
+                        <thead>
+                            <tr>
+                                <th style={{padding: '10px'}}>时间</th>
+                                <th>类型</th>
+                                <th>实例ID</th>
+                                <th>内容</th>
+                            </tr>
+                        </thead>
+                        <tbody ref="tbody">
+                            <tr>
+                                <td style={{padding: '10px'}}>1111</td>
+                                <td>222</td>
+                                <td>333</td>
+                                <td>4444</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {/* <Table
                     columns={columns}
                     dataSource={this.state.data}
                     size="small"
@@ -163,7 +190,7 @@ class MyGatesLogviewer extends Component {
                     rowkey="key"
                     scroll={{y: 600, x: false}}
                     bordered
-                />
+                /> */}
 
             </div>
         );

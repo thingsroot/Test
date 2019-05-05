@@ -267,11 +267,23 @@ class MyGates extends PureComponent {
                     onClick={this.showModal}
                     style={{
                         position: 'absolute',
-                        right: 0,
+                        right: 130,
                         top: 0,
                         zIndex: 999
                     }}
                 >添加ThingsLink</Button>
+                <Button
+                    type="primary"
+                    style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: 0,
+                        zIndex: 999
+                    }}
+                    onClick={()=>{
+                        this.props.history.push('/MyVirtualGates')
+                    }}
+                >添加虚拟网关</Button>
                 <Modal
                     title="添加ThingsLink网关"
                     visible={this.state.visible}
