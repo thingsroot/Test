@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { withRouter} from 'react-router-dom';
 import { _getCookie } from '../../utils/Session';
-import { Button, Alert, Input } from 'antd';
+import { Button, Alert, Input, Select } from 'antd';
 const Search = Input.Search;
 import http from '../../utils/Server';
 import mqtt from 'mqtt';
-
+import './style.scss';
 let client;
 // const columns = [{
 //     title: '时间',
@@ -27,6 +27,8 @@ let client;
 //     dataIndex: 'content',
 //     key: 'content'
 //   }];
+const Option = Select.Option;
+
   function getLocalTime (nS) {
     return new Date(parseInt(nS) * 1000).toLocaleString();
  }
@@ -51,8 +53,10 @@ class MyGatesLogviewer extends Component {
     state = {
         data: [],
         flag: true,
+        searchflag: true,
         maxNum: false,
-        connected: false
+        connected: false,
+        searchtype: 'content'
     }
     componentDidMount (){
         this.t1 = setInterval(()=>this.tick(), 60000);
@@ -68,14 +72,20 @@ class MyGatesLogviewer extends Component {
             }
             http.postToken('/api/gateways_enable_log', data)
     }
+    handleChange = (value)=> {
+        this.setState({
+            searchtype: value.key
+        })
+      }
     connect = () =>{
+            const arr = [];
             const sn = this.props.match.params.sn;
             const options = {
             connectTimeout: 4000, // 超时时间
             // 认证信息
             clientId: 'webclient-' + makeid(),
-            username: _getCookie('user_id'),
-            password: _getCookie('sid'),
+            username: unescape(_getCookie('user_id')),
+            password: unescape(_getCookie('sid')),
             keepAlive: 6000,
             timeout: 3,
             topic: sn + '/log',
@@ -93,9 +103,17 @@ class MyGatesLogviewer extends Component {
             })
             client.on('message', (topic, message)=>{
                 if (this.state.data && this.state.data.length < 1000){
-                    console.log(this.state.data.length)
-                    //let data = this.state.data;
                     const newmessage = JSON.parse(message.toString());
+                    //let data = this.state.data;
+                    arr.push({
+                        time: getLocalTime(newmessage[1]),
+                        type: newmessage[0],
+                        id: newmessage[2].split(']:')[0] + ']',
+                        content: newmessage[2].split(']:')[1]
+                    })
+                    this.setState({
+                        data: arr
+                    })
                     const obj = `
                     <tr>
                         <th padding='10px'>${getLocalTime(newmessage[1])}</th>
@@ -104,8 +122,9 @@ class MyGatesLogviewer extends Component {
                         <th>${newmessage[2].split(']:')[1]}</th>
                     </tr>
                     `
-                    console.log(obj)
-                   this.refs.tbody.innerHTML = obj +  this.refs.tbody.innerHTML
+                   if (this.state.searchflag) {
+                    this.refs.tbody.innerHTML = obj +  this.refs.tbody.innerHTML
+                   }
                 } else {
                     client.unsubscribe(topic)
                     this.setState({flag: true, maxNum: true})
@@ -122,9 +141,8 @@ class MyGatesLogviewer extends Component {
         this.setState({maxNum: false})
     }
     render () {
-        console.log('1')
         return (
-            <div>
+            <div style={{position: 'relative'}}>
                     {
                         this.state.flag
                         ? <Button
@@ -144,9 +162,61 @@ class MyGatesLogviewer extends Component {
                     <Button
                         onClick={()=>{
                             this.setState({data: []})
+                            this.refs.tbody.innerHTML = '';
                         }}
                     >清除</Button>
-                    <Search />
+                    <div className="searwrap">
+                        <Select
+                            labelInValue
+                            defaultValue={{ key: 'content' }}
+                            style={{ width: 120 }}
+                            onChange={this.handleChange}
+                        >
+                            <Option value="content">内容</Option>
+                            <Option value="id">ID</Option>
+                            <Option value="type">类型</Option>
+                        </Select>
+                        <Search
+                            placeholder="input search text"
+                            onSearch={(value)=>{
+                                if (value) {
+                                const newarr = this.state.data.filter(item=>item[this.state.searchtype].indexOf(value) !== -1);
+                                let html = '';
+                                newarr.map(item=>{
+                                    html +=    `
+                                        <tr>
+                                            <th padding='10px'>${item.time}</th>
+                                            <th>${item.type}</th>
+                                            <th>${item.id}</th>
+                                            <th>${item.content}</th>
+                                        </tr>
+                                        `
+                                });
+                                this.refs.tbody.innerHTML = html
+                                this.setState({
+                                    searchflag: false
+                                })
+                                } else {
+                                let html = '';
+                                this.state.data.map(item=>{
+                                    html +=    `
+                                        <tr>
+                                            <th padding='10px'>${item.time}</th>
+                                            <th>${item.type}</th>
+                                            <th>${item.id}</th>
+                                            <th>${item.content}</th>
+                                        </tr>
+                                        `
+                                });
+                                this.refs.tbody.innerHTML = html;
+                                this.setState({
+                                    searchflag: true
+                                })
+                                }
+                            }}
+                            enterButton
+                        />
+                    </div>
                     <div>当前日志数量：{this.state.data && this.state.data.length}</div>
                 {
                     this.state.maxNum
@@ -159,7 +229,10 @@ class MyGatesLogviewer extends Component {
                       />
                     : ''
                 }
-                <div ref="table">
+                <div
+                    ref="table"
+                    className="logview"
+                >
                     <table
                         style={{width: '100%', padding: '8px'}}
                         border="1"
@@ -173,25 +246,10 @@ class MyGatesLogviewer extends Component {
                             </tr>
                         </thead>
                         <tbody ref="tbody">
-                            <tr>
-                                <td style={{padding: '10px'}}>1111</td>
-                                <td>222</td>
-                                <td>333</td>
-                                <td>4444</td>
-                            </tr>
+
                         </tbody>
                     </table>
                 </div>
-                {/* <Table
-                    columns={columns}
-                    dataSource={this.state.data}
-                    size="small"
-                    pagination={false}
-                    rowkey="key"
-                    scroll={{y: 600, x: false}}
-                    bordered
-                /> */}
-
             </div>
         );
     }

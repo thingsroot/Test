@@ -51,12 +51,13 @@ class LinkStatus extends Component {
     }
     UNSAFE_componentWillReceiveProps (nextProps){
       if (nextProps.location.pathname !== this.props.location.pathname){
-        const sn = nextProps.match.params.sn;
         this.setState({
             loading: true
-        }, ()=>{
+        })
+        setTimeout(() => {
+        const sn = nextProps.match.params.sn;
             this.getData(sn);
-        });
+        }, 1000);
       }
     }
     getData (sn){
@@ -121,8 +122,8 @@ class LinkStatus extends Component {
             });
 
         })
-        http.get('/api/gateways_read?name=' + sn).then(res=>{
-            axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
+        const res = this.props.store.appStore.status;
+        axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
                 let config = res;
                 if (location.data.regeocode){
                     config.address = location.data.regeocode.formatted_address;
@@ -137,7 +138,6 @@ class LinkStatus extends Component {
                     UOLOAD_VALUE: config.event_upload
                 })
             })
-        })
         http.get('/api/gateways_beta_read?gateway=' + sn).then(res=>{
             this.setState({use_beta: res.data.use_beta === 1})
         })
@@ -307,7 +307,7 @@ class LinkStatus extends Component {
                             <Card title="| 配置信息"
                                 bordered={false}
                                 style={{ width: '100%' }}
-                                // loading={loading}
+                                loading={loading}
                             >
                             <p><b>CPU:</b>{config.cpu}</p>
                             <p><b>内存:</b>{config.ram}</p>
@@ -341,7 +341,7 @@ class LinkStatus extends Component {
                         <Card className="border">
                             <p>CPU负载</p>
                             <div
-                                style={{height: 280, width: 700}}
+                                style={{height: 280, width: 700, minWidth: 300}}
                                 id="CPU"
                                 ref="cpu"
                             ></div>
@@ -349,7 +349,7 @@ class LinkStatus extends Component {
                         <Card className="border">
                             <p>内存负载</p>
                             <div
-                                style={{height: 280, width: 700}}
+                                style={{height: 280, width: 700, minWidth: 300}}
                                 id="memory"
                                 ref="mem"
                             ></div>
@@ -508,7 +508,7 @@ class LinkStatus extends Component {
                         </div>
                         <div className="list">
                             <span>
-                                日志上传等级 [*事件上传的最低等级]
+                                事件上传等级 [*事件上传的最低等级]
                             </span>
                             <div style={{position: 'relative'}}>
                                 <InputNumber
@@ -576,9 +576,6 @@ class LinkStatus extends Component {
                                         </div>
                                         <div>
                                             <h3>{title}</h3>
-                                            {
-                                                console.log(this.state)
-                                            }
                                             <p>{title === 'FreeIOE' ? config.version < this.state.iot_beta ? <span>{config.version} -> {this.state.iot_beta}</span> : <span>{this.state.iot_beta}</span>
                                             : config.skynet_version < this.state.skynet_version ? <span>{config.skynet_version} -> {this.state.skynet_version}</span> : <span>{this.state.skynet_version}</span>}</p>
                                             <span>{title === 'FreeIOE' ? config.version === this.state.iot_beta ? '已经是最新版' : '可升级到最新版' : config.skynet_version === this.state.skynet_version ? '已经是最新版' : '可升级到最新版'}</span>
@@ -592,8 +589,8 @@ class LinkStatus extends Component {
                                                 console.log(this.state.data)
                                                 const data = {
                                                     gateway: this.props.match.params.sn,
-                                                    app: 'FreeIOE Core',
-                                                    inst: 'freeioe',
+                                                    app: 'FreeIOE',
+                                                    inst: 'ioe_frpc',
                                                     version: this.state.iot_beta,
                                                     conf: {},
                                                     id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`

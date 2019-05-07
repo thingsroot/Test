@@ -162,9 +162,10 @@ class BrowsingHistory extends Component {
           default: '';
         }
       }
-      searchVariable = () =>{
+      searchVariable = (e) =>{
+        const events = event || e;
         if (this.state.filterdata && this.state.filterdata.length > 0){
-          let value = event.target.value;
+          let value = events.target.value;
           let data = this.state.filterdata.filter((item)=>item.name.indexOf(value) !== -1)
           this.setState({
             data

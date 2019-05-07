@@ -37,14 +37,14 @@ class MyGatesDevices extends Component {
     } else {
       this.setState({flag: true})
     }
-    if (this.props.match.params !== nextProps.match.params){
+    if (this.props.match.params.sn !== nextProps.match.params.sn){
       this.sendAjax(nextProps.match.params.sn)
     }
   }
   sendAjax = (sn) => {
-    http.get('/api/gateways_read?name=' + sn).then(res=>{
-      this.props.store.appStore.setStatus(res)
-    })
+    // http.get('/api/gateways_read?name=' + sn).then(res=>{
+    //   this.props.store.appStore.setStatus(res)
+    // })
     http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
       if (Object.values(res.message).filter(item=> item.device_name === 'ioe_frpc').length > 0){
         this.setState({VPNflag: true})
