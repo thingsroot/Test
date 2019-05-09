@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react';
 import http from '../../utils/Server';
-import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input } from 'antd';
+import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input, Icon } from 'antd';
 import './style.scss';
 import { inject } from 'mobx-react';
 import { Link } from 'react-router-dom';
 import { _getCookie } from '../../utils/Session';
 const TabPane = Tabs.TabPane;
+let timer;
 function getDevicesList (){
     http.get('/api/gateways_list').then(res=>{
         const online = [];
@@ -176,6 +177,12 @@ class MyGates extends PureComponent {
         //     console.log(res)
         // })
         this.getDevicesList('online')
+        timer = setInterval(() => {
+            this.getDevicesList()
+        }, 10000);
+    }
+    componentWillUnmount () {
+        clearInterval(timer)
     }
     onChanges = (type) => {
         const value = event.target.value.trim()
@@ -210,7 +217,7 @@ class MyGates extends PureComponent {
             'device_name': name,
             'description': desc,
             'owner_type': 'User',
-            'owner_id': _getCookie('user_id')
+            'owner_id': unescape(_getCookie('user_id'))
           };
         this.setState({
             confirmLoading: true
@@ -218,6 +225,7 @@ class MyGates extends PureComponent {
               http.postToken('/api/gateways_create', data).then(res=>{
                   if (res.ok) {
                     message.success('绑定成功')
+                    this.getDevicesList()
                   } else {
                     message.error(res.error)
                   }
@@ -300,23 +308,48 @@ class MyGates extends PureComponent {
                         />
                     </div>
                 </Modal>
-                {
-                    <Tabs
-                        type="card"
+
+                <div style={{position: 'relative'}}>
+                    <Button
+                        style={{position: 'absolute', left: 200, top: 0, zIndex: 999}}
+                        onClick={()=>{
+                            this.getDevicesList()
+                        }}
                     >
-                                                    <TabPane tab="在线"
-                                                        key="1"
-                                                    >
-                                                        <Table columns={
-                                                                    this.state.columns
+                        <Icon type="sync"/>
+                    </Button>
+                    {
+                        <Tabs
+                            type="card"
+                        >
+                                                        <TabPane tab="在线"
+                                                            key="1"
+                                                        >
+                                                            <Table columns={
+                                                                        this.state.columns
+                                                                    }
+                                                                dataSource={
+                                                                    online && online.length > 0 ? online : []
                                                                 }
+                                                                bordered
+                                                                loading={this.state.loading}
+                                                                rowKey="sn"
+                                                                size="small"
+                                                                rowClassName={(record, index) => {
+                                                                    let className = 'light-row';
+                                                                    if (index % 2 === 1) {
+                                                                        className = 'dark-row';
+                                                                    }
+                                                                    return className;
+                                                                }}
+                                                            /></TabPane>
+                                                        <TabPane tab="离线"
+                                                            key="2"
+                                                        ><Table columns={this.state.columns}
                                                             dataSource={
-                                                                online && online.length > 0 ? online : []
+                                                                offline && offline.length > 0 ? offline : []
                                                             }
-                                                            bordered
-                                                            loading={this.state.loading}
                                                             rowKey="sn"
-                                                            size="small"
                                                             rowClassName={(record, index) => {
                                                                 let className = 'light-row';
                                                                 if (index % 2 === 1) {
@@ -324,45 +357,31 @@ class MyGates extends PureComponent {
                                                                 }
                                                                 return className;
                                                             }}
+                                                            bordered
+                                                            loading={this.state.loading}
+                                                            size="small "
                                                         /></TabPane>
-                                                    <TabPane tab="离线"
-                                                        key="2"
-                                                    ><Table columns={this.state.columns}
-                                                        dataSource={
-                                                            offline && offline.length > 0 ? offline : []
-                                                        }
-                                                        rowKey="sn"
-                                                        rowClassName={(record, index) => {
-                                                            let className = 'light-row';
-                                                            if (index % 2 === 1) {
-                                                                className = 'dark-row';
+                                                        <TabPane tab="全部"
+                                                            key="3"
+                                                        ><Table columns={this.state.columns}
+                                                            dataSource={
+                                                                data && data.length > 0 ? data : []
                                                             }
-                                                            return className;
-                                                        }}
-                                                        bordered
-                                                        loading={this.state.loading}
-                                                        size="small "
-                                                     /></TabPane>
-                                                    <TabPane tab="全部"
-                                                        key="3"
-                                                    ><Table columns={this.state.columns}
-                                                        dataSource={
-                                                            data && data.length > 0 ? data : []
-                                                        }
-                                                        rowClassName={(record, index) => {
-                                                            let className = 'light-row';
-                                                            if (index % 2 === 1) {
-                                                                className = 'dark-row';
-                                                            }
-                                                            return className;
-                                                        }}
-                                                        rowKey="sn"
-                                                        bordered
-                                                        loading={this.state.loading}
-                                                        size="small "
-                                                     /></TabPane>
-                                                </Tabs>
-                }
+                                                            rowClassName={(record, index) => {
+                                                                let className = 'light-row';
+                                                                if (index % 2 === 1) {
+                                                                    className = 'dark-row';
+                                                                }
+                                                                return className;
+                                                            }}
+                                                            rowKey="sn"
+                                                            bordered
+                                                            loading={this.state.loading}
+                                                            size="small "
+                                                        /></TabPane>
+                                                    </Tabs>
+                    }
+                </div>
             </div>
         );
     }

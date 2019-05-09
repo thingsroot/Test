@@ -90,7 +90,6 @@ class LinkStatus extends Component {
                   }
                 ]
             });
-            
         window.addEventListener('resize', function (){
             myFaultTypeChart.resize();
         })
@@ -595,7 +594,7 @@ class LinkStatus extends Component {
                                                 console.log(this.state.data)
                                                 const data = {
                                                     gateway: this.props.match.params.sn,
-                                                    app: 'FreeIOE',
+                                                    app: 'frpc',
                                                     inst: 'ioe_frpc',
                                                     version: this.state.iot_beta,
                                                     conf: {},

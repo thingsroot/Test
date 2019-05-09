@@ -109,7 +109,8 @@ function getMin (i, date){
           data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
         }
         console.log(name)
-        if (res.message && res.message.length > 0) {
+        if (res.message && res.message.length > 0 && this.state.record.vt !== 'string') {
+          console.log(record)
           myFaultTypeChart = echarts.init(myCharts);
           myFaultTypeChart.setOption({
               tooltip: {
@@ -131,6 +132,10 @@ function getMin (i, date){
                 }
               ]
           });
+        } else if (this.state.record.vt === 'string') {
+          console.log(myCharts)
+          myCharts.style.textAlin = 'center'
+          myCharts.innerHTML = '暂不支持此类数据，请点击更多历史数据查看更多数据。'
         } else {
           console.log(myCharts)
           myCharts.style.textAlin = 'center'

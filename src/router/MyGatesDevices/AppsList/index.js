@@ -148,16 +148,26 @@ class AppsList extends Component {
       }
       componentDidMount () {
         this.fetch(this.props.match.params.sn);
+        timer = setInterval(() => {
+          this.fetch(this.props.match.params.sn)
+        }, 10000);
       }
       UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
         const sn = nextProps.match.params.sn;
+        clearInterval(timer);
+        timer = setInterval(() => {
+          this.fetch(nextProps.match.params.sn)
+        }, 10000);
         this.setState({
           loading: true
         }, ()=>{
           this.fetch(sn);
         })
         }
+      }
+      componentWillUnmount (){
+        clearInterval(timer)
       }
       setAutoDisabled (record, props){
         const { sn } = this.props.match.params;
