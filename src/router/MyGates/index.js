@@ -345,40 +345,44 @@ class MyGates extends PureComponent {
                                                             /></TabPane>
                                                         <TabPane tab="离线"
                                                             key="2"
-                                                        ><Table columns={this.state.columns}
-                                                            dataSource={
-                                                                offline && offline.length > 0 ? offline : []
-                                                            }
-                                                            rowKey="sn"
-                                                            rowClassName={(record, index) => {
-                                                                let className = 'light-row';
-                                                                if (index % 2 === 1) {
-                                                                    className = 'dark-row';
+                                                        >
+                                                            <Table columns={this.state.columns}
+                                                                dataSource={
+                                                                    offline && offline.length > 0 ? offline : []
                                                                 }
-                                                                return className;
-                                                            }}
-                                                            bordered
-                                                            loading={this.state.loading}
-                                                            size="small "
-                                                        /></TabPane>
+                                                                rowKey="sn"
+                                                                rowClassName={(record, index) => {
+                                                                    let className = 'light-row';
+                                                                    if (index % 2 === 1) {
+                                                                        className = 'dark-row';
+                                                                    }
+                                                                    return className;
+                                                                }}
+                                                                bordered
+                                                                loading={this.state.loading}
+                                                                size="small "
+                                                            />
+                                                        </TabPane>
                                                         <TabPane tab="全部"
                                                             key="3"
-                                                        ><Table columns={this.state.columns}
-                                                            dataSource={
-                                                                data && data.length > 0 ? data : []
-                                                            }
-                                                            rowClassName={(record, index) => {
-                                                                let className = 'light-row';
-                                                                if (index % 2 === 1) {
-                                                                    className = 'dark-row';
+                                                        >
+                                                            <Table columns={this.state.columns}
+                                                                dataSource={
+                                                                    data && data.length > 0 ? data : []
                                                                 }
-                                                                return className;
-                                                            }}
-                                                            rowKey="sn"
-                                                            bordered
-                                                            loading={this.state.loading}
-                                                            size="small "
-                                                        /></TabPane>
+                                                                rowClassName={(record, index) => {
+                                                                    let className = 'light-row';
+                                                                    if (index % 2 === 1) {
+                                                                        className = 'dark-row';
+                                                                    }
+                                                                    return className;
+                                                                }}
+                                                                rowKey="sn"
+                                                                bordered
+                                                                loading={this.state.loading}
+                                                                size="small "
+                                                            />
+                                                        </TabPane>
                                                     </Tabs>
                     }
                 </div>
