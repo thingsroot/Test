@@ -3,6 +3,7 @@ import { Input, Button, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import './style.scss';
 import http from '../../utils/Server';
+import {_getCookie} from '../../utils/Session';
 
 const Search = Input.Search;
 
@@ -16,16 +17,36 @@ const none = {
 class MyApps extends PureComponent {
     state = {
         appList: [],
+        myList: [],
+        myLists: [],
+        collectList: [],  //收藏应用列表
+        collectLists: [],  //收藏应用列表
+        forkList: [],
+        forkLists: [],
         backups: [],
         loading: true
     };
 
     componentDidMount (){
+        let user = unescape(_getCookie('user_id'));
         http.get('/api/applications_list').then(res=>{
+            let formData = [];
+            let myData = [];
             if (res) {
+                res.data && res.data.length > 0 && res.data.map((item=>{
+                    if (item.fork_from !== null) {
+                        formData.push(item)
+                    } else if (item.owner === user) {
+                        myData.push(item)
+                    }
+                }));
                 this.setState({
                     loading: false,
                     appList: res.data,
+                    myList: myData,
+                    myLists: myData,
+                    forkList: formData,
+                    forkLists: formData,
                     backups: res.data
                 })
             }
@@ -38,34 +59,41 @@ class MyApps extends PureComponent {
         this.timer = setTimeout(() => {
             this.setState({
                 text: text
-            }, ()=>{
-                console.log(this.state.text)
             })
         }, 1000);
     };
     searchApp = ()=>{
         let text = event.target.value;
-        console.log(text);
         this.tick(text);
+        if (text) {
         let newData = [];
-        this.state.backups.map((v)=>{
+        let newData1 = [];
+        this.state.myLists.map((v)=>{
             if (v.app_name.toLowerCase().indexOf(text.toLowerCase()) !== -1) {
                 newData.push(v)
             }
         });
-        if (text !== '') {
-            this.setState({
-                appList: newData
-            });
+        this.state.forkLists.map((v)=>{
+            if (v.app_name.toLowerCase().indexOf(text.toLowerCase()) !== -1) {
+                newData1.push(v)
+            }
+        });
+        this.setState({
+            myList: newData,
+            forkList: newData1
+        });
+
         } else {
-            let backups = this.state.backups;
+            let myLists = this.state.myLists;
+            let forkLists = this.state.forkLists;
             this.setState({
-                appList: backups
+                myList: myLists,
+                forkList: forkLists
             });
         }
     };
     render () {
-        const appList = this.state.appList;
+        const { appList, myList, forkList } = this.state;
         return (
             <div className="myApps">
 
@@ -86,31 +114,101 @@ class MyApps extends PureComponent {
                 <div style={{lineHeight: '300px', textAlign: 'center'}}>
                     <Spin spinning={this.state.loading}/>
                 </div>
-                <ul style={appList && appList.length > 0 || this.state.loading === false ? block : none}>
-                    {
-                        appList && appList.length > 0 && appList.map((v, key)=>{
-                            return <li key={key}>
-                                <div className="appImg">
-                                    <Link to={`/myAppDetails/${v.name}`}>
-                                        <img
-                                            src={`http://cloud.thingsroot.com${v.icon_image}`}
-                                            alt=""
-                                        />
-                                    </Link>
-                                </div>
-                                <div className="appInfo">
-                                    <p className="appName">{v.app_name}</p>
-                                    <p className="info">
-                                        <span>生产日期：{v.modified.substr(0, 11)}</span>
-                                        <span>应用分类：{v.category}</span><br/>
-                                        <span>通讯协议：{v.protocol}</span>
-                                        <span>设备厂商：{v.device_supplier}</span>
-                                    </p>
-                                </div>
-                            </li>
-                        })
-                    }
-                </ul>
+                <div
+                    style={this.state.loading === false ? block : none}
+                >
+                    <p
+                        className="detailsTitle"
+                    >|<span>原创应用</span></p>
+                    <ul style={myList.length > 0 ? {} : {height: '40px'}}>
+                        {
+                            myList && myList.length > 0 && myList.map((v, key)=>{
+                                return <li key={key}>
+                                    <div className="appImg">
+                                        <Link to={`/myAppDetails/${v.name}`}>
+                                            <img
+                                                src={`http://cloud.thingsroot.com${v.icon_image}`}
+                                                alt=""
+                                            />
+                                        </Link>
+                                    </div>
+                                    <div className="appInfo">
+                                        <p className="appName">{v.app_name}</p>
+                                        <p className="info">
+                                            <span>生产日期：{v.modified.substr(0, 11)}</span>
+                                            <span>应用分类：{v.category === null ? '----' : v.category}</span><br/>
+                                            <span>通讯协议：{v.protocol === null ? '----' : v.protocol}</span>
+                                            <span>设备厂商：{v.device_supplier === null ? '----' : v.device_supplier}</span>
+                                        </p>
+                                    </div>
+                                </li>
+                            })
+                        }
+                    </ul>
+                </div>
+
+                <div
+                    style={this.state.loading === false ? block : none}
+                >
+                    <p
+                        className="detailsTitle"
+                    >|<span>克隆应用</span></p>
+                    <ul>
+                        {
+                            forkList && forkList.length > 0 && forkList.map((v, key)=>{
+                                return <li key={key}>
+                                    <div className="appImg">
+                                        <Link to={`/myAppDetails/${v.name}`}>
+                                            <img
+                                                src={`http://cloud.thingsroot.com${v.icon_image}`}
+                                                alt=""
+                                            />
+                                        </Link>
+                                    </div>
+                                    <div className="appInfo">
+                                        <p className="appName">{v.app_name}</p>
+                                        <p className="info">
+                                            <span>生产日期：{v.modified.substr(0, 11)}</span>
+                                            <span>应用分类：{v.category === null ? '----' : v.category}</span><br/>
+                                            <span>通讯协议：{v.protocol === null ? '----' : v.protocol}</span>
+                                            <span>设备厂商：{v.device_supplier === null ? '----' : v.device_supplier}</span>
+                                        </p>
+                                    </div>
+                                </li>
+                            })
+                        }
+                    </ul>
+                </div>
+
+                {/*<div style={this.state.loading === false ? block : none}>*/}
+                {/*    <p className="detailsTitle">|<span>我的收藏</span></p>*/}
+                {/*    <ul>*/}
+                {/*        {*/}
+                {/*            appList && appList.length > 0 && appList.map((v, key)=>{*/}
+                {/*                return <li key={key}>*/}
+                {/*                    <div className="appImg">*/}
+                {/*                        <Link to={`/myAppDetails/${v.name}`}>*/}
+                {/*                            <img*/}
+                {/*                                src={`http://cloud.thingsroot.com${v.icon_image}`}*/}
+                {/*                                alt=""*/}
+                {/*                            />*/}
+                {/*                        </Link>*/}
+                {/*                    </div>*/}
+                {/*                    <div className="appInfo">*/}
+                {/*                        <p className="appName">{v.app_name}</p>*/}
+                {/*                        <p className="info">
+                                            <span>生产日期：{v.modified.substr(0, 11)}</span>
+                                            <span>应用分类：{v.category === null ? '----' : v.category}</span><br/>
+                                            <span>通讯协议：{v.protocol === null ? '----' : v.protocol}</span>
+                                            <span>设备厂商：{v.device_supplier === null ? '----' : v.device_supplier}</span>
+                                        </p>
+                {/*                    </div>*/}
+                {/*                </li>*/}
+                {/*            })*/}
+                {/*        }*/}
+                {/*    </ul>*/}
+                {/*</div>*/}
+
                 <div
                     style={this.state.loading ? none : block}
                 >
