@@ -25,7 +25,18 @@ const todayColumns = [{
     title: '名称',
     dataIndex: 'name',
     className: 'nameWidth',
-    key: 'name'
+    key: 'name',
+    render: (text, record)=>{
+        return <span
+            style={{cursor: 'pointer'}}
+            onClick={()=>{
+                console.log(record);
+                window.location.href = `/DeviceMessage/${record.sn}`
+            }}
+        >
+            {text}
+        </span>
+    }
 }, {
     title: '位置',
     dataIndex: 'position',
@@ -50,7 +61,18 @@ const weekColumns = [{
     title: '名称',
     dataIndex: 'name',
     className: 'nameWidth',
-    key: 'name'
+    key: 'name',
+    render: (text, record)=>{
+        return <span
+            style={{cursor: 'pointer'}}
+            onClick={()=>{
+                console.log(record);
+                window.location.href = `/DeviceMessage/${record.sn}`
+            }}
+        >
+            {text}
+        </span>
+    }
 }, {
     title: '位置',
     dataIndex: 'position',
@@ -122,6 +144,9 @@ class Home extends PureComponent {
                         ]
                     }]
                 });
+                window.addEventListener('resize', ()=>{
+                    myGatesChart.resize();
+                });
             }
         });
         // 在线数据
@@ -169,6 +194,9 @@ class Home extends PureComponent {
                                 color: '#eac736'
                             }
                         }]
+                });
+                window.addEventListener('resize', ()=>{
+                    myOnlineChart.resize();
                 });
             }
         });
@@ -224,6 +252,9 @@ class Home extends PureComponent {
                         color: '#FF9F7F',
                         data: data4
                     }]
+                });
+                window.addEventListener('resize', ()=>{
+                    myFaultTypeChart.resize();
                 });
             }
         });
@@ -303,7 +334,7 @@ class Home extends PureComponent {
                         <p>在线统计</p>
                         <div id="onlineMain"
                             style={{width: '97%',
-                            height: 300}}
+                            height: 320}}
                         >  </div>
                         <div className="tips"
                             style={this.state.timeData && this.state.timeData.length > 0 ? hide : show}
@@ -355,7 +386,7 @@ class Home extends PureComponent {
                     >
                         <p>网关型号统计</p>
                         <div id="gatesMain"
-                            style={{width: '97%', height: 300}}
+                            style={{width: '97%', height: 350}}
                         >  </div>
                         <div className="tips"
                             style={this.state.pieData !== undefined ? hide : show}
@@ -368,7 +399,7 @@ class Home extends PureComponent {
                     >
                         <p>故障类型统计</p>
                         <div id="faultTypeMain"
-                            style={{width: '97%', height: 300}}
+                            style={{width: '97%', height: 350}}
                         >  </div>
                         <div className="tips"
                             style={this.state.barData && this.state.barData.length > 0 ? hide : show}

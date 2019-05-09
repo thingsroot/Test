@@ -77,7 +77,7 @@ class ContentMain extends PureComponent {
                     component={PlatformMessage}
                 />
                 <PrivateRoute
-                    path="/DeviceMessage"
+                    path="/DeviceMessage/:sn"
                     component={DeviceMessage}
                 />
 
