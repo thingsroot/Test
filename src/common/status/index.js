@@ -13,6 +13,13 @@ class Status extends Component {
             this.props.store.appStore.setStatus(res)
           })
     }
+    UNSAFE_componentWillReceiveProps (nextProps) {
+        if (nextProps.location.pathname !== this.props.location.pathname) {
+            http.get('/api/gateways_read?name=' + nextProps.match.params.sn).then(res=>{
+                this.props.store.appStore.setStatus(res)
+              })
+        }
+    }
     render () {
         const { status } = this.props.store.appStore;
         return (

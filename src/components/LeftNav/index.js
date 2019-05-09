@@ -22,8 +22,8 @@ class LeftNav extends Component {
                 href: '/AppsList'
             }, {
                 icon: 'database',
-                text: '网关状态',
-                href: '/LinkStatus'
+                text: '网关设置',
+                href: '/setgateway'
             }
         ],
         index: 0

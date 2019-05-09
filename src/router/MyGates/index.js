@@ -48,25 +48,6 @@ function getDevicesList (){
         })
     })
 }
-function callback (key){
-    key;
-    // switch (key) {
-    //     case '1':
-    //             this.setState({loading: true})
-    //             this.getDevicesList('online')
-    //         break;
-    //     case '2':
-    //             this.setState({loading: true})
-    //             this.getDevicesList('offline')
-    //         break;
-    //     case '3':
-    //             this.setState({loading: true})
-    //             this.getDevicesList('all')
-    //         break;
-    //     default:
-    //         break;
-    // }
-}
   function confirm (record) {
       http.postToken('/api/gateways_remove', {
         name: record.name
@@ -91,7 +72,6 @@ function callback (key){
 class MyGates extends PureComponent {
     constructor (props){
         super(props)
-        this.callback = callback.bind(this);
         this.getDevicesList = getDevicesList.bind(this);
         this.confirm = confirm.bind(this);
         this.state = {
@@ -198,20 +178,21 @@ class MyGates extends PureComponent {
         this.getDevicesList('online')
     }
     onChanges = (type) => {
+        const value = event.target.value.trim()
         switch (type){
             case 'sn':
                 this.setState({
-                    sn: event.target.value
+                    sn: value
                 })
                 break;
             case 'name':
                 this.setState({
-                    name: event.target.value
+                    name: value
                 })
                 break;
             case 'desc':
                 this.setState({
-                    desc: event.target.value
+                    desc: value
                 })
                 break;
             default: '';
@@ -320,7 +301,7 @@ class MyGates extends PureComponent {
                     </div>
                 </Modal>
                 {
-                    <Tabs onChange={this.callback}
+                    <Tabs
                         type="card"
                     >
                                                     <TabPane tab="在线"

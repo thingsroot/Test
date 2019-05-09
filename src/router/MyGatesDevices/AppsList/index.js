@@ -1,62 +1,41 @@
 import React, { Component } from 'react';
 import { Table, Switch, Button, Popconfirm, message, Icon } from 'antd';
 import http from '../../../utils/Server';
-// import { deviceAppOption } from '../../../utils/Session';
 import { inject, observer } from 'mobx-react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { exec_result } from '../../../utils/Session';
-function confirm (record, name, type, sn) {
-  console.log(record, name, type, sn)
-  // name 是应用市场ID
-  // record.device_name 是网关应用名称
-  const update = {
-    gateway: sn,
-    app: name,
-    inst: record.device_name,
-    version: record.latestVersion,
-    conf: {},
-    id: `upgrade/${sn}/${name}/${record.name}/${new Date() * 1}`
-  };
-  if (type === 'update'){
-    http.post('/api/gateways_applications_upgrade', update).then(res=>{
-      console.log(res);
-      exec_result(res.data)
-    })
-    return false;
-  }
+let timer;
+const confirm = (record, sn, _this)=>{
+  console.log(_this)
   const data = {
-    gateway: name,
+    gateway: sn,
     inst: record.device_name,
-    id: `app_upgrade/${name}/ ${record.device_name}/${new Date() * 1}`
+    id: `app_remove/${sn}/${record.device_name}/${new Date() * 1}`
   }
   http.postToken('/api/gateways_applications_remove', data).then(res=>{
     console.log(res)
-    exec_result(res.data)
+    if (res.data){
+      timer = setInterval(() => {
+        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+          if (result.data) {
+            if (result.data.result) {
+              message.success('应用卸载成功')
+              clearInterval(timer)
+              http.post('/api/gateways_applications_refresh', {
+                gateway: sn,
+                id: `gateways/refresh/${sn}/${new Date() * 1}`
+              })
+              console.log(this)
+              _this.fetch(_this.props.match.params.sn)
+            } else if (result.data.result === false) {
+              message.error('应用卸载失败，请重试')
+              clearInterval(timer)
+            }
+          }
+        })
+      }, 1000);
+    }
   })
-  // const hide = message.loading('Action in progress..', 0);
-  // setTimeout(hide, 2500);
-  // const data = {
-  //   data: {
-  //     inst: record.info.inst,
-  //     name: record.info.name
-  //   },
-  //   device: sn,
-  //   id: `app_upgrade/${sn}/ ${record.info.inst}/${new Date() * 1}`
-  // };
-  // http.postToken('/api/method/iot.device_api.app_upgrade', data).then(res=>{
-  //   if (res.message){
-  //     setTimeout(() => {
-  //       http.get(`/api/method/iot.device_api.get_action_result?id=${res.message}`).then(data=>{
-  //         console.log(data)
-  //         if (data && data.message.result){
-  //           message.success('应用更新成功！')
-  //         } else {
-  //           message.error('应用更新失败，请重试！')
-  //         }
-  //       })
-  //     }, 2000);
-  //   }
-  // })
 }
 
 function cancel () {
@@ -64,9 +43,10 @@ function cancel () {
 }
 @withRouter
 @inject('store') @observer
-
 class AppsList extends Component {
-      state = {
+      constructor (props){
+        super(props)
+        this.state = {
           data: [],
           pagination: {},
           loading: true,
@@ -96,20 +76,12 @@ class AppsList extends Component {
             render: (props, record)=>{
               if (record.latestVersion > props) {
                 return (
-                  <Popconfirm
-                      title={'Are you sure you want to update this task to ' + record.latestVersion + '?'}
-                      onConfirm={()=>{
-                        confirm(record, record.name, 'update', this.props.match.params.sn)
-                      }}
-                      onCancel={cancel}
-                      okText="Yes"
-                      cancelText="No"
+                  <Link
+                      to={`/MyGatesAppsUpgrade/${this.props.match.params.sn}/${record.device_name}/${props}/${record.name}`}
+                      style={{color: 'blue'}}
                   >
-                    <a
-                        href="#"
-                        style={{color: 'blue'}}
-                    >{props}  <Icon type="arrow-up"/></a>
-                  </Popconfirm>
+                    {props} <Icon type="arrow-up"/>
+                  </Link>
                 )
               } else {
                 return <span>{props}</span>
@@ -159,7 +131,7 @@ class AppsList extends Component {
                   <Popconfirm
                       title="Are you sure update this app?"
                       onConfirm={()=>{
-                        confirm(record, this.props.match.params.sn)
+                        this.confirm(record, this.props.match.params.sn, this)
                       }}
                       onCancel={cancel}
                       okText="Yes"
@@ -172,17 +144,9 @@ class AppsList extends Component {
             }
           }]
       }
+        this.confirm = confirm.bind(this)
+      }
       componentDidMount () {
-        // http.get('/api/gateways_app_dev_len?name=da7f421dbd').then(res=>{
-        //   console.log(res)
-        // })
-        http.post('/api/gateways_applications_start', {
-          gateway: this.props.match.params.sn,
-          inst: 'ioe_frpc',
-          id: `start${this.props.match.params.sn}/ioe_frpc/${new Date() * 1}`
-        }).then(res=>{
-          exec_result(res.data)
-        })
         this.fetch(this.props.match.params.sn);
       }
       UNSAFE_componentWillReceiveProps (nextProps){
@@ -197,8 +161,7 @@ class AppsList extends Component {
       }
       setAutoDisabled (record, props){
         const { sn } = this.props.match.params;
-        let type = props ? 0 : 1
-        // let value = record.info.auto ? 0 : 1
+        let type = props ? 0 : 1;
         const data = {
           gateway: sn,
           inst: record.device_name,
@@ -212,13 +175,6 @@ class AppsList extends Component {
             exec_result(res.data)
           }
         })
-        // const message = deviceAppOption(record.info.inst, 'auto', value, this.props.store.appStore.status.sn, type, record.sn);
-        // if (message !== null){
-        //   this.fetch(sn)
-        // }
-        // http.post('/api/gateways_applications_' + type, data).then(res=>{
-        //   console.log(res)
-        // })
       }
       handleTableChange = (pagination, filters, sorter) => {
         const pager = { ...this.state.pagination };
@@ -235,51 +191,15 @@ class AppsList extends Component {
         });
       }
       fetch = (sn) => {
-        http.postToken('/api/gateways_applications_refresh', {
-          gateway: sn,
-          id: `/gateways/refresh/${sn}/${new Date() * 1}`
-        }).then(res=>{
-          exec_result(res.data)
-        })
         const pagination = { ...this.state.pagination };
         http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
-          // const keys = Object.keys(res)
-          // const values = Object.values(res)
-          // values.map((item, key)=>{
-          //   if (item.running){
-          //       item.status = 'running';
-          //       item.running = new Date(parseInt(item.running) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ')
-          //   }
-          //   item.device_name = keys[key]
-          // })
           this.props.store.appStore.setApplen(res.message.length)
           this.setState({
             data: res.message,
             loading: false,
             pagination
           })
-          //this.props.store.appStore.setStatus(res.message)
         })
-        // http.get('/api/method/iot_ui.iot_api.gate_applist?sn=' + sn).then((res) => {
-        //     let data = res.message;
-        //     data && data.length > 0 && data.map((item)=>{
-        //       if (item.cloud){
-        //         item.cloud.icon_image = 'http://cloud.thingsroot.com' + item.cloud.icon_image;
-        //       }
-        //       if (item.info.running){
-        //           item.info.running = new Date(parseInt(item.info.running) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ')
-        //       }
-        //       if (item.info.auto === '1'){
-        //           item.info.auto = true
-        //       } else {
-        //           item.info.auto = false
-        //       }
-        //       item.sn = item.info.sn;
-        //   })
-          // Read total count from server
-          // pagination.total = data.totalCount;
-          // pagination.total = 200;
-        //});
       }
     render () {
       const { loading } = this.state;

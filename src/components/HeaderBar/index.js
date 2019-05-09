@@ -43,7 +43,10 @@ class Headers extends PureComponent {
                 >
                   <Icon type="user"/>
                   {
-                    _getCookie('full_name').split(' ')[0]
+                    console.log((_getCookie('full_name')))
+                  }
+                  {
+                    decodeURI(_getCookie('full_name').split(' ')[0])
                   }
                 </a>
               </Dropdown>

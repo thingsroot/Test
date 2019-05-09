@@ -9,6 +9,12 @@
         border-bottom: 1px solid #eee;
         vertical-align: middle;
         position: relative;
+        >button{
+            position: absolute;
+            right:50%;
+            top:50%;
+            transform: translate3d(0,-50%,0)
+        }
     }
 }
 .hide{

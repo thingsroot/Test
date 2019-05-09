@@ -4,14 +4,17 @@ import { isAuthenticated } from '../../utils/Session';
 
 const PrivateRoute = ({component: Component, ...rest}) => (
   <Route {...rest}
-      render={(props) => (
-        !!isAuthenticated()
-        ? <Component {...props} />
-        : <Redirect to={{
-          pathname: '/login',
-          state: {from: props.location}
-        }}/>
-    )}
+      render={(props) => {
+        document.title = rest.title ? '冬笋云 · ' + rest.title : '冬笋云';
+        return (
+          !!isAuthenticated()
+          ? <Component {...props} />
+          : <Redirect to={{
+            pathname: '/login',
+            state: {from: props.location}
+          }}/>
+      )
+      }}
   />
 )
 

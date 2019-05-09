@@ -10,7 +10,7 @@ import { inject, observer } from 'mobx-react';
 import { Drawer, Button, Icon } from 'antd';
 const GatesList = LoadableComponent(()=>import('./GatesList'));
 const AppsList = LoadableComponent(()=>import('./AppsList'));
-const LinkStatus = LoadableComponent(()=>import('./LinkStatus'));
+const Setgateway = LoadableComponent(()=>import('./Setgateway'));
 const VPN  = LoadableComponent(()=>import('./VPN'));
 const Vserial = LoadableComponent(()=>import('./Vserial'));
 @withRouter
@@ -37,14 +37,14 @@ class MyGatesDevices extends Component {
     } else {
       this.setState({flag: true})
     }
-    if (this.props.match.params !== nextProps.match.params){
+    if (this.props.match.params.sn !== nextProps.match.params.sn){
       this.sendAjax(nextProps.match.params.sn)
     }
   }
   sendAjax = (sn) => {
-    http.get('/api/gateways_read?name=' + sn).then(res=>{
-      this.props.store.appStore.setStatus(res)
-    })
+    // http.get('/api/gateways_read?name=' + sn).then(res=>{
+    //   this.props.store.appStore.setStatus(res)
+    // })
     http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
       if (Object.values(res.message).filter(item=> item.device_name === 'ioe_frpc').length > 0){
         this.setState({VPNflag: true})
@@ -140,8 +140,8 @@ class MyGatesDevices extends Component {
                       <PrivateRoute path={`${path}/AppsList`}
                           component={AppsList}
                       />
-                      <PrivateRoute path={`${path}/LinkStatus`}
-                          component={LinkStatus}
+                      <PrivateRoute path={`${path}/setgateway`}
+                          component={Setgateway}
                       />
                       <PrivateRoute path={`${path}/VPN`}
                           component={VPN}
