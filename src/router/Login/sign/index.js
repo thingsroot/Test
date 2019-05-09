@@ -73,9 +73,7 @@ class Sign extends PureComponent {
                     </Form.Item>
                     <Form.Item>
                         {getFieldDecorator('password', {
-                            rules: [{ required: true, message: '请输入密码!' }, {
-                                pattern: /^[\w]{6,12}$/, message: '密码格式6-12数字、字母组合'
-                            }]
+                            rules: [{ required: true, message: '请输入密码!' }]
                         })(
                             <Input prefix={
                                 <Icon type="lock"
