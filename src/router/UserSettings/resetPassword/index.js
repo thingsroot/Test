@@ -11,26 +11,31 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
             num: '',
             newPassword: ''
         };
-        VerifyPassword = (email)=>{
-            http.post('/api/user_reset_password?email=' + email)
-                .then(res=>{
-                    console.log(res)
-                })
-        };
 
         render () {
             const {
                 visible, onCancel, onCreate, form
             } = this.props;
             const { getFieldDecorator } = form;
+            //旧密码验证
+            const verifyPassword = (rule, value, callback) => {
+                http.post('/home/api/method/iot_ui.iot_api.verify_password', {password: value})
+                    .then(res=> {
+                        res;
+                        callback()
+                    })
+                    .catch(err=>{
+                        err;
+                        callback('旧密码不正确！')
+                    })
+                // callback(value)
+            };
             //  密码验证
             const passwordValidator = (rule, value, callback) => {
                 const { getFieldValue } = this.props.form;
                 if (value && value !== getFieldValue('password')) {
                     callback('两次输入不一致！')
                 }
-
-                // 必须总是返回一个 callback，否则 validateFields 无法响应
                 callback();
             };
 
@@ -46,7 +51,9 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
                     <Form layout="vertical">
                         <Form.Item label="旧密码">
                             {getFieldDecorator('oldPassword', {
-                                rules: [{ required: true, message: '不能为空' }]
+                                rules: [{ required: true, message: '不能为空' }, {
+                                    validator: verifyPassword
+                            }]
                             })(
                                 <Input type="password"/>
                             )}
@@ -54,7 +61,8 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
                         <Form.Item label="新密码">
                             {getFieldDecorator('password', {
                                 rules: [{ required: true, message: '请输入密码!' }, {
-                                    pattern: /^[\w]{6,12}$/, message: '密码格式6-12数字和字母组合'
+                                    pattern: /^(?![a-zA-z]+$)(?!\d+$)(?![!@_#$%^&*]+$)[a-zA-Z\d!_@#$%^&*]{6,12}$/,
+                                    message: '长度最低6位，密码须包含字母，数字或特殊字符'
                                 }]
                             })(
                                 <Input

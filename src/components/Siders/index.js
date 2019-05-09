@@ -109,7 +109,7 @@ class Siders extends PureComponent {
                         </Link>
                     </Menu.Item>
                     <Menu.Item key="5">
-                        <Link to="/DeviceMessage">
+                        <Link to="/DeviceMessage/1">
                             <Icon type="message" />
                             <span>设备消息</span>
                         </Link>

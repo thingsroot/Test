@@ -9,33 +9,6 @@ import http from '../../utils/Server';
 const Option = Select.Option;
 const { TextArea } = Input;
 const confirm = Modal.confirm;
-function format (list) {
-    let data = [];
-    for (let i = 0; i < list.length; i++){
-        if (list[i].children){
-            console.log(list[i]);
-            if (list[i].childrenData){
-                data.push({
-                    title: list[i].text,
-                    key: list[i].id,
-                    type: list[i].type,
-                    isLeaf: false,
-                    children: format(list[i].childrenData)
-                })
-            }
-        } else {
-            console.log(list[i])
-            data.push({
-                title: list[i].text,
-                key: list[i].id,
-                type: list[i].type,
-                isLeaf: true
-            })
-        }
-    }
-    console.log(data)
-    return data;
-}
 
 @withRouter
 @inject('store')
@@ -139,7 +112,8 @@ class AppEditorCode extends Component {
                     comment: 'v' + newVersion
                 })
 
-            })
+            });
+        console.log(app);
     }
     //提示弹框
     info = (title, content)=>{
@@ -188,7 +162,7 @@ class AppEditorCode extends Component {
             visible: false
         });
         let url = '/home/api/method/app_center.editor.editor_revert';
-        http.postToken(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
+        http.postToken(url + '?app=' + this.props.match.params.app + '&operation=set_content&version=' + this.state.version)
             .then(res=>{
                 this.props.store.codeStore.change();
                 message.success(res.message);
@@ -252,34 +226,39 @@ class AppEditorCode extends Component {
         }, 1000)
     };
 
-    getTreeData = ()=>{
-        http.get('/home/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_node&id=' + '#')
-            .then(res=>{
-                let resData = res;
-                resData.map((v)=>{
-                    if (v.children) {
-                        http.get('/home/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_node&id=' + v.id)
-                            .then(res=>{
-                                v['childrenData'] = res;
-                                let data = format(resData);
-                                console.log(data);
-                                this.props.store.codeStore.setTreeData(data)
-                            });
-                    }
-                });
-            });
-    };
-
     //添加文件
     addFile = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
+        console.log(myFolder);
         if (this.props.store.codeStore.addFileName !== '') {
             let url = '/home/api/method/app_center.editor.editor';
             http.get(url + '?app=' + this.state.app + '&operation=create_node&type=file&id=' +
                 myFolder + '&text=' + this.props.store.codeStore.addFileName)
                 .then(res=>{
                     console.log(res);
-                    this.getTreeData();
+                    let treeData = this.props.store.codeStore.treeData;
+                    treeData.map(item=>{
+                        if (item.id === myFolder) {
+                            console.log('添加数据')
+                        } else {
+                            if (item.children) {
+                                item.children.map(i=>{
+                                    if (i.id === myFolder) {
+                                        console.log('添加数据')
+                                    } else {
+                                        if (i.children) {
+                                            i.children.map(v=>{
+                                                if (v.id === myFolder) {
+                                                    console.log('添加数据3')
+                                                }
+                                            })
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    })
+
                 });
             message.success('创建文件成功！');
             this.addFileHide();
@@ -332,7 +311,7 @@ class AppEditorCode extends Component {
                 myFolder + '&text=' + this.props.store.codeStore.addFolderName)
                 .then(res=>{
                     console.log(res);
-                    this.getTreeData();
+                    // this.getTreeData();
                 });
             message.success('创建文件夹成功');
             this.addFolderHide();
@@ -351,7 +330,7 @@ class AppEditorCode extends Component {
                         } else {
                             reject(false);
                         }
-                        this.getTreeData();
+                        // this.getTreeData();
                     });
             }).catch(() =>{
             });
@@ -411,7 +390,7 @@ class AppEditorCode extends Component {
                 myFolder + '&text=' + this.state.editorFileName)
                 .then(res=>{
                     console.log(res);
-                    this.getTreeData();
+                    // this.getTreeData();
                 });
             message.success('编辑文件成功');
             this.addFolderHide();

@@ -1,4 +1,15 @@
 .myAppDetails{
+  .button{
+    color: rgba(0,0,0,0.65);
+    padding: 6px 15px;
+    margin: 0 10px;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+  }
+  .button:hover{
+    border-color: #00c0ef;
+    color: #00c0ef;
+  }
   .header{
     width: 100%;
     line-height: 50px;

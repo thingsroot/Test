@@ -13,7 +13,7 @@ function format (list) {
             data.push({
                 title: item.text,
                 key: item.id,
-                // type: item.type,
+                type: item.type,
                 isLeaf: false
                 // children: item.childrenData
             })
@@ -21,7 +21,7 @@ function format (list) {
             data.push({
                 title: item.text,
                 key: item.id,
-                // type: item.type,
+                type: item.type,
                 isLeaf: true
             })
         }
@@ -80,7 +80,7 @@ class MyTree extends Component {
                 treeData: [...this.state.treeData]
             });
             resolve();
-        }, 1000);
+        }, 500);
     });
     renderTreeNodes = data => data.map((item) => {
         if (item.children) {

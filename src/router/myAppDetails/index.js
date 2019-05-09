@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Icon, Tabs } from 'antd';
+import { Icon, Tabs } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import VersionList from './versionList';
@@ -33,7 +33,7 @@ class MyAppDetails extends Component {
         onLine: []
     };
     componentDidMount (){
-        let user = _getCookie('user_id');
+        let user = unescape(_getCookie('user_id'));
         let app = this.props.match.params.name;
         this.setState({
             user: user,
@@ -78,6 +78,7 @@ class MyAppDetails extends Component {
     render () {
         const { url } = this.props.match;
         let { app, message, time, user, templateList } = this.state;
+        console.log(user)
         return (
             <div className="myAppDetails">
                 <div className="header">
@@ -101,55 +102,51 @@ class MyAppDetails extends Component {
                         <p className="info">
                             <span>    发布者：{message.owner}</span>
                             <span>创建时间：{time}</span><br/>
-                            <span>应用分类：{message.category}</span>
-                            <span>通讯协议：{message.protocol}</span><br/>
-                            <span>适配型号：{message.device_serial}</span>
-                            <span>设备厂商：{message.device_supplier}</span>
+                            <span>应用分类：{message.category === null ? '----' : message.category}</span>
+                            <span>通讯协议：{message.protocol === null ? '----' : message.protocol}</span><br/>
+                            <span>适配型号：{message.device_serial === null ? '----' : message.device_serial}</span>
+                            <span>设备厂商：{message.device_supplier === null ? '----' : message.device_supplier}</span>
                         </p>
                     </div>
                     <div className="btnGroup">
-                        <Button style={message.owner === user ? block : none}>
-                            <Link to={`/appSettings/2/${message.name}`}>
-                                <Icon type="setting" />
-                                设置
-                            </Link>
-                        </Button>
-                        <Button style={message.owner === user ? block : none}>
-                            <Link to={`/AppEditorCode/${message.name}/${message.app_name}`}>
-                                <Icon type="edit" />
-                                代码编辑
-                            </Link>
 
-                        </Button>
-                        <Button
-                            style={{margin: '0 10px'}}
-                            onClick={()=>{
-                                console.log(`/AppsInstall/${this.state.onLine}/${message.name}/2`)
-                            }}
+                        <Link
+                            className="button"
+                            style={message.owner === user ? block : none}
+                            to={`/appSettings/2/${message.name}`}>
+                            <Icon type="setting" />
+                            设置
+                        </Link>
+                        <Link
+                            className="button"
+                            style={message.owner === user ? block : none}
+                            to={`/AppEditorCode/${message.name}/${message.app_name}`}>
+                            <Icon type="edit" />
+                            代码编辑
+                        </Link>
+                        <Link
+                            className="button"
+                            to={`/AppsInstall/${this.state.onLine}/${message.name}/2`}
                         >
-                            <Link
-                                to={`/AppsInstall/${this.state.onLine}/${message.name}/2`}
-                            >
-                                <Icon type="download" />
-                                下载
-                            </Link>
-                        </Button>
-                        <Button style={message.fork_from ? block : none}>
-                            <Link
-                                to={`/myAppDetails/${message.fork_from}`}
-                                onClick={
-                                    ()=>{
-                                        this.getDetails(message.fork_from);
-                                        this.setState({
-                                            app: this.props.match.params.name
-                                        });
-                                    }
+                            <Icon type="download" />
+                            下载
+                        </Link>
+                        <Link
+                            className="button"
+                            style={message.fork_from ? block : none}
+                            to={`/myAppDetails/${message.fork_from}`}
+                            onClick={
+                                ()=>{
+                                    this.getDetails(message.fork_from);
+                                    this.setState({
+                                        app: this.props.match.params.name
+                                    });
                                 }
-                            >
-                                <Icon type="share-alt" />
-                                分支
-                            </Link>
-                        </Button>
+                            }
+                        >
+                            <Icon type="share-alt" />
+                            分支
+                        </Link>
                     </div>
                 </div>
                 <Tabs

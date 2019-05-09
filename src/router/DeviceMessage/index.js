@@ -59,14 +59,14 @@ class DevicemMessage extends Component {
                 <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
             )
         }, {
-            title: '消息类型',
+            title: '事件类型',
             dataIndex: 'operation',
             width: '10%',
             render: (text, record) => (
                 <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
             )
         }, {
-            title: '消息类型',
+            title: '事件等级',
             dataIndex: 'event_level',
             width: '10%',
             render: (text, record) => (
@@ -187,12 +187,24 @@ class DevicemMessage extends Component {
             let source = [];
             if (res.data.ok === true) {
                 sourceData.map((v)=>{
+                    // console.log(v.event_type)
                     let type = '';
+                    let level = '';
                     if (v.event_type === 'EVENT') {
                         type = '设备'
                     } else {
                         type = v.event_type
                     }
+                    if (v.event_level === 1) {
+                        level = '常规'
+                    } else if (v.event_level === 2) {
+                        level = '错误'
+                    } else if (v.event_level === 3) {
+                        level = '警告'
+                    } else if (v.event_level === 99) {
+                        level = '致命'
+                    }
+
                     data.push({
                         title: v.event_info,
                         device: v.event_source,
@@ -201,8 +213,8 @@ class DevicemMessage extends Component {
                         disposed: v.disposed,
                         name: v.name,
                         data: v.event_data,
-                        event_level: v.event_level,
-                        event_type: v.event_type
+                        event_level: level,
+                        event_type: type
                     });
                     source.push(v.event_type);
                 });
@@ -255,7 +267,7 @@ class DevicemMessage extends Component {
                     newData.push(v)
                 }
             });
-            this.props.store.codeStore.setDeviceData(deviceTableData)
+            this.props.store.codeStore.setDeviceData(newData)
         } else {
             let data = this.props.store.codeStore.deviceTableData;
             this.props.store.codeStore.setDeviceData(data)
