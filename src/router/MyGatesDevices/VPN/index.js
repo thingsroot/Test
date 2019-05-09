@@ -84,8 +84,8 @@ class VPN extends Component {
             }
         })
     }
-    setIp = ()=>{
-        this.setState({virtualIp: event.target.value})
+    setIp = (e)=>{
+        this.setState({virtualIp: e.target.value})
     }
     getStatus = ()=>{
         fetch('/apis/act_result', {

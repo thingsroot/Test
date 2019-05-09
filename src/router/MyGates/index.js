@@ -178,20 +178,21 @@ class MyGates extends PureComponent {
         this.getDevicesList('online')
     }
     onChanges = (type) => {
+        const value = event.target.value.trim()
         switch (type){
             case 'sn':
                 this.setState({
-                    sn: event.target.value
+                    sn: value
                 })
                 break;
             case 'name':
                 this.setState({
-                    name: event.target.value
+                    name: value
                 })
                 break;
             case 'desc':
                 this.setState({
-                    desc: event.target.value
+                    desc: value
                 })
                 break;
             default: '';

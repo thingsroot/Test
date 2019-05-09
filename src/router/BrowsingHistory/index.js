@@ -51,7 +51,9 @@ class BrowsingHistory extends Component {
         defaultvalue: '--',
         way: 'raw',
         domain: '5m',
-        scope: '1h'
+        scope: '1h',
+        vt: '',
+        record: {}
       };
       componentDidMount () {
         this.fetch();
@@ -101,46 +103,50 @@ class BrowsingHistory extends Component {
           });
         });
       }
-
-      onClickRow = (record) => {
+      getData = (record)=>{
         const { way, scope, domain} = this.state;
+        this.setState({
+          rowId: record.id,
+          vt: record.vt,
+          defaultvalue: this.state.data[record.id].name,
+          detailloading: true,
+          record: record
+        }, ()=>{
+          if (record.vt === 'int'){
+            record.vt = 'int';
+          } else if (record.vt === 'string'){
+            record.vt = 'string';
+          } else {
+            record.vt = 'float';
+          }
+            axios(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=${record.name}&vt=${record.vt || 'float'}&time_condition=time > now() - ${scope}&value_method=${way}&group_time_span=${domain}&_=1551251898530`, {
+              method: 'get',
+              headers: {
+                  Accept: 'application/json, text/javascript, */*; q=0.01'
+              }
+            }).then(res=>{
+                if (res.data.message !== undefined){
+                  res.data.message.map((val, ind)=>{
+                    val.id = ind + 1;
+                    val.type = this.state.way;
+                  })
+                  this.setState({
+                      detail: res.data.message,
+                      detailloading: false
+                  })
+                } else {
+                  this.setState({
+                    detail: [],
+                    detailloading: false
+                })
+                }
+            })
+        });
+      }
+      onClickRow = (record) => {
         return {
             onClick: () => {
-              this.setState({
-                rowId: record.id,
-                defaultvalue: this.state.data[record.id].name,
-                detailloading: true
-              }, ()=>{
-                if (record.vt === 'int'){
-                  record.vt = 'int';
-                } else if (record.vt === 'string'){
-                  record.vt = 'string';
-                } else {
-                  record.vt = 'float';
-                }
-                  axios(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=${record.name}&vt=${record.vt || 'float'}&time_condition=time > now() - ${scope}&value_method=${way}&group_time_span=${domain}&_=1551251898530`, {
-                    method: 'get',
-                    headers: {
-                        Accept: 'application/json, text/javascript, */*; q=0.01'
-                    }
-                  }).then(res=>{
-                      if (res.data.message !== undefined){
-                        res.data.message.map((val, ind)=>{
-                          val.id = ind + 1;
-                          val.type = this.state.way;
-                        })
-                        this.setState({
-                            detail: res.data.message,
-                            detailloading: false
-                        })
-                      } else {
-                        this.setState({
-                          detail: [],
-                          detailloading: false
-                      })
-                      }
-                  })
-              });
+              this.getData(record)
             }
           };
       }
@@ -151,13 +157,25 @@ class BrowsingHistory extends Component {
         console.log(value)
         switch (type){
           case 'way':
-              this.setState({way: value});
+              this.setState({way: value}, ()=>{
+                if (Object.keys(this.state.record).length > 0) {
+                  this.getData(this.state.record)
+                }
+              });
               break;
           case 'domain':
-              this.setState({domain: value});
+              this.setState({domain: value}, ()=>{
+                if (Object.keys(this.state.record).length > 0) {
+                  this.getData(this.state.record)
+                }
+              });
               break;
           case 'scope':
-              this.setState({scope: value});
+              this.setState({scope: value}, ()=>{
+                if (Object.keys(this.state.record).length > 0) {
+                  this.getData(this.state.record)
+                }
+              });
               break;
           default: '';
         }
@@ -209,10 +227,11 @@ class BrowsingHistory extends Component {
                         <div>
                           取值方式：
                             <Select defaultValue="raw"
+                                disabled={this.state.vt === 'string'}
                                 style={{ width: 120 }}
                                 onChange={(value)=>{
-                              this.handleChange('way', value)
-                            }}
+                                  this.handleChange('way', value)
+                                }}
                             >
                               <Option value="raw">原始值</Option>
                               <Option value="mean">平均值</Option>

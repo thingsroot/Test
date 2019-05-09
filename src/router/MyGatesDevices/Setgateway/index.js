@@ -90,6 +90,10 @@ class LinkStatus extends Component {
                   }
                 ]
             });
+            
+        window.addEventListener('resize', function (){
+            myFaultTypeChart.resize();
+        })
 
         })
         http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
@@ -120,7 +124,9 @@ class LinkStatus extends Component {
                   }
                 ]
             });
-
+            window.addEventListener('resize', function (){
+                myFaultTypeChart.resize();
+            })
         })
         const res = this.props.store.appStore.status;
         axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
@@ -341,7 +347,7 @@ class LinkStatus extends Component {
                         <Card className="border">
                             <p>CPU负载</p>
                             <div
-                                style={{height: 280, width: 700, minWidth: 300}}
+                                style={{height: 280, width: '100%', minWidth: 300}}
                                 id="CPU"
                                 ref="cpu"
                             ></div>
@@ -349,7 +355,7 @@ class LinkStatus extends Component {
                         <Card className="border">
                             <p>内存负载</p>
                             <div
-                                style={{height: 280, width: 700, minWidth: 300}}
+                                style={{height: 280, width: '100%', minWidth: 300}}
                                 id="memory"
                                 ref="mem"
                             ></div>

@@ -10,7 +10,7 @@ import { inject, observer } from 'mobx-react';
 import { Drawer, Button, Icon } from 'antd';
 const GatesList = LoadableComponent(()=>import('./GatesList'));
 const AppsList = LoadableComponent(()=>import('./AppsList'));
-const LinkStatus = LoadableComponent(()=>import('./LinkStatus'));
+const Setgateway = LoadableComponent(()=>import('./Setgateway'));
 const VPN  = LoadableComponent(()=>import('./VPN'));
 const Vserial = LoadableComponent(()=>import('./Vserial'));
 @withRouter
@@ -140,8 +140,8 @@ class MyGatesDevices extends Component {
                       <PrivateRoute path={`${path}/AppsList`}
                           component={AppsList}
                       />
-                      <PrivateRoute path={`${path}/LinkStatus`}
-                          component={LinkStatus}
+                      <PrivateRoute path={`${path}/setgateway`}
+                          component={Setgateway}
                       />
                       <PrivateRoute path={`${path}/VPN`}
                           component={VPN}

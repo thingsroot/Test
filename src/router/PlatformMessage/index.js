@@ -71,7 +71,7 @@ class PlatformMessage extends Component {
     componentDidMount (){
         let params = {
             category: 'user',
-            name: _getCookie('user_id'),
+            name: unescape(_getCookie('user_id')),
             start: 0,
             limit: 100,
             filters: {}
