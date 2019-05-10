@@ -113,14 +113,16 @@ class MyAppDetails extends Component {
                         <Link
                             className="button"
                             style={message.owner === user ? block : none}
-                            to={`/appSettings/2/${message.name}`}>
+                            to={`/appSettings/2/${message.name}`}
+                        >
                             <Icon type="setting" />
                             设置
                         </Link>
                         <Link
                             className="button"
                             style={message.owner === user ? block : none}
-                            to={`/AppEditorCode/${message.name}/${message.app_name}`}>
+                            to={`/AppEditorCode/${message.name}/${message.app_name}`}
+                        >
                             <Icon type="edit" />
                             代码编辑
                         </Link>

@@ -104,23 +104,7 @@ class GatesList extends Component {
             devList: res.message,
             loading: false
           })
-          // trhis.props.store.appStore.setStatus(res.message)
         })
-    //   http.get('/api/method/iot_ui.iot_api.gate_devs_list?sn=' + sn ).then(res=>{
-    //     let data = [];
-    //     data = res.message;
-    //     data.map((item)=>{
-    //         item.ioc = '' + (item.inputs ? item.inputs : '0') + '/' + (item.outputs ? item.outputs : '0') + '/' + (item.commands ? item.commands : '0');
-    //         if (item.outputs > 0){
-    //           item.Gate_Sn = this.props.match.params.sn;
-    //           item.set_data = true
-    //         }
-    //     })
-    //     this.setState({
-    //         data,
-    //         loading: false
-    //     })
-    // })
     }
     render () {
         let { data, loading } = this.state;
@@ -129,10 +113,10 @@ class GatesList extends Component {
                       <Table
                           columns={columns}
                           dataSource={
-                              data
+                              data && data.length > 0 ? data : []
                           }
                           loading={loading}
-                          rowKey="sn"
+                          rowKey="meta.sn"
                           expandedRowRender={Collapses}
                           expandRowByClick
                       />

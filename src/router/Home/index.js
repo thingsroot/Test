@@ -27,15 +27,17 @@ const todayColumns = [{
     className: 'nameWidth',
     key: 'name',
     render: (text, record)=>{
-        return <span
-            style={{cursor: 'pointer'}}
-            onClick={()=>{
-                console.log(record);
-                window.location.href = `/DeviceMessage/${record.sn}`
-            }}
-        >
+        return (
+            <span
+                style={{cursor: 'pointer'}}
+                onClick={()=>{
+                    console.log(record);
+                    window.location.href = `/DeviceMessage/${record.sn}`
+                }}
+            >
             {text}
         </span>
+        )
     }
 }, {
     title: '位置',
@@ -63,15 +65,17 @@ const weekColumns = [{
     className: 'nameWidth',
     key: 'name',
     render: (text, record)=>{
-        return <span
-            style={{cursor: 'pointer'}}
-            onClick={()=>{
-                console.log(record);
-                window.location.href = `/DeviceMessage/${record.sn}`
-            }}
-        >
+        return (
+            <span
+                style={{cursor: 'pointer'}}
+                onClick={()=>{
+                    console.log(record);
+                    window.location.href = `/DeviceMessage/${record.sn}`
+                }}
+            >
             {text}
         </span>
+        )
     }
 }, {
     title: '位置',

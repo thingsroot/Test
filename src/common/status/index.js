@@ -4,21 +4,35 @@ import { Icon } from 'antd';
 import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
+let timer;
 @withRouter
 @inject('store')
 @observer
 class Status extends Component {
     componentDidMount (){
-        http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
-            this.props.store.appStore.setStatus(res)
-          })
+        this.gatewayRead(this.props.match.params.sn)
+        timer = setInterval(() => {
+            this.gatewayRead(this.props.match.params.sn)
+        }, 5000);
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
         if (nextProps.location.pathname !== this.props.location.pathname) {
-            http.get('/api/gateways_read?name=' + nextProps.match.params.sn).then(res=>{
-                this.props.store.appStore.setStatus(res)
-              })
+            this.gatewayRead(nextProps.match.params.sn)
+            clearInterval(timer)
+            timer = setInterval(() => {
+                http.get('/api/gateways_read?name=' + nextProps.match.params.sn).then(res=>{
+                    this.props.store.appStore.setStatus(res)
+                  })
+            }, 5000);
         }
+    }
+    componentWillUnmount (){
+        clearInterval(timer);
+    }
+    gatewayRead = (sn)=>{
+        http.get('/api/gateways_read?name=' + sn).then(res=>{
+            this.props.store.appStore.setStatus(res)
+          })
     }
     render () {
         const { status } = this.props.store.appStore;
