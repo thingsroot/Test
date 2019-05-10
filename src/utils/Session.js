@@ -47,7 +47,12 @@ export function _setCookie (name, value, expire) {
     (expire ? ';expires=' + date.toGMTString() : '')
 }
 export function isAuthenticated () {
-  return _getCookie(LOGIN_COOKIE_NAME)
+  if (_getCookie(LOGIN_COOKIE_NAME) && _getCookie('sid') !== 'Guest'){
+    return true
+  } else {
+    return false;
+  }
+  // return _getCookie(LOGIN_COOKIE_NAME)
 }
 
 export function authenticateSuccess (token) {

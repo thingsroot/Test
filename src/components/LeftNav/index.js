@@ -37,7 +37,7 @@ class LeftNav extends Component {
             this.setState({
                 index: 1
             });
-        } else if (pathname.indexOf('/LinkStatus') !== -1){
+        } else if (pathname.indexOf('/setgateway') !== -1){
             this.setState({
                 index: 2
             });

@@ -10,12 +10,18 @@
         font-size: 20px;
         line-height: 50px;
         text-align: center;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         padding: 0 15px;
         font-weight: 800;
         overflow: hidden;
     }
+    .ant-layout{
+      z-index: 4;
+    }
+    .ant-layout-sider{
+      z-index: 3;
+    }
     .ant-layout-header{
+      z-index: 999;
       position: relative;
       >.anticon{
         margin-left: 20px;
