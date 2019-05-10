@@ -47,6 +47,19 @@ class CodeStore {
         preConfiguration: ''
     };
 
+    @observable instNames = '';
+
+    @observable errorMessage = '';
+
+    @action setInstNames (values) {
+        this.instNames = values;
+        console.log(values)
+    }
+
+    @action setErrorMessage (values) {
+        this.errorMessage = values;
+    }
+
     @action setGroupName (values) {
         this.groupName = values;
     }
@@ -139,8 +152,9 @@ class CodeStore {
     @action change () {
         this.isChange = !this.isChange
     }
-    @action setReadOnly () {
-        this.readOnly = !this.readOnly
+    @action setReadOnly (values) {
+        console.log(values)
+        this.readOnly = values
     }
     @action setFileName (values) {
         this.fileName = values;

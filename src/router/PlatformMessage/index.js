@@ -353,7 +353,7 @@ class PlatformMessage extends Component {
             let newData = [];
             let tableData = this.props.store.codeStore.tableData;
             tableData.map((v)=>{
-                if (v[inpVal].indexOf(text) !== -1) {
+                if (v[inpVal].toLowerCase().indexOf(text.toLowerCase()) !== -1) {
                     newData.push(v)
                 }
             });

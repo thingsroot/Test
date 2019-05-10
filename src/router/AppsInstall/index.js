@@ -13,12 +13,13 @@ import { split as SplitEditor} from 'react-ace';
 import 'brace/mode/json';
 import 'brace/theme/github';
 import EditableTable from './editorTable';
+import Inst from './Inst';
 const TabPane = Tabs.TabPane;
 const Search = Input.Search;
 const Option = Select.Option;
 const openNotification = (title, message) => {
     notification.open({
-        message: 'title',
+        message: title,
         description: message,
         placement: 'buttonRight'
     });
@@ -214,7 +215,6 @@ class MyGatesAppsInstall extends Component {
             })
 
         }
-
     }
 
     shouldComponentUpdate (nextProps, nextState){
@@ -306,57 +306,13 @@ class MyGatesAppsInstall extends Component {
         })
     };
 
-    inst = ()=>{
-        let sn = this.props.match.params.sn;
-        http.post('/api/gateways_applications_refresh', {
-            gateway: sn,
-            id: 'refresh' + sn
-        }).then(res=>{
-            if (res.ok === true) {
-                http.get('/api/gateways_applications_list?gateway=' + sn).then(res=>{
-                    if (res.ok === true) {
-                        let names = Object.keys(res.data);
-                        names && names.length > 0 && names.map(item=>{
-                            if (item === this.refs.inst.value) {
-                                this.setState({
-                                    errorMessage: '实例名已存在'
-                                })
-                            } else {
-                                this.setState({
-                                    errorMessage: ''
-                                })
-                            }
-                        })
-
-                    }
-                })
-            }
-        })
-    };
-
-    instBlur = ()=>{
-        if (this.refs.inst.value === '' || this.refs.inst.value === undefined) {
-            this.setState({
-                errorMessage: '实例名不能为空'
-            })
-        } else {
-            this.setState({
-                errorMessage: ''
-            })
-        }
-    };
-
-    instChange = ()=>{
-        this.refs.inst.value = event.target.value;
-        setTimeout(this.inst, 1000)
-    };
-
     getConfig = (val)=>{
         this.setState({
             error: false,
             configuration: '',
             activeKey: '1'
         });
+        this.props.store.codeStore.setInstNames('');
         let config = [];
         if (val.conf_template) {
             let con = val.conf_template.replace(/[\r\n]/g, '');
@@ -378,12 +334,14 @@ class MyGatesAppsInstall extends Component {
             ) {
                 this.setState({
                     error: true
-                })
+                });
+                this.props.store.codeStore.setReadOnly(false)
             }
             if (v.child === undefined) {
                 this.setState({
                     error: true
-                })
+                });
+                this.props.store.codeStore.setReadOnly(false)
             }
             if (v.name === 'device_section') {
                 let tableNameData = {};
@@ -471,7 +429,6 @@ class MyGatesAppsInstall extends Component {
     getData = ()=>{
         const { tcp, serial, selectSection, keys } = this.state;
         let sourceCodeData = {};
-        sourceCodeData['inst'] = this.refs['inst'].value;
         keys.map((item, key)=>{
             key;
             if (item.name === 'Link_type') {
@@ -509,48 +466,54 @@ class MyGatesAppsInstall extends Component {
                 sourceCodeData[item.name] = this.refs[item.name].value === undefined ? item.value : this.refs[item.name].value
             }
         });
-        this.setState({
-            configuration: JSON.stringify(sourceCodeData)
-        })
+        if (JSON.stringify(sourceCodeData) !== '{}') {
+            this.setState({
+                configuration: JSON.stringify(sourceCodeData)
+            })
+        }
+
     };
 
     submitData = ()=>{
         this.getData();
-        const { configuration, app } = this.state;
+        let { configuration, app } = this.state;
         let sn = this.props.match.params.sn;
         let version = 0;
-        openNotification('提交任务成功', '网关' + sn + '安装' + this.refs.inst.value + '应用.');
         http.get('/api/applications_versions_latest?app=' + app).then(res=>{
             version = res.data;
-            if (version <= 0) {
-                message.error('应用暂时没有版本，无法安装！')
-            } else {
+            if (version > 0) {
                 let params = {
                     gateway: sn,
-                    inst: this.refs.inst.value,
+                    inst: this.props.store.codeStore.instNames,
                     app: app,
                     version: version,
                     conf: configuration,
-                    id: 'app_install/' + sn + '/' + this.refs.inst.value + '/' + app
+                    id: 'app_install/' + sn + '/' + this.props.store.codeStore.instNames + '/' + app
                 };
-                if (this.refs.inst.value === '' || this.refs.inst.value === undefined) {
+                if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
                     message.error('实例名不能为空！')
                 }
                 http.post('/api/gateways_applications_install', params).then(res=>{
+                    openNotification('提交任务成功', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.');
                     let max = 18000;
                     let min = 0;
                     if (res.ok === true) {
                         if (min > max) {
-                            openNotification('安装应用' + this.refs.inst.value + '失败', '安装超时.')
+                            openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '错误：' + res.data.message)
                         } else {
                             let timer = setInterval(()=>{
                                 min += 5000;
                                 setTimeout(()=>{
                                     http.get('/api/gateways_exec_result?id=' + res.data.data)
                                         .then(res=>{
-                                            if (res.data.result === true) {
-                                                openNotification('安装应用' + this.refs.inst.value + '成功', '' + res.data.id);
-                                                clearInterval(timer);
+                                            if (JSON.stringify(res) !== '{}') {
+                                                if (res.data.result === true) {
+                                                    openNotification('安装应用' + this.props.store.codeStore.instNames + '成功', '' + res.data.id);
+                                                    clearInterval(timer);
+                                                } else if (res.data.result === false) {
+                                                    openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '' + res.data.message);
+                                                    clearInterval(timer);
+                                                }
                                             }
                                         })
                                 }, 1000)
@@ -560,6 +523,8 @@ class MyGatesAppsInstall extends Component {
                         openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
                     }
                 })
+            } else {
+                message.error('应用暂时没有正式版本，无法安装！')
             }
         });
     };
@@ -574,17 +539,16 @@ class MyGatesAppsInstall extends Component {
                 activeKey: '2'
             })
         }
-        if (this.state.config && this.state.config.length > 0) {
+        if (this.state.error === true || this.state.config.length === 0) {
+            this.props.store.codeStore.setReadOnly(false);
+        } else if (this.state.config && this.state.config.length > 0 || this.state.error === false) {
             this.getData();
-        } else {
-            this.props.store.codeStore.setReadOnly(true);
         }
-
     };
 
     render () {
-        const { data, flag, item, detail, showTempLists, serial, tcp,
-            addTempLists, instName, showTempList, config, addTempList} = this.state;
+        const { data, flag, item, detail, showTempLists, serial, tcp, error,
+            addTempLists, showTempList, config, addTempList} = this.state;
         return (<div>
             <Status />
                 <div className="AppInstall">
@@ -648,21 +612,14 @@ class MyGatesAppsInstall extends Component {
                             onChange={this.callback}
                             type="card"
                         >
-                            <p style={{lineHeight: '50px'}}>
-                                <span className="spanStyle">实例名：</span>
-                                <Input
-                                    type="text"
-                                    ref="inst"
-                                    style={{width: '300px'}}
-                                    defaultValue={instName}
-                                    onChange={this.instChange}
-                                    onBlur={this.instBlur}
-                                />
-                                <span className="error">{this.state.errorMessage}</span>
-                            </p>
                             <TabPane tab="配置面板"
                                 key="1"
                             >
+                                <Inst
+                                    sn={this.props.match.params.sn}
+                                    onChange={this.instChange}
+                                    onBlur={this.instBlur}
+                                />
                                 <div
                                     style={this.state.error ? none : block}
                                 >
@@ -937,19 +894,25 @@ class MyGatesAppsInstall extends Component {
                                 </div>
                                 <Button
                                     type="primary"
-                                    style={config && config.length > 0 ? block : none}
+                                    style={error === true || config.length <= 0 ? none : block}
                                     onClick={this.submitData}
                                 >提交</Button>
                             </TabPane>
                             <TabPane tab="JSON源码"
                                 key="2"
                             >
+                                <Inst
+                                    sn={this.props.match.params.sn}
+                                    onChange={this.instChange}
+                                    onBlur={this.instBlur}
+                                />
                                 <div className="editorInfo">
                                     <p style={{lineHeight: '40px'}}>
                                         编辑器状态：
                                         <span>{this.props.store.codeStore.readOnly ? '不可编辑' : '可编辑'}</span>
                                     </p>
                                 </div>
+                                {console.log(this.state.configuration)}
                                 <SplitEditor
                                     style={{width: '100%'}}
                                     mode="json"

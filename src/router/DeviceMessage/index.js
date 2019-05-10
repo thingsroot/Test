@@ -24,12 +24,12 @@ class DevicemMessage extends Component {
         category: '',
         user: '',
         start: 0,
-        length: 100,
+        length: 500,
         filters: {},
         tableData: [],
         deviceData: [],
         dataSource: [],
-        selectValue: 'title',
+        selectValue: '',
         text: '',
         loading: false,
         selectedRowKeys: [],
@@ -75,12 +75,11 @@ class DevicemMessage extends Component {
         }]
     };
     componentDidMount (){
-
         let params = {
             category: 'user',
             name: unescape(_getCookie('user_id')),
             start: 0,
-            limit: 100,
+            limit: this.state.length,
             filters: {}
         };
         this.setState({
@@ -88,10 +87,19 @@ class DevicemMessage extends Component {
             name: params.name,
             start: params.start,
             length: params.limit,
-            filters: params.filters
+            filters: params.filters,
+            selectValue: 'title'
         });
         this.getMessageList(params);
-
+        if (this.props.match.params.sn !== '1') {
+            this.setState({
+                selectValue: 'device'
+            });
+        } else {
+            this.setState({
+                selectValue: 'title'
+            });
+        }
 
     }
     onSelectChange = (selectedRowKeys) => {
@@ -187,7 +195,6 @@ class DevicemMessage extends Component {
             let source = [];
             if (res.data.ok === true) {
                 sourceData.map((v)=>{
-                    // console.log(v.event_type)
                     let type = '';
                     let level = '';
                     if (v.event_type === 'EVENT') {
@@ -227,6 +234,15 @@ class DevicemMessage extends Component {
             });
             this.props.store.codeStore.setDeviceData(data);
             this.props.store.codeStore.setDeviceTableData(data)
+            if (this.props.match.params.sn !== '1') {
+                let newData = [];
+                data.length > 0 && data.map((v)=>{
+                    if (v['device'].toLowerCase().indexOf(this.props.match.params.sn.toLowerCase()) !== -1) {
+                        newData.push(v)
+                    }
+                });
+                this.props.store.codeStore.setDeviceData(newData)
+            }
         })
     };
     //时间戳转换
@@ -263,7 +279,7 @@ class DevicemMessage extends Component {
             let newData = [];
             let deviceTableData = this.props.store.codeStore.deviceTableData;
             deviceTableData.map((v)=>{
-                if (v[inpVal].indexOf(text) !== -1) {
+                if (v[inpVal].toLowerCase().indexOf(text.toLowerCase()) !== -1) {
                     newData.push(v)
                 }
             });
@@ -419,7 +435,7 @@ class DevicemMessage extends Component {
                     }}
                     >
                         <InputGroup compact>
-                            <Select defaultValue="标题"
+                            <Select defaultValue={this.props.match.params.sn !== '1' ? '序列号' : '标题'}
                                 onChange={this.getSelect}
                                 style={{width: '100px'}}
                             >
@@ -429,6 +445,7 @@ class DevicemMessage extends Component {
                             <Input
                                 style={{ width: '70%' }}
                                 placeholder="请输入关键字"
+                                defaultValue={this.props.match.params.sn !== '1' ? this.props.match.params.sn : ''}
                                 onChange={
                                     ()=>{
                                         this.search(selectValue)

@@ -281,8 +281,8 @@ class AppEditorCode extends Component {
         }
 
     };
-    addFileName = ()=>{
-        this.props.store.codeStore.setAddFileName(event.target.value );
+    addFileName = (e)=>{
+        this.props.store.codeStore.setAddFileName(e.target.value );
     };
 
     //添加文件夹
@@ -300,8 +300,8 @@ class AppEditorCode extends Component {
             isAddFolderShow: false
         })
     };
-    addFolderName = ()=>{
-        this.props.store.codeStore.setAddFolderName(event.target.value)
+    addFolderName = (e)=>{
+        this.props.store.codeStore.setAddFolderName(e.target.value)
     };
     addFolder = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
@@ -377,9 +377,9 @@ class AppEditorCode extends Component {
             isEditorFileShow: false
         })
     };
-    editorFileName = ()=>{
+    editorFileName = (e)=>{
         this.setState({
-            editorFileName: event.target.value
+            editorFileName: e.target.value
         })
     };
     editorFile = ()=>{
