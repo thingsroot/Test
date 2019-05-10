@@ -9,6 +9,30 @@ import http from '../../utils/Server';
 const Option = Select.Option;
 const { TextArea } = Input;
 const confirm = Modal.confirm;
+// function format (list) {
+//     let data = [];
+//     for (var i = 0; i < list.length; i++){
+//         if (list[i].children){
+//             if (list[i].childrenData){
+//                 data.push({
+//                     title: list[i].text,
+//                     key: list[i].id,
+//                     type: list[i].type,
+//                     isLeaf: false,
+//                     children: format(list[i].childrenData)
+//                 })
+//             }
+//         } else {
+//             data.push({
+//                 title: list[i].text,
+//                 key: list[i].id,
+//                 type: list[i].type,
+//                 isLeaf: true
+//             })
+//         }
+//     }
+//     return data;
+// }
 
 @withRouter
 @inject('store')
@@ -43,10 +67,12 @@ class AppEditorCode extends Component {
         http.get('/home/api/method/app_center.editor.editor_worksapce_version?app=' + app)
             .then(res=>{
                 let worksapceVersion = res.message;
+                // console.log(worksapceVersion);
                 if (worksapceVersion && worksapceVersion !== 'undefined') {
                     http.get('/home/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
                             let lastVersion = data.message;
+                            // console.log(lastVersion);
                             if (worksapceVersion !== lastVersion) {
                                 //提示当前工作区是会基于worksapceVersion，当前的最新版本为latest_version（弹框）
                                 this.info('版本提示', '当前工作区是会基于版本    ' + worksapceVersion + '，当前的最新版本为    ' + lastVersion + '.');
@@ -77,6 +103,7 @@ class AppEditorCode extends Component {
                                 http.get('/home/api/method/app_center.editor.editor_init?app=' + app + '&version=' + data.message)
                                     .then(res=>{
                                         let initVersion = res.message;
+                                        // console.log(initVersion);
                                         this.setState({
                                             version: initVersion
                                         });
@@ -99,7 +126,7 @@ class AppEditorCode extends Component {
         http.get('/home/api/method/app_center.api.get_versions?app=' + app + '&beta=1')
             .then(res=>{
                 let data = [];
-                res.message && res.message.length > 0 && res.message.map((v)=>{
+                res.message.map((v)=>{
                     data.push(v.version)
                 });
                 data.sort(function (a, b) {
@@ -112,8 +139,7 @@ class AppEditorCode extends Component {
                     comment: 'v' + newVersion
                 })
 
-            });
-        console.log(app);
+            })
     }
     //提示弹框
     info = (title, content)=>{
@@ -162,7 +188,7 @@ class AppEditorCode extends Component {
             visible: false
         });
         let url = '/home/api/method/app_center.editor.editor_revert';
-        http.postToken(url + '?app=' + this.props.match.params.app + '&operation=set_content&version=' + this.state.version)
+        http.postToken(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
             .then(res=>{
                 this.props.store.codeStore.change();
                 message.success(res.message);
@@ -170,17 +196,13 @@ class AppEditorCode extends Component {
     };//重置版本结束
     //保存文件
     saveFile = ()=>{
-        console.log(this.props.store.codeStore.newEditorContent)
         if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent) {
             message.warning('文件未改动！')
         } else {
-            let params = {
-                app: this.state.app,
-                operation: 'set_content',
-                id: this.props.store.codeStore.fileName,
-                text: this.props.store.codeStore.newEditorContent
-            };
-            http.post('/home/api/method/app_center.editor.editor', params)
+            let url = '/home/api/method/app_center.editor.editor';
+            http.postToken(url + '?app=' + this.state.app +
+                '&operation=set_content&id=' + this.props.store.codeStore.fileName +
+                '&text=' + this.props.store.codeStore.newEditorContent)
                 .then(res=>{
                     console.log(res);
                     message.success('文件保存成功！')
@@ -226,39 +248,34 @@ class AppEditorCode extends Component {
         }, 1000)
     };
 
+    // getTreeData = ()=>{
+    //     http.get('/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_node&id=' + '#')
+    //         .then(res=>{
+    //             let resData = res;
+    //             resData.map((v)=>{
+    //                 if (v.children) {
+    //                     http.get('/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_node&id=' + v.id)
+    //                         .then(res=>{
+    //                             v['childrenData'] = res;
+    //                             let data = format(resData);
+    //                             console.log(data);
+    //                             this.props.store.codeStore.setTreeData(data)
+    //                         });
+    //                 }
+    //             });
+    //         });
+    // };
+
     //添加文件
     addFile = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
-        console.log(myFolder);
         if (this.props.store.codeStore.addFileName !== '') {
-            let url = '/home/api/method/app_center.editor.editor';
+            let url = '/api/method/app_center.editor.editor';
             http.get(url + '?app=' + this.state.app + '&operation=create_node&type=file&id=' +
                 myFolder + '&text=' + this.props.store.codeStore.addFileName)
                 .then(res=>{
                     console.log(res);
-                    let treeData = this.props.store.codeStore.treeData;
-                    treeData.map(item=>{
-                        if (item.id === myFolder) {
-                            console.log('添加数据')
-                        } else {
-                            if (item.children) {
-                                item.children.map(i=>{
-                                    if (i.id === myFolder) {
-                                        console.log('添加数据')
-                                    } else {
-                                        if (i.children) {
-                                            i.children.map(v=>{
-                                                if (v.id === myFolder) {
-                                                    console.log('添加数据3')
-                                                }
-                                            })
-                                        }
-                                    }
-                                })
-                            }
-                        }
-                    })
-
+                    this.getTreeData();
                 });
             message.success('创建文件成功！');
             this.addFileHide();
@@ -281,8 +298,8 @@ class AppEditorCode extends Component {
         }
 
     };
-    addFileName = (e)=>{
-        this.props.store.codeStore.setAddFileName(e.target.value );
+    addFileName = ()=>{
+        this.props.store.codeStore.setAddFileName(event.target.value );
     };
 
     //添加文件夹
@@ -300,8 +317,8 @@ class AppEditorCode extends Component {
             isAddFolderShow: false
         })
     };
-    addFolderName = (e)=>{
-        this.props.store.codeStore.setAddFolderName(e.target.value)
+    addFolderName = ()=>{
+        this.props.store.codeStore.setAddFolderName(event.target.value)
     };
     addFolder = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
@@ -311,7 +328,7 @@ class AppEditorCode extends Component {
                 myFolder + '&text=' + this.props.store.codeStore.addFolderName)
                 .then(res=>{
                     console.log(res);
-                    // this.getTreeData();
+                    this.getTreeData();
                 });
             message.success('创建文件夹成功');
             this.addFolderHide();
@@ -330,7 +347,7 @@ class AppEditorCode extends Component {
                         } else {
                             reject(false);
                         }
-                        // this.getTreeData();
+                        this.getTreeData();
                     });
             }).catch(() =>{
             });
@@ -377,9 +394,9 @@ class AppEditorCode extends Component {
             isEditorFileShow: false
         })
     };
-    editorFileName = (e)=>{
+    editorFileName = ()=>{
         this.setState({
-            editorFileName: e.target.value
+            editorFileName: event.target.value
         })
     };
     editorFile = ()=>{
@@ -390,7 +407,7 @@ class AppEditorCode extends Component {
                 myFolder + '&text=' + this.state.editorFileName)
                 .then(res=>{
                     console.log(res);
-                    // this.getTreeData();
+                    this.getTreeData();
                 });
             message.success('编辑文件成功');
             this.addFolderHide();

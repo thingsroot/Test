@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
-import { split as SplitEditor} from 'react-ace';
+import AceEditor from 'react-ace';
 import http from '../../../utils/Server';
-import 'brace/mode/json';
+import 'brace/mode/java';
 import 'brace/theme/github';
 @withRouter
 @inject('store')
 @observer
 
 class MyCode extends Component {
-
     constructor (props){
         super(props);
         this.state = {
@@ -21,11 +20,9 @@ class MyCode extends Component {
             newContent: ''
         }
     }
-
     componentDidMount () {
         this.getContent();
     }
-
     UNSAFE_componentWillReceiveProps (nextProps){
         if (this.props.fileName !== nextProps.fileName || this.props.isChange !== nextProps.isChange){
             this.getContent();
@@ -39,13 +36,12 @@ class MyCode extends Component {
                 this.props.store.codeStore.setNewEditorContent(res.content);
             })
     };
-
     setContent = (newValue)=>{
         this.props.store.codeStore.setNewEditorContent(newValue);
     };
-
-    onChange = (newValue)=>{
-        this.setContent(newValue[0]);
+    onChange = (newValue, e)=>{
+        console.log(newValue, e);
+        this.setContent(newValue)
     };
     // blur = ()=>{
     //     this.props.store.codeStore.setMyEditor(this.refs.editor);
@@ -55,19 +51,20 @@ class MyCode extends Component {
     render () {
         const { fontSize } = this.props;
         return (
-            <SplitEditor
-                style={{width: '100%', height: '600px'}}
-                mode="json"
-                theme="github"
-                ref="editor"
-                fontSize={fontSize}
-                splits={1}
-                onChange={this.onChange.bind(this)}
-                // onBlur={this.blur.bind(this)}
-                value={[this.props.store.codeStore.editorContent]}
-                name="UNIQUE_ID_OF_DIV"
-                editorProps={{$blockScrolling: true}}
-            />
+            <div className="myCode">
+                <AceEditor
+                    style={{width: '100%', height: '600px'}}
+                    mode="java"
+                    theme="github"
+                    ref="editor"
+                    fontSize={fontSize}
+                    onChange={this.onChange.bind(this)}
+                    // onBlur={this.blur.bind(this)}
+                    value={this.props.store.codeStore.editorContent}
+                    name="UNIQUE_ID_OF_DIV"
+                    editorProps={{$blockScrolling: true}}
+                />
+            </div>
         );
     }
 }

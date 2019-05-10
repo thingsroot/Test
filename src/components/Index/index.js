@@ -49,11 +49,11 @@ class App extends PureComponent {
             trigger={null}
             collapsible
             collapsed={this.state.collapsed}
-            style={{width: '100%'}}
+            style={{width: '100%', zIndex: 99}}
         >
           <Siders collapsed={this.state.collapsed}/>
         </Sider>
-        <Layout style={{width: '100%', overflowX: 'auto'}}>
+        <Layout>
           <Header style={this.state.collapsed ? minHeader : maxHeader}>
             <Icon
                 className="trigger"
@@ -63,7 +63,8 @@ class App extends PureComponent {
             <HeaderBar />
           </Header>
           <Content style={{
-            margin: '68px 16px 24px 16px', padding: 24, background: '#fff', minHeight: 280
+            margin: '68px 16px 24px 16px', padding: 24,
+              background: '#fff', minHeight: 280, zIndex: 0
           }}
           >
             <ContentMain className="border"/>
