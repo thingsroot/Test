@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import {
     Form, Icon, Input, Button, Checkbox, message
 } from 'antd';
 import http  from '../../../utils/Server';
 import { _getCookie, _setCookie } from '../../../utils/Session';
-
+@withRouter
 class Sign extends PureComponent {
     handleSubmit = (e) => {
         e.preventDefault();

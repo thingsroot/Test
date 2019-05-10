@@ -195,12 +195,14 @@ function getMin (i, date){
       return (
         <div>
           <Table
+              style={{scrollbarWidth: '0'}}
               size="small"
               rowKey="key"
               loading={this.state.flag}
               columns={this.state.columns}
               dataSource={this.state.data}
               pagination={false}
+              scroll={{x: '100%', y: 500}}
           />
           <Modal
               title={this.state.record ? '变量' + this.state.record.name + '十分钟内数值变化' : ''}

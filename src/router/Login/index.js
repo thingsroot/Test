@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
+import { _getCookie } from '../../utils/Session';
 import './login.scss'
 import Background from '../../assets/images/background.png';
 import Sign from './sign'
@@ -19,6 +20,11 @@ var sectionStyle = {
 @withRouter
 class Login extends PureComponent {
 
+    componentDidMount () {
+        if (_getCookie('T&R_auth_token') && _getCookie('sid') !== 'Guest'){
+            this.props.history.push('/')
+        }
+    }
     render () {
         const { path } = this.props.match;
         return (
