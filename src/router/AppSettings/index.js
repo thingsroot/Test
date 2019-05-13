@@ -219,7 +219,7 @@ class AppSettings extends Component {
                         {/*</div>*/}
                     </TabPane>
                     <TabPane
-                        tab="预定义"
+                        tab="默认安装配置"
                         key="2"
                     >
                         <div style={{minHeight: '400px'}}>
@@ -234,6 +234,13 @@ class AppSettings extends Component {
                     onClick={this.handleSubmit}
                 >
                     {this.props.match.params.type === '1' ? '创建' : '修改'}
+                </Button>
+                <Button
+                    onClick={()=>{
+                        window.location.href = '/myApps'
+                    }}
+                >
+                    取消
                 </Button>
             </div>
         )
