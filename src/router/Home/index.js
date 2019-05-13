@@ -364,7 +364,7 @@ class Home extends PureComponent {
                                         size="small"
                                         style={{width: '100%'}}
                                         pagination={false}
-                                        scroll={{ y: 280 }}
+                                        scroll={{ y: 220 }}
                                         locale={{emptyText: '恭喜你,今天沒有发生故障'}}
                                     />
                                 </TabPane>
@@ -378,7 +378,7 @@ class Home extends PureComponent {
                                         size="small"
                                         style={{width: '100%'}}
                                         pagination={false}
-                                        scroll={{ y: 280 }}
+                                        scroll={{ y: 220 }}
                                         locale={{emptyText: '恭喜你,本周沒有发生故障'}}
                                     />
                                 </TabPane>

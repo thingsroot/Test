@@ -44,7 +44,21 @@ class MyAppDetails extends Component {
             this.props.store.codeStore.setGroupName(res.data[0].name)
         });
     }
+
     getDetails = (app)=>{
+        http.get('/api/gateways_list')
+            .then(res=>{
+                const online = [];
+                res.message && res.message.length > 0 && res.message.map((v)=>{
+                    if (v.data.device_status === 'ONLINE'){
+                        online.push(v.data)
+                    }
+                });
+                console.log(online[0].sn);
+                this.setState({
+                    onLine: online[0].name
+                })
+            });
         http.get('/api/applications_read?app=' + app).then(res=>{
             this.setState({
                 message: res.data.data.data,
@@ -59,18 +73,6 @@ class MyAppDetails extends Component {
             .then(res=>{
                 this.props.store.codeStore.setTemplateList(res.message)
             });
-        http.get('/api/gateways_list')
-            .then(res=>{
-                const online = [];
-                res.message && res.message.length > 0 && res.message.map((v)=>{
-                    if (v.data.device_status === 'ONLINE'){
-                        online.push(v.data)
-                    }
-                });
-                this.setState({
-                    onLine: online[0].sn
-                })
-            })
     };
     callback = (key)=>{
         console.log(key);
@@ -131,7 +133,7 @@ class MyAppDetails extends Component {
                             to={`/AppsInstall/${this.state.onLine}/${message.name}/2`}
                         >
                             <Icon type="download" />
-                            下载
+                            安装此应用
                         </Link>
                         <Link
                             className="button"
