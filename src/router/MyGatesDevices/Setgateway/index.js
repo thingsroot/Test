@@ -141,31 +141,55 @@ class LinkStatus extends Component {
                     DATA_UPLOAD_PERIOD_VALUE: config.data_upload_period,
                     COV_TTL_VALUE: config.data_upload_cov_ttl,
                     UOLOAD_VALUE: config.event_upload
+                }, ()=>{
+                    http.get('/api/applications_versions_list?app=FreeIOE').then(res=>{
+                        const arr = [];
+                        res.data && res.data.length > 0 && res.data.map(item=>{
+                            if (item.version > this.state.config.version){
+                                if (config.use_beta){
+                                    arr.push(item)
+                                } else {
+                                    if (item.beta === 0){
+                                        arr.push(item)
+                                    }
+                                }
+                            }
+                        })
+                        this.setState({
+                            newdata: arr
+                        })
+                    })
+                    http.get('/api/applications_versions_list?app=openwrt%2Fx86_64_skynet').then(res=>{
+                        const arr = [];
+                        res.data && res.data.length > 0 && res.data.map(item=>{
+                            if (item.version > this.state.config.skynet_version){
+                                if (config.use_beta){
+                                    arr.push(item)
+                                } else {
+                                    if (item.beta === 0){
+                                        arr.push(item)
+                                    }
+                                }
+                            }
+                        })
+                        this.setState({
+                            opendata: arr
+                        })
+                    })
                 })
             })
         http.get('/api/gateways_beta_read?gateway=' + sn).then(res=>{
-            this.setState({use_beta: res.data.use_beta === 1})
-        })
-        http.get('/api/applications_versions_latest?app=freeioe&beta=1').then(res=>{
-            console.log(res)
-            this.setState({
-                iot_beta: res.data
-            })
-        })
-        http.get('/api/applications_versions_latest?app=openwrt%2Fx86_64_skynet&beta=1').then(res=>{
-            console.log(res)
-            this.setState({
-                skynet_version: res.data
-            })
-        })
-        http.get('/api/applications_versions_list?app=FreeIOE').then(res=>{
-            this.setState({
-                newdata: res.data
-            })
-        })
-        http.get('/api/applications_versions_list?app=openwrt%2Fx86_64_skynet').then(res=>{
-            this.setState({
-                opendata: res.data
+            this.setState({use_beta: res.data.use_beta === 1}, ()=>{
+                http.get('/api/applications_versions_latest?app=freeioe&beta=' + (this.state.use_beta ? 1 : 0)).then(res=>{
+                    this.setState({
+                        iot_beta: res.data
+                    })
+                })
+                http.get('/api/applications_versions_latest?app=openwrt%2Fx86_64_skynet&beta=' + (this.state.use_beta ? 1 : 0)).then(res=>{
+                    this.setState({
+                        skynet_version: res.data
+                    })
+                })
             })
         })
     }

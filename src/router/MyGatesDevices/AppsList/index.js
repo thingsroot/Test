@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Table, Switch, Button, Popconfirm, message, Icon } from 'antd';
+import { Table, Switch, Button, Popconfirm, message, Icon, Modal } from 'antd';
 import http from '../../../utils/Server';
 import { inject, observer } from 'mobx-react';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { exec_result } from '../../../utils/Session';
+import MyGatesAppsUpgrade from '../../Upgrade';
 let timer;
 const confirm = (record, sn, _this)=>{
   console.log(_this)
@@ -50,7 +51,9 @@ class AppsList extends Component {
           data: [],
           pagination: {},
           loading: true,
+          visible: false,
           url: window.location.pathname,
+          record: {},
           columns: [{
             title: '',
             dataIndex: 'data.data.icon_image',
@@ -76,12 +79,24 @@ class AppsList extends Component {
             render: (props, record)=>{
               if (record.latestVersion > props) {
                 return (
-                  <Link
-                      to={`/MyGatesAppsUpgrade/${this.props.match.params.sn}/${record.device_name}/${props}/${record.name}`}
-                      style={{color: 'blue'}}
-                  >
-                    {props} <Icon type="arrow-up"/>
-                  </Link>
+                  // <Link
+                  //     to={`/MyGatesAppsUpgrade/${this.props.match.params.sn}/${record.device_name}/${props}/${record.name}`}
+                  //     style={{color: 'blue'}}
+                  // >
+                    // {props} <Icon type="arrow-up"/>
+                    <Button
+                        type="primary"
+                        onClick={()=>{
+                          this.setState({
+                            record
+                          }, ()=>{
+                            this.showModal()
+                          })
+                        }}
+                    >
+                     {props} <Icon type="arrow-up"/>
+                    </Button>
+                  // </Link>
                 )
               } else {
                 return <span>{props}</span>
@@ -115,7 +130,7 @@ class AppsList extends Component {
                 return (
                 <Switch checkedChildren="ON"
                     unCheckedChildren="OFF"
-                    defaultChecked={props === 1 ? true : false}
+                    defaultChecked={Number(props) === 0 ? false : true}
                     onChange={()=>{
                       this.setAutoDisabled(record, props)
                     }}
@@ -154,7 +169,6 @@ class AppsList extends Component {
       }
       UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
-        const sn = nextProps.match.params.sn;
         clearInterval(timer);
         timer = setInterval(() => {
           this.fetch(nextProps.match.params.sn)
@@ -162,12 +176,57 @@ class AppsList extends Component {
         this.setState({
           loading: true
         }, ()=>{
-          this.fetch(sn);
+          this.fetch(nextProps.match.params.sn);
         })
         }
       }
       componentWillUnmount (){
         clearInterval(timer)
+      }
+      showModal = (record) => {
+        console.log(record)
+        this.setState({
+          visible: true
+        });
+      }
+      handleOk = () => {
+        const {record} = this.state;
+        console.log(record)
+        this.setState({ loading: true });
+        const data = {
+          gateway: this.props.match.params.sn,
+          app: record.name,
+          inst: record.device_name,
+          version: record.latestVersion,
+          conf: {},
+          id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
+      }
+      console.log(data)
+      http.postToken('/api/gateways_applications_upgrade', data).then(res=>{
+          timer = setInterval(() => {
+              http.get('/api/gateways_exec_result?id=' + res.data).then(res=>{
+                  if (res.ok){
+                      message.success('应用升级成功')
+                      clearInterval(timer)
+                      // http.post('/api/gateways_applications_refresh', {
+                      //     gateway: this.props.sn,
+                      //     id: `gateways/refresh/${this.props.match.params.sn}/${new Date() * 1}`
+                      // }).then(()=>{
+                      //     this.props.history.go(-1)
+                      // })
+                  } else if (res.ok === false){
+                      message.error('应用升级操作失败，请重试');
+                      clearInterval(timer)
+                  }
+              })
+          }, 1000);
+      })
+        setTimeout(() => {
+          this.setState({ loading: false, visible: false });
+        }, 3000);
+      }
+      handleCancel = () => {
+        this.setState({ visible: false });
       }
       setAutoDisabled (record, props){
         const { sn } = this.props.match.params;
@@ -212,7 +271,7 @@ class AppsList extends Component {
         })
       }
     render () {
-      const { loading } = this.state;
+      const { loading, visible, record } = this.state;
         return (
             <div>
                 <Table
@@ -224,6 +283,36 @@ class AppsList extends Component {
                     onChange={this.handleTableChange}
                     bordered
                 />
+                <Modal
+                    visible={visible}
+                    title="应用升级详情"
+                    onOk={this.handleOk}
+                    destroyOnClose
+                    onCancel={this.handleCancel}
+                    footer={[
+                      <Button
+                          key="back"
+                          onClick={this.handleCancel}
+                      >
+                        取消
+                      </Button>,
+                      <Button
+                          key="submit"
+                          type="primary"
+                          loading={loading}
+                          onClick={this.handleOk}
+                      >
+                        升级
+                      </Button>
+                    ]}
+                >
+                  <MyGatesAppsUpgrade
+                      version={record.version}
+                      inst={record.device_name}
+                      sn={this.props.match.params.sn}
+                      app={record.name}
+                  />
+                </Modal>
             </div>
         );
     }
