@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Icon, message, Menu, Button, Dropdown } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, withRouter} from 'react-router-dom';
 import { _getCookie, _setCookie } from '../../utils/Session';
 const menu = (
     <Menu style={{padding: 20}}>
@@ -30,7 +30,13 @@ const menu = (
       </Menu.Item>
     </Menu>
   );
+  @withRouter
 class Headers extends PureComponent {
+    UNSAFE_componentWillReceiveProps () {
+      if (_getCookie('sid') === 'Guest') {
+        this.history.push('/login')
+      }
+    }
     render () {
         return (
             <div className="headerUser">
@@ -42,9 +48,6 @@ class Headers extends PureComponent {
                     style={{display: 'block', padding: '0 10px'}}
                 >
                   <Icon type="user"/>
-                  {
-                    console.log((_getCookie('full_name')))
-                  }
                   {
                     decodeURI(_getCookie('full_name').split(' ')[0])
                   }

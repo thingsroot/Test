@@ -25,24 +25,25 @@ class Siders extends PureComponent {
         }
     }
     UNSAFE_componentWillMount () {
-        const { pathname } = this.props.location;
-        if (pathname.indexOf('/Home') !== -1){
+        const pathname = this.props.location.pathname.toLowerCase();
+        console.log(pathname)
+        if (pathname.indexOf('/home') !== -1){
             this.setState({
                 key: '1'
             })
-        } else if (pathname.indexOf('/MyGates') !== -1 || pathname.indexOf('/AppsInstall') !== -1) {
+        } else if (pathname.indexOf('/mygates') !== -1 || pathname.indexOf('/appinstall') !== -1) {
             this.setState({
                 key: '2'
             })
-        } else if (pathname.indexOf('/MyApps') !== -1) {
+        } else if (pathname.indexOf('/myapps') !== -1) {
             this.setState({
                 key: '3'
             })
-        } else if (pathname.indexOf('/PlatformMessage') !== -1) {
+        } else if (pathname.indexOf('/platformmessage') !== -1) {
             this.setState({
                 key: '4'
             })
-        } else if (pathname.indexOf('/DeviceMessage') !== -1) {
+        } else if (pathname.indexOf('/devicesmessage') !== -1) {
             this.setState({
                 key: '5'
             })

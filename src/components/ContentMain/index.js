@@ -20,7 +20,6 @@ const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
 const MyTemplateDetails = LoadableComponent(()=>import('../../router/MyTemplateDetails'));
 const MyGatesLogviewer = LoadableComponent(()=>import('../../router/MyGatesLogviewer'));
-const Upgrade = LoadableComponent(()=>import('../../router/Upgrade'));
 class ContentMain extends PureComponent {
     render (){
         return (
@@ -120,11 +119,6 @@ class ContentMain extends PureComponent {
                     path="/MyGatesLogviewer/:sn"
                     component={MyGatesLogviewer}
                     title={'网关日志'}
-                />
-                <PrivateRoute
-                    path="/MyGatesAppsUpgrade/:sn/:inst/:version/:app"
-                    component={Upgrade}
-                    title={'应用版本列表'}
                 />
                 <Redirect
                     from="/"

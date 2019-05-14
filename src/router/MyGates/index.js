@@ -7,47 +7,55 @@ import { Link } from 'react-router-dom';
 import { _getCookie } from '../../utils/Session';
 const TabPane = Tabs.TabPane;
 let timer;
-function getDevicesList (){
-    http.get('/api/gateways_list').then(res=>{
-        const online = [];
-        const offline = [];
-        const data = [];
-        res.message && res.message.length > 0 && res.message.map((v, i)=>{
-            if (v.data) {
-                v.data.last_updated = v.data.modified.slice(0, -7);
-                if (res.message[i].app.data){
-                    v.data.device_apps_num = Object.keys(res.message[i].app.data).length;
-                } else {
-                    v.data.device_apps_num = 0;
-                }
-                if (res.message[i].devices.data){
-                    v.data.device_devs_num = Object.keys(res.message[i].devices.data).length;
-                } else {
-                    v.data.device_devs_num = 0;
-                }
-                if (v.data.device_status === 'ONLINE'){
-                    v.data.disabled = false;
-                    online.push(v.data)
-                } else if (v.data.device_status === 'OFFLINE') {
-                    offline.push(v.data)
-                    v.data.disabled = true;
-                } else {
-                    v.data.disabled = true;
-                }
-                data.push(v.data)
-            }
-        })
-        if (status === 'online'){
-            this.props.store.appStore.setGatelist(res.message);
-        }
+function getDevicesList (status){
+    http.get('/api/gateway_list?status=' + status).then(res=>{
+        console.log(res)
         this.setState({
-            status,
-            data,
+            [status]: res.message,
             loading: false,
-            online,
-            offline
+            status
         })
     })
+    // http.get('/api/gateways_list').then(res=>{
+    //     const online = [];
+    //     const offline = [];
+    //     const data = [];
+    //     res.message && res.message.length > 0 && res.message.map((v, i)=>{
+    //         if (v.data) {
+    //             v.data.last_updated = v.data.modified.slice(0, -7);
+    //             if (res.message[i].app.data){
+    //                 v.data.device_apps_num = Object.keys(res.message[i].app.data).length;
+    //             } else {
+    //                 v.data.device_apps_num = 0;
+    //             }
+    //             if (res.message[i].devices.data){
+    //                 v.data.device_devs_num = Object.keys(res.message[i].devices.data).length;
+    //             } else {
+    //                 v.data.device_devs_num = 0;
+    //             }
+    //             if (v.data.device_status === 'ONLINE'){
+    //                 v.data.disabled = false;
+    //                 online.push(v.data)
+    //             } else if (v.data.device_status === 'OFFLINE') {
+    //                 offline.push(v.data)
+    //                 v.data.disabled = true;
+    //             } else {
+    //                 v.data.disabled = true;
+    //             }
+    //             data.push(v.data)
+    //         }
+    //     })
+    //     if (status === 'online'){
+    //         this.props.store.appStore.setGatelist(res.message);
+    //     }
+        // this.setState({
+        //     status,
+        //     data,
+        //     loading: false,
+        //     online,
+        //     offline
+        // })
+    // })
 }
   function confirm (record) {
       http.postToken('/api/gateways_remove', {
@@ -97,7 +105,7 @@ class MyGates extends PureComponent {
         this.state = {
             online: [],
             offline: [],
-            data: [],
+            all: [],
             status: 'online',
             loading: true,
             visible: false,
@@ -107,6 +115,7 @@ class MyGates extends PureComponent {
             desc: '',
             setName: false,
             record: {},
+            recordVisible: false,
             columns: [{
                 title: '名称',
                 dataIndex: 'dev_name',
@@ -178,7 +187,7 @@ class MyGates extends PureComponent {
                             disabled={record.disabled}
                             overlay={(
                                 <Menu>
-                                <Menu.Item key="5">
+                                <Menu.Item key="0">
                                     <Link to={{
                                         pathname: `/MyGatesDevices/${record.sn}/setgateway`,
                                         state: record
@@ -186,22 +195,10 @@ class MyGates extends PureComponent {
                                         style={{color: 'rgba(0, 0, 0, 0.65)'}}
                                         disabled={record.disabled}
                                     >
-                                        <a key="1"
+                                        <span key="1"
                                             disabled={record.disabled}
-                                        >网关设置</a>
+                                        >网关设置</span>
                                     </Link>
-                                </Menu.Item>
-                                <Menu.Item key="0">
-                                <a
-                                    onClick={()=>{
-                                        console.log(record)
-                                        this.setState({
-                                            record
-                                        }, ()=>{
-                                            this.showModal('setName')
-                                        })
-                                    }}
-                                >更改名称</a>
                                 </Menu.Item>
                                 <Menu.Item key="1">
                                 <a
@@ -213,13 +210,25 @@ class MyGates extends PureComponent {
                                             this.showModal('setName')
                                         })
                                     }}
+                                >更改名称及经纬度</a>
+                                </Menu.Item>
+                                {/* <Menu.Item key="1">
+                                <a
+                                    onClick={()=>{
+                                        console.log(record)
+                                        this.setState({
+                                            record
+                                        }, ()=>{
+                                            this.showModal('setName')
+                                        })
+                                    }}
                                 >设置经纬度</a>
-                                </Menu.Item>
-                                <Menu.Item key="2">
-                                <a href="#">查看和操作应用</a>
-                                </Menu.Item>
+                                </Menu.Item> */}
+                                {/* <Menu.Item key="2">
+                                    <a href="#">查看和操作应用</a>
+                                </Menu.Item> */}
                                 <Menu.Item key="3">
-                                <a href="#">浏览设备数据</a>
+                                    <a href="#">浏览设备数据</a>
                                 </Menu.Item>
                                 <Menu.Divider />
                                 <Menu.Item key="4">
@@ -253,12 +262,9 @@ class MyGates extends PureComponent {
         }
     }
     componentDidMount (){
-        // http.get('/api/user_csrf_token').then(res=>{
-        //     console.log(res)
-        // })
-        this.getDevicesList('online')
+        this.getDevicesList(this.state.status)
         timer = setInterval(() => {
-            this.getDevicesList()
+            this.getDevicesList('online')
         }, 10000);
     }
     componentWillUnmount () {
@@ -311,7 +317,7 @@ class MyGates extends PureComponent {
                 http.postToken('/api/gateways_create', data).then(res=>{
                     if (res.ok) {
                       message.success('绑定成功')
-                      this.getDevicesList()
+                      this.getDevicesList('online')
                     } else {
                       message.error(res.error)
                     }
@@ -347,7 +353,7 @@ class MyGates extends PureComponent {
         });
       }
     render (){
-        let { data, online, offline, confirmLoading } = this.state;
+        let { all, online, offline, confirmLoading } = this.state;
         return (
             <div
                 style={{
@@ -482,7 +488,7 @@ class MyGates extends PureComponent {
                     <Button
                         style={{position: 'absolute', left: 200, top: 0, zIndex: 999}}
                         onClick={()=>{
-                            this.getDevicesList()
+                            this.getDevicesList(this.state.status)
                         }}
                     >
                         <Icon type="sync"/>
@@ -490,6 +496,17 @@ class MyGates extends PureComponent {
                     {
                         <Tabs
                             type="card"
+                            onChange={(value)=>{
+                                this.setState({loading: true}, ()=>{
+                                    if (value === '1') {
+                                        this.getDevicesList('online')
+                                    } else if (value === '2') {
+                                        this.getDevicesList('offline')
+                                    } else {
+                                        this.getDevicesList('all')
+                                    }
+                                })
+                            }}
                         >
                                                         <TabPane tab="在线"
                                                             key="1"
@@ -537,7 +554,7 @@ class MyGates extends PureComponent {
                                                         >
                                                             <Table columns={this.state.columns}
                                                                 dataSource={
-                                                                    data && data.length > 0 ? data : []
+                                                                    all && all.length > 0 ? all : []
                                                                 }
                                                                 rowClassName={(record, index) => {
                                                                     let className = 'light-row';

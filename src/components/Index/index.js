@@ -49,7 +49,7 @@ class App extends PureComponent {
             trigger={null}
             collapsible
             collapsed={this.state.collapsed}
-            style={{width: '100%', zIndex: 99}}
+            style={{width: '100%', zIndex: 0}}
         >
           <Siders collapsed={this.state.collapsed}/>
         </Sider>
