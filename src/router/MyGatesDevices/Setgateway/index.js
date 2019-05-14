@@ -11,7 +11,7 @@ import 'echarts/lib/component/legend';
 import 'echarts/lib/component/tooltip';
 import './style.scss';
 import { exec_result } from '../../../utils/Session';
-
+let timer;
 function getMin (i, date) {
     let Dates = new Date(date - i * 60000)
     let min = Dates.getMinutes();
@@ -60,6 +60,10 @@ class LinkStatus extends Component {
         }, 1000);
       }
     }
+    componentWillUnmount () {
+        // window.removeEventListener('resize', ()=>{})
+        clearInterval(timer)
+    }
     getData (sn){
 
         http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
@@ -92,7 +96,7 @@ class LinkStatus extends Component {
             });
         window.addEventListener('resize', function (){
             myFaultTypeChart.resize();
-        })
+        }, 20)
 
         })
         http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
@@ -237,7 +241,6 @@ class LinkStatus extends Component {
                 }
             })
         }
-        console.log(record, config)
     }
     setAutoDisabled (record, config){
         console.log(config)
@@ -269,9 +272,7 @@ class LinkStatus extends Component {
       changeState  = (name)=> {
           // const data = Object.assign(this.state.config, {[name]: !this.state.config[name]});
           const { config } = this.state;
-          console.log(this)
           const data = Object.assign({}, config, {[name]: !config[name]});
-          console.log(data)
         this.setState({
             config: data
         }, ()=>{
@@ -280,7 +281,6 @@ class LinkStatus extends Component {
       }
         onChange (value, type) {
             this.setState({[type]: value})
-        console.log('changed', value, type);
       }
       buttonOnclick (value, type){
           console.log(value, type)
@@ -604,80 +604,114 @@ class LinkStatus extends Component {
                                             <Icon type="setting" />
                                         </div>
                                         <div>
-                                            <h3>{title}</h3>
-                                            <p>{title === 'FreeIOE' ? config.version < this.state.iot_beta ? <span>{config.version} -> {this.state.iot_beta}</span> : <span>{this.state.iot_beta}</span>
-                                            : config.skynet_version < this.state.skynet_version ? <span>{config.skynet_version} -> {this.state.skynet_version}</span> : <span>{this.state.skynet_version}</span>}</p>
+                                            <h3>FreeIOE</h3>
+                                            <p>
+                                                {config.version < this.state.iot_beta
+                                                ? <span>{config.version} -> {this.state.iot_beta}</span>
+                                                : <span>{this.state.iot_beta}</span>
+                                            }</p>
+                                        </div>
+                                        <div className="Icon"
+                                            style={{marginLeft: 100}}
+                                        >
+                                            <Icon type="setting" />
+                                        </div>
+                                        <div>
+                                            <h3>openwrt x86_64_skynet</h3>
+                                            <p>
+                                                {config.skynet_version < this.state.skynet_version ? <span>{config.skynet_version} -> {this.state.skynet_version}</span> : <span>{this.state.skynet_version}</span>}</p>
                                             <span>{title === 'FreeIOE' ? config.version === this.state.iot_beta ? '已经是最新版' : '可升级到最新版' : config.skynet_version === this.state.skynet_version ? '已经是最新版' : '可升级到最新版'}</span>
                                         </div>
                                     </div>
                                     {
-                                        title === 'FreeIOE'
-                                        ? config.version < this.state.iot_beta
+                                        // title === 'FreeIOE'
+                                        config.version < this.state.iot_beta || config.skynet_version < this.state.skynet_version
                                         ? <Button
                                             onClick={()=>{
                                                 console.log(this.state.data)
                                                 const data = {
-                                                    gateway: this.props.match.params.sn,
-                                                    app: 'frpc',
-                                                    inst: 'ioe_frpc',
+                                                    name: this.props.match.params.sn,
+                                                    skynet_version: this.state.skynet_version,
                                                     version: this.state.iot_beta,
-                                                    conf: {},
+                                                    no_ack: 1,
                                                     id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
-                                                }
-                                                http.postToken('/api/gateways_applications_upgrade', data).then(res=>{
-                                                    exec_result(res.data)
+                                                } 
+                                                http.postToken('/api/gateways_upgrade', data).then(res=>{
+                                                    console.log(res)
+                                                    timer = setInterval(() => {
+                                                        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                                                            if (result.ok){
+                                                                message.success('网关固件升级成功')
+                                                                clearInterval(timer)
+                                                            } else {
+                                                                message.error('网关固件升级失败，请重试')
+                                                                clearInterval(timer)
+                                                            }
+                                                        })
+                                                    }, 3000);
+                                                    // exec_result(res.data)
                                                 })
                                             }}
                                           >升级更新</Button> : <Button>检查更新</Button>
-                                          : config.skynet_version < this.state.skynet_version
-                                          ? <Button
-                                              onClick={()=>{
-                                                  console.log(this.state.data)
-                                                  const data = {
-                                                      gateway: this.props.match.params.sn,
-                                                      app: 'openwrt/x86_64_skynet',
-                                                      inst: 'OPENWRT.x86_64.SKYNET',
-                                                      version: this.state.skynet_version,
-                                                      conf: {},
-                                                      id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
-                                                  }
-                                                  http.postToken('/api/gateways_applications_upgrade', data).then(res=>{
-                                                      exec_result(res.data)
-                                                  })
-                                              }}
-                                            >升级更新</Button> : <Button>检查更新</Button>
+                                        //   : config.skynet_version < this.state.skynet_version
+                                        //   ? <Button
+                                        //       onClick={()=>{
+                                        //           console.log(this.state.data)
+                                        //           const data = {
+                                        //               gateway: this.props.match.params.sn,
+                                        //               app: 'openwrt/x86_64_skynet',
+                                        //               inst: 'OPENWRT.x86_64.SKYNET',
+                                        //               version: this.state.skynet_version,
+                                        //               conf: {},
+                                        //               id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
+                                        //           }
+                                        //           http.postToken('/api/gateways_applications_upgrade', data).then(res=>{
+                                        //               exec_result(res.data)
+                                        //           })
+                                        //       }}
+                                        //     >升级更新</Button> : <Button>检查更新</Button>
                                     }
                         </div>
-                        <h1>{title}</h1>
-                        {
-                            title === 'FreeIOE'
-                            ? newdata && newdata.length > 0 && newdata.map((v, i)=>{
-                                return (
-                                    <Card
-                                        title={`应用名称：${v.app_name}`}
-                                        key={i}
-                                        style={{marginTop: 10}}
-                                    >
-                                        <p>版本号：{v.version}</p>
-                                        <p>更新内容：{v.comment}</p>
-                                        <p>更新时间：{v.modified.split('.')[0]}</p>
-                                    </Card>
-                                )
-                            })
-                            : opendata && opendata.length > 0 && opendata.map((v, i)=>{
-                                return (
-                                    <Card
-                                        title={`应用名称：${v.app_name}`}
-                                        key={i}
-                                        style={{marginTop: 10}}
-                                    >
-                                        <p>版本号：{v.version}</p>
-                                        <p>更新内容：{v.comment}</p>
-                                        <p>更新时间：{v.modified.split('.')[0]}</p>
-                                    </Card>
-                                )
-                            })
-                        }
+                        {/* <h1>{title}</h1> */}
+                        <div style={{display: 'flex', flexWrap: 'wrap'}}>
+                            <div style={{width: '50%', padding: 10, boxSizing: 'border-box'}}>
+                            <h1>FreeIOE</h1>
+                                {
+                                    // title === 'FreeIOE'
+                                    newdata && newdata.length > 0 && newdata.map((v, i)=>{
+                                        return (
+                                            <Card
+                                                title={`应用名称：${v.app_name}`}
+                                                key={i}
+                                                style={{marginTop: 10}}
+                                            >
+                                                <p>版本号：{v.version}</p>
+                                                <p>更新内容：{v.comment}</p>
+                                                <p>更新时间：{v.modified.split('.')[0]}</p>
+                                            </Card>
+                                        )
+                                    })
+                                }
+                            </div>
+                            <div style={{width: '50%', padding: 10}}>
+                            <h1>openwrt x86_64_skynet</h1>
+                                {
+                                    opendata && opendata.length > 0 && opendata.map((v, i)=>{
+                                        return (
+                                            <Card
+                                                title={`应用名称：${v.app_name}`}
+                                                key={i}
+                                                style={{marginTop: 10}}
+                                            >
+                                                <p>版本号：{v.version}</p>
+                                                <p>更新内容：{v.comment}</p>
+                                                <p>更新时间：{v.modified.split('.')[0]}</p>
+                                            </Card>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

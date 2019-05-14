@@ -13,6 +13,7 @@ const AppsList = LoadableComponent(()=>import('./AppsList'));
 const Setgateway = LoadableComponent(()=>import('./Setgateway'));
 const VPN  = LoadableComponent(()=>import('./VPN'));
 const Vserial = LoadableComponent(()=>import('./Vserial'));
+const GatewayRecord = LoadableComponent(()=>import('./GatewayRecord'))
 @withRouter
 @inject('store')
 @observer
@@ -56,14 +57,9 @@ class MyGatesDevices extends Component {
     http.get('/api/gateways_dev_len?gateway=' + sn).then(res=>{
       this.props.store.appStore.setDevlen(res.length);
     })
-    http.get('/api/gateways_list').then(res=>{
-      const online = [];
-      res.message && res.message.length > 0 && res.message.map((v)=>{
-          if (v.data.device_status === 'ONLINE'){
-              online.push(v.data)
-          }
-      })
-      this.props.store.appStore.setGatelist(online)
+    http.get('/api/gateway_list?status=online').then(res=>{
+      console.log(res.message)
+      this.props.store.appStore.setGatelist(res.message)
   })
   }
   showDrawer = () => {
@@ -148,6 +144,9 @@ class MyGatesDevices extends Component {
                       />
                       <PrivateRoute path={`${path}/Vserial`}
                           component={Vserial}
+                      />
+                      <PrivateRoute path={`${path}/gatewayrecord`}
+                          component={GatewayRecord}
                       />
                       <Redirect from={path}
                           to={`${path}/GatesList`}

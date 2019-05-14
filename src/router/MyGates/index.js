@@ -115,6 +115,7 @@ class MyGates extends PureComponent {
             desc: '',
             setName: false,
             record: {},
+            recordVisible: false,
             columns: [{
                 title: '名称',
                 dataIndex: 'dev_name',
@@ -186,7 +187,7 @@ class MyGates extends PureComponent {
                             disabled={record.disabled}
                             overlay={(
                                 <Menu>
-                                <Menu.Item key="5">
+                                <Menu.Item key="0">
                                     <Link to={{
                                         pathname: `/MyGatesDevices/${record.sn}/setgateway`,
                                         state: record
@@ -194,22 +195,10 @@ class MyGates extends PureComponent {
                                         style={{color: 'rgba(0, 0, 0, 0.65)'}}
                                         disabled={record.disabled}
                                     >
-                                        <a key="1"
+                                        <span key="1"
                                             disabled={record.disabled}
-                                        >网关设置</a>
+                                        >网关设置</span>
                                     </Link>
-                                </Menu.Item>
-                                <Menu.Item key="0">
-                                <a
-                                    onClick={()=>{
-                                        console.log(record)
-                                        this.setState({
-                                            record
-                                        }, ()=>{
-                                            this.showModal('setName')
-                                        })
-                                    }}
-                                >更改名称</a>
                                 </Menu.Item>
                                 <Menu.Item key="1">
                                 <a
@@ -221,13 +210,25 @@ class MyGates extends PureComponent {
                                             this.showModal('setName')
                                         })
                                     }}
+                                >更改名称及经纬度</a>
+                                </Menu.Item>
+                                {/* <Menu.Item key="1">
+                                <a
+                                    onClick={()=>{
+                                        console.log(record)
+                                        this.setState({
+                                            record
+                                        }, ()=>{
+                                            this.showModal('setName')
+                                        })
+                                    }}
                                 >设置经纬度</a>
-                                </Menu.Item>
-                                <Menu.Item key="2">
-                                <a href="#">查看和操作应用</a>
-                                </Menu.Item>
+                                </Menu.Item> */}
+                                {/* <Menu.Item key="2">
+                                    <a href="#">查看和操作应用</a>
+                                </Menu.Item> */}
                                 <Menu.Item key="3">
-                                <a href="#">浏览设备数据</a>
+                                    <a href="#">浏览设备数据</a>
                                 </Menu.Item>
                                 <Menu.Divider />
                                 <Menu.Item key="4">

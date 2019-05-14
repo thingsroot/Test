@@ -15,7 +15,7 @@ class LeftNav extends Component {
             {
                 icon: 'profile',
                 text: '设备列表',
-                href: '/GatesList'
+                href: '/gateslist'
             }, {
                 icon: 'appstore',
                 text: '应用列表',
@@ -32,8 +32,12 @@ class LeftNav extends Component {
         // http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
         //     this.props.store.appStore.setStatus(res.message)
         //   })
-        const { pathname } = this.props.location;
-        if (pathname.indexOf('/AppsList') !== -1){
+        const pathname = this.props.location.pathname.toLowerCase();
+        if (pathname.indexOf('/gateslist') !== -1) {
+            this.setState({
+                index: 0
+            })
+        } else if (pathname.indexOf('/appslist') !== -1){
             this.setState({
                 index: 1
             });
@@ -41,10 +45,14 @@ class LeftNav extends Component {
             this.setState({
                 index: 2
             });
-        } else if (pathname.indexOf('/VPN') !== -1){
+        } else if (pathname.indexOf('/vpn') !== -1){
             this.setState({
                 index: '4'
             });
+        } else if (pathname.indexOf('/gatewayrecord') !== -1){
+            this.setState({
+                index: 5
+            })
         }
     }
     setIndex (key){
@@ -66,20 +74,35 @@ class LeftNav extends Component {
                                     <Link to={`${url}${v.href}`}
                                         key={i}
                                         onClick={()=>{
-                                        this.setIndex(i)
+                                            this.setIndex(i)
                                         }}
                                     ><li className={index === i ? 'active' : ''}>
                                     {
-                                        v.href === '/GatesList' ? <div className="gatecount count">{this.props.store.appStore.devs_len}</div> : ''
+                                        v.href.toLowerCase() === '/gateslist' ? <div className="gatecount count">{this.props.store.appStore.devs_len}</div> : ''
                                     }
                                     {
-                                        v.href === '/AppsList' ? <div className="appcount count">{this.props.store.appStore.apps_len}</div> : ''
+                                        v.href.toLowerCase() === '/appslist' ? <div className="appcount count">{this.props.store.appStore.apps_len}</div> : ''
                                     }
                                     <Icon type={v.icon}/>&nbsp;&nbsp;{v.text}</li></Link>
                                 )
                             })
                         }
                     </ul>
+                </div>
+                <div className="navlist">
+                        <p>高级功能</p>
+                        <ul>
+                            <Link
+                                to={`${url}/gatewayrecord`}
+                                onClick={()=>{
+                                    this.setState({index: 5})
+                                }}
+                            >
+                                <li
+                                    className={index === 5 ? 'active' : ''}
+                                ><Icon type="reconciliation"/>&nbsp;&nbsp;在线记录</li>
+                            </Link>
+                        </ul>
                 </div>
                 <div className="navlist">
                     <p>扩展功能</p>
