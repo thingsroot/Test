@@ -6,10 +6,6 @@ import http from '../../../utils/Server';
 @inject('store')
 @observer
 class Inst extends React.Component {
-    componentDidMount () {
-
-    }
-
     instBlur = ()=>{
         if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
             this.props.store.codeStore.setErrorMessage('实例名不能为空')

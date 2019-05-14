@@ -23,13 +23,14 @@ class MyTemplateDetails extends PureComponent {
             content: '',  //数据原型
             csvData: '',  //csv数据
             versionList: [],   //版本号列表
-            confName: '',    //关联应用名称
             visible: false,
             dataList: [],    //版本信息列表
             file: '',        //文件流
             previewData: '',  //预览数据原型
             previewCsvData: '', //预览csv数据
-            maxVersion: 0
+            maxVersion: 0,
+            confName: '',
+            appName: ''
         }
     }
     componentDidMount () {
@@ -39,6 +40,7 @@ class MyTemplateDetails extends PureComponent {
         });
         this.getVersionList(conf);
     }
+
     getVersionList = (conf)=>{
         http.get('/api/configurations_versions_list?conf=' + conf)
             .then(res=>{
@@ -51,7 +53,9 @@ class MyTemplateDetails extends PureComponent {
                         versionList: list,
                         maxVersion: list[0],
                         dataList: res.data,
-                        csvData: Papa.parse(res.data[0].data).data
+                        csvData: Papa.parse(res.data[0].data).data,
+                        appName: res.data[0].app_name,
+                        confName: res.data[0].app_conf_name
                     });
                     this.getDetails(list[0]);
                 }
@@ -141,7 +145,7 @@ class MyTemplateDetails extends PureComponent {
     };
 
     render () {
-        const {content, csvData, versionList, confName, previewCsvData, maxVersion} = this.state;
+        const { confName, appName, content, csvData, versionList, previewCsvData, maxVersion } = this.state;
         return (
             <div className="MyTemplateDetails">
                 <div className="title">
@@ -164,8 +168,7 @@ class MyTemplateDetails extends PureComponent {
                                 })
                             }
                         </Select>
-                        <span style={{paddingLeft: '50px'}}>关联应用：</span>
-                        <span>{confName}</span>
+                        <span style={{paddingLeft: '50px'}}>关联应用：{appName}</span>
                     </div>
                     <div>
                         <Button
@@ -176,7 +179,10 @@ class MyTemplateDetails extends PureComponent {
                             type="primary"
                             disabled={versionList.length > 0 ? false : true}
                         >
-                            <CSVLink data={content}>下载到本地</CSVLink>
+                            <CSVLink
+                                data={content}
+                                filename={appName + '-' + confName + '-' + maxVersion}
+                            >下载到本地</CSVLink>
                         </Button>
 
                     </div>
@@ -251,6 +257,7 @@ class MyTemplateDetails extends PureComponent {
                             style={{minWidth: '100%'}}
                             border="1"
                         >
+                            <tbody>
                             {
                                 previewCsvData && previewCsvData.length > 0 && previewCsvData.map((v, key)=>{
                                     if (v.length > 1) {
@@ -272,6 +279,7 @@ class MyTemplateDetails extends PureComponent {
 
                                 })
                             }
+                            </tbody>
                         </table>
                     </div>
                 </Modal>

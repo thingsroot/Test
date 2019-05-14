@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { withRouter, Link } from 'react-router-dom';
-import { Select, Input, Rate, Icon, Button, Tabs, Table, Modal, Checkbox, message, notification  } from 'antd';
+import { withRouter } from 'react-router-dom';
+import { Input, Rate, Icon, Button, message, notification  } from 'antd';
 import { inject, observer} from 'mobx-react';
 import Status from '../../common/status';
 import http from '../../utils/Server';
@@ -9,14 +9,8 @@ import highlight from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import './style.scss';
 import Nav from './Nav';
-import { split as SplitEditor} from 'react-ace';
-import 'brace/mode/json';
-import 'brace/theme/github';
-import EditableTable from './editorTable';
-import Inst from './Inst';
-const TabPane = Tabs.TabPane;
+import AppConfig from './AppConfig'
 const Search = Input.Search;
-const Option = Select.Option;
 const openNotification = (title, message) => {
     notification.open({
         message: title,
@@ -24,18 +18,12 @@ const openNotification = (title, message) => {
         placement: 'buttonRight'
     });
 };
-const block = {
-    display: 'block'
-};
-const none = {
-    display: 'none'
-};
+
 @withRouter
 @inject('store')
 @observer
 class MyGatesAppsInstall extends Component {
     state = {
-        error: false,
         app: '',
         vendor: [],
         agreement: [],
@@ -57,136 +45,12 @@ class MyGatesAppsInstall extends Component {
         deviceList: [],
         object: {},
         editingKey: '',
-        selectSection: 'socket',   //socket :false     serial: true
         deviceColumns: [],
         deviceSource: [],
         SourceCode: [],
         dataSourceCode: [],
         errorMessage: '',
-        addTempLists: [{
-            title: '名称',
-            dataIndex: 'conf_name',
-            key: 'conf_name',
-            render: text => <a href="javascript:;">{text}</a>
-        }, {
-            title: '描述',
-            dataIndex: 'description',
-            key: 'description'
-        }, {
-            title: '模板ID',
-            dataIndex: 'name',
-            key: 'name'
-        }, {
-            title: '版本',
-            key: 'latest_version',
-            dataIndex: 'latest_version'
-        }, {
-            title: '操作',
-            render: (record) => (
-                <div>
-                    <Button>
-                        <Link to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}>查看</Link>
-                    </Button>
-                    <span style={{padding: '0 5px'}}> </span>
-                    <Button
-                        disabled={record.disabled}
-                        onClick={()=>{
-                            this.addSingleTemp(record.conf_name, record.description, record.name, record.latest_version)
-                        }}
-                    >添加</Button>
-                </div>
-            )
-        }],
-        showTempLists: [{
-            title: '名称',
-            dataIndex: 'conf_name',
-            key: 'conf_name',
-            render: text => <a href="javascript:;">{text}</a>
-        }, {
-            title: '描述',
-            dataIndex: 'description',
-            key: 'description'
-        }, {
-            title: '模板ID',
-            dataIndex: 'name',
-            key: 'name'
-        }, {
-            title: '版本',
-            key: 'latest_version',
-            dataIndex: 'latest_version'
-        }, {
-            title: '操作',
-            key: 'app',
-            render: (record) => (
-                <Button
-                    onClick={()=>{
-                        this.onDelete(`${record.name}`)
-                    }
-                    }
-                >删除</Button>
-            )
-        }],
-        tcp: [
-            {
-                'name': 'ip',
-                'desc': 'IP地址',
-                'type': 'text',
-                'value': '192.168.1.132'
-            },
-            {
-                'name': 'port',
-                'desc': '端口',
-                'type': 'number',
-                'value': 502
-            },
-            {
-                'name': 'nodelay',
-                'desc': 'Nodelay',
-                'type': 'boolean',
-                'value': true
-            }
-        ],
-        serial: [
-            {
-                'name': 'tty',
-                'desc': '端口',
-                'type': 'dropdown',
-                'value': ['ttymcx0', 'ttymcx1']
-            },
-            {
-                'name': 'baudrate',
-                'desc': '波特率',
-                'type': 'dropdown',
-                'value': [4800, 9600, 115200, 19200]
-            },
-            {
-                'name': 'stop_bits',
-                'desc': '停止位',
-                'type': 'dropdown',
-                'value': [1, 2]
-            },
-            {
-                'name': 'data_bits',
-                'desc': '数据位',
-                'type': 'dropdown',
-                'value': [8, 7]
-            },
-            {
-                'name': 'flow_control',
-                'desc': '流控',
-                'type': 'boolean',
-                'value': false
-            },
-            {
-                'name': 'parity',
-                'desc': '校验',
-                'type': 'dropdown',
-                'value': ['None', 'Even', 'Odd']
-            }
-        ],
-        keys: [],
-        configuration: '',
-        activeKey: '1'
+        keys: []
     };
 
     componentDidMount (){
@@ -234,9 +98,7 @@ class MyGatesAppsInstall extends Component {
     }
 
     onChange = (newValue)=>{
-        this.setState({
-            configuration: newValue[0]
-        })
+        this.props.store.codeStore.setInstallConfiguration(newValue)
     };
     //添加模板
     templateShow = ()=>{
@@ -305,19 +167,21 @@ class MyGatesAppsInstall extends Component {
             addTempList: addTempList
         })
     };
-
     getConfig = (val)=>{
-        this.setState({
-            error: false,
-            configuration: '',
-            activeKey: '1'
-        });
+        console.log(val);
+        this.props.store.codeStore.setActiveKey('1');
+        this.props.store.codeStore.setErrorCode();
+        this.props.store.codeStore.setInstallConfiguration('{}');
         this.props.store.codeStore.setInstNames('');
         let config = [];
         if (val.conf_template) {
             let con = val.conf_template.replace(/[\r\n]/g, '');
             let cons = con.replace(/\s+/g, '');
+            console.log(cons);
+            console.log(typeof cons);
             config = JSON.parse(cons);
+            console.log(JSON.parse(cons))
+            console.log(config)
         }
         let deviceColumns = [];
         let tableName = [];  //存放表名
@@ -332,15 +196,11 @@ class MyGatesAppsInstall extends Component {
                 v.type !== 'number' ||
                 v.type !== 'dropdown'
             ) {
-                this.setState({
-                    error: true
-                });
-                this.props.store.codeStore.setReadOnly(false)
+                this.props.store.codeStore.setReadOnly(false);
+                this.props.store.codeStore.setErrorCode()
             }
             if (v.child === undefined) {
-                this.setState({
-                    error: true
-                });
+                this.props.store.codeStore.setErrorCode();
                 this.props.store.codeStore.setReadOnly(false)
             }
             if (v.name === 'device_section') {
@@ -392,14 +252,15 @@ class MyGatesAppsInstall extends Component {
             obj[Object.keys(item)] = Object.values(item)
         });
         http.get('/api/application_configurations_list?app=' + val.name + '&conf_type=Template').then(res=>{
+            console.log(res);
             this.setState({
                 addTempList: res.data
             })
         });
+        console.log(obj)
         this.setState({
             flag: false,
             item: val,
-            configuration: val.pre_configuration,
             detail: true,
             config: config,
             deviceColumns: obj,
@@ -410,22 +271,12 @@ class MyGatesAppsInstall extends Component {
             this.setState({
                 flag: false,
                 detail: false
-            })
+            });
+            this.props.store.codeStore.setActiveKey('2')
         }
+        this.props.store.codeStore.setInstallConfiguration(val.pre_configuration);
+        console.log(val.pre_configuration);
     };
-
-    inputChange = (refName)=>{
-        this.refs[refName].value = event.target.value
-    };
-
-    checkedChange = (refName)=>{
-        this.refs[refName].value = event.target.checked
-    };
-
-    selectChangeValue = (refName)=>{
-        this.refs[refName].value = event.target.innerText
-    };
-
     getData = ()=>{
         const { tcp, serial, selectSection, keys } = this.state;
         let sourceCodeData = {};
@@ -467,16 +318,14 @@ class MyGatesAppsInstall extends Component {
             }
         });
         if (JSON.stringify(sourceCodeData) !== '{}') {
-            this.setState({
-                configuration: JSON.stringify(sourceCodeData)
-            })
+            this.props.store.codeStore.setInstallConfiguration(JSON.stringify(sourceCodeData))
         }
 
     };
 
     submitData = ()=>{
         this.getData();
-        let { configuration, app } = this.state;
+        let { app } = this.state;
         let sn = this.props.match.params.sn;
         let version = 0;
         http.get('/api/applications_versions_latest?app=' + app).then(res=>{
@@ -487,7 +336,7 @@ class MyGatesAppsInstall extends Component {
                     inst: this.props.store.codeStore.instNames,
                     app: app,
                     version: version,
-                    conf: configuration,
+                    conf: this.props.store.codeStore.installConfiguration,
                     id: 'app_install/' + sn + '/' + this.props.store.codeStore.instNames + '/' + app
                 };
                 if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
@@ -495,30 +344,35 @@ class MyGatesAppsInstall extends Component {
                 }
                 http.post('/api/gateways_applications_install', params).then(res=>{
                     openNotification('提交任务成功', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.');
+                    setTimeout(()=>{
+                        this.setState({
+                            details: true
+                        })
+                    }, 1000);
                     let max = 18000;
                     let min = 0;
                     if (res.ok === true) {
                         if (min > max) {
                             openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '错误：' + res.data.message)
                         } else {
-                            let timer = setInterval(()=>{
-                                min += 5000;
-                                setTimeout(()=>{
-                                    http.get('/api/gateways_exec_result?id=' + res.data.data)
-                                        .then(res=>{
-                                            if (JSON.stringify(res) !== '{}') {
-                                                if (res.data.result === true) {
-                                                    openNotification('安装应用' + this.props.store.codeStore.instNames + '成功', '' + res.data.id);
-                                                    clearInterval(timer);
-                                                } else if (res.data.result === false) {
-                                                    openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '' + res.data.message);
-                                                    clearInterval(timer);
+                                let timer = setInterval(()=>{
+                                    min += 5000;
+                                    setTimeout(()=>{
+                                        http.get('/api/gateways_exec_result?id=' + res.data.data)
+                                            .then(res=>{
+                                                if (JSON.stringify(res) !== '{}') {
+                                                    if (res.data.result === true) {
+                                                        openNotification('安装应用' + this.props.store.codeStore.instNames + '成功', '' + res.data.id);
+                                                        clearInterval(timer);
+                                                    } else if (res.data.result === false) {
+                                                        openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '' + res.data.message);
+                                                        clearInterval(timer);
+                                                    }
                                                 }
-                                            }
-                                        })
-                                }, 1000)
-                            }, 5000)
-                        }
+                                            })
+                                    }, 1000)
+                                }, 5000)
+                            }
                     } else {
                         openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
                     }
@@ -530,25 +384,25 @@ class MyGatesAppsInstall extends Component {
     };
 
     callback = (key)=>{
+        const { errorCode } = this.props.store.codeStore;
         if (key === '1') {
-            this.setState({
-                activeKey: '1'
-            })
-        } else {
-            this.setState({
-                activeKey: '2'
-            })
+            this.props.store.codeStore.setActiveKey(key);
+        } else if (key === '2') {
+            this.props.store.codeStore.setActiveKey(key);
         }
-        if (this.state.error === true || this.state.config.length === 0) {
+
+        if (errorCode === true || this.state.config.length === 0) {
             this.props.store.codeStore.setReadOnly(false);
-        } else if (this.state.config && this.state.config.length > 0 || this.state.error === false) {
+        } else if (this.state.config && this.state.config.length > 0 || errorCode === false) {
             this.getData();
         }
     };
 
     render () {
-        const { data, flag, item, detail, showTempLists, serial, tcp, error,
-            addTempLists, showTempList, config, addTempList} = this.state;
+        const { data, flag, item, detail, config, deviceColumns } = this.state;
+
+        console.log(deviceColumns)
+
         return (<div>
             <Status />
                 <div className="AppInstall">
@@ -569,6 +423,8 @@ class MyGatesAppsInstall extends Component {
                             type="rollback"
                             className="back"
                             onClick={()=>{
+                                this.props.store.codeStore.setActiveKey('1');
+                                this.props.store.codeStore.setInstallConfiguration('{}');
                                 this.setState({
                                     flag: true
                                 })
@@ -600,340 +456,21 @@ class MyGatesAppsInstall extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <div id="box"
+                            <div
+                                id="box"
                                 style={{marginTop: 20}}
                             >
                                 markdown
                             </div>
                         </div>
                         <div className={detail ? 'installapp hide' : 'installapp show'}>
-                        <Tabs
-                            defaultActiveKey={this.state.activeKey}
-                            onChange={this.callback}
-                            type="card"
-                        >
-                            <TabPane tab="配置面板"
-                                key="1"
-                            >
-                                <Inst
-                                    sn={this.props.match.params.sn}
-                                    onChange={this.instChange}
-                                    onBlur={this.instBlur}
-                                />
-                                <div
-                                    style={this.state.error ? none : block}
-                                >
-                                    {
-                                        config && config.length > 0 && config.map((v, key) => {
-                                            if (v.type === 'section') {
-                                                if (v.name === 'serial_section') {
-                                                    return (
-                                                        <div
-                                                            id={v.name}
-                                                            key={key}
-                                                            style={this.state.selectSection === 'serial' ? block : none}
-                                                        >
-                                                            <p className="sectionName">
-                                                                <span
-                                                                    style={{padding: '0 5px'}}
-                                                                >|</span>{v.desc}</p>
-                                                            {
-                                                                serial && serial.length > 0 && serial.map((a, index) => {
-                                                                    if (a.type === 'dropdown') {
-                                                                        return (
-                                                                            <div
-                                                                                style={{lineHeight: '50px'}}
-                                                                                key={index}
-                                                                            >
-                                                                                <span
-                                                                                    className="spanStyle"
-                                                                                >{a.desc}</span>
-                                                                                <Select
-                                                                                    defaultValue={a.value ? a.value[0] : ''}
-                                                                                    style={{width: 300}}
-                                                                                    onChange={() => {
-                                                                                        this.selectChangeValue(a.name)
-                                                                                    }}
-                                                                                >
-                                                                                    {a.value && a.value.length > 0 && a.value.map(b => {
-                                                                                        return (
-                                                                                            <Option
-                                                                                                key={b}
-                                                                                            >{b}</Option>
-                                                                                        )
-                                                                                    })}
-                                                                                </Select>
-                                                                                <Input
-                                                                                    ref={a.name}
-                                                                                    type="hidden"
-                                                                                    value={a.value ? a.value[0] : ''}
-                                                                                />
-                                                                            </div>
-                                                                        )
-                                                                    } else {
-                                                                        return (
-                                                                            <div
-                                                                                style={{lineHeight: '50px'}}
-                                                                                key={index}
-                                                                            >
-                                                                                <span
-                                                                                    className="spanStyle"
-                                                                                >{a.desc}</span>
-                                                                                <Checkbox
-                                                                                    defaultChecked={a.value}
-                                                                                    onChange={
-                                                                                        () => {
-                                                                                            this.checkedChange(a.name)
-                                                                                        }
-                                                                                    }
-                                                                                >
-                                                                                </Checkbox>
-                                                                                <Input
-                                                                                    ref={a.name}
-                                                                                    type="hidden"
-                                                                                    value={a.value}
-                                                                                />
-                                                                            </div>
-                                                                        )
-                                                                    }
-                                                                })
-                                                            }
-                                                        </div>
-                                                    )
-                                                } else if (v.name === 'tcp_section') {
-                                                    return (
-                                                        <div
-                                                            id={v.name}
-                                                            key={key}
-                                                            style={this.state.selectSection === 'socket' ? block : none}
-                                                        >
-                                                            <p className="sectionName">
-                                                                <span
-                                                                    style={{padding: '0 5px'}}
-                                                                >|</span>{v.desc}</p>
-                                                            {
-                                                                tcp && tcp.length > 0 && tcp.map((a, index) => {
-                                                                    if (a.type === 'boolean') {
-                                                                        return (
-                                                                            <div
-                                                                                style={{lineHeight: '50px'}}
-                                                                                key={index}
-                                                                            >
-                                                                                <span
-                                                                                    className="spanStyle"
-                                                                                >{a.desc}</span>
-                                                                                <Checkbox
-                                                                                    defaultChecked={a.value}
-                                                                                    onChange={
-                                                                                        () => {
-                                                                                            this.checkedChange(a.name)
-                                                                                        }
-                                                                                    }
-                                                                                >
-                                                                                </Checkbox>
-                                                                                <Input
-                                                                                    ref={a.name}
-                                                                                    type="hidden"
-                                                                                    value={a.value}
-                                                                                />
-                                                                            </div>
-                                                                        )
-                                                                    } else {
-                                                                        return (
-                                                                            <div
-                                                                                style={{lineHeight: '50px'}}
-                                                                                key={index}
-                                                                            >
-                                                                                <span
-                                                                                    className="spanStyle"
-                                                                                >{a.desc}</span>
-
-                                                                                <Input
-                                                                                    style={{width: 320}}
-                                                                                    ref={a.name}
-                                                                                    type={a.type}
-                                                                                    defaultValue={a.value}
-                                                                                    onChange={()=>{
-                                                                                        this.inputChange(a.name)
-                                                                                    }}
-                                                                                />
-                                                                            </div>
-                                                                        )
-                                                                    }
-                                                                })
-                                                            }
-                                                        </div>
-                                                    )
-                                                }
-                                            } else if (v.type === 'templates') {
-                                                return (
-                                                    <div
-                                                        id={v.name}
-                                                        key={key}
-                                                    >
-                                                        <p className="sectionName">
-                                                                <span
-                                                                    style={{padding: '0 5px'}}
-                                                                >|</span>{v.desc}</p>
-                                                        <Table
-                                                            rowKey="name"
-                                                            dataSource={showTempList}
-                                                            columns={showTempLists}
-                                                            pagination={false}
-                                                            style={showTempList.length > 0 ? block : none}
-                                                        />
-                                                        <Button
-                                                            onClick={this.templateShow}
-                                                            style={{margin: '10px 0'}}
-                                                            disabled={addTempList && addTempList.length > 0 ? false : true}
-                                                        >
-                                                            {addTempList && addTempList.length > 0 ? '添加模板' : '此应用下暂时没有模板'}
-                                                        </Button>
-                                                        <Modal
-                                                            title="添加模板"
-                                                            visible={this.state.isTemplateShow}
-                                                            onOk={this.handleCancelAddTempList}
-                                                            onCancel={this.handleCancelAddTempList}
-                                                            wrapClassName={'tableModal'}
-                                                            okText="确定"
-                                                            cancelText="取消"
-                                                        >
-                                                            <Table
-                                                                rowKey="name"
-                                                                dataSource={addTempList ? addTempList : []}
-                                                                columns={addTempLists}
-                                                                pagination={false}
-                                                            />
-                                                        </Modal>
-                                                    </div>
-                                                )
-                                            } else if ( v.type === 'table') {
-                                                return (
-                                                    <div
-                                                        id={v.name}
-                                                        key={key}
-                                                    >
-                                                        {
-                                                            v.child && v.child.length > 0 && v.child.map((w, index)=>{
-                                                                return (
-                                                                    <div
-                                                                        id={w.name}
-                                                                        key={index}
-                                                                    >
-                                                                        <p className="sectionName">
-                                                                                <span
-                                                                                    style={{padding: '0 5px'}}
-                                                                                >|</span>{w.desc}</p>
-                                                                        <EditableTable
-                                                                            tableName={w.name}
-                                                                            deviceColumns={this.state.deviceColumns[w.name]}
-                                                                        />
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
-                                                )
-                                            } else if (v.type === 'dropdown') {
-                                                return (
-                                                    <div
-                                                        id={v.name}
-                                                        key={key}
-                                                    >
-                                                        <div style={{lineHeight: '50px'}}>
-                                                            <span className="spanStyle">{v.desc}：</span>
-                                                            <Select
-                                                                defaultValue={v.value ? v.value[0] : ''}
-                                                                style={{width: 300}}
-                                                                onChange={this.protocolChange}
-                                                            >
-                                                                {v.value && v.value.length > 0 && v.value.map(w => <Option key={w}>{w}</Option>)}
-                                                            </Select>
-                                                            <Input
-                                                                type="hidden"
-                                                                value={v.value ? v.value[0] : ''}
-                                                                ref={v.name}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )
-                                            } else if (v.type === 'text' || v.type === 'number') {
-                                                return (
-                                                    <div
-                                                        id={v.name}
-                                                        key={key}
-                                                    >
-                                                        <div style={{lineHeight: '50px'}}>
-                                                            <span className="spanStyle">{v.desc}：</span>
-                                                            <Input
-                                                                style={{width: '300px'}}
-                                                                type={v.type}
-                                                                defaultValue={v.value === undefined ? '' : v.value}
-                                                                ref={v.name}
-                                                                onChange={()=>{
-                                                                    this.inputChange(v.name)
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )
-                                            }
-                                        })
-                                    }
-                                </div>
-                                <div
-                                    style={this.state.error ? block : none}
-                                    className="message"
-                                >
-                                    数据错误，请使用JSON格式配置！
-                                </div>
-                                <div style={config && config.length > 0 ? none : block}>
-                                    <p
-                                        className="message"
-                                    >此应用不支持配置界面 请使用JSON格式配置</p>
-                                </div>
-                                <Button
-                                    type="primary"
-                                    style={error === true || config.length <= 0 ? none : block}
-                                    onClick={this.submitData}
-                                >提交</Button>
-                            </TabPane>
-                            <TabPane tab="JSON源码"
-                                key="2"
-                            >
-                                <Inst
-                                    sn={this.props.match.params.sn}
-                                    onChange={this.instChange}
-                                    onBlur={this.instBlur}
-                                />
-                                <div className="editorInfo">
-                                    <p style={{lineHeight: '40px'}}>
-                                        编辑器状态：
-                                        <span>{this.props.store.codeStore.readOnly ? '不可编辑' : '可编辑'}</span>
-                                    </p>
-                                </div>
-                                {console.log(this.state.configuration)}
-                                <SplitEditor
-                                    style={{width: '100%'}}
-                                    mode="json"
-                                    theme="github"
-                                    splits={1}
-                                    autoFocus="true"
-                                    onChange={this.onChange}
-                                    value={[this.state.configuration === null ? '{}' : this.state.configuration]}
-                                    fontSize={16}
-                                    readOnly={this.props.store.codeStore.readOnly}
-                                    name="UNIQUE_ID_OF_DIV"
-                                    editorProps={{$blockScrolling: true}}
-                                />
-                                <Button
-                                    type="primary"
-                                    onClick={this.submitData}
-                                >提交</Button>
-                            </TabPane>
-                        </Tabs>
-
+                            <AppConfig
+                                config={config}
+                                configuration={this.props.store.codeStore.installConfiguration}
+                                deviceColumns={deviceColumns}
+                            />
                         </div>
+
                     </div>
                     <div className={flag ? 'show' : 'hide'}>
                         <div className="installheader">
@@ -959,6 +496,7 @@ class MyGatesAppsInstall extends Component {
                                                alt="logo"
                                                onClick={()=>{
                                                    this.getConfig(val)
+                                                   console.log(val)
                                                }}
                                            />
                                            <div className="apptitle">

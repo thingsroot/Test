@@ -51,9 +51,38 @@ class CodeStore {
 
     @observable errorMessage = '';
 
+    @observable correlationApp = '';
+
+    //安装应用配置
+    @observable activeKey = '1';  //配置面板/json源码  active
+    @observable errorCode = {};  //配置面板代码错误
+    @observable config = [];  //配置面板数据
+    @observable installConfiguration = [];  //json源码
+    @observable iDeviceColumns = [];  //配置面板表格
+
+    @action setCorrelationApp (values) {
+        this.correlationApp = values;
+    }
+
+    @action setInstallConfiguration (values) {
+        this.installConfiguration = values;
+    }
+
+    @action setErrorCode (values) {
+        this.errorCode = values;
+    }
+
+    @action setConfig (values) {
+        this.config = values;
+    }
+
+    @action setActiveKey (values) {
+        this.activeKey = values;
+        console.log(values)
+    }
+
     @action setInstNames (values) {
         this.instNames = values;
-        console.log(values)
     }
 
     @action setErrorMessage (values) {
