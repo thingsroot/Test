@@ -10,6 +10,7 @@ class AppStore {
   @observable config ={}
   @observable devs_len = 0;
   @observable apps_len = 0;
+  @observable actionSwi = false;
   @action setGatelist (values) {
       this.gateList = [...values];
   }
@@ -22,7 +23,12 @@ class AppStore {
   @action setStatus (values){
       // this.devs_len = values.devs_len
       // this.apps_len = values.apps_len
-      this.status = values
+      this.status = values;
+      if (values.device_status === 'ONLINE'){
+        this.actionSwi = false;
+      } else {
+        this.actionSwi = true;
+      }
       // this.config = {...values.config}
   }
 

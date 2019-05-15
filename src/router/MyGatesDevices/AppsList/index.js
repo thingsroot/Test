@@ -117,7 +117,7 @@ class AppsList extends Component {
       fetch = (sn) => {
         const pagination = { ...this.state.pagination };
         http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
-          this.props.store.appStore.setApplen(res.message.length)
+          this.props.store.appStore.setApplen(res.message && res.message.length)
           this.setState({
             data: res.message,
             loading: false,

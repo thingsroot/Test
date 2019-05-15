@@ -2,12 +2,15 @@ import React, { Component } from 'react';
 import { Button, Switch, Popconfirm, message, Modal, Input } from 'antd';
 import http from '../../../../utils/Server';
 import { withRouter } from 'react-router-dom';
+import { observer, inject } from 'mobx-react';
 import MyGatesAppsUpgrade from '../../../Upgrade';
 let timer;
 function cancel () {
     message.error('You have canceled the update');
   }
 @withRouter
+@observer
+@inject('store')
 class Action extends Component {
     state = {
         visible: false,
@@ -19,6 +22,7 @@ class Action extends Component {
     }
     confirm = (record, sn)=>{
         console.log(this)
+       if (!this.props.store.appStore.actionSwi) {
         const data = {
           gateway: sn,
           inst: record.device_name,
@@ -48,6 +52,7 @@ class Action extends Component {
             }, 1000);
           }
         })
+       }
       }
       handleCancel = e => {
         console.log(e);
@@ -155,30 +160,41 @@ class Action extends Component {
         })
       }
     render () {
+        const { actionSwi } = this.props.store.appStore;
+        console.log(actionSwi)
         const { record } = this.props;
         const { loading, visible, setName, nameValue } = this.state;
         return (
             <div style={{display: 'flex', justifyContent: 'space-around'}}>
                 <Button
+                    disabled={actionSwi}
                     onClick={()=>{
                         this.showModal('setName')
                     }}
                 >
                     更改名称
                 </Button>
-                <Button>
+                <Button
+                    disabled={actionSwi}
+                >
                     应用配置
                 </Button>
                 {
                     record.running
-                    ? <Button onClick={()=>{
-                        this.appSwitch('stop')
-                    }}>
+                    ? <Button
+                        disabled={actionSwi}
+                        onClick={()=>{
+                          this.appSwitch('stop')
+                        }}
+                      >
                         关闭应用
                       </Button>
-                    : <Button onClick={()=>{
+                    : <Button
+                        onClick={()=>{
                         this.appSwitch('start')
-                    }}>
+                        }}
+                        disabled={actionSwi}
+                      >
                         启动应用
                       </Button>
                 }
@@ -186,6 +202,7 @@ class Action extends Component {
                     onClick={()=>{
                         this.showModal('visible')
                     }}
+                    disabled={actionSwi}
                 >
                     更新版本
                 </Button>
@@ -195,12 +212,14 @@ class Action extends Component {
                     <Switch checkedChildren="ON"
                         unCheckedChildren="OFF"
                         defaultChecked={Number(record.auto) === 0 ? false : true}
+                        disabled={actionSwi}
                         onChange={()=>{
                             this.setAutoDisabled(record, record.auto)
                         }}
                     />
                 </div>
                 <Popconfirm
+                    disabled={actionSwi}
                     title="Are you sure update this app?"
                     onConfirm={()=>{
                         this.confirm(record, this.props.match.params.sn, this)
@@ -210,6 +229,7 @@ class Action extends Component {
                     cancelText="No"
                 >
                     <Button
+                        disabled={actionSwi}
                         type="danger"
                     >应用卸载</Button>
                   </Popconfirm>
