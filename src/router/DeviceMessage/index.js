@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Input, Select, Button, message } from 'antd'
+import {Table, Input, Select, Button, message, Icon} from 'antd'
 import './style.scss'
 import http from '../../utils/Server';
 import {_getCookie} from '../../utils/Session';
@@ -33,46 +33,52 @@ class DevicemMessage extends Component {
         text: '',
         loading: false,
         selectedRowKeys: [],
-        columns: [{
-            title: '标题',
-            dataIndex: 'title',
-            width: '25%',
-            render: (text, record) => (
-                <span
-                    className="cursor"
-                    style={record.disposed === 0 ? disposed : posed}
-                >{text}
-                </span>
-            )
-        }, {
-            title: '网关序列号',
-            dataIndex: 'device',
-            width: '35%',
-            render: (text, record) => (
-                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-            )
-        }, {
-            title: '发生时间',
-            dataIndex: 'creation',
-            width: '20%',
-            render: (text, record) => (
-                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-            )
-        }, {
-            title: '事件类型',
-            dataIndex: 'operation',
-            width: '10%',
-            render: (text, record) => (
-                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-            )
-        }, {
-            title: '事件等级',
-            dataIndex: 'event_level',
-            width: '10%',
-            render: (text, record) => (
-                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-            )
-        }]
+        columns: [
+            {
+                title: '标题',
+                dataIndex: 'title',
+                width: '25%',
+                render: (text, record) => (
+                    <span
+                        className="cursor"
+                        style={record.disposed === 0 ? disposed : posed}
+                    >{text}
+                    </span>
+                )
+            }, {
+                title: '网关序列号',
+                dataIndex: 'device',
+                width: '35%',
+                render: (text, record) => (
+                    <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+                )
+            }, {
+                title: '发生时间',
+                dataIndex: 'creation',
+                width: '20%',
+                render: (text, record) => (
+                    <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+                )
+            }, {
+                title: '事件类型',
+                dataIndex: 'operation',
+                width: '10%',
+                render: (text, record) => (
+                    <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+                )
+            }, {
+                title: '事件等级',
+                dataIndex: 'event_level',
+                width: '10%',
+                render: (text, record) => (
+                    <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+                )
+            }
+        ],
+        flag: false,
+        messageCount: 0,
+        unconfirmed: 0,
+        sync: false
     };
     componentDidMount (){
         let params = {
@@ -100,11 +106,12 @@ class DevicemMessage extends Component {
                 selectValue: 'title'
             });
         }
-
     }
+
     onSelectChange = (selectedRowKeys) => {
         this.setState({ selectedRowKeys });
     };
+
     //确认消息
     confMessage = (arr)=>{
         if (arr.length === 0) {
@@ -136,14 +143,15 @@ class DevicemMessage extends Component {
                 this.setState({
                     selectedRowKeys: [],
                     loading: false,
-                    deviceData: newData
+                    deviceData: newData,
+                    unconfirmed: this.state.unconfirmed - arr.length
                 });
             }).catch(err=>{
                 console.log(err)
             })
         }
     };
-    //确认消息
+    //确认所有消息
     confAllMessage = ()=>{
         this.setState({
             loading: true
@@ -161,6 +169,7 @@ class DevicemMessage extends Component {
             events: data,
             disposed: 1
         };
+
         http.post('/api/events_dispose', params).then(res=>{
             res;
             deviceData && deviceData.length > 0 && deviceData.map((v, key)=>{
@@ -174,7 +183,8 @@ class DevicemMessage extends Component {
             this.setState({
                 selectedRowKeys: [],
                 loading: false,
-                platform: deviceData
+                platform: deviceData,
+                unconfirmed: 0
             });
         }).catch(err=>{
             console.log(err)
@@ -183,7 +193,8 @@ class DevicemMessage extends Component {
     //获取消息列表
     getMessageList = (params)=>{
         this.setState({
-            loading: true
+            loading: true,
+            unconfirmed: 0
         });
         axios({
             url: '/api/device_events_list',
@@ -193,8 +204,12 @@ class DevicemMessage extends Component {
             let sourceData = res.data.data.list.data;
             let data = [];
             let source = [];
+            let unconfirmed = 0;
             if (res.data.ok === true) {
                 sourceData.map((v)=>{
+                    if (v.disposed === 0) {
+                        unconfirmed++
+                    }
                     let type = '';
                     let level = '';
                     if (v.event_type === 'EVENT') {
@@ -211,7 +226,6 @@ class DevicemMessage extends Component {
                     } else if (v.event_level === 99) {
                         level = '致命'
                     }
-
                     data.push({
                         title: v.event_info,
                         device: v.event_source,
@@ -230,7 +244,10 @@ class DevicemMessage extends Component {
             }
             this.setState({
                 loading: false,
-                deviceData: data
+                deviceData: data,
+                messageCount: res.data.data.count,
+                unconfirmed: unconfirmed,
+                sync: false
             });
             this.props.store.codeStore.setDeviceData(data);
             this.props.store.codeStore.setDeviceTableData(data)
@@ -244,6 +261,38 @@ class DevicemMessage extends Component {
                 this.props.store.codeStore.setDeviceData(newData)
             }
         })
+    };
+    //查看所有、查看未确认
+    toggleMessage = ()=>{
+        this.setState({
+            flag: !this.state.flag
+        }, ()=>{
+            let params = {
+                category: this.state.category,
+                name: this.state.name,
+                start: this.state.start,
+                filters: this.state.filters,
+                limit: this.state.length
+            };
+            if (this.state.flag) {
+                this.getUnconfirmed()
+            } else {
+                this.getMessageList(params)
+            }
+        })
+    };
+    //获取未读消息
+    getUnconfirmed = ()=>{
+        let params = {
+            category: this.state.category,
+            name: this.state.name,
+            start: this.state.start,
+            limit: this.state.unconfirmed,
+            filters: {
+                disposed: 0
+            }
+        };
+        this.getMessageList(params)
     };
     //时间戳转换
     timestampToTime = (timestamp)=>{
@@ -372,8 +421,30 @@ class DevicemMessage extends Component {
         console.log('params', pagination, filters, sorter)
     };
 
+    refresh = ()=>{
+        this.setState({
+            sync: true
+        });
+        let filters = this.state.filters;
+        let params = {
+            category: 'user',
+            name: unescape(_getCookie('user_id')),
+            start: 0,
+            limit: this.state.length
+        };
+        if (this.state.flag) {
+            filters['disposed'] = 0;
+            params['filters'] = filters;
+            this.getMessageList(params)
+        } else {
+            params['filters'] = filters;
+            this.getMessageList(params)
+        }
+    };
+
     render () {
-        let { selectValue, selectedRowKeys, columns, category } = this.state;
+        let { selectValue, selectedRowKeys, columns, category, flag,
+            messageCount, unconfirmed } = this.state;
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange
@@ -381,44 +452,6 @@ class DevicemMessage extends Component {
         return (
             <div className="deviceMessage">
                 <div className="searchBox">
-                    <Select defaultValue="消息类型"
-                        style={{ width: 120 }}
-                        onChange={this.messageChange}
-                    >
-                        <Option value="">全部消息类型</Option>
-                        <Option value="通讯">通讯</Option>
-                        <Option value="数据">数据</Option>
-                        <Option value="应用">应用</Option>
-                        <Option value="系统">系统</Option>
-                        <Option value="设备">设备</Option>
-                    </Select>
-                    <Select defaultValue="等级"
-                        style={{ width: 120 }}
-                        onChange={this.gradeChange}
-                    >
-                        <Option value="">全部消息类型</Option>
-                        <Option value="1">常规</Option>
-                        <Option value="2">错误</Option>
-                        <Option value="3">警告</Option>
-                        <Option value="99">致命</Option>
-                    </Select>
-                    <Select defaultValue="记录数"
-                        style={{ width: 120 }}
-                        onChange={this.messageTotal}
-                    >
-                        <Option value="100">100</Option>
-                        <Option value="300">300</Option>
-                        <Option value="500">500</Option>
-                    </Select>
-                    <Select defaultValue="时间"
-                        style={{ width: 120 }}
-                        onChange={this.messageTime}
-                    >
-                        <Option value="1">1小时</Option>
-                        <Option value="6">6小时</Option>
-                        <Option value="24">24小时</Option>
-                        <Option value="72">72小时</Option>
-                    </Select>
                     <Button onClick={()=>{
                         this.confMessage(selectedRowKeys)
                     }}
@@ -427,6 +460,44 @@ class DevicemMessage extends Component {
                         this.confAllMessage()
                     }}
                     >确认所有消息</Button>
+                    <Select defaultValue="消息类型：全部"
+                        style={{ width: 150 }}
+                        onChange={this.messageChange}
+                    >
+                        <Option value="">消息类型：全部</Option>
+                        <Option value="通讯">消息类型：通讯</Option>
+                        <Option value="数据">消息类型：数据</Option>
+                        <Option value="应用">消息类型：应用</Option>
+                        <Option value="系统">消息类型：系统</Option>
+                        <Option value="设备">消息类型：设备</Option>
+                    </Select>
+                    <Select defaultValue="等级：全部"
+                        style={{ width: 130 }}
+                        onChange={this.gradeChange}
+                    >
+                        <Option value="">等级：全部</Option>
+                        <Option value="1">等级：常规</Option>
+                        <Option value="2">等级：错误</Option>
+                        <Option value="3">等级：警告</Option>
+                        <Option value="99">等级：致命</Option>
+                    </Select>
+                    <Select defaultValue="记录数：500"
+                        style={{ width: 130 }}
+                        onChange={this.messageTotal}
+                    >
+                        <Option value="100">记录数：100</Option>
+                        <Option value="300">记录数：300</Option>
+                        <Option value="500">记录数：500</Option>
+                    </Select>
+                    <Select defaultValue="时间：默认"
+                        style={{ width: 130 }}
+                        onChange={this.messageTime}
+                    >
+                        <Option value="1">时间：1小时</Option>
+                        <Option value="6">时间：6小时</Option>
+                        <Option value="24">时间：24小时</Option>
+                        <Option value="72">时间：72小时</Option>
+                    </Select>
                     <div style={{
                         width: '340px',
                         position: 'absolute',
@@ -454,6 +525,12 @@ class DevicemMessage extends Component {
                             />
                         </InputGroup>
                     </div>
+                    <Icon
+                        style={{fontSize: '18px', lineHeight: '35px', padding: '0 10px'}}
+                        type="sync"
+                        spin={this.state.sync}
+                        onClick={this.refresh}
+                    />
                 </div>
                 <Table
                     rowSelection={rowSelection}
@@ -472,6 +549,18 @@ class DevicemMessage extends Component {
                     expandRowByClick
                     rowClassName={this.setClassName} //表格行点击高亮
                     rowKey="name"
+                    footer={() => {
+                        return (
+                            <div className="none">
+                                {'全部消息' + messageCount + '条，列表中为确认消息' + unconfirmed + '条，'}
+                                <a
+                                    onClick={this.toggleMessage}
+                                >
+                                    {flag ? '查看所有' : '查看未确认'}
+                                </a>
+                            </div>
+                        )
+                    }}
                 />
             </div>
         );

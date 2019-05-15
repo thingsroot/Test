@@ -1,5 +1,5 @@
- import React, { Component } from 'react';
-import { Table, Input, Select, Button, message } from 'antd'
+import React, { Component } from 'react';
+import { Table, Input, Select, Button, message, Icon } from 'antd'
 import SonTable from './SonTable';
 import './style.scss'
 import http from '../../utils/Server';
@@ -33,40 +33,46 @@ class PlatformMessage extends Component {
         loading: false,
         selectedRowKeys: [],
         visible: false,
-        columns: [{
-            title: '标题',
-            dataIndex: 'title',
-            width: '30%',
-            render: (text, record) => (
-                <span
-                    className="cursor"
-                    style={record.disposed === 0 ? disposed : posed}
-                >
-                    {text}
-                </span>
-            )
-        }, {
-            title: '网关序列号',
-            dataIndex: 'device',
-            width: '35%',
-            render: (text, record) => (
-                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-            )
-        }, {
-            title: '发生时间',
-            dataIndex: 'creation',
-            width: '20%',
-            render: (text, record) => (
-                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-            )
-        }, {
-            title: '消息类型',
-            dataIndex: 'operation',
-            width: '10%',
-            render: (text, record) => (
-                <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-            )
-        }]
+        columns: [
+            {
+                title: '标题',
+                dataIndex: 'title',
+                width: '30%',
+                render: (text, record) => (
+                    <span
+                        className="cursor"
+                        style={record.disposed === 0 ? disposed : posed}
+                    >
+                        {text}
+                    </span>
+                )
+            }, {
+                title: '网关序列号',
+                dataIndex: 'device',
+                width: '35%',
+                render: (text, record) => (
+                    <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+                )
+            }, {
+                title: '发生时间',
+                dataIndex: 'creation',
+                width: '20%',
+                render: (text, record) => (
+                    <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+                )
+            }, {
+                title: '消息类型',
+                dataIndex: 'operation',
+                width: '10%',
+                render: (text, record) => (
+                    <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
+                )
+            }
+        ],
+        unconfirmed: 0,
+        messageCount: 0,
+        flag: false,
+        sync: false
     };
     componentDidMount (){
         let params = {
@@ -85,13 +91,14 @@ class PlatformMessage extends Component {
         });
         this.getMessageList(params);
     }
+
     onChange = (pagination, filters, sorter)=>{
         console.log('params', pagination, filters, sorter)
     };
+
     onSelectChange = (selectedRowKeys) => {
         this.setState({ selectedRowKeys });
     };
-
     //确认消息
     confMessage = (arr)=>{
         if (arr.length === 0) {
@@ -117,13 +124,13 @@ class PlatformMessage extends Component {
                         }
                     });
                 });
-                let newData = platform.splice(0, platform.length - 10);
-                this.props.store.codeStore.setPlatformData(newData);
-                this.props.store.codeStore.setTableData(newData);
+                this.props.store.codeStore.setPlatformData(platform);
+                this.props.store.codeStore.setTableData(platform);
                 this.setState({
                     selectedRowKeys: [],
                     loading: false,
-                    platform: newData
+                    platform: platform,
+                    unconfirmed: this.state.unconfirmed - arr.length
                 });
             }).catch(err=>{
                 console.log(err)
@@ -156,12 +163,14 @@ class PlatformMessage extends Component {
                     v.disposed = 1;
                 }
             });
+            console.log(platform);
             this.props.store.codeStore.setPlatformData(platform);
             this.props.store.codeStore.setTableData(platform);
             this.setState({
                 selectedRowKeys: [],
                 loading: false,
-                platform: platform
+                platform: platform,
+                unconfirmed: 0
             });
         }).catch(err=>{
             console.log(err)
@@ -170,7 +179,8 @@ class PlatformMessage extends Component {
     //获取消息列表
     getMessageList = (params)=>{
         this.setState({
-            loading: true
+            loading: true,
+            unconfirmed: 0
         });
         axios({
             url: '/api/platform_activities_lists',
@@ -181,8 +191,12 @@ class PlatformMessage extends Component {
                 let sourceData = res.data.data.list.data;
                 let data = [];
                 let source = [];
+                let unconfirmed = 0;
                 if (sourceData) {
                     sourceData.map((v)=>{
+                        if (v.disposed === 0) {
+                            unconfirmed++
+                        }
                         let obj = JSON.parse(v.message);
                         let sub = '';
                         //设备状态
@@ -310,7 +324,10 @@ class PlatformMessage extends Component {
                 }
                 this.setState({
                     loading: false,
-                    platform: data
+                    platform: data,
+                    unconfirmed: unconfirmed,
+                    sync: false,
+                    messageCount: res.data.data.count
                 });
                 this.props.store.codeStore.setPlatformData(data);
                 this.props.store.codeStore.setTableData(data);
@@ -318,6 +335,38 @@ class PlatformMessage extends Component {
                 message.error('获取消息列表失败！')
             }
         });
+    };
+    //查看所有、查看未确认
+    toggleMessage = ()=>{
+        this.setState({
+            flag: !this.state.flag
+        }, ()=>{
+            let params = {
+                category: this.state.category,
+                name: this.state.name,
+                start: this.state.start,
+                filters: this.state.filters,
+                limit: this.state.length
+            };
+            if (this.state.flag) {
+                this.getUnconfirmed()
+            } else {
+                this.getMessageList(params)
+            }
+        })
+    };
+    //获取未读消息
+    getUnconfirmed = ()=>{
+        let params = {
+            category: this.state.category,
+            name: this.state.name,
+            start: this.state.start,
+            limit: this.state.unconfirmed,
+            filters: {
+                disposed: 0
+            }
+        };
+        this.getMessageList(params)
     };
     //时间戳转换
     timestampToTime = (timestamp)=>{
@@ -336,6 +385,7 @@ class PlatformMessage extends Component {
             selectValue: text
         })
     };
+
     tick = (text)=>{
         if (this.timer){
             clearTimeout(this.timer)
@@ -346,6 +396,7 @@ class PlatformMessage extends Component {
             })
         }, 1000);
     };
+
     search = (inpVal)=>{
         let text = event.target.value;
         this.tick(text);
@@ -391,8 +442,12 @@ class PlatformMessage extends Component {
                     data.push(v);
                 }
             });
+            let filters = this.state.filters;
+            filters['operation'] = value;
+            console.log(filters);
             this.setState({
-                platform: data
+                platform: data,
+                filters: filters
             });
             this.props.store.codeStore.setPlatformData(data)
         } else {
@@ -424,9 +479,24 @@ class PlatformMessage extends Component {
         });
         this.getMessageList(params);
     };
-
+    //刷新
+    refresh = ()=>{
+        this.setState({
+            sync: true
+        });
+        let params = {
+            category: 'user',
+            name: unescape(_getCookie('user_id')),
+            start: 0,
+            limit: this.state.length,
+            filters: this.state.filters
+        };
+        console.log(params);
+        this.getMessageList(params)
+    };
     render () {
-        let { selectValue, selectedRowKeys, columns, category } = this.state;
+        let { selectValue, selectedRowKeys, columns, category, flag,
+            unconfirmed, messageCount } = this.state;
         const { platformData } = this.props.store.codeStore;
         const rowSelection = {
             selectedRowKeys,
@@ -435,31 +505,6 @@ class PlatformMessage extends Component {
         return (
             <div className="platformMessage">
                 <div className="searchBox">
-                    <Select defaultValue="消息类型"
-                        style={{ width: 120 }}
-                        onChange={this.messageChange}
-                    >
-                        <Option value="">全部消息类型</Option>
-                        <Option value="Action">设备操作</Option>
-                        <Option value="Status">设备消息</Option>
-                    </Select>
-                    <Select defaultValue="记录数"
-                        style={{ width: 120 }}
-                        onChange={this.messageTotal}
-                    >
-                        <Option value="100">100</Option>
-                        <Option value="300">300</Option>
-                        <Option value="500">500</Option>
-                    </Select>
-                    <Select defaultValue="时间"
-                        style={{ width: 120 }}
-                        onChange={this.messageTime}
-                    >
-                        <Option value="1">1小时</Option>
-                        <Option value="6">6小时</Option>
-                        <Option value="24">24小时</Option>
-                        <Option value="72">72小时</Option>
-                    </Select>
                     <Button onClick={()=>{
                         this.confMessage(selectedRowKeys)
                     }}
@@ -468,6 +513,31 @@ class PlatformMessage extends Component {
                         this.confAllMessage()
                     }}
                     >确认所有消息</Button>
+                    <Select defaultValue="消息类型：全部"
+                        style={{ width: 180 }}
+                        onChange={this.messageChange}
+                    >
+                        <Option value="">消息类型：全部</Option>
+                        <Option value="Action">消息类型：设备操作</Option>
+                        <Option value="Status">消息类型：设备消息</Option>
+                    </Select>
+                    <Select defaultValue="记录数：100"
+                        style={{ width: 140 }}
+                        onChange={this.messageTotal}
+                    >
+                        <Option value="100">记录数：100</Option>
+                        <Option value="300">记录数：300</Option>
+                        <Option value="500">记录数：500</Option>
+                    </Select>
+                    <Select defaultValue="时间：默认"
+                        style={{ width: 140 }}
+                        onChange={this.messageTime}
+                    >
+                        <Option value="1">时间：1小时</Option>
+                        <Option value="6">时间：6小时</Option>
+                        <Option value="24">时间：24小时</Option>
+                        <Option value="72">时间：72小时</Option>
+                    </Select>
                     <div style={{
                         width: '340px',
                         position: 'absolute',
@@ -494,6 +564,12 @@ class PlatformMessage extends Component {
                             />
                         </InputGroup>
                     </div>
+                    <Icon
+                        style={{fontSize: '18px', lineHeight: '35px', padding: '0 10px'}}
+                        type="sync"
+                        spin={this.state.sync}
+                        onClick={this.refresh}
+                    />
                 </div>
                 <Table
                     rowSelection={rowSelection}
@@ -509,6 +585,18 @@ class PlatformMessage extends Component {
                                 category={category}
                                 data={record}
                             />
+                        )
+                    }}
+                    footer={() => {
+                        return (
+                            <div className="none">
+                                {'全部消息' + messageCount + '条，列表中为确认消息' + unconfirmed + '条，'}
+                                <a
+                                    onClick={this.toggleMessage}
+                                >
+                                    {flag ? '查看所有' : '查看未确认'}
+                                </a>
+                            </div>
                         )
                     }}
                 />

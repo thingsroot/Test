@@ -32,6 +32,7 @@ class MyAppDetails extends Component {
         groupName: '',
         onLine: []
     };
+
     componentDidMount (){
         let user = unescape(_getCookie('user_id'));
         let app = this.props.match.params.name;
@@ -66,6 +67,7 @@ class MyAppDetails extends Component {
                 time: res.data.data.data.modified.substr(0, 11),
                 templateList: res.data.tempList
             });
+            sessionStorage.setItem('app_name', res.data.data.data.app_name);
             this.props.store.codeStore.setVersionList(res.data.versionList.data);
             this.props.store.codeStore.setVersionLatest(res.data.versionLatest.data)
         });
@@ -80,7 +82,6 @@ class MyAppDetails extends Component {
     render () {
         const { url } = this.props.match;
         let { app, message, time, user, templateList } = this.state;
-        console.log(user)
         return (
             <div className="myAppDetails">
                 <div className="header">

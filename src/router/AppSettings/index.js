@@ -51,7 +51,6 @@ class AppSettings extends Component {
             })
         })
     };
-
     handleSubmit = (e) => {
         const { description, configuration, predefined } = this.props.store.codeStore;
         e.preventDefault();
@@ -89,7 +88,9 @@ class AppSettings extends Component {
                                     message.success('应用创建成功！');
                                 }
                             });
-                            window.location.href = '/myApps'
+                            setTimeout(()=>{
+                                window.location.href = '/myApps'
+                            }, 1500)
                         } else {
                             message.error('应用创建失败！')
                         }
