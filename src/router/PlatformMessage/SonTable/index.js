@@ -31,9 +31,8 @@ class SonTable extends React.Component {
                 v.disposed = 1
             }
         });
-        let newData = data.splice(0, data.length - 1);
-        this.props.store.codeStore.setPlatformData(newData);
-        this.props.store.codeStore.setTableData(newData);
+        this.props.store.codeStore.setPlatformData(data);
+        this.props.store.codeStore.setTableData(data);
     }
 
     render () {

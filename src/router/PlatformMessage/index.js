@@ -40,7 +40,7 @@ class PlatformMessage extends Component {
                 width: '30%',
                 render: (text, record) => (
                     <span
-                        className="cursor"
+                        className="cursor overflow"
                         style={record.disposed === 0 ? disposed : posed}
                     >
                         {text}
@@ -75,12 +75,16 @@ class PlatformMessage extends Component {
         sync: false
     };
     componentDidMount (){
+        let hours = Date.parse(new Date()) - 72 * 60 * 60 * 1000;
+        let time = this.timestampToTime(hours);
         let params = {
             category: 'user',
             name: unescape(_getCookie('user_id')),
             start: 0,
             limit: 100,
-            filters: {}
+            filters: {
+                creation: ['>', time]
+            }
         };
         this.setState({
             category: params.category,
@@ -88,8 +92,9 @@ class PlatformMessage extends Component {
             start: params.start,
             length: params.limit,
             filters: params.filters
+        }, ()=>{
+            this.getMessageList(params);
         });
-        this.getMessageList(params);
     }
 
     onChange = (pagination, filters, sorter)=>{
@@ -211,102 +216,128 @@ class PlatformMessage extends Component {
                             if (obj.channel === 'app') {
                                 if (obj.action === 'option') {   //开机自启动
                                     if (obj.data.value === 1) {
-                                        sub = '开启应用' + obj.data.inst + '开机自启动'
+                                        sub = v.full_name + '  开启应用' + obj.data.inst + '开机自启动'
                                     } else if (obj.data.value === 0) {
-                                        sub = '关闭应用' + obj.data.inst + '开机自启动'
+                                        sub = v.full_name + '  关闭应用' + obj.data.inst + '开机自启动'
+                                    } else {
+                                        sub = JSON.stringify(obj)
                                     }
                                 } else if (obj.action === 'restart') {
-                                    sub = '重启应用' + obj.data.inst
+                                    sub = v.full_name + '    重启应用' + obj.data.inst
                                 } else if (obj.action === 'start') {
-                                    sub = '启动应用' + obj.data.inst
+                                    sub = v.full_name + '    启动应用' + obj.data.inst
                                 } else if (obj.action === 'stop') {
-                                    sub = '停止应用' + obj.data.inst
+                                    sub = v.full_name + '   停止应用' + obj.data.inst
                                 } else if (obj.action === 'conf') {
-                                    sub = '更改应用' + obj.data.inst + '应用配置'
+                                    sub = v.full_name + '   更改应用' + obj.data.inst + '应用配置'
                                 } else if (obj.action === 'upload_comm') {
                                     if (obj.data.sec === 0) {
-                                        sub = '停止上传应用' + obj.data.inst + '报文'
+                                        sub = v.full_name + '   停止上传应用' + obj.data.inst + '报文'
                                     } else if (obj.data.sec === 120) {
-                                        sub = '上传应用' + obj.data.inst + '报文'
+                                        sub = v.full_name + '   上传应用' + obj.data.inst + '报文'
+                                    } else {
+                                        sub = JSON.stringify(obj)
                                     }
                                 } else if (obj.action === 'install') {
-                                    sub = '安装应用' + obj.data.name + '实例名' + obj.data.inst
+                                    sub = v.full_name + '   安装应用' + obj.data.name + '实例名' + obj.data.inst
                                 } else if (obj.action === 'uninstall') {
-                                    sub = '卸载应用' + obj.data.inst
+                                    sub = v.full_name + '   卸载应用' + obj.data.inst
                                 } else if (obj.action === 'query_comm') {
-                                    sub = '应用' + obj.data.inst + '查询报文'
+                                    sub = v.full_name + '   查询应用' + obj.data.inst + '报文'
                                 } else if (obj.action === 'query_log') {
-                                    sub = '应用' + obj.data.inst + '查询日志'
+                                    sub = v.full_name + '   应用查询' + obj.data.inst + '日志'
                                 } else if (obj.action === 'list') {
-                                    sub = '刷新应用列表'
+                                    sub = v.full_name + '   刷新应用列表'
                                 } else if (obj.action === 'upgrade') {
-                                    sub = '应用' + obj.data.inst + '升级到最新版本'
+                                    sub = v.full_name + '   升级应用' + obj.data.inst + '到最新版本'
                                 } else if (obj.action === 'rename') {
-                                    sub = '应用' + obj.data.inst + '重命名为' + obj.data.new_name
+                                    sub = v.full_name + '   重命名应用' + obj.data.inst + '为' + obj.data.new_name
+                                } else {
+                                    sub = JSON.stringify(obj)
                                 }
                             } else if (obj.channel === 'sys') {
                                 if (obj.action === 'enable/beta') {
                                     if (obj.data === 0) {
-                                        sub = '网关关闭beta模式'
-                                    } else if (obj.data === 1) {
-                                        sub = '网关开启beta模式'
+                                        sub = v.full_name + '    关闭网关beta模式'
+                                    } else if (obj.data !== 0) {
+                                        sub = v.full_name + '    开启网关beta模式'
+                                    } else {
+                                        sub = JSON.stringify(obj)
                                     }
                                 } else if (obj.action === 'enable/data') {
                                     if (obj.data === 0) {
-                                        sub = '网关关闭数据上传'
+                                        sub = v.full_name + '    关闭网关数据上传'
                                     } else if (obj.data === 1) {
-                                        sub = '网关开启数据上传'
+                                        sub = v.full_name + '    开启网关数据上传'
+                                    } else {
+                                        sub = JSON.stringify(obj)
                                     }
                                 } else if (obj.action === 'enable/log') {
                                     if (obj.data === '') {
-                                        sub = '网关关闭日志上送'
+                                        sub = v.full_name + '    关闭网关日志上送'
                                     } else if (obj.data === 60) {
-                                        sub = '网关开启日志上送'
+                                        sub = v.full_name + '    开启网关日志上送'
+                                    } else {
+                                        sub = JSON.stringify(obj)
                                     }
                                 } else if (obj.action === 'enable/comm') {
                                     if (obj.data === 0) {
-                                        sub = '网关停止报文上送'
+                                        sub = v.full_name + '    停止网关报文上送'
                                     } else if (obj.data === 60) {
-                                        sub = '网关开启报文上送'
+                                        sub = v.full_name + '    开启网关报文上送'
+                                    } else {
+                                        sub = JSON.stringify(obj)
                                     }
                                 } else if (obj.action === 'restart') {
-                                    sub = '网关IOT程序重启'
+                                    sub = v.full_name + '    重启网关IOT程序'
                                 } else if (obj.action === 'reboot') {
-                                    sub = '网关设备重启'
+                                    sub = v.full_name + '    重启网关设备'
                                 } else if (obj.action === 'cloud_conf') {
-                                    sub = '网关云中心配置选项更新'
+                                    sub = v.full_name + '    更新网关云中心配置选项'
                                 } else if (obj.action === 'enable/data_one_short') {
                                     if (obj.data === '') {
-                                        sub = '网关关闭临时上传数据'
+                                        sub = v.full_name + '    关闭网关临时上传数据'
                                     } else if (obj.data === 60) {
-                                        sub = '网关开启临时上传数据'
+                                        sub = v.full_name + '    开启网关临时上传数据'
+                                    } else {
+                                        sub = JSON.stringify(obj)
                                     }
                                 } else if (obj.action === 'ext/upgrade') {
-                                    sub = '网关更新扩展库' + obj.data.name
+                                    sub = v.full_name + '    更新网关扩展库' + obj.data.name
                                 } else if (obj.action === 'ext/list') {
-                                    sub = '网关上传扩展库列表'
+                                    sub = v.full_name + '    上传网关扩展库列表'
                                 } else if (obj.action === 'cfg/download') {
-                                    sub = '网关IOT固件配置下载'
+                                    sub = v.full_name + '    下载网关IOT固件配置'
                                 } else if (obj.action === 'cfg/upload') {
-                                    sub = '网关IOT固件配置上传'
+                                    sub = v.full_name + '    上传网关IOT固件配置'
                                 } else if (obj.action === 'upgrade') {
-                                    sub = '网关升级到最新版本'
+                                    sub = v.full_name + '    升级网关到最新版本'
                                 } else if (obj.action === 'enable/event') {
-                                    sub = '网关更改事件上传等级'
+                                    sub = v.full_name + '    更改网关事件上传等级'
                                 } else if (obj.action === 'enable/stat') {
-                                    sub = '网关开启统计数据上传'
+                                    sub = v.full_name + '    开启网关统计数据上传'
                                 } else if (obj.action === 'batch_script') {
-                                    sub = '网关执行批量操作'
+                                    sub = v.full_name + '    执行网关批量操作'
                                 } else if (obj.action === 'upgrade/ack') {
-                                    sub = '网关IOT固件升级确认'
+                                    sub = v.full_name + '    确认升级网关IOT固件'
                                 } else if (obj.action === 'data/query') {
-                                    sub = '网关请求立刻上传数据'
+                                    sub = v.full_name + '    请求立刻上传网关数据'
+                                } else {
+                                    sub = JSON.stringify(obj)
                                 }
                             } else if (obj.channel === 'command') {
-                                sub = '网关应用设备执行' + obj.data.cmd + '指令'
+                                sub = v.full_name + '    执行网关应用设备' + obj.data.cmd + '指令'
                             } else if (obj.channel === 'output') {
-                                sub = '网关设备应用' + obj.data.output + '数据输出'
-                            }  //output
+                                sub = v.full_name + '    操作网关设备应用' + obj.data.output + '数据输出'
+                            } else if (obj.action === 'Delete') {
+                                sub = v.full_name + '    删除应用'
+                            } else if (obj.action === 'Add') {
+                                sub = v.full_name + '    添加应用'
+                            } else {
+                                sub = JSON.stringify(obj)
+                            } //output
+                        } else {
+                            sub = JSON.stringify(obj)
                         }
                         data.push({
                             title: sub,
@@ -331,6 +362,9 @@ class PlatformMessage extends Component {
                 });
                 this.props.store.codeStore.setPlatformData(data);
                 this.props.store.codeStore.setTableData(data);
+                if (this.state.text !== '') {
+                    this.tick(this.state.text)
+                }
             } else {
                 message.error('获取消息列表失败！')
             }
@@ -383,39 +417,52 @@ class PlatformMessage extends Component {
     getSelect = (text)=>{
         this.setState({
             selectValue: text
+        }, ()=>{
+            this.tick(this.state.text);
         })
     };
 
     tick = (text)=>{
+        this.setState({
+            loading: true
+        });
         if (this.timer){
             clearTimeout(this.timer)
         }
         this.timer = setTimeout(() => {
             this.setState({
                 text: text
+            }, ()=>{
+                if (text) {
+                    let newData = [];
+                    let tableData = this.props.store.codeStore.tableData;
+                    tableData.map((v)=>{
+                        if (v[this.state.selectValue].toLowerCase().indexOf(text.toLowerCase()) !== -1) {
+                            newData.push(v)
+                        }
+                    });
+                    this.setState({
+                        platform: newData,
+                        loading: false
+                    });
+                    this.props.store.codeStore.setPlatformData(newData);
+                } else {
+                    let params = {
+                        category: this.state.category,
+                        name: this.state.name,
+                        start: this.state.start,
+                        limit: this.state.length,
+                        filters: this.state.filters
+                    };
+                    this.getMessageList(params)
+                }
             })
         }, 1000);
     };
 
-    search = (inpVal)=>{
-        let text = event.target.value;
+    search = (e)=>{
+        let text = e.target.value;
         this.tick(text);
-        if (text) {
-            let newData = [];
-            let tableData = this.props.store.codeStore.tableData;
-            tableData.map((v)=>{
-                if (v[inpVal].toLowerCase().indexOf(text.toLowerCase()) !== -1) {
-                    newData.push(v)
-                }
-            });
-            this.setState({
-                platform: newData
-            });
-            this.props.store.codeStore.setPlatformData(newData);
-        } else {
-            let data = this.props.store.codeStore.tableData;
-            this.props.store.codeStore.setPlatformData(data);
-        }
     };
     //最大记录数
     messageTotal = (value)=>{
@@ -427,6 +474,7 @@ class PlatformMessage extends Component {
             limit: num,
             filters: this.state.filters
         };
+        console.log(params);
         this.setState({
             length: params.limit
         });
@@ -434,22 +482,21 @@ class PlatformMessage extends Component {
     };
     //筛选消息类型
     messageChange = (value)=>{
-        if (`${value}`) {
-            let data = [];
-            let tableData = this.props.store.codeStore.tableData;
-            tableData.map((v)=>{
-                if (v.operation === `${value}`) {
-                    data.push(v);
-                }
-            });
+        if (value) {
             let filters = this.state.filters;
             filters['operation'] = value;
-            console.log(filters);
+            let params = {
+                category: this.state.category,
+                name: this.state.name,
+                start: this.state.start,
+                limit: this.state.length
+            };
+            params['filters'] = filters;
+            console.log(params)
             this.setState({
-                platform: data,
-                filters: filters
+                filters: params.filters
             });
-            this.props.store.codeStore.setPlatformData(data)
+            this.getMessageList(params);
         } else {
             let data = this.props.store.codeStore.tableData;
             this.props.store.codeStore.setPlatformData(data);
@@ -462,18 +509,15 @@ class PlatformMessage extends Component {
     messageTime = (value)=>{
         let hours = Date.parse(new Date()) - `${value}` * 60 * 60 * 1000;
         let time = this.timestampToTime(hours);
+        let filters = this.state.filters;
+        filters['creation'] = ['>', time];
         let params = {
             category: this.state.category,
             name: this.state.name,
             start: this.state.start,
-            limit: this.state.length,
-            filters: {
-                'creation': [
-                    '>',
-                    time
-                ]
-            }
+            limit: this.state.length
         };
+        params['filters'] = filters;
         this.setState({
             filters: params.filters
         });
@@ -495,7 +539,7 @@ class PlatformMessage extends Component {
         this.getMessageList(params)
     };
     render () {
-        let { selectValue, selectedRowKeys, columns, category, flag,
+        let { selectedRowKeys, columns, category, flag,
             unconfirmed, messageCount } = this.state;
         const { platformData } = this.props.store.codeStore;
         const rowSelection = {
@@ -529,7 +573,7 @@ class PlatformMessage extends Component {
                         <Option value="300">记录数：300</Option>
                         <Option value="500">记录数：500</Option>
                     </Select>
-                    <Select defaultValue="时间：默认"
+                    <Select defaultValue="时间：24小时"
                         style={{ width: 140 }}
                         onChange={this.messageTime}
                     >
@@ -556,11 +600,7 @@ class PlatformMessage extends Component {
                             <Input
                                 style={{ width: '70%' }}
                                 placeholder="请输入关键字"
-                                onChange={
-                                    ()=>{
-                                        this.search(selectValue)
-                                    }
-                                }
+                                onChange={this.search}
                             />
                         </InputGroup>
                     </div>
