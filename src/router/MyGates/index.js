@@ -58,14 +58,16 @@ function getDevicesList (status){
     // })
 }
   function confirm (record) {
-      http.postToken('/api/gateways_remove', {
-        name: record.name
-      }).then(res=>{
-          if (res.ok){
-            message.success('移除网关成功')
-        }
-        this.getDevicesList(this.state.status)
-      })
+     if (record.device_status === 'ONLINE'){
+        http.postToken('/api/gateways_remove', {
+            name: record.name
+          }).then(res=>{
+              if (res.ok){
+                message.success('移除网关成功')
+            }
+            this.getDevicesList(this.state.status)
+          })
+     }
 //   http.postToken('/api/method/iot_ui.iot_api.remove_gate', {
 //       sn: [record.device_sn]
 //   }).then(res=>{
@@ -165,10 +167,10 @@ class MyGates extends PureComponent {
                             pathname: `/MyGatesDevices/${record.sn}`,
                             state: record
                         }}
-                            disabled={record.disabled}
+                            // disabled={record.disabled}
                         >
                             <Button key="1"
-                                disabled={record.disabled}
+                                // disabled={record.disabled}
                             >设备</Button>
                         </Link>
                         <Divider type="vertical" />
@@ -176,10 +178,10 @@ class MyGates extends PureComponent {
                             pathname: `/MyGatesDevices/${record.sn}/AppsList`,
                             state: record
                         }}
-                            disabled={record.disabled}
+                            // disabled={record.disabled}
                         >
                             <Button key="2"
-                                disabled={record.disabled}
+                                // disabled={record.disabled}
                             >应用</Button>
                         </Link>
                         <Divider type="vertical" />
@@ -200,8 +202,23 @@ class MyGates extends PureComponent {
                                         >网关设置</span>
                                     </Link>
                                 </Menu.Item>
+                                
+                                <Menu.Item key="2">
+                                    <Link to={{
+                                        pathname: `/MyGatesDevices/${record.sn}/gatewayrecord`,
+                                        state: record
+                                    }}
+                                        style={{color: 'rgba(0, 0, 0, 0.65)'}}
+                                        disabled={record.disabled}
+                                    >
+                                        <span key="1"
+                                            disabled={record.disabled}
+                                        >网关在线记录</span>
+                                    </Link>
+                                </Menu.Item>
                                 <Menu.Item key="1">
                                 <a
+                                    disabled={record.device_status !== 'ONLINE'}
                                     onClick={()=>{
                                         console.log(record)
                                         this.setState({
@@ -227,9 +244,9 @@ class MyGates extends PureComponent {
                                 {/* <Menu.Item key="2">
                                     <a href="#">查看和操作应用</a>
                                 </Menu.Item> */}
-                                <Menu.Item key="3">
+                                {/* <Menu.Item key="3">
                                     <a href="#">浏览设备数据</a>
-                                </Menu.Item>
+                                </Menu.Item> */}
                                 <Menu.Divider />
                                 <Menu.Item key="4">
                                     <Popconfirm
@@ -241,9 +258,9 @@ class MyGates extends PureComponent {
                                         cancelText="取消"
                                     >
                                         <Button key="3"
+                                            disabled={record.device_status !== 'ONLINE'}
                                             style={{border: 'none'}}
                                             type="danger"
-                                            disabled={record.disabled}
                                         >删除网关</Button>
                                     </Popconfirm>
                                 </Menu.Item>

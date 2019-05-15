@@ -13,15 +13,6 @@ import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
 import './style.scss';
 let myFaultTypeChart;
-function getMin (i, date){
-  let Dates = new Date(date - i * 60000)
-  let min = Dates.getMinutes();
-  if (min < 10){
-    return '0' + min
-  } else {
-    return min;
-  }
-}
   class ExpandedRowRender extends PureComponent {
     state = {
       data: [],
@@ -105,12 +96,14 @@ function getMin (i, date){
         const { myCharts } = this.refs;
         let data = [];
         const date = new Date() * 1;
-        for (var i = 0;i < 10;i++){
-          data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
+        const length = res.message.length > 120 ? 120 : res.message.length
+        for (var i = 0;i < length;i++){
+          const hours = new Date(date - (i * 5000)).getHours()
+          const min = new Date(date - (i * 5000)).getMinutes()
+          const seconds = new Date(date - (i * 5000)).getSeconds();
+          data.unshift(hours + ':' + (min < 10 ? '0' + min : min) + ':' + (seconds < 10 ? '0' + seconds : seconds));
         }
-        console.log(name)
         if (res.message && res.message.length > 0 && this.state.record.vt !== 'string') {
-          console.log(record)
           myFaultTypeChart = echarts.init(myCharts);
           myFaultTypeChart.setOption({
               tooltip: {
@@ -133,45 +126,13 @@ function getMin (i, date){
               ]
           });
         } else if (this.state.record.vt === 'string') {
-          console.log(myCharts)
           myCharts.style.textAlin = 'center'
           myCharts.innerHTML = '暂不支持此类数据，请点击更多历史数据查看更多数据。'
         } else {
-          console.log(myCharts)
           myCharts.style.textAlin = 'center'
           myCharts.innerHTML = '暂未获取到数据'
         }
       })
-      // http.get(`/api/method/iot_ui.iot_api.taghisdata?sn=${data.sn}&vsn=${data.vsn}&tag=${data.name}&vt=${data.vt}&time_condition=time > now() - 10m&value_method=raw&group_time_span=10m&_=1551251898530`).then((res)=>{
-      //   const { myCharts } = this.refs;
-      //   let data = [];
-      //   const date = new Date() * 1;
-      //   for (var i = 0;i < 10;i++){
-      //     data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
-      //   }
-      //   console.log(name)
-      //   myFaultTypeChart = echarts.init(myCharts);
-      //     myFaultTypeChart.setOption({
-      //         tooltip: {
-      //             trigger: 'axis',
-      //             axisPointer: {
-      //                 type: 'cross'
-      //             }
-      //         },
-      //         xAxis: {
-      //             data: data
-      //         },
-      //         yAxis: {},
-      //         series: [
-      //           {
-      //             name: '数值',
-      //             type: 'line',
-      //             color: '#37A2DA',
-      //             data: res.message
-      //           }
-      //         ]
-      //     });
-      // })
     }
     handleOk = () => {
       const {record} = this.state;
@@ -209,6 +170,7 @@ function getMin (i, date){
               visible={this.state.visible}
               onOk={this.handleOk}
               onCancel={this.handleCancel}
+              width="50%"
               footer={[
                 <Button key="back"
                     onClick={this.handleCancel}
@@ -224,7 +186,7 @@ function getMin (i, date){
             <div
                 id="faultTypeMain"
                 ref="myCharts"
-                style={{width: 472, height: 250, textAlign: 'center', fontSize: 30}}
+                style={{width: '100%', height: 400, textAlign: 'center', fontSize: 30}}
             ></div>
           </Modal>
         </div>

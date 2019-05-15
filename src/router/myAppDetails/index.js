@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { Icon, Tabs } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
@@ -18,7 +18,7 @@ const block = {
 const none = {
     display: 'none'
 };
-
+@withRouter
 @inject('store')
 @observer
 class MyAppDetails extends Component {
@@ -88,7 +88,8 @@ class MyAppDetails extends Component {
                     <span><Icon type="appstore" />{message.app_name}</span>
                     <span
                         onClick={()=>{
-                            window.location.href = '/myApps'
+                            console.log(this)
+                            this.props.history.go(-1)
                         }}
                     >
                     <Icon type="rollback"/></span>

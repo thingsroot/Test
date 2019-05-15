@@ -1,47 +1,10 @@
 import React, { Component } from 'react';
-import { Table, Switch, Button, Popconfirm, message, Icon, Modal } from 'antd';
+import { Table, Button, Icon } from 'antd';
 import http from '../../../utils/Server';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { exec_result } from '../../../utils/Session';
-import MyGatesAppsUpgrade from '../../Upgrade';
+import Action from './action';
 let timer;
-const confirm = (record, sn, _this)=>{
-  console.log(_this)
-  const data = {
-    gateway: sn,
-    inst: record.device_name,
-    id: `app_remove/${sn}/${record.device_name}/${new Date() * 1}`
-  }
-  http.postToken('/api/gateways_applications_remove', data).then(res=>{
-    console.log(res)
-    if (res.data){
-      timer = setInterval(() => {
-        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-          if (result.data) {
-            if (result.data.result) {
-              message.success('应用卸载成功')
-              clearInterval(timer)
-              http.post('/api/gateways_applications_refresh', {
-                gateway: sn,
-                id: `gateways/refresh/${sn}/${new Date() * 1}`
-              })
-              console.log(this)
-              _this.fetch(_this.props.match.params.sn)
-            } else if (result.data.result === false) {
-              message.error('应用卸载失败，请重试')
-              clearInterval(timer)
-            }
-          }
-        })
-      }, 1000);
-    }
-  })
-}
-
-function cancel () {
-  message.error('You have canceled the update');
-}
 @withRouter
 @inject('store') @observer
 class AppsList extends Component {
@@ -51,9 +14,7 @@ class AppsList extends Component {
           data: [],
           pagination: {},
           loading: true,
-          visible: false,
           url: window.location.pathname,
-          record: {},
           columns: [{
             title: '',
             dataIndex: 'data.data.icon_image',
@@ -71,7 +32,12 @@ class AppsList extends Component {
             dataIndex: 'device_name',
             sorter: true,
             //render: name => `${name} ${name}`,
-            width: '20%'
+            width: '20%',
+            action: (record)=>{
+              return (
+                <Button>{record}</Button>
+              )
+            }
           }, {
             title: '版本',
             dataIndex: 'version',
@@ -79,24 +45,9 @@ class AppsList extends Component {
             render: (props, record)=>{
               if (record.latestVersion > props) {
                 return (
-                  // <Link
-                  //     to={`/MyGatesAppsUpgrade/${this.props.match.params.sn}/${record.device_name}/${props}/${record.name}`}
-                  //     style={{color: 'blue'}}
-                  // >
-                    // {props} <Icon type="arrow-up"/>
-                    <Button
-                        type="primary"
-                        onClick={()=>{
-                          this.setState({
-                            record
-                          }, ()=>{
-                            this.showModal()
-                          })
-                        }}
-                    >
+                    <span style={{color: 'blue'}}>
                      {props} <Icon type="arrow-up"/>
-                    </Button>
-                  // </Link>
+                    </span>
                 )
               } else {
                 return <span>{props}</span>
@@ -123,43 +74,9 @@ class AppsList extends Component {
           }, {
             title: '启动时间',
             dataIndex: 'running'
-          }, {
-            title: '开机自启',
-            dataIndex: 'auto',
-            render: (props, record, )=>{
-                return (
-                <Switch checkedChildren="ON"
-                    unCheckedChildren="OFF"
-                    defaultChecked={Number(props) === 0 ? false : true}
-                    onChange={()=>{
-                      this.setAutoDisabled(record, props)
-                    }}
-                />)
-            }
-          }, {
-            title: '操作',
-            dataIndex: '',
-            render: (record)=>{
-              record
-              return (
-                <div>
-                  <Popconfirm
-                      title="Are you sure update this app?"
-                      onConfirm={()=>{
-                        this.confirm(record, this.props.match.params.sn, this)
-                      }}
-                      onCancel={cancel}
-                      okText="Yes"
-                      cancelText="No"
-                  >
-                    <Button>应用卸载</Button>
-                  </Popconfirm>
-                </div>
-              )
-            }
-          }]
+          }
+        ]
       }
-        this.confirm = confirm.bind(this)
       }
       componentDidMount () {
         this.fetch(this.props.match.params.sn);
@@ -183,68 +100,6 @@ class AppsList extends Component {
       componentWillUnmount (){
         clearInterval(timer)
       }
-      showModal = (record) => {
-        console.log(record)
-        this.setState({
-          visible: true
-        });
-      }
-      handleOk = () => {
-        const {record} = this.state;
-        console.log(record)
-        this.setState({ loading: true });
-        const data = {
-          gateway: this.props.match.params.sn,
-          app: record.name,
-          inst: record.device_name,
-          version: record.latestVersion,
-          conf: {},
-          id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
-      }
-      console.log(data)
-      http.postToken('/api/gateways_applications_upgrade', data).then(res=>{
-          timer = setInterval(() => {
-              http.get('/api/gateways_exec_result?id=' + res.data).then(res=>{
-                  if (res.ok){
-                      message.success('应用升级成功')
-                      clearInterval(timer)
-                      // http.post('/api/gateways_applications_refresh', {
-                      //     gateway: this.props.sn,
-                      //     id: `gateways/refresh/${this.props.match.params.sn}/${new Date() * 1}`
-                      // }).then(()=>{
-                      //     this.props.history.go(-1)
-                      // })
-                  } else if (res.ok === false){
-                      message.error('应用升级操作失败，请重试');
-                      clearInterval(timer)
-                  }
-              })
-          }, 1000);
-      })
-        setTimeout(() => {
-          this.setState({ loading: false, visible: false });
-        }, 3000);
-      }
-      handleCancel = () => {
-        this.setState({ visible: false });
-      }
-      setAutoDisabled (record, props){
-        const { sn } = this.props.match.params;
-        let type = props ? 0 : 1;
-        const data = {
-          gateway: sn,
-          inst: record.device_name,
-          option: 'auto',
-          value: type,
-          id: `option/${sn}/${record.sn}/${new Date() * 1}`
-        }
-        http.post('/api/gateways_applications_option', data).then(res=>{
-          console.log(res)
-          if (res.data){
-            exec_result(res.data)
-          }
-        })
-      }
       handleTableChange = (pagination, filters, sorter) => {
         const pager = { ...this.state.pagination };
         pager.current = pagination.current;
@@ -262,7 +117,7 @@ class AppsList extends Component {
       fetch = (sn) => {
         const pagination = { ...this.state.pagination };
         http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
-          this.props.store.appStore.setApplen(res.message.length)
+          this.props.store.appStore.setApplen(res.message && res.message.length)
           this.setState({
             data: res.message,
             loading: false,
@@ -271,7 +126,7 @@ class AppsList extends Component {
         })
       }
     render () {
-      const { loading, visible, record } = this.state;
+      const { loading } = this.state;
         return (
             <div>
                 <Table
@@ -282,37 +137,8 @@ class AppsList extends Component {
                     loading={loading}
                     onChange={this.handleTableChange}
                     bordered
+                    expandedRowRender={(record) => <Action record={record}/>}
                 />
-                <Modal
-                    visible={visible}
-                    title="应用升级详情"
-                    onOk={this.handleOk}
-                    destroyOnClose
-                    onCancel={this.handleCancel}
-                    footer={[
-                      <Button
-                          key="back"
-                          onClick={this.handleCancel}
-                      >
-                        取消
-                      </Button>,
-                      <Button
-                          key="submit"
-                          type="primary"
-                          loading={loading}
-                          onClick={this.handleOk}
-                      >
-                        升级
-                      </Button>
-                    ]}
-                >
-                  <MyGatesAppsUpgrade
-                      version={record.version}
-                      inst={record.device_name}
-                      sn={this.props.match.params.sn}
-                      app={record.name}
-                  />
-                </Modal>
             </div>
         );
     }

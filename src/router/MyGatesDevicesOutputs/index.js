@@ -42,7 +42,9 @@ class MyGatesDevicesOutputs extends PureComponent {
             width: '150px',
             render: (record)=>{
                 return (
-                    <Button onClick={()=>{
+                    <Button
+                        disabled={this.props.store.appStore.actionSwi}
+                        onClick={()=>{
                         this.showModal(record)
                     }}
                     >下置</Button>

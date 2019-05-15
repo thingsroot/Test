@@ -6,6 +6,7 @@ const Search = Input.Search;
 import http from '../../utils/Server';
 import mqtt from 'mqtt';
 import './style.scss';
+import iScroll from 'iscroll/build/iscroll-probe';
 let client;
 // const columns = [{
 //     title: '时间',
@@ -48,6 +49,7 @@ function success (){
 function error (){
     console.log('error')
 }
+
 @withRouter
 class MyGatesLogviewer extends Component {
     state = {
@@ -60,7 +62,29 @@ class MyGatesLogviewer extends Component {
     }
     componentDidMount (){
         this.t1 = setInterval(()=>this.tick(), 60000);
+        this.myScroll = new iScroll('#tbody', {
+            probeType: 2,
+            mouseWheel: true,
+            scrollbars: true,
+            interactiveScrollbars: true,
+            freeScroll: true,
+            momentum: false,
+            resizePolling: 1,
+            hideScrollbar: true,
+            sanp: true
+        })
+        this.myScroll.on('scroll', ()=>{
+            console.log('lllllllllllllll')
+        })
+        this.myScroll.on('scrollEnd', function (){
+            console.log('sssssssssssssssss')
+            console.log(this.myScroll)
+        })
     }
+    componentDidUpdate () {
+        // console.log(this.myScroll.scrollToElement())
+        this.myScroll.refresh()
+      }
     componentWillUnmount (){
         clearInterval(this.t1)
     }
@@ -115,15 +139,25 @@ class MyGatesLogviewer extends Component {
                         data: arr
                     })
                     const obj = `
-                    <tr>
-                        <th padding='10px'>${getLocalTime(newmessage[1])}</th>
-                        <th>${newmessage[0]}</th>
-                        <th>${newmessage[2].split(']:')[0] + ']'}</th>
-                        <th>${newmessage[2].split(']:')[1]}</th>
-                    </tr>
+                            <div class="tableHeaders">
+                                <div>${getLocalTime(newmessage[1])}</div>
+                                <div>${newmessage[0]}</div>
+                                <div>${newmessage[2].split(']:')[0] + ']'}</div>
+                                <div>${newmessage[2].split(']:')[1]}</div>
+                            </div>
                     `
+                    // const obj = `
+                    // <tr>
+                    //     <th padding='10px'>${getLocalTime(newmessage[1])}</th>
+                    //     <th>${newmessage[0]}</th>
+                    //     <th>${newmessage[2].split(']:')[0] + ']'}</th>
+                    //     <th>${newmessage[2].split(']:')[1]}</th>
+                    // </tr>
+                    // `
+                    this.myScroll.scrollTo(0, 400)
+                    // console.log(this.myScroll)
                    if (this.state.searchflag) {
-                    this.refs.tbody.innerHTML = obj +  this.refs.tbody.innerHTML
+                    this.refs.content.innerHTML = obj +  this.refs.content.innerHTML;
                    }
                 } else {
                     client.unsubscribe(topic)
@@ -139,6 +173,9 @@ class MyGatesLogviewer extends Component {
     }
     onClose = ()=>{
         this.setState({maxNum: false})
+    }
+    onSCroll = ()=>{
+        console.log('22222')
     }
     render () {
         return (
@@ -162,7 +199,7 @@ class MyGatesLogviewer extends Component {
                     <Button
                         onClick={()=>{
                             this.setState({data: []})
-                            this.refs.tbody.innerHTML = '';
+                            this.refs.content.innerHTML = '';
                         }}
                     >清除</Button>
                     <div className="searwrap">
@@ -192,7 +229,7 @@ class MyGatesLogviewer extends Component {
                                         </tr>
                                         `
                                 });
-                                this.refs.tbody.innerHTML = html
+                                this.refs.content.innerHTML = html
                                 this.setState({
                                     searchflag: false
                                 })
@@ -208,7 +245,7 @@ class MyGatesLogviewer extends Component {
                                         </tr>
                                         `
                                 });
-                                this.refs.tbody.innerHTML = html;
+                                this.refs.content.innerHTML = html;
                                 this.setState({
                                     searchflag: true
                                 })
@@ -233,7 +270,7 @@ class MyGatesLogviewer extends Component {
                     ref="table"
                     className="logview"
                 >
-                    <table
+                    {/* <table
                         style={{width: '100%', padding: '8px'}}
                         border="1"
                     >
@@ -245,10 +282,23 @@ class MyGatesLogviewer extends Component {
                                 <th>内容</th>
                             </tr>
                         </thead>
-                        <tbody ref="tbody">
+                            <tbody ref="tbody">
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                    </table> */}
+                    <div style={{width: '100%'}}>
+                        <div className="tableHeaders">
+                            <div>时间</div>
+                            <div>类型</div>
+                            <div>实例ID</div>
+                            <div>内容</div>
+                        </div>
+                            <div className="tableContent" id="tbody">
+                                <div ref="content">
+
+                                </div>
+                            </div>
+                    </div>
                 </div>
             </div>
         );

@@ -14,12 +14,19 @@ class upgrade extends PureComponent {
     componentDidMount (){
         http.get('/api/applications_versions_list?app=' + this.props.app).then(res=>{
             const data = []
-            res.data.map(item=>{
-                if (item.version > this.props.version) {
-                    data.push(item)
+            console.log(res)
+            if (res.data[0].version >= this.props.version){
+                res.data.map(item=>{
+                    if (item.version > this.props.version) {
+                        data.push(item)
+                    }
+                })
+                if (data.length > 0 ){
+                    this.setState({newdata: data, title: data[0].app_name, version: data[0].version, app: data[0].app, loading: false})
                 }
-            })
-            this.setState({newdata: data, title: data[0].app_name, version: data[0].version, app: data[0].app, loading: false})
+            } else {
+                this.refs.version.innerHTML = '已经是最新版，无需升级'
+            }
         })
     }
     componentWillUnmount (){
@@ -49,22 +56,24 @@ class upgrade extends PureComponent {
                                     </div>
                         </div>
                         <h1>{title}版本信息</h1>
-                        {
-                            newdata && newdata.length > 0 && newdata.map((v, i)=>{
-                                return (
-                                    <Card
-                                        title={`应用名称：${v.app_name}`}
-                                        key={i}
-                                        style={{marginTop: 10}}
-                                        loading={loading}
-                                    >
-                                        <p>版本号：{v.version}</p>
-                                        <p>更新内容：{v.comment}</p>
-                                        <p>更新时间：{v.modified.split('.')[0]}</p>
-                                    </Card>
-                                )
-                            })
-                        }
+                        <div ref="version">
+                            {
+                                newdata && newdata.length > 0 && newdata.map((v, i)=>{
+                                    return (
+                                        <Card
+                                            title={`应用名称：${v.app_name}`}
+                                            key={i}
+                                            style={{marginTop: 10}}
+                                            loading={loading}
+                                        >
+                                            <p>版本号：{v.version}</p>
+                                            <p>更新内容：{v.comment}</p>
+                                            <p>更新时间：{v.modified.split('.')[0]}</p>
+                                        </Card>
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
             </div>

@@ -306,7 +306,7 @@ class LinkStatus extends Component {
           }
       }
     render () {
-        const { status } = this.props.store.appStore;
+        const { status, actionSwi } = this.props.store.appStore;
         const {  flag, title, update, config, newdata, opendata, use_beta, loading, DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, UOLOAD, UOLOAD_VALUE } = this.state;
         return (
             <div>
@@ -316,6 +316,7 @@ class LinkStatus extends Component {
                     >
                         <div className="setbutton">
                             <Button
+                                disabled={actionSwi}
                                 onClick={()=>{
                                     this.setState({update: true})
                                 }}
@@ -627,6 +628,7 @@ class LinkStatus extends Component {
                                         // title === 'FreeIOE'
                                         config.version < this.state.iot_beta || config.skynet_version < this.state.skynet_version
                                         ? <Button
+                                            disabled={actionSwi}
                                             onClick={()=>{
                                                 console.log(this.state.data)
                                                 const data = {
