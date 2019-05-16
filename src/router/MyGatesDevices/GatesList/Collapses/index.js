@@ -13,6 +13,7 @@ class Collapses extends Component {
         return (
             <div>
                 <Collapse
+                    destroyInactivePanel
                     defaultActiveKey={['1']}
                     // onChange={callback}
                 >
@@ -24,6 +25,9 @@ class Collapses extends Component {
                             inputs={this.props.inputs}
                             vsn={this.props.meta.sn}
                         />
+                        {
+                            console.log(this.props)
+                        }
                     </Panel>
                     <Panel
                         disabled={this.props.outputs && Object.keys(this.props.outputs).length > 0 ? false : true}

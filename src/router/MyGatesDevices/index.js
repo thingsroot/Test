@@ -13,7 +13,8 @@ const AppsList = LoadableComponent(()=>import('./AppsList'));
 const Setgateway = LoadableComponent(()=>import('./Setgateway'));
 const VPN  = LoadableComponent(()=>import('./VPN'));
 const Vserial = LoadableComponent(()=>import('./Vserial'));
-const GatewayRecord = LoadableComponent(()=>import('./GatewayRecord'))
+const GatewayRecord = LoadableComponent(()=>import('./GatewayRecord'));
+const Logviewer = LoadableComponent(()=>import('./MyGatesLogviewer'));
 @withRouter
 @inject('store')
 @observer
@@ -147,6 +148,9 @@ class MyGatesDevices extends Component {
                       />
                       <PrivateRoute path={`${path}/gatewayrecord`}
                           component={GatewayRecord}
+                      />
+                      <PrivateRoute path={`${path}/logviewer`}
+                          component={Logviewer}
                       />
                       <Redirect from={path}
                           to={`${path}/GatesList`}

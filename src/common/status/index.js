@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon } from 'antd';
 import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
@@ -53,13 +52,6 @@ class Status extends Component {
                 <div>
                     <div className="positon"><span></span></div>
                     &nbsp;序号: {status.sn}
-                </div>
-                <div>
-                    <Link to={'/MyGatesLogviewer/' + status.sn}
-                        style={{color: 'blue'}}
-                    >   <Icon type="ordered-list"
-                        style={{color: 'blue'}}
-                        />日志</Link>
                 </div>
                     {
                         this.props.location.pathname.indexOf('/AppsInstall') === -1

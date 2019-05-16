@@ -53,6 +53,10 @@ class LeftNav extends Component {
             this.setState({
                 index: 5
             })
+        } else if (pathname.indexOf('/logviewer') !== -1){
+            this.setState({
+                index: 6
+            })
         }
     }
     setIndex (key){
@@ -101,6 +105,16 @@ class LeftNav extends Component {
                                 <li
                                     className={index === 5 ? 'active' : ''}
                                 ><Icon type="reconciliation"/>&nbsp;&nbsp;在线记录</li>
+                            </Link>
+                            <Link
+                                to={`${url}/logviewer`}
+                                onClick={()=>{
+                                    this.setState({index: 6})
+                                }}
+                            >
+                                <li
+                                    className={index === 6 ? 'active' : ''}
+                                ><Icon type="ordered-list"/>&nbsp;&nbsp;日志</li>
                             </Link>
                         </ul>
                 </div>
