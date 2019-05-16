@@ -50,7 +50,66 @@ class MyGatesAppsInstall extends Component {
         SourceCode: [],
         dataSourceCode: [],
         errorMessage: '',
-        keys: []
+        keys: [],
+        selectSection: 'socket',
+        tcp: [
+            {
+                'name': 'ip',
+                'desc': 'IP地址',
+                'type': 'text',
+                'value': '192.168.1.132'
+            },
+            {
+                'name': 'host',
+                'desc': '端口',
+                'type': 'number',
+                'value': 502
+            },
+            {
+                'name': 'nodelay',
+                'desc': 'Nodelay',
+                'type': 'boolean',
+                'value': true
+            }
+        ],
+        serial: [
+            {
+                'name': 'tty',
+                'desc': '端口',
+                'type': 'dropdown',
+                'value': ['ttymcx0', 'ttymcx1']
+            },
+            {
+                'name': 'baudrate',
+                'desc': '波特率',
+                'type': 'dropdown',
+                'value': [4800, 9600, 115200, 19200]
+            },
+            {
+                'name': 'stop_bits',
+                'desc': '停止位',
+                'type': 'dropdown',
+                'value': [1, 2]
+            },
+            {
+                'name': 'data_bits',
+                'desc': '数据位',
+                'type': 'dropdown',
+                'value': [8, 7]
+            },
+            {
+                'name': 'flow_control',
+                'desc': '流控',
+                'type': 'boolean',
+                'value': false
+            },
+            {
+                'name': 'parity',
+                'desc': '校验',
+                'type': 'dropdown',
+                'value': ['None', 'Even', 'Odd']
+            }
+        ]
     };
 
     componentDidMount (){
@@ -125,49 +184,6 @@ class MyGatesAppsInstall extends Component {
         }
     };
 
-    //添加模板
-    addSingleTemp = (conf, desc, name, version)=>{
-        let single = {
-            conf_name: conf,
-            description: desc,
-            name: name,
-            latest_version: version
-        };
-        let template = this.props.store.codeStore.template;
-        template.push(conf)
-        this.props.store.codeStore.setTemplate(template);
-        let source = this.state.addTempList;
-        source && source.length > 0 && source.map((v)=>{
-            if (v.name === name) {
-                v.disabled = true
-            }
-        });
-        let data = this.state.showTempList;
-        data.push(single);
-        this.setState({
-            showTempList: data,
-            addTempList: source,
-            template: template
-        })
-    };
-
-    onDelete =  (name)=>{
-        let dataSource = this.state.showTempList;
-        dataSource.splice(name, 1);//index为获取的索引，后面的 1 是删除几行
-        this.setState({
-            showTempList: dataSource
-        });
-        let addTempList = this.state.addTempList;
-        addTempList && addTempList.length > 0 && addTempList.map((v)=>{
-            if (v.name === name) {
-                v.disabled = false;
-            }
-        });
-        this.setState({
-            addTempList: addTempList
-        })
-    };
-
     getConfig = (val)=>{
         this.props.store.codeStore.setActiveKey('1');
         this.props.store.codeStore.setErrorCode();
@@ -177,11 +193,7 @@ class MyGatesAppsInstall extends Component {
         if (val.conf_template) {
             let con = val.conf_template.replace(/[\r\n]/g, '');
             let cons = con.replace(/\s+/g, '');
-            console.log(cons);
-            console.log(typeof cons);
             config = JSON.parse(cons);
-            console.log(JSON.parse(cons))
-            console.log(config)
         }
         let deviceColumns = [];
         let tableName = [];  //存放表名
@@ -277,6 +289,7 @@ class MyGatesAppsInstall extends Component {
         this.props.store.codeStore.setInstallConfiguration(val.pre_configuration);
         console.log(val.pre_configuration);
     };
+
     getData = ()=>{
         const { tcp, serial, selectSection, keys } = this.state;
         let sourceCodeData = {};
@@ -399,9 +412,7 @@ class MyGatesAppsInstall extends Component {
     };
 
     render () {
-        const { data, flag, item, detail, config, deviceColumns } = this.state;
-
-        console.log(deviceColumns)
+        const { data, flag, item, detail, config, deviceColumns, selectSection, tcp, serial } = this.state;
 
         return (<div>
             <Status />
@@ -465,12 +476,15 @@ class MyGatesAppsInstall extends Component {
                         </div>
                         <div className={detail ? 'installapp hide' : 'installapp show'}>
                             <AppConfig
+                                tcp={tcp}
+                                serial={serial}
+                                selectSection={selectSection}
                                 config={config}
                                 configuration={this.props.store.codeStore.installConfiguration}
                                 deviceColumns={deviceColumns}
+                                submitData={this.submitData}
                             />
                         </div>
-
                     </div>
                     <div className={flag ? 'show' : 'hide'}>
                         <div className="installheader">
@@ -502,8 +516,7 @@ class MyGatesAppsInstall extends Component {
                                            <img src={`http://ioe.thingsroot.com/${val.icon_image}`}
                                                alt="logo"
                                                onClick={()=>{
-                                                   this.getConfig(val)
-                                                   console.log(val)
+                                                   this.getConfig(val);
                                                }}
                                            />
                                            <div className="apptitle">

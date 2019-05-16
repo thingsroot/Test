@@ -24,65 +24,6 @@ const none = {
 
 class AppConfig extends Component {
     state = {
-        selectSection: 'socket',
-        tcp: [
-            {
-                'name': 'ip',
-                'desc': 'IP地址',
-                'type': 'text',
-                'value': '192.168.1.132'
-            },
-            {
-                'name': 'host',
-                'desc': '端口',
-                'type': 'number',
-                'value': 502
-            },
-            {
-                'name': 'nodelay',
-                'desc': 'Nodelay',
-                'type': 'boolean',
-                'value': true
-            }
-        ],
-        serial: [
-            {
-                'name': 'tty',
-                'desc': '端口',
-                'type': 'dropdown',
-                'value': ['ttymcx0', 'ttymcx1']
-            },
-            {
-                'name': 'baudrate',
-                'desc': '波特率',
-                'type': 'dropdown',
-                'value': [4800, 9600, 115200, 19200]
-            },
-            {
-                'name': 'stop_bits',
-                'desc': '停止位',
-                'type': 'dropdown',
-                'value': [1, 2]
-            },
-            {
-                'name': 'data_bits',
-                'desc': '数据位',
-                'type': 'dropdown',
-                'value': [8, 7]
-            },
-            {
-                'name': 'flow_control',
-                'desc': '流控',
-                'type': 'boolean',
-                'value': false
-            },
-            {
-                'name': 'parity',
-                'desc': '校验',
-                'type': 'dropdown',
-                'value': ['None', 'Even', 'Odd']
-            }
-        ],
         error: false,
         addTempLists: [
             {
@@ -226,11 +167,9 @@ class AppConfig extends Component {
     };
 
     render () {
-        const { serial, tcp, addTempLists, showTempLists, showTempList, addTempList } = this.state;
+        const { addTempLists, showTempLists, showTempList, addTempList } = this.state;
         const { errorCode, installConfiguration } = this.props.store.codeStore;
-        let { config, deviceColumns } = this.props;
-        console.log(config);
-        console.log(deviceColumns);
+        let { config, deviceColumns, serial, tcp, selectSection, submitData } = this.props;
 
         return (
             <Tabs
@@ -256,7 +195,7 @@ class AppConfig extends Component {
                                             <div
                                                 id={v.name}
                                                 key={key}
-                                                style={this.state.selectSection === 'serial' ? block : none}
+                                                style={selectSection === 'serial' ? block : none}
                                             >
                                                 <p className="sectionName">
                                                                 <span
@@ -330,7 +269,7 @@ class AppConfig extends Component {
                                             <div
                                                 id={v.name}
                                                 key={key}
-                                                style={this.state.selectSection === 'socket' ? block : none}
+                                                style={selectSection === 'socket' ? block : none}
                                             >
                                                 <p className="sectionName">
                                                                 <span
@@ -523,7 +462,7 @@ class AppConfig extends Component {
                     <Button
                         type="primary"
                         style={errorCode === true || config.length <= 0 ? none : block}
-                        onClick={this.submitData}
+                        onClick={submitData}
                     >提交</Button>
                 </TabPane>
                 <TabPane
@@ -555,7 +494,7 @@ class AppConfig extends Component {
                     />
                     <Button
                         type="primary"
-                        onClick={this.submitData}
+                        onClick={submitData}
                     >提交</Button>
                 </TabPane>
             </Tabs>
