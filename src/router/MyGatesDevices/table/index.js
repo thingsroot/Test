@@ -51,6 +51,15 @@ let myFaultTypeChart;
       if (myFaultTypeChart && myFaultTypeChart.dispose) {
         myFaultTypeChart.dispose();
         }
+        this.fetch()
+      this.timer = setInterval(() => {
+        this.fetch()
+      }, 3000);
+    }
+    componentWillUnmount (){
+      clearInterval(this.timer)
+    }
+    fetch = ()=>{
       const { sn } = this.props.match.params;
       const { vsn } = this.props;
       http.get('/api/gateway_devf_data?gateway=' + sn + '&name=' + vsn).then(res=>{
