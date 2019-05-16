@@ -167,8 +167,8 @@ class MyGatesAppsInstall extends Component {
             addTempList: addTempList
         })
     };
+
     getConfig = (val)=>{
-        console.log(val);
         this.props.store.codeStore.setActiveKey('1');
         this.props.store.codeStore.setErrorCode();
         this.props.store.codeStore.setInstallConfiguration('{}');
