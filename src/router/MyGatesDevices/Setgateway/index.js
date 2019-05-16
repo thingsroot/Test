@@ -360,7 +360,7 @@ class LinkStatus extends Component {
                                 }}
                               >发现新版本></Link> : ''}</p>
                             {/* <p><b>公网IP:</b>{config.public_ip}</p> */}
-                            <p><b>调试模式:</b>{config.use_beta ? '开启' : '关闭'}</p>
+                            <p><b>调试模式:</b>{config.enable_beta === 1 ? '开启' : '关闭'}</p>
                             <p><b>数据上传:</b>{config.data_upload ? '开启' : '关闭'}</p>
                             <p><b>统计上传:</b>{config.stat_upload ? '开启' : '关闭'}</p>
                             <p><b>日志上传:</b>{config.event_upload}</p>
@@ -405,7 +405,7 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                checked={config.use_beta}
+                                checked={config.enable_beta === 1}
                                 onChange={()=>{
                                     //this.setState({use_beta: !this.state.use_beta})
                                     this.changeState('use_beta');
@@ -625,19 +625,17 @@ class LinkStatus extends Component {
                                         </div>
                                     </div>
                                     {
-                                        // title === 'FreeIOE'
                                         config.version < this.state.iot_beta || config.skynet_version < this.state.skynet_version
                                         ? <Button
                                             disabled={actionSwi}
                                             onClick={()=>{
-                                                console.log(this.state.data)
                                                 const data = {
                                                     name: this.props.match.params.sn,
                                                     skynet_version: this.state.skynet_version,
                                                     version: this.state.iot_beta,
                                                     no_ack: 1,
                                                     id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
-                                                } 
+                                                }
                                                 http.postToken('/api/gateways_upgrade', data).then(res=>{
                                                     console.log(res)
                                                     timer = setInterval(() => {
@@ -651,35 +649,15 @@ class LinkStatus extends Component {
                                                             }
                                                         })
                                                     }, 3000);
-                                                    // exec_result(res.data)
                                                 })
                                             }}
                                           >升级更新</Button> : <Button>检查更新</Button>
-                                        //   : config.skynet_version < this.state.skynet_version
-                                        //   ? <Button
-                                        //       onClick={()=>{
-                                        //           console.log(this.state.data)
-                                        //           const data = {
-                                        //               gateway: this.props.match.params.sn,
-                                        //               app: 'openwrt/x86_64_skynet',
-                                        //               inst: 'OPENWRT.x86_64.SKYNET',
-                                        //               version: this.state.skynet_version,
-                                        //               conf: {},
-                                        //               id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
-                                        //           }
-                                        //           http.postToken('/api/gateways_applications_upgrade', data).then(res=>{
-                                        //               exec_result(res.data)
-                                        //           })
-                                        //       }}
-                                        //     >升级更新</Button> : <Button>检查更新</Button>
                                     }
                         </div>
-                        {/* <h1>{title}</h1> */}
                         <div style={{display: 'flex', flexWrap: 'wrap'}}>
                             <div style={{width: '50%', padding: 10, boxSizing: 'border-box'}}>
                             <h1>FreeIOE</h1>
                                 {
-                                    // title === 'FreeIOE'
                                     newdata && newdata.length > 0 && newdata.map((v, i)=>{
                                         return (
                                             <Card
