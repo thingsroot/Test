@@ -72,7 +72,7 @@ class AppEditorCode extends Component {
                     http.get('/home/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
                             let lastVersion = data.message;
-                            // console.log(lastVersion);
+                            console.log(lastVersion);
                             if (worksapceVersion !== lastVersion) {
                                 //提示当前工作区是会基于worksapceVersion，当前的最新版本为latest_version（弹框）
                                 this.info('版本提示', '当前工作区是会基于版本    ' + worksapceVersion + '，当前的最新版本为    ' + lastVersion + '.');
@@ -126,7 +126,7 @@ class AppEditorCode extends Component {
         http.get('/home/api/method/app_center.api.get_versions?app=' + app + '&beta=1')
             .then(res=>{
                 let data = [];
-                res.message.map((v)=>{
+                res.message && res.message.length > 0 && res.message.map((v)=>{
                     data.push(v.version)
                 });
                 data.sort(function (a, b) {
@@ -444,9 +444,9 @@ class AppEditorCode extends Component {
                             onClick={this.deleteFileShow}
                         />
                     </p>
-                    <p>
+                    <p style={{width: 'auto', position: 'resolute'}}>
                         <Icon
-                            type="rollback"
+                            type="sync"
                             onClick={this.showModal}
                         />
                         <Icon
@@ -470,6 +470,13 @@ class AppEditorCode extends Component {
                             {/*onClick={this.undo}*/}
                         {/*/>*/}
                         {/*<Icon type="redo" onClick={this.keyPress} />*/}
+                        <Icon
+                            style={{position: 'absolute', right: 30, top: 85}}
+                            type="rollback"
+                            onClick={()=>{
+                                this.props.history.go(-1)
+                            }}
+                        />
                     </p>
                 </div>
                 <div className="main">

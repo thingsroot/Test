@@ -1,9 +1,10 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Input, Button, Spin } from 'antd';
-import { Link } from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 import './style.scss';
 import http from '../../utils/Server';
 import {_getCookie} from '../../utils/Session';
+import {inject, observer} from 'mobx-react';
 
 const Search = Input.Search;
 
@@ -14,7 +15,11 @@ const none = {
     display: 'none'
 };
 
-class MyApps extends PureComponent {
+@withRouter
+@inject('store')
+@observer
+
+class MyApps extends Component {
     state = {
         appList: [],
         myList: [],
@@ -101,6 +106,9 @@ class MyApps extends PureComponent {
                     <Button
                         type="primary"
                         style={{margin: '0 20px'}}
+                        onClick={()=>{
+                            this.props.store.codeStore.setSettingData('');
+                        }}
                     >
                         <Link to={'/appSettings/1'}>创建新应用</Link>
                     </Button>

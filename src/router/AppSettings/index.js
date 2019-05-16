@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Form, Row, Col, Input, Button, Select, Tabs, message } from 'antd';
+import {Form, Row, Col, Input, Button, Select, Tabs, message, Checkbox } from 'antd';
 import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
@@ -25,12 +25,17 @@ class AppSettings extends Component {
         imgSrc: '',
         previewImage: '',
         previewVisible: false,
-        imageUrl: ''
+        imageUrl: '',
+        checkValue: 0
     };
     componentDidMount (){
         let app = this.props.match.params.name;
         if (app) {
             this.getDetails(app);
+        } else {
+            this.setState({
+                imgSrc: 'http://cloud.thingsroot.com/assets/app_center/img/logo.png'
+            })
         }
     }
 
@@ -44,7 +49,7 @@ class AppSettings extends Component {
                 confTemplate: res.data.pre_configuration,
                 preConfiguration: res.data.conf_template
             };
-            this.props.store.codeStore.setDescription(res.data.description)
+            this.props.store.codeStore.setDescription(res.data.description);
             this.props.store.codeStore.setSettingData(settingData);
             this.setState({
                 imgSrc: 'http://cloud.thingsroot.com' + res.data.icon_image
@@ -62,6 +67,7 @@ class AppSettings extends Component {
                 let params = {
                     app_name: values.app_name,
                     code_name: values.code_name,
+                    published: values.published === true ? 1 : 0,
                     license_type: 'Open',
                     description: description,
                     conf_template: configuration,
@@ -132,6 +138,15 @@ class AppSettings extends Component {
         })
     };
 
+    checkChange = (e)=>{
+        console.log(e.target.value);
+        if (e.target.value === '0') {
+            e.target.value = 1
+        } else {
+            e.target.value = 0
+        }
+    };
+
     render () {
         const { getFieldDecorator } = this.props.form;
         const { settingData } = this.props.store.codeStore;
@@ -162,10 +177,11 @@ class AppSettings extends Component {
                             </div>
                         </Col>
                         <Col span={21}>
-                            <Col span={8}>
+                            <Col span={7}>
                                 <Form.Item label="应用名称">
-                                    {getFieldDecorator('app_name', { initialValue: settingData.appName }, {
-                                        rules: [{ required: true, message: '不能为空！' }]
+                                    {getFieldDecorator('app_name', {
+                                        rules: [{ required: true, message: '不能为空！' }],
+                                        initialValue: settingData.appName ? settingData.appName : ''
                                     })(
                                         <Input type="text"
                                             style={{width: '240px'}}
@@ -173,10 +189,14 @@ class AppSettings extends Component {
                                     )}
                                 </Form.Item>
                             </Col>
-                            <Col span={8}>
-                                <Form.Item label="应用文件">
-                                    {getFieldDecorator('code_name', { initialValue: settingData.codeName }, {
-                                        rules: [{ required: true, message: '不能为空！' }]
+                            <Col span={7}>
+                                <Form.Item label="应用ID">
+                                    {getFieldDecorator('code_name', {
+                                        rules: [{ required: true, message: '不能为空！' }, {
+                                            pattern: /^[a-zA-Z]+$/,
+                                            message: '只能填写字母！'
+                                        }],
+                                        initialValue: settingData.codeName ? settingData.codeName : ''
                                     })(
                                         <Input
                                             type="text"
@@ -185,10 +205,11 @@ class AppSettings extends Component {
                                     )}
                                 </Form.Item>
                             </Col>
-                            <Col span={8}>
+                            <Col span={7}>
                                 <Form.Item label="授权类型">
-                                    {getFieldDecorator('license_type', { initialValue: settingData.licenseType }, {
-                                        rules: [{ required: true, message: '不能为空！' }]
+                                    {getFieldDecorator('license_type', {
+                                        rules: [{ required: true, message: '不能为空！' }],
+                                        initialValue: settingData.licenseType ? settingData.licenseType : ''
                                     })(
                                         <Select
                                             style={{ width: 240 }}
@@ -198,15 +219,29 @@ class AppSettings extends Component {
                                     )}
                                 </Form.Item>
                             </Col>
+                            <Col span={3}>
+                                <Form.Item label="发布">
+                                    {getFieldDecorator('published', {
+                                        initialValue: settingData.published ? settingData.published : 0
+                                    })(
+                                        <Checkbox
+                                            onChange={this.checkChange}
+                                        >
+
+                                        </Checkbox>
+                                    )}
+                                </Form.Item>
+                            </Col>
                         </Col>
                     </Row>
+                </Form>
                     <Row>
                         <Col span={18}
                             style={{ textAlign: 'right' }}
                         >
                         </Col>
                     </Row>
-                </Form>
+
                 <Tabs
                     onChange={callback}
                     type="card"
@@ -215,9 +250,7 @@ class AppSettings extends Component {
                         tab="描述"
                         key="1"
                     >
-                        {/*<div style={{minHeight: '400px'}}>*/}
                         <EditorDesc />
-                        {/*</div>*/}
                     </TabPane>
                     <TabPane
                         tab="默认安装配置"
@@ -231,6 +264,7 @@ class AppSettings extends Component {
 
                 <Button
                     type="primary"
+                    htmlType="submit"
                     className="login-form-button"
                     onClick={this.handleSubmit}
                 >
@@ -238,7 +272,7 @@ class AppSettings extends Component {
                 </Button>
                 <Button
                     onClick={()=>{
-                        window.location.href = '/myApps'
+                        this.props.history.go(-1)
                     }}
                 >
                     取消

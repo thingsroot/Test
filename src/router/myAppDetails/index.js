@@ -80,7 +80,6 @@ class MyAppDetails extends Component {
         console.log(key);
     };
     render () {
-        const { url } = this.props.match;
         let { app, message, time, user, templateList } = this.state;
         return (
             <div className="myAppDetails">
@@ -88,7 +87,6 @@ class MyAppDetails extends Component {
                     <span><Icon type="appstore" />{message.app_name}</span>
                     <span
                         onClick={()=>{
-                            console.log(this)
                             this.props.history.go(-1)
                         }}
                     >
@@ -160,25 +158,13 @@ class MyAppDetails extends Component {
                     type="card"
                 >
                     <TabPane
-                        tab={
-                            <Link
-                                style={{textDecoration: 'none'}}
-                                to={`${url}/appDesc`}
-                            >
-                                描述
-                            </Link>}
+                        tab="描述"
                         key="1"
                     >
                         <AppDesc desc={this.state.desc}/>
                     </TabPane>
                     <TabPane
-                        tab={
-                            <Link
-                                style={{textDecoration: 'none'}}
-                                to={`${url}/versionList`}
-                            >
-                                版本列表
-                            </Link>}
+                        tab="版本列表"
                         key="2"
                     >
                         <VersionList
@@ -187,13 +173,7 @@ class MyAppDetails extends Component {
                         />
                     </TabPane>
                     <TabPane
-                        tab={
-                            <Link
-                                style={{textDecoration: 'none'}}
-                                to={`${url}/templateList`}
-                            >
-                                模板列表
-                            </Link>}
+                        tab="模板列表"
                         key="3"
                     >
                         <TemplateList
