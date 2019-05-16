@@ -24,7 +24,7 @@ class DevicemMessage extends Component {
         category: '',
         user: '',
         start: 0,
-        length: 500,
+        length: 100,
         filters: {},
         tableData: [],
         deviceData: [],
@@ -81,12 +81,16 @@ class DevicemMessage extends Component {
         sync: false
     };
     componentDidMount (){
+        let hours = Date.parse(new Date()) - 24 * 60 * 60 * 1000;
+        let time = this.timestampToTime(hours);
         let params = {
             category: 'user',
             name: unescape(_getCookie('user_id')),
             start: 0,
             limit: this.state.length,
-            filters: {}
+            filters: {
+                creation: ['>', time]
+            }
         };
         this.setState({
             category: params.category,
@@ -95,8 +99,9 @@ class DevicemMessage extends Component {
             length: params.limit,
             filters: params.filters,
             selectValue: 'title'
+        }, ()=>{
+            this.getMessageList(params);
         });
-        this.getMessageList(params);
         if (this.props.match.params.sn !== '1') {
             this.setState({
                 selectValue: 'device'
@@ -235,7 +240,8 @@ class DevicemMessage extends Component {
                         name: v.name,
                         data: v.event_data,
                         event_level: level,
-                        event_type: type
+                        event_type: type,
+                        event_time: v.creation.split('.')[0]
                     });
                     source.push(v.event_type);
                 });
@@ -250,7 +256,10 @@ class DevicemMessage extends Component {
                 sync: false
             });
             this.props.store.codeStore.setDeviceData(data);
-            this.props.store.codeStore.setDeviceTableData(data)
+            this.props.store.codeStore.setDeviceTableData(data);
+            if (this.state.text !== '') {
+                this.tick(this.state.text)
+            }
             if (this.props.match.params.sn !== '1') {
                 let newData = [];
                 data.length > 0 && data.map((v)=>{
@@ -309,34 +318,43 @@ class DevicemMessage extends Component {
     getSelect = (text)=>{
         this.setState({
             selectValue: text
+        }, ()=>{
+            this.tick(this.state.text);
         })
     };
     tick = (text)=>{
+        this.setState({
+            loading: true
+        });
         if (this.timer){
             clearTimeout(this.timer)
         }
         this.timer = setTimeout(() => {
             this.setState({
                 text: text
+            }, ()=>{
+                if (text) {
+                    let newData = [];
+                    let deviceTableData = this.props.store.codeStore.deviceTableData;
+                    deviceTableData.map((v)=>{
+                        if (v[this.state.selectValue].toLowerCase().indexOf(text.toLowerCase()) !== -1) {
+                            newData.push(v)
+                        }
+                    });
+                    this.setState({
+                        loading: false
+                    });
+                    this.props.store.codeStore.setDeviceData(newData)
+                } else {
+                    let data = this.props.store.codeStore.deviceTableData;
+                    this.props.store.codeStore.setDeviceData(data)
+                }
             })
         }, 1000);
     };
-    search = (inpVal)=>{
-        let text = event.target.value;
+    search = (e)=>{
+        let text = e.target.value;
         this.tick(text);
-        if (text) {
-            let newData = [];
-            let deviceTableData = this.props.store.codeStore.deviceTableData;
-            deviceTableData.map((v)=>{
-                if (v[inpVal].toLowerCase().indexOf(text.toLowerCase()) !== -1) {
-                    newData.push(v)
-                }
-            });
-            this.props.store.codeStore.setDeviceData(newData)
-        } else {
-            let data = this.props.store.codeStore.deviceTableData;
-            this.props.store.codeStore.setDeviceData(data)
-        }
     };
     //最大记录数
     messageTotal = (value)=>{
@@ -355,17 +373,20 @@ class DevicemMessage extends Component {
     };
     //筛选消息类型
     messageChange = (value)=>{
-        let data = [];
-        if (`${value}`) {
-            this.props.store.codeStore.deviceTableData.map((v)=>{
-                if (v.operation === `${value}`) {
-                    data.push(v);
-                }
-            });
+        if (value) {
+            let filters = this.state.filters;
+            filters['event_type'] = value;
+            let params = {
+                category: this.state.category,
+                name: this.state.name,
+                start: this.state.start,
+                limit: this.state.length,
+                filters: filters
+            };
             this.setState({
-                deviceData: data
+                filters: params.filters
             });
-            this.props.store.codeStore.setDeviceData(data);
+            this.getMessageList(params)
         } else {
             let data = this.props.store.codeStore.deviceTableData;
             this.setState({
@@ -374,42 +395,46 @@ class DevicemMessage extends Component {
             this.props.store.codeStore.setDeviceData(data);
         }
     };
+    //等级筛选
     gradeChange = (value)=>{
-        let data = [];
-        if (`${value}`) {
-            let deviceTableData = this.props.store.codeStore.deviceTableData;
-            deviceTableData && deviceTableData.length > 0 && deviceTableData.map((v)=>{
-                if (v.event_level === parseInt(`${value}`)) {
-                    data.push(v);
-                }
-            });
+        console.log(value);
+        if (value !== '') {
+            let filters = this.state.filters;
+            filters['event_level'] = value;
+            let params = {
+                category: this.state.category,
+                name: this.state.name,
+                start: this.state.start,
+                limit: this.state.length,
+                filters: filters
+            };
             this.setState({
-                deviceData: data
+                filters: params.filters
             });
-            this.props.store.codeStore.setDeviceData(data);
+            this.getMessageList(params)
         } else {
-            let data = this.props.store.codeStore.deviceTableData;
-            this.setState({
-                deviceData: data
-            });
-            this.props.store.codeStore.setDeviceData(data);
+            let params = {
+                category: this.state.category,
+                name: this.state.name,
+                start: this.state.start,
+                limit: this.state.length,
+                filters: this.state.filters
+            };
+            this.getMessageList(params)
         }
     };
     //时间
     messageTime = (value)=>{
         let hours = Date.parse(new Date()) - `${value}` * 60 * 60 * 1000;
         let time = this.timestampToTime(hours);
+        let filters = this.state.filters;
+        filters['creation'] = ['>', time];
         let params = {
             category: this.state.category,
             name: this.state.name,
             start: this.state.start,
             limit: this.state.length,
-            filters: {
-                'creation': [
-                    '>',
-                    time
-                ]
-            }
+            filters: filters
         };
         this.setState({
             filters: params.filters
@@ -443,7 +468,7 @@ class DevicemMessage extends Component {
     };
 
     render () {
-        let { selectValue, selectedRowKeys, columns, category, flag,
+        let { selectedRowKeys, columns, category, flag,
             messageCount, unconfirmed } = this.state;
         const rowSelection = {
             selectedRowKeys,
@@ -481,7 +506,7 @@ class DevicemMessage extends Component {
                         <Option value="3">等级：警告</Option>
                         <Option value="99">等级：致命</Option>
                     </Select>
-                    <Select defaultValue="记录数：500"
+                    <Select defaultValue="记录数：100"
                         style={{ width: 130 }}
                         onChange={this.messageTotal}
                     >
@@ -489,8 +514,8 @@ class DevicemMessage extends Component {
                         <Option value="300">记录数：300</Option>
                         <Option value="500">记录数：500</Option>
                     </Select>
-                    <Select defaultValue="时间：默认"
-                        style={{ width: 130 }}
+                    <Select defaultValue="时间：24小时"
+                        style={{ width: 140 }}
                         onChange={this.messageTime}
                     >
                         <Option value="1">时间：1小时</Option>
@@ -517,11 +542,7 @@ class DevicemMessage extends Component {
                                 style={{ width: '70%' }}
                                 placeholder="请输入关键字"
                                 defaultValue={this.props.match.params.sn !== '1' ? this.props.match.params.sn : ''}
-                                onChange={
-                                    ()=>{
-                                        this.search(selectValue)
-                                    }
-                                }
+                                onChange={this.search}
                             />
                         </InputGroup>
                     </div>
@@ -552,7 +573,7 @@ class DevicemMessage extends Component {
                     footer={() => {
                         return (
                             <div className="none">
-                                {'全部消息' + messageCount + '条，列表中为确认消息' + unconfirmed + '条，'}
+                                {'全部消息' + messageCount + '条，列表中未确认消息' + unconfirmed + '条，'}
                                 <a
                                     onClick={this.toggleMessage}
                                 >

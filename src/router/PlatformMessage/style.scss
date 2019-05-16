@@ -4,6 +4,13 @@
     display: flex;
     position: relative;
   }
+  .overflow{
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
   .hidden{
     display: none;
   }
@@ -16,9 +23,10 @@
   .cursor{
     cursor: pointer;
   }
-  //.ant-table-row-expand-icon-cell, .ant-table-expand-icon-th{
-  //  display: none!important;
-  //}
+  -moz-user-select: none; /*火狐*/
+  -webkit-user-select: none; /*webkit浏览器*/
+  -ms-user-select: none; /*IE10*/
+  user-select: none;
   .SonTable{
     ul>li{
       line-height: 30px;

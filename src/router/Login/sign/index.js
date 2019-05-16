@@ -59,9 +59,7 @@ class Sign extends PureComponent {
                 >
                     <Form.Item>
                         {getFieldDecorator('userName', {
-                            rules: [{ required: true, message: '请输入用户名' }, {
-                                // pattern: //, message: '用户名格式6-16位字母、数字或  - 、  _ 、  @'
-                            }]
+                            rules: [{ required: true, message: '请输入用户名' }]
                         })(
                             <Input prefix={
                                 <Icon type="user"

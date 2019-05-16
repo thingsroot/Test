@@ -1,5 +1,6 @@
 import React from 'react';
 import http from '../../../utils/Server';
+import { _getCookie } from '../../../utils/Session';
 import {inject, observer} from 'mobx-react';
 
 @inject('store')
@@ -25,9 +26,8 @@ class SonTables extends React.Component {
                 v.disposed = 1
             }
         });
-        let newData = deviceTableData.splice(0, deviceTableData.length - 1);
-        this.props.store.codeStore.setDeviceData(newData);
-        this.props.store.codeStore.setDeviceTableData(newData);
+        this.props.store.codeStore.setDeviceData(deviceTableData);
+        this.props.store.codeStore.setDeviceTableData(deviceTableData);
     }
 
     render () {
@@ -37,12 +37,12 @@ class SonTables extends React.Component {
                 <ul>
                     <li><span>标题：</span>{data.title}</li>
                     <li><span>所属设备序列号：</span>{data.device}</li>
+                    <li><span>触发时间：</span>{data.event_time}</li>
                     <li><span>发生时间：</span>{data.creation}</li>
                     <li><span>事件等级：</span>{data.event_level}</li>
                     <li><span>事件类型：</span>{data.event_type}</li>
                     <li><span>详情信息：</span>{data.data}</li>
-                    {/*<li><span>是否确认消息：</span>{data.dieposed}</li>*/}
-                    {/*<li><span>确认消息用户：</span></li>*/}
+                    <li><span>确认消息用户：</span>{data.disposed_by ? data.disposed_by : unescape(_getCookie('user_id'))}</li>
                 </ul>
             </div>
         )
