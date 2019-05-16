@@ -60,6 +60,12 @@ class CodeStore {
     @observable installConfiguration = [];  //json源码
     @observable iDeviceColumns = [];  //配置面板表格
 
+    @observable userBeta = 0;   //网关是否开启beta模式
+
+    @action setUserBeta (values) {
+        this.userBeta = values
+    }
+
     @action setCorrelationApp (values) {
         this.correlationApp = values;
     }

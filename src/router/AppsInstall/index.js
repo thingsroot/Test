@@ -341,7 +341,14 @@ class MyGatesAppsInstall extends Component {
         let { app } = this.state;
         let sn = this.props.match.params.sn;
         let version = 0;
-        http.get('/api/applications_versions_latest?app=' + app).then(res=>{
+        console.log(this.props.store.codeStore.userBeta);
+        let url = '';
+        if (this.props.store.codeStore.userBeta === 1) {
+            url = '/api/applications_versions_latest?beta=1&app='
+        } else {
+            url = '/api/applications_versions_latest?app='
+        }
+        http.get(url + app).then(res=>{
             version = res.data;
             if (version > 0) {
                 let params = {
@@ -391,7 +398,11 @@ class MyGatesAppsInstall extends Component {
                     }
                 })
             } else {
-                message.error('应用暂时没有正式版本，无法安装！')
+                if (this.props.store.codeStore.userBeta === 1) {
+                    message.error('应用暂时没有正式版本，无法安装！')
+                } else {
+                    message.error('应用暂时没有正式版本，无法安装！')
+                }
             }
         });
     };

@@ -549,7 +549,7 @@ class PlatformMessage extends Component {
         return (
             <div className="platformMessage">
                 <div className="searchBox flex">
-                    <div style={{width: 280}}>
+                    <div style={{minWidth: 250}}>
                         <Button onClick={()=>{
                             this.confMessage(selectedRowKeys)
                         }}
@@ -559,7 +559,12 @@ class PlatformMessage extends Component {
                         }}
                         >确认所有消息</Button>
                     </div>
-                    <div className="flex">
+                    <div
+                        className="flex"
+                        style={{
+                        minWidth: 810
+                    }}
+                    >
                         <Select
                             defaultValue="消息类型：全部"
                             style={{ width: 180 }}
@@ -588,7 +593,7 @@ class PlatformMessage extends Component {
                             <Option value="24">时间：24小时</Option>
                             <Option value="72">时间：72小时</Option>
                         </Select>
-                        &nbsp; &nbsp; &nbsp; &nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;
                         <InputGroup
                             compact
                         >
