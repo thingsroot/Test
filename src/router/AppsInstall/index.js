@@ -483,6 +483,13 @@ class MyGatesAppsInstall extends Component {
                                    }}
                                    style={{ width: 200 }}
                                />
+                               <Icon
+                                   className="rollback"
+                                   type="rollback"
+                                   onClick={()=>{
+                                       this.props.history.go(-1)
+                                   }}
+                               />
                            </div>
                        </div>
                        <div className="installcontent">
