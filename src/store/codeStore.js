@@ -164,7 +164,8 @@ class CodeStore {
         this.editorContent = values;
     }
     @action setTreeData (values) {
-        this.treeData = [...values];
+        console.log(values)
+        this.treeData = values;
     }
     @action setMyEditor (values) {
         this.myEditor = values;

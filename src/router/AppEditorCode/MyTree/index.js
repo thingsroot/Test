@@ -41,7 +41,8 @@ class MyTree extends Component {
             defaultExpandAll: true,
             autoExpandParent: true,
             selectedKeys: ['version'],
-            arr: []
+            arr: [],
+            a: 1
         }
     }
     componentDidMount () {
@@ -49,27 +50,17 @@ class MyTree extends Component {
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (this.props.isChange !== nextProps.isChange){
-            this.getTree('#');
+            setTimeout(()=>{
+                this.getTree('#').then(data=>{
+                    console.log(data);
+                    this.setState({
+                        arr: data
+                    })
+                });
+            }, 0)
         }
     }
 
-    // getTree =  id => new Promise((resolve => {
-    //     let data = [];
-    //     http.get('/home/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + id)
-    //         .then(res=>{
-    //             res.map((v)=>{
-    //                 data.push(v);
-    //             });
-    //             if (data.length === 0) {
-    //                 console.log('不执行')
-    //                 resolve([]);
-    //             } else {
-    //                 console.log(data)
-    //                 resolve(this.format(data));
-    //             }
-    //         });
-    // }));
-    //
     getTree =  id => new Promise((resolve => {
         let data = [];
         http.get('/home/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + id)
@@ -77,30 +68,45 @@ class MyTree extends Component {
                 res.map((v)=>{
                     data.push(v);
                 });
-                if (data.length === 0) {
-                    resolve([]);
-                } else {
-                    resolve(this.format(data));
-                }
+                resolve(this.format(data, this.state.a))
             });
     }));
 
-    format = (list)=>{
+    format = (list, a)=>{
         let arr = [];
-        list && list.length > 0 && list.map((v)=>{
+        list && list.length > 0 && list.map((v, key)=>{
+            key;
             if (v.children === true){
                 this.getTree(v.id).then(data=>{
-                    v['childrenData'] = data;
-                    arr.push(v);
-                    return false;
+                    let a = {
+                        children: data,
+                        title: v.text,
+                        isLeaf: !v.children,
+                        type: v.type,
+                        key: v.id
+                    };
+                    arr.push(a);
                 })
             } else {
-                arr.push(v)
+                let a = {
+                    title: v.text,
+                    isLeaf: !v.children,
+                    type: v.type,
+                    key: v.id
+                };
+                arr.push(a);
             }
         });
-        console.log(arr);
+        if (a === 1) {
+            this.setState({
+                arr: arr,
+                a: this.state.a + 1
+            }, ()=>{
+                this.props.store.codeStore.setTreeData(this.state.arr);
+            });
+        }
         this.setState({
-            arr: arr
+            a: this.state.a + 1
         });
         return arr;
     };
@@ -112,38 +118,26 @@ class MyTree extends Component {
         });
 
     };
+
     onSelect = (selectedKeys, info) => {
         this.setState({ selectedKeys }, ()=>{
             this.props.store.codeStore.setFileName(this.state.selectedKeys);
         });
         this.props.store.codeStore.setMyFolder(selectedKeys);
-        this.props.store.codeStore.setFolderType(info.node.props.type);
-        console.log(this.props.store.codeStore.treeData)
+        this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
     };
 
-
-    renderTreeNodes = data => data.map((item, key) => {
-        key;
-        if (item.children) {
-            return (
-                <TreeNode
-                    title={item.title}
-                    key={item.key}
-                    type={item.type}
-                    isLeaf={item.isLeaf}
-                >
-                    {this.renderTreeNodes(item.children)}
-                </TreeNode>
-            );
-        }
-        return (
-            <TreeNode
-                {...item}
-                isLeaf={item.isLeaf}
-                key={item.key}
-            />
-        )
-    });
+    renderTreeNodes = data =>
+        data.map(item => {
+            if (item.children) {
+                return (
+                    <TreeNode title={item.title} key={item.key} dataRef={item}>
+                        {this.renderTreeNodes(item.children)}
+                    </TreeNode>
+                );
+            }
+            return <TreeNode  title={item.title} key={item.key} dataRef={item} />;
+        });
 
     render () {
         const { appName } = this.props;
@@ -155,15 +149,14 @@ class MyTree extends Component {
                 expandedKeys={this.state.expandedKeys}
                 onSelect={this.onSelect}
                 selectedKeys={this.state.selectedKeys}
-                draggable
-                blockNode
+
             >
                 <TreeNode
                     defaultExpandAll
                     title={appName}
                     key={appName}
                 >
-                    {this.renderTreeNodes(this.props.store.codeStore.treeData)}
+                    {this.renderTreeNodes(this.state.arr)}
                 </TreeNode>
 
             </Tree>
