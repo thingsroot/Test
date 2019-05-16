@@ -137,6 +137,7 @@ class AppsList extends Component {
                     loading={loading}
                     onChange={this.handleTableChange}
                     bordered
+                    expandRowByClick
                     expandedRowRender={(record) => <Action record={record}/>}
                 />
             </div>

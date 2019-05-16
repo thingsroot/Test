@@ -2,7 +2,7 @@ import { Button, Select, Table } from 'antd';
 import mqtt from 'mqtt';
 import React, { Component } from 'react';
 import { _getCookie } from '../../../utils/Session';
-import Logviewer from '../../MyGatesLogviewer';
+import Logviewer from '../MyGatesLogviewer';
 import './style.scss';
 const Option = Select.Option;
 const cloums = [

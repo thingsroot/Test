@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { withRouter} from 'react-router-dom';
-import { _getCookie } from '../../utils/Session';
+import { _getCookie } from '../../../utils/Session';
 import { Button, Alert, Input, Select } from 'antd';
 const Search = Input.Search;
-import http from '../../utils/Server';
+import http from '../../../utils/Server';
 import mqtt from 'mqtt';
 import './style.scss';
 import iScroll from 'iscroll/build/iscroll-probe';
@@ -28,6 +28,7 @@ let client;
 //     dataIndex: 'content',
 //     key: 'content'
 //   }];
+let unWill = true;
 const Option = Select.Option;
 
   function getLocalTime (nS) {
@@ -76,7 +77,7 @@ class MyGatesLogviewer extends Component {
         })
     }
     componentWillUnmount (){
-        clearInterval(this.t1)
+        unWill = false;
     }
     tick (){
             const data = {
@@ -108,6 +109,7 @@ class MyGatesLogviewer extends Component {
       }
       const topic = sn + '/log';
       if (!this.state.connected){
+          let number = 0;
           client = mqtt.connect('ws://ioe.thingsroot.com:8083/mqtt', options)
             client.on('connect', ()=>{
                 this.setState({flag: false, connected: true})
@@ -115,39 +117,43 @@ class MyGatesLogviewer extends Component {
                 client.subscribe(topic)
             })
             client.on('message', (topic, message)=>{
-                if (this.state.data && this.state.data.length < 1000){
-                    const newmessage = JSON.parse(message.toString());
-                    arr.push({
-                        time: getLocalTime(newmessage[1]),
-                        type: newmessage[0],
-                        id: newmessage[2].split(']:')[0] + ']',
-                        content: newmessage[2].split(']:')[1]
-                    })
-                    this.setState({
-                        data: arr
-                    }, ()=>{
-                            this.filter(this.state.value)
-                    })
-                    const obj = `
-                            <div class="tableHeaders">
-                                <div>${getLocalTime(newmessage[1])}</div>
-                                <div>${newmessage[0]}</div>
-                                <div>${newmessage[2].split(']:')[0] + ']'}</div>
-                                <div>${newmessage[2].split(']:')[1]}</div>
-                            </div>
-                    `
-                   if (this.state.searchflag) {
-                    const height = document.getElementById('tbody').children[0].offsetHeight;
-                    this.refs.content.innerHTML = obj +  this.refs.content.innerHTML;
-                    const newHeight = document.getElementById('tbody').children[0].offsetHeight;
-                    this.myScroll.refresh()
-                    if (this.myScroll.y !== 0) {
-                        this.myScroll.scrollTo(0, this.myScroll.y - (newHeight - height), 0)
+                console.log('111111')
+                if (unWill) {
+                    if (this.state.data && this.state.data.length < 1000){
+                        const newmessage = JSON.parse(message.toString());
+                        arr.push({
+                            time: getLocalTime(newmessage[1]),
+                            type: newmessage[0],
+                            id: newmessage[2].split(']:')[0] + ']',
+                            content: newmessage[2].split(']:')[1]
+                        })
+                        this.setState({
+                            data: arr
+                        })
+                        const obj = `
+                                <div class="tableHeaders">
+                                    <div>${getLocalTime(newmessage[1])}</div>
+                                    <div>${newmessage[0]}</div>
+                                    <div>${newmessage[2].split(']:')[0] + ']'}</div>
+                                    <div>${newmessage[2].split(']:')[1]}</div>
+                                </div>
+                        `
+                       if (this.state.searchflag) {
+                        const height = document.getElementById('tbody').children[0].offsetHeight;
+                        this.refs.content.innerHTML = obj +  this.refs.content.innerHTML;
+                        const newHeight = document.getElementById('tbody').children[0].offsetHeight;
+                        this.myScroll.refresh()
+                        if (this.myScroll.y !== 0) {
+                            this.myScroll.scrollTo(0, this.myScroll.y - (newHeight - height), 0)
+                        }
+                       }
+                    } else {
+                        client.unsubscribe(topic)
+                        this.setState({flag: true, maxNum: true})
                     }
-                   }
                 } else {
-                    client.unsubscribe(topic)
-                    this.setState({flag: true, maxNum: true})
+                    number++;
+                    console.log(number)
                 }
            })
         } else {
@@ -166,14 +172,14 @@ class MyGatesLogviewer extends Component {
             const newarr = this.state.data.filter(item=>item[this.state.searchtype].indexOf(value) !== -1);
             let html = '';
             newarr.map(item=>{
-                html +=    `
+                html =    `
                 <div class="tableHeaders">
                     <div>${item.time}</div>
                     <div>${item.type}</div>
                     <div>${item.id}</div>
                     <div>${item.content}</div>
                 </div>
-            `
+            ` + html;
             });
             this.refs.content.innerHTML = html;
             this.myScroll.refresh();
@@ -183,14 +189,14 @@ class MyGatesLogviewer extends Component {
         } else {
             let html = '';
             this.state.data.map(item=>{
-                html +=    `
+                html =    `
                     <div class="tableHeaders">
                         <div padding='10px'>${item.time}</div>
                         <div>${item.type}</div>
                         <div>${item.id}</div>
                         <div>${item.content}</div>
                     </div>
-                    `
+                    ` + html
             });
             this.refs.content.innerHTML = html;
             this.myScroll.refresh();
@@ -204,7 +210,7 @@ class MyGatesLogviewer extends Component {
     }
     render () {
         return (
-            <div style={{position: 'relative'}}>
+            <div style={{position: 'relative', marginTop: 20}}>
                     {
                         this.state.flag
                         ? <Button

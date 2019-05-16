@@ -49,12 +49,10 @@
         min-width: 200px;
     }
     >div:nth-child(2){
-        width: 10%;
-        min-width: 80px;
+        width: 80px;
     }
     >div:nth-child(3){
-        width: 10%;
-        min-width: 80px;
+        width: 100px;
     }
     >div:nth-child(4){
         flex:1;
@@ -62,6 +60,6 @@
 }
 .tableContent{
     position: relative;
-    max-height: 680px;
+    max-height: 600px;
     overflow: hidden;
 }

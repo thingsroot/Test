@@ -38,10 +38,6 @@ class Action extends Component {
                     if (result.data.result) {
                       message.success('应用卸载成功,请稍后...')
                       clearInterval(timer)
-                      http.post('/api/gateways_applications_refresh', {
-                        gateway: sn,
-                        id: `gateways/refresh/${sn}/${new Date() * 1}`
-                      })
                     } else if (result.data.result === false) {
                       message.error('应用卸载失败，请重试')
                       clearInterval(timer)
@@ -113,12 +109,6 @@ class Action extends Component {
                   if (res.ok){
                       message.success('应用升级成功')
                       clearInterval(timer)
-                      // http.post('/api/gateways_applications_refresh', {
-                      //     gateway: this.props.sn,
-                      //     id: `gateways/refresh/${this.props.match.params.sn}/${new Date() * 1}`
-                      // }).then(()=>{
-                      //     this.props.history.go(-1)
-                      // })
                   } else if (res.ok === false){
                       message.error('应用升级操作失败，请重试');
                       clearInterval(timer)
@@ -165,7 +155,16 @@ class Action extends Component {
         const { record } = this.props;
         const { loading, visible, setName, nameValue } = this.state;
         return (
-            <div style={{display: 'flex', justifyContent: 'space-around'}}>
+            <div>
+              <div style={{lineHeight: '30px', paddingLeft: 20}}>
+                <div>
+                  应用名称:{record.data.data.name}
+                </div>
+                <div>
+                  应用开发者：{record.data.data.owner}
+                </div>
+              </div>
+              <div style={{display: 'flex', justifyContent: 'space-around'}}>
                 <Button
                     disabled={actionSwi}
                     onClick={()=>{
@@ -288,6 +287,7 @@ class Action extends Component {
                             }}
                         />
                     </Modal>
+              </div>
             </div>
         );
     }
