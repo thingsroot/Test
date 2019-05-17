@@ -262,31 +262,13 @@ class MyGates extends PureComponent {
     componentWillUnmount () {
         clearInterval(timer)
     }
-    onChanges = (type) => {
-        console.log(event.target.value)
-        const value = event.target.value.trim()
+    onChanges = (e, type) => {
+        const events = e || event;
+        const value = events.target.value.trim()
         this.setState({
             [type]: value,
             record: {...this.state.record, [type]: value}
         })
-        // switch (type){
-        //     case 'sn':
-        //         this.setState({
-        //             sn: value
-        //         })
-        //         break;
-        //     case 'name':
-        //         this.setState({
-        //             name: value
-        //         })
-        //         break;
-        //     case 'desc':
-        //         this.setState({
-        //             desc: value
-        //         })
-        //         break;
-        //     default: '';
-        // }
     }
     showModal = (name) => {
         this.setState({
@@ -390,8 +372,8 @@ class MyGates extends PureComponent {
                     <div className="inputs">
                         <span>序号：</span>
                         <Input
-                            onChange={()=>{
-                                this.onChanges('sn')
+                            onChange={(e)=>{
+                                this.onChanges(e, 'sn')
                             }}
                             placeholder="必填"
                         />
@@ -399,8 +381,8 @@ class MyGates extends PureComponent {
                     <div className="inputs">
                         <span>名称：</span>
                         <Input
-                            onChange={()=>{
-                                this.onChanges('name')
+                            onChange={(e)=>{
+                                this.onChanges(e, 'name')
                             }}
                             placeholder="必填"
                         />
@@ -408,8 +390,8 @@ class MyGates extends PureComponent {
                     <div className="inputs">
                         <span>描述：</span>
                         <Input
-                            onChange={()=>{
-                                this.onChanges('desc')
+                            onChange={(e)=>{
+                                this.onChanges(e, 'desc')
                             }}
                             placeholder="选填"
                         />
@@ -438,9 +420,8 @@ class MyGates extends PureComponent {
                         <span>名称：</span>
                         <Input
                             value={this.state.record.dev_name}
-                            onChange={()=>{
-                                console.log(event)
-                                this.onChanges('dev_name')
+                            onChange={(e)=>{
+                                this.onChanges(e, 'dev_name')
                             }}
                             placeholder="必填"
                         />
@@ -449,8 +430,8 @@ class MyGates extends PureComponent {
                         <span>描述：</span>
                         <Input
                             value={this.state.record.description}
-                            onChange={()=>{
-                                this.onChanges('description')
+                            onChange={(e)=>{
+                                this.onChanges(e, 'description')
                             }}
                             placeholder="选填"
                         />
@@ -459,8 +440,8 @@ class MyGates extends PureComponent {
                         <span>经度：</span>
                         <Input
                             value={this.state.record.longitude}
-                            onChange={()=>{
-                                this.onChanges('longitude')
+                            onChange={(e)=>{
+                                this.onChanges(e, 'longitude')
                             }}
                             placeholder="选填"
                         />
@@ -469,8 +450,8 @@ class MyGates extends PureComponent {
                         <span>纬度：</span>
                         <Input
                             value={this.state.record.latitude}
-                            onChange={()=>{
-                                this.onChanges('latitude')
+                            onChange={(e)=>{
+                                this.onChanges(e, 'latitude')
                             }}
                             placeholder="选填"
                         />
