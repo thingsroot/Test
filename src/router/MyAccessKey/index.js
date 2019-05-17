@@ -7,12 +7,13 @@ class MyAccessKey extends PureComponent {
             {
                 key: 'value',
                 dataIndex: 'value',
-                title: 'AccessKey'
+                title: 'AccessKey',
+                width: '50%'
             },
             {   key: 'action',
                 dataIndex: 'action',
                 title: '操作',
-                width: '200px',
+                width: '50%',
                 render: ()=>{
                     return (
                         <Popconfirm
@@ -62,7 +63,7 @@ class MyAccessKey extends PureComponent {
     render () {
         const { columns, dataSource } = this.state;
         return (
-            <div>
+            <div style={{boxSizing: 'border-box', padding: '0 20px'}}>
                 <Table
                     pagination={false}
                     columns={columns}
