@@ -29,14 +29,18 @@
         border-radius: 5px;
     }
     .rightecharts{
-        flex:1;
+        flex: 1;
+        width: 50%;
+        min-width: 300px;
         height: 790px;
         background: #eee;
         padding:30px;
     }
 }
 .linkstatus{
-    width: 550px;
+    min-width: 500px;
+    max-width: 600px;
+    width:50%;
     position: relative;
     .setbutton{
         position: absolute;
@@ -99,4 +103,8 @@
     h1{
         margin-top: 20px;
     }
+}
+.setgateway{
+    width: 100%;
+    overflow: hidden;
 }

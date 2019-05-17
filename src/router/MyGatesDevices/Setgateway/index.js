@@ -72,9 +72,9 @@ class LinkStatus extends Component {
             for (var i = 0;i < 10;i++){
             data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
             }
-            let myCharts = this.refs.cpu
-            let myFaultTypeChart = echarts.init(myCharts);
-            myFaultTypeChart.setOption({
+            let myCharts1 = this.refs.cpu
+            this.myFaultTypeChart1 = echarts.init(myCharts1);
+            this.myFaultTypeChart1.setOption({
                 tooltip: {
                     trigger: 'axis',
                     axisPointer: {
@@ -94,10 +94,9 @@ class LinkStatus extends Component {
                   }
                 ]
             });
-        window.addEventListener('resize', function (){
-            myFaultTypeChart.resize();
-        }, 20)
-
+            window.addEventListener('resize', ()=>{
+                this.myFaultTypeChart1.resize();
+            });
         })
         http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
             let data = [];
@@ -105,9 +104,9 @@ class LinkStatus extends Component {
             for (var i = 0;i < 10;i++){
             data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
             }
-            let myCharts = this.refs.mem
-            let myFaultTypeChart = echarts.init(myCharts);
-            myFaultTypeChart.setOption({
+            let myCharts2 = this.refs.mem
+            this.myFaultTypeChart2 = echarts.init(myCharts2);
+            this.myFaultTypeChart2.setOption({
                 tooltip: {
                     trigger: 'axis',
                     axisPointer: {
@@ -127,10 +126,12 @@ class LinkStatus extends Component {
                   }
                 ]
             });
-            window.addEventListener('resize', function (){
-                myFaultTypeChart.resize();
-            })
+            window.addEventListener('resize', ()=>{
+                this.myFaultTypeChart2.resize();
+            });
         })
+        console.log(this.myFaultTypeChart1)
+        
         const res = this.props.store.appStore.status;
         axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
                 let config = res;
@@ -309,7 +310,7 @@ class LinkStatus extends Component {
         const { status, actionSwi } = this.props.store.appStore;
         const {  flag, title, update, config, newdata, opendata, use_beta, loading, DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, UOLOAD, UOLOAD_VALUE } = this.state;
         return (
-            <div>
+            <div className="setgateway">
                 <div className={flag && !update ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
                     <div style={{ background: '#ECECEC', padding: '30px' }}
                         className="linkstatus"
