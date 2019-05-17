@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import http from '../../../utils/Server';
-import { Button, message, Tabs, Divider, Modal } from 'antd';
+import { Button, message, Tabs, Modal } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import MyTemplateForm from '../myForm';
 import CopyForm from '../CopyForm';
@@ -20,11 +20,13 @@ class TemplateList extends Component {
     constructor () {
         super();
         this.state = {
-            deleteName: ''
+            deleteName: '',
+            type: '',
+            conf: ''
         }
     }
 
-    copyContent = (conf, name, desc, version, publics, owner_type)=>{
+    copyContent = (conf, name, desc, version, publics, owner_type, type)=>{
         let data = {
             conf_name: name + '-copy',
             description: desc,
@@ -32,6 +34,10 @@ class TemplateList extends Component {
             owner_type: owner_type,
             version: version
         };
+        this.setState({
+            type: type === 1 ? '复制' : '编辑',
+            conf: conf
+        });
         if (version !== 0) {
             http.get('/api/configurations_version_read?conf=' + conf + '&version=' + version)
                 .then(res=>{
@@ -89,7 +95,7 @@ class TemplateList extends Component {
     render () {
         const { templateList, app } = this.props;
         let myList = this.props.store.codeStore.templateList;
-        const { templateContent } = this.state;
+        const { templateContent, type, conf } = this.state;
         return (
             <div className="templateList">
                 <Button
@@ -99,6 +105,8 @@ class TemplateList extends Component {
                     上传新模板
                 </Button>
                 <MyTemplateForm
+                    type={type}
+                    conf={conf}
                     visible={this.props.store.codeStore.templateVisible}
                     onCancel={this.handleCancel}
                     app={app}
@@ -106,6 +114,8 @@ class TemplateList extends Component {
                     myList={myList}
                 />
                 <CopyForm
+                    type={type}
+                    conf={conf}
                     visible={this.props.store.codeStore.copyVisible}
                     onCancel={this.CancelCopy}
                     app={app}
@@ -140,39 +150,52 @@ class TemplateList extends Component {
                                         <div>
                                             <div>版本号：<span className="fontColor">{v.latest_version}</span>
                                                 <div style={{float: 'right'}}>
-                                                    <span
-                                                        style={{height: '26px', cursor: 'pointer'}}
+                                                    <Button
+                                                        size="small"
+                                                        type="primary"
+                                                        style={{fontSize: '12px'}}
                                                     >
                                                         <Link
                                                             to={`/myTemplateDetails/${v.app}/${v.name}/${v.latest_version}`}
                                                         >
                                                             查看
                                                         </Link>
-                                                    </span>
-                                                    <Divider type="vertical" />
-                                                    <span
-                                                        style={{height: '26px', cursor: 'pointer'}}
+                                                    </Button>
+                                                    &nbsp;&nbsp;
+                                                    <Button
+                                                        size="small"
+                                                        style={{fontSize: '12px'}}
                                                         onClick={
                                                             () => {
-                                                                this.copyContent(v.name, v.conf_name, v.description, v.latest_version, v.public, v.owner_type)
+                                                                this.copyContent(v.name, v.conf_name, v.description, v.latest_version, v.public, v.owner_type, 2)
                                                             }
                                                         }
-                                                    >复制</span>
-                                                    <Divider type="vertical" />
-                                                    {/*<span*/}
-                                                    {/*    style={{height: '26px', cursor: 'pointer'}}*/}
-                                                    {/*>*/}
-                                                    {/*    修改*/}
-                                                    {/*</span>*/}
-                                                    {/*<Divider type="vertical" />*/}
-                                                    <span
-                                                        style={{height: '26px', cursor: 'pointer'}}
+                                                    >
+                                                        编辑
+                                                    </Button>
+                                                    &nbsp;&nbsp;
+                                                    <Button
+                                                        size="small"
+                                                        type="primary"
+                                                        style={{fontSize: '12px'}}
+                                                        onClick={
+                                                            () => {
+                                                                this.copyContent(v.name, v.conf_name, v.description, v.latest_version, v.public, v.owner_type, 1)
+                                                            }
+                                                        }
+                                                    >
+                                                        复制
+                                                        </Button>
+                                                    &nbsp;&nbsp;
+                                                    <Button
+                                                        size="small"
+                                                        style={{fontSize: '12px'}}
                                                         onClick={()=>{
                                                             this.getName(v.name)
                                                         }}
                                                     >
                                                         删除
-                                                    </span>
+                                                    </Button>
                                                 </div>
                                             </div>
                                         </div>

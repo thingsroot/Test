@@ -103,26 +103,38 @@ class AppSettings extends Component {
                     })
                 } else {
                     params['name'] = this.props.match.params.name;
-                    http.post('/api/applications_update', params).then(res=>{
-                        if (res.ok === true) {
-                            let formData = new FormData();
-                            formData.append('name', params.name);
-                            formData.append('file', this.state.imageUrl);
-                            reqwest({
-                                url: '/api/applications_icon',
-                                method: 'post',
-                                processData: false,
-                                data: formData,
-                                success: (res) => {
-                                    res;
-                                    message.success('应用已更新！');
-                                    window.location.href = '/myApps'
+                    http.post('/api/applications_update', params)
+                        .then(res=>{
+                            if (res.ok === true) {
+                                let formData = new FormData();
+                                formData.append('name', params.name);
+                                formData.append('file', this.state.imageUrl);
+                                reqwest({
+                                    url: '/api/applications_icon',
+                                    method: 'post',
+                                    processData: false,
+                                    data: formData,
+                                    success: (res) => {
+                                        res;
+                                        console.log(res)
+                                        message.success('应用已更新！');
+                                        setTimeout(()=>{
+                                            this.props.history.go(-1)
+                                        }, 1500)
+                                    },
+                                    error: (args)=>{
+                                        console.log(args)
+                                    }
+                                });
+                            } else {
+                                if (JSON.parse(JSON.parse(res._server_messages)[0]).message ===
+                                    'App Path must be unique') {
+                                    message.error('应用ID已存在！')
+                                } else {
+                                    message.error('应用更新失败！')
                                 }
-                            });
-                        } else {
-                            message.error('应用更新失败！')
-                        }
-                    })
+                            }
+                        })
                 }
             })
         } else {
@@ -220,7 +232,7 @@ class AppSettings extends Component {
                                 </Form.Item>
                             </Col>
                             <Col span={3}>
-                                <Form.Item label="发布">
+                                <Form.Item label="发布到应用市场">
                                     {getFieldDecorator('published', {
                                         initialValue: settingData.published ? settingData.published : 0
                                     })(

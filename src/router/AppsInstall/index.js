@@ -150,7 +150,7 @@ class MyGatesAppsInstall extends Component {
     searchApp (value){
         let { filterdata } = this.state;
         let newdata = [];
-        newdata = filterdata.filter((item)=>item.app_name.indexOf(value) !== -1);
+        newdata = filterdata.filter((item)=>item.app_name.toLowerCase().indexOf(value.toLowerCase()) !== -1);
         this.setState({
             data: newdata
         })
@@ -348,9 +348,16 @@ class MyGatesAppsInstall extends Component {
         } else {
             url = '/api/applications_versions_latest?app='
         }
+        if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
+            message.error('实例名不能为空！')
+            return false;
+        }
         http.get(url + app).then(res=>{
+            console.log(url)
+            console.log(res.data)
             version = res.data;
             if (version > 0) {
+                message.success('应用没有正式版本，安装当前最新beta版本!')
                 let params = {
                     gateway: sn,
                     inst: this.props.store.codeStore.instNames,
@@ -359,9 +366,6 @@ class MyGatesAppsInstall extends Component {
                     conf: this.props.store.codeStore.installConfiguration,
                     id: 'app_install/' + sn + '/' + this.props.store.codeStore.instNames + '/' + app
                 };
-                if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
-                    message.error('实例名不能为空！')
-                }
                 http.post('/api/gateways_applications_install', params).then(res=>{
                     openNotification('提交任务成功', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.');
                     setTimeout(()=>{
@@ -398,11 +402,7 @@ class MyGatesAppsInstall extends Component {
                     }
                 })
             } else {
-                if (this.props.store.codeStore.userBeta === 1) {
-                    message.error('应用暂时没有正式版本，无法安装！')
-                } else {
-                    message.error('应用暂时没有正式版本，无法安装！')
-                }
+                message.error('应用暂时没有版本，无法安装！')
             }
         });
     };

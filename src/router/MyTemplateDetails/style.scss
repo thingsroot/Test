@@ -16,15 +16,15 @@
 }
 .web{
   .ant-modal-content {
-    width: 1000px!important;
-    height: 540px!important;
-    margin-left: -500px!important;
+    width: 70vw!important;
+    //height: 72vh!important;
+    margin-left: -35vw!important;
     position: absolute;
     left: 50%;
   }
   .ant-modal-body {
-    width: 1000px!important;
-    height: 430px!important;
+    width: 70vw!important;
+    height: 57vh!important;
   }
   .ant-upload-list-item, .ant-upload-list-item-error{
     display: none!important;
