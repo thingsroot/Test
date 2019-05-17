@@ -67,8 +67,8 @@ class MyApps extends Component {
             })
         }, 1000);
     };
-    searchApp = ()=>{
-        let text = event.target.value;
+    searchApp = (e)=>{
+        let text = e.target.value;
         this.tick(text);
         if (text) {
         let newData = [];

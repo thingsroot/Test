@@ -73,6 +73,7 @@ class UserSettings extends PureComponent {
                     <p><span>|</span>基本资料</p>
                     <p><span>账户全称：</span><span>{info.first_name}{info.last_name}</span></p>
                     <p><span>账户ID：</span><span>{info.name}</span></p>
+                    <br/>
                     <Button
                         type="primary"
                         onClick={this.showModal}

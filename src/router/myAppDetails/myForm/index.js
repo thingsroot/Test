@@ -29,6 +29,7 @@ const MyTemplateForm = Form.create({ name: 'template_form' })(
                 } else {
                     params['owner_id'] = this.props.store.codeStore.groupName
                 }
+                console.log(params);
                 http.post('/api/configurations_create', params).then(res=>{
                     if (res.ok === false) {
                         message.error('新版本上传失败！');

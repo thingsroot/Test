@@ -242,10 +242,10 @@ class MyTemplateDetails extends PureComponent {
                 >
                     <div style={previewCsvData.length > 0
                         ? {display: 'none'}
-                        : {width: '100%', height: '370px', display: 'block'}}
+                        : {width: '100%', height: '100%', display: 'block'}}
                     >
                         <Dragger
-                            style={{width: '100%', height: '600px'}}
+                            style={{width: '100%', height: '100%'}}
                             accept=".csv"
                             onChange={this.fileChang}
                         >
@@ -256,7 +256,7 @@ class MyTemplateDetails extends PureComponent {
                         </Dragger>
                     </div>
                     <div style={previewCsvData.length > 0
-                        ? {width: '100%', height: '370px', overflow: 'auto', display: 'block'}
+                        ? {width: '100%', height: '100%', overflow: 'auto', display: 'block'}
                         : {display: 'none'}}
                     >
                         <table
