@@ -80,7 +80,7 @@ class MyVirtualGates extends React.Component {
                             zIndex: 999
                         }}
                         onClick={()=>{
-                            http.get('/api/user_virtual_gateways_create').then(res=>{
+                            http.post('/api/user_virtual_gateways_create').then(res=>{
                                 if (res.ok) {
                                     this.virtual_gateways_list()
                                 }
