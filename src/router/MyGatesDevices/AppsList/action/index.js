@@ -20,6 +20,10 @@ class Action extends Component {
     componentDidMount (){
         console.log(this.props)
     }
+    componentWillUnmount (){
+      clearInterval(this.t1);
+      clearInterval(timer)
+    }
     confirm = (record, sn)=>{
         console.log(this)
        if (!this.props.store.appStore.actionSwi) {
@@ -121,10 +125,18 @@ class Action extends Component {
         }, 3000);
       }
       appSwitch = (type) =>{
-          const data = type === 'stop' ? {
+        let action = '';
+        if (type === 'stop'){
+          action = '关闭'
+        } else if (type === 'start'){
+          action = '开启'
+        } else {
+          action = '重启'
+        }
+          const data = type === 'stop' || type === 'restart' ? {
             gateway: this.props.match.params.sn,
             inst: this.props.record.device_name,
-            reason: 'stopreason',
+            reason: 'reason',
             id: `gateways/${type}/${this.props.match.params.sn}/${new Date() * 1}`
         } : {
             gateway: this.props.match.params.sn,
@@ -133,14 +145,14 @@ class Action extends Component {
         }
         http.post('/api/gateways_applications_' + type, data).then(res=>{
             if (res.ok) {
-              timer = setInterval(() => {
+              this.t1 = setInterval(() => {
                 http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
                   if (result.ok) {
                     if (result.data.result){
-                      message.success((type === 'start' ? '启动' : '停止') + '应用成功，请稍后...')
-                      clearInterval(timer)
+                      message.success(action + '应用成功，请稍后...')
+                      clearInterval(this.t1)
                     } else {
-                      clearInterval(timer)
+                      clearInterval(this.t1)
                       message.error(result.data.message)
                     }
                   }
@@ -155,7 +167,7 @@ class Action extends Component {
         const { record } = this.props;
         const { loading, visible, setName, nameValue } = this.state;
         return (
-            <div>
+            <div style={{position: 'relative', paddingBottom: 50}}>
               <div style={{lineHeight: '30px', paddingLeft: 20}}>
                 <div>
                   应用名称:{record.data.data.name}
@@ -164,7 +176,7 @@ class Action extends Component {
                   应用开发者：{record.data.data.owner}
                 </div>
               </div>
-              <div style={{display: 'flex', justifyContent: 'space-around'}}>
+              <div style={{display: 'flex', justifyContent: 'space-around', marginTop: 20, width: 770, position: 'absolute', right: 20, bottom: 15}}>
                 <Button
                     disabled={actionSwi}
                     onClick={()=>{
@@ -178,36 +190,40 @@ class Action extends Component {
                 >
                     应用配置
                 </Button>
-                {
-                    record.running
-                    ? <Button
+                <Button
+                    disabled={record.latestVersion <= record.version || actionSwi}
+                    onClick={()=>{
+                        this.showModal('visible')
+                    }}
+                >
+                    更新版本
+                </Button>
+                    <Button
+                        onClick={()=>{
+                          this.appSwitch('start')
+                        }}
+                        disabled={actionSwi}
+                    >
+                        启动应用
+                      </Button>
+                    <Button
                         disabled={actionSwi}
                         onClick={()=>{
                           this.appSwitch('stop')
                         }}
-                      >
+                    >
                         关闭应用
                       </Button>
-                    : <Button
-                        onClick={()=>{
-                        this.appSwitch('start')
-                        }}
-                        disabled={actionSwi}
+                      <Button
+                          onClick={()=>{
+                            this.appSwitch('restart')
+                          }}
                       >
-                        启动应用
+                        重启应用
                       </Button>
-                }
-                <Button
-                    onClick={()=>{
-                        this.showModal('visible')
-                    }}
-                    disabled={actionSwi}
-                >
-                    更新版本
-                </Button>
-                <div>
+                <div style={{paddingTop: 5}}>
                     <span>开机自启:</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                     <Switch checkedChildren="ON"
                         unCheckedChildren="OFF"
                         defaultChecked={Number(record.auto) === 0 ? false : true}
