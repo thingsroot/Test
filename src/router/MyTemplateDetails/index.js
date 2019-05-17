@@ -144,6 +144,12 @@ class MyTemplateDetails extends PureComponent {
         });
     };
 
+    deleteCsv = ()=>{
+        this.setState({
+            previewCsvData: ''
+        })
+    };
+
     render () {
         const { confName, appName, content, csvData, versionList, previewCsvData, maxVersion } = this.state;
         return (
@@ -236,7 +242,7 @@ class MyTemplateDetails extends PureComponent {
                 >
                     <div style={previewCsvData.length > 0
                         ? {display: 'none'}
-                        : {width: '100%', height: '390px', display: 'block'}}
+                        : {width: '100%', height: '370px', display: 'block'}}
                     >
                         <Dragger
                             style={{width: '100%', height: '600px'}}
@@ -250,7 +256,7 @@ class MyTemplateDetails extends PureComponent {
                         </Dragger>
                     </div>
                     <div style={previewCsvData.length > 0
-                        ? {width: '100%', height: '390px', overflow: 'auto', display: 'block'}
+                        ? {width: '100%', height: '370px', overflow: 'auto', display: 'block'}
                         : {display: 'none'}}
                     >
                         <table
@@ -276,12 +282,17 @@ class MyTemplateDetails extends PureComponent {
                                             }
                                         </tr>
                                     }
-
                                 })
                             }
                             </tbody>
                         </table>
                     </div>
+                    <Button
+                        small
+                        type="primary"
+                        style={previewCsvData.length > 0 ? {display: 'block'} : {display: 'none'}}
+                        onClick={this.deleteCsv}
+                    >清空</Button>
                 </Modal>
             </div>
         );

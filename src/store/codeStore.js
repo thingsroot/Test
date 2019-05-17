@@ -60,6 +60,12 @@ class CodeStore {
     @observable installConfiguration = [];  //json源码
     @observable iDeviceColumns = [];  //配置面板表格
 
+    @observable userBeta = 0;   //网关是否开启beta模式
+
+    @action setUserBeta (values) {
+        this.userBeta = values
+    }
+
     @action setCorrelationApp (values) {
         this.correlationApp = values;
     }
@@ -164,7 +170,8 @@ class CodeStore {
         this.editorContent = values;
     }
     @action setTreeData (values) {
-        this.treeData = [...values];
+        console.log(values)
+        this.treeData = values;
     }
     @action setMyEditor (values) {
         this.myEditor = values;

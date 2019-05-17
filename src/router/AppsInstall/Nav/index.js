@@ -39,14 +39,23 @@ class Nav extends Component {
         // http.get('/api/method/iot_ui.iot_api.devices_list?filter=online').then(res=>{
         //   this.props.store.appStore.setGatelist(res.message);
         // })
-      }
+      };
       setUrl = (sn) => {
         let arr = location.pathname.split('/');
-        arr[2] = sn
+        arr[2] = sn;
         return arr.join('/')
-      }
+      };
+
+    setBeta = (sn)=>{
+        http.get('/api/gateways_read?name=' + sn)
+            .then(res=>{
+                this.props.store.codeStore.setUserBeta(res.enable_beta);
+            })
+    };
+
     render () {
         const { gateList } = this.props.store.appStore;
+        console.log(gateList);
         return (
             <div className="Nav">
                 <ul>
@@ -54,10 +63,14 @@ class Nav extends Component {
                     {
                       gateList && gateList.length > 0 && gateList.map((v, i)=>{
                         return (
-                        <Link key={i}
+                        <Link
+                            key={i}
+                            onClick={()=>{
+                              this.setBeta(v.sn)
+                            }}
                             to={
-                          this.setUrl(v.sn)
-                        }
+                              this.setUrl(v.sn)
+                            }
                         >
                             <li onClick={this.onClose}
                                 className={this.props.match.params.sn === v.sn ? 'gateslist gateslistactive' : 'gateslist'}

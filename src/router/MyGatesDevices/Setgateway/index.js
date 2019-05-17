@@ -276,7 +276,7 @@ class LinkStatus extends Component {
         this.setState({
             config: data
         }, ()=>{
-            console.log(this.state.config)
+            console.log(this.state.config);
         })
       }
         onChange (value, type) {

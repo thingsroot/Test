@@ -548,49 +548,57 @@ class PlatformMessage extends Component {
         };
         return (
             <div className="platformMessage">
-                <div className="searchBox">
-                    <Button onClick={()=>{
-                        this.confMessage(selectedRowKeys)
-                    }}
-                    >确认消息</Button>
-                    <Button onClick={()=>{
-                        this.confAllMessage()
-                    }}
-                    >确认所有消息</Button>
-                    <Select defaultValue="消息类型：全部"
-                        style={{ width: 180 }}
-                        onChange={this.messageChange}
-                    >
-                        <Option value="">消息类型：全部</Option>
-                        <Option value="Action">消息类型：设备操作</Option>
-                        <Option value="Status">消息类型：设备消息</Option>
-                    </Select>
-                    <Select defaultValue="记录数：100"
-                        style={{ width: 140 }}
-                        onChange={this.messageTotal}
-                    >
-                        <Option value="100">记录数：100</Option>
-                        <Option value="300">记录数：300</Option>
-                        <Option value="500">记录数：500</Option>
-                    </Select>
-                    <Select defaultValue="时间：24小时"
-                        style={{ width: 140 }}
-                        onChange={this.messageTime}
-                    >
-                        <Option value="1">时间：1小时</Option>
-                        <Option value="6">时间：6小时</Option>
-                        <Option value="24">时间：24小时</Option>
-                        <Option value="72">时间：72小时</Option>
-                    </Select>
-                    <div style={{
-                        width: '340px',
-                        position: 'absolute',
-                        right: '0',
-                        top: '0'
+                <div className="searchBox flex">
+                    <div style={{minWidth: 250}}>
+                        <Button onClick={()=>{
+                            this.confMessage(selectedRowKeys)
+                        }}
+                        >确认消息</Button>
+                        <Button onClick={()=>{
+                            this.confAllMessage()
+                        }}
+                        >确认所有消息</Button>
+                    </div>
+                    <div
+                        className="flex"
+                        style={{
+                        minWidth: 810
                     }}
                     >
-                        <InputGroup compact>
-                            <Select defaultValue="标题"
+                        <Select
+                            defaultValue="消息类型：全部"
+                            style={{ width: 180 }}
+                            onChange={this.messageChange}
+                        >
+                            <Option value="">消息类型：全部</Option>
+                            <Option value="Action">消息类型：设备操作</Option>
+                            <Option value="Status">消息类型：设备消息</Option>
+                        </Select>
+                        <Select
+                            defaultValue="记录数：100"
+                            style={{ width: 140 }}
+                            onChange={this.messageTotal}
+                        >
+                            <Option value="100">记录数：100</Option>
+                            <Option value="300">记录数：300</Option>
+                            <Option value="500">记录数：500</Option>
+                        </Select>
+                        <Select
+                            defaultValue="时间：24小时"
+                            style={{ width: 140 }}
+                            onChange={this.messageTime}
+                        >
+                            <Option value="1">时间：1小时</Option>
+                            <Option value="6">时间：6小时</Option>
+                            <Option value="24">时间：24小时</Option>
+                            <Option value="72">时间：72小时</Option>
+                        </Select>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <InputGroup
+                            compact
+                        >
+                            <Select
+                                defaultValue="标题"
                                 onChange={this.getSelect}
                                 style={{width: '100px'}}
                             >
@@ -598,18 +606,19 @@ class PlatformMessage extends Component {
                                 <Option value="device">序列号</Option>
                             </Select>
                             <Input
-                                style={{ width: '70%' }}
+                                style={{ width: 200 }}
                                 placeholder="请输入关键字"
                                 onChange={this.search}
                             />
                         </InputGroup>
+                        <Icon
+                            style={{fontSize: '18px', lineHeight: '35px', padding: '0 10px'}}
+                            type="sync"
+                            spin={this.state.sync}
+                            onClick={this.refresh}
+                        />
                     </div>
-                    <Icon
-                        style={{fontSize: '18px', lineHeight: '35px', padding: '0 10px'}}
-                        type="sync"
-                        spin={this.state.sync}
-                        onClick={this.refresh}
-                    />
+
                 </div>
                 <Table
                     rowSelection={rowSelection}
