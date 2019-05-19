@@ -39,7 +39,7 @@ class MyTree extends Component {
         this.state = {
             expandedKeys: [],
             defaultExpandAll: true,
-            autoExpandParent: true,
+            autoExpandParent: false,
             selectedKeys: ['version'],
             arr: [],
             a: 1
@@ -98,8 +98,17 @@ class MyTree extends Component {
             }
         });
         if (a === 1) {
+            let data = [
+                {
+                    title: this.props.appName,
+                    isLeaf: false,
+                    type: 'folder',
+                    key: this.props.appName,
+                    children: arr
+                }
+            ]
             this.setState({
-                arr: arr,
+                arr: data,
                 a: this.state.a + 1
             }, ()=>{
                 this.props.store.codeStore.setTreeData(this.state.arr);
@@ -108,6 +117,7 @@ class MyTree extends Component {
         this.setState({
             a: this.state.a + 1
         });
+
         return arr;
     };
 
@@ -125,10 +135,33 @@ class MyTree extends Component {
         });
         this.props.store.codeStore.setMyFolder(selectedKeys);
         this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+        if (selectedKeys[0].indexOf('.') !== -1) {
+            let suffixName = '';
+            switch (selectedKeys[0].substr(selectedKeys[0].indexOf('.') + 1, selectedKeys[0].length)) {
+                case 'js' : suffixName = 'javascript'; break;
+                case 'html' : suffixName = 'html'; break;
+                case 'java' : suffixName = 'java'; break;
+                case 'py' : suffixName = 'python'; break;
+                case 'lua' : suffixName = 'lua'; break;
+                case 'xml' : suffixName = 'xml'; break;
+                case 'rb' : suffixName = 'ruby'; break;
+                case 'sass' : suffixName = 'sass'; break;
+                case 'less' : suffixName = 'sass'; break;
+                case 'md' : suffixName = 'markdown'; break;
+                case 'sql' : suffixName = 'mysql'; break;
+                case 'json' : suffixName = 'json'; break;
+                case 'ts' : suffixName = 'typescript'; break;
+                case 'css' : suffixName = 'css'; break;
+            }
+            this.props.store.codeStore.setSuffixName(suffixName);
+        } else {
+            this.props.store.codeStore.setSuffixName('text');
+        }
     };
 
     renderTreeNodes = data =>
         data.map(item => {
+
             if (item.children) {
                 return (
                     <TreeNode
@@ -159,15 +192,9 @@ class MyTree extends Component {
                 expandedKeys={this.state.expandedKeys}
                 onSelect={this.onSelect}
                 selectedKeys={this.state.selectedKeys}
-
+                autoExpandParent={[appName]}
             >
-                <TreeNode
-                    defaultExpandAll
-                    title={appName}
-                    key={appName}
-                >
-                    {this.renderTreeNodes(this.state.arr)}
-                </TreeNode>
+                {this.renderTreeNodes(this.state.arr)}
 
             </Tree>
         );

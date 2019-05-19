@@ -289,6 +289,9 @@ class AppEditorCode extends Component {
         let myFolder = this.props.store.codeStore.myFolder[0];
         if (this.props.store.codeStore.addFolderName !== '') {
             let url = '/home/api/method/app_center.editor.editor';
+            if (myFolder === this.props.appName) {
+                myFolder = '/'
+            }
             http.get(url + '?app=' + this.state.app + '&operation=create_node&type=folder&id=' +
                 myFolder + '&text=' + this.props.store.codeStore.addFolderName)
                 .then(res=>{

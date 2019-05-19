@@ -319,7 +319,9 @@ class DevicemMessage extends Component {
         this.setState({
             selectValue: text
         }, ()=>{
-            this.tick(this.state.text);
+            if (this.state.text) {
+                this.tick(this.state.text);
+            }
         })
     };
     tick = (text)=>{
@@ -347,7 +349,10 @@ class DevicemMessage extends Component {
                     this.props.store.codeStore.setDeviceData(newData)
                 } else {
                     let data = this.props.store.codeStore.deviceTableData;
-                    this.props.store.codeStore.setDeviceData(data)
+                    this.props.store.codeStore.setDeviceData(data);
+                    this.setState({
+                        loading: false
+                    });
                 }
             })
         }, 1000);

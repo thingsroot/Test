@@ -2,7 +2,7 @@ import {observable, action} from 'mobx';
 class CodeStore {
     @observable treeData = [];
     @observable isChange = false;
-    @observable folderType = '';
+    @observable folderType = 'file';
     @observable myFolder = '';
     @observable editorContent = '';
     @observable newEditorContent = '';
@@ -62,8 +62,14 @@ class CodeStore {
 
     @observable userBeta = 0;   //网关是否开启beta模式
 
+    @observable suffixName = '';
+
     @action setUserBeta (values) {
         this.userBeta = values
+    }
+
+    @action setSuffixName (values) {
+        this.suffixName = values
     }
 
     @action setCorrelationApp (values) {
@@ -80,6 +86,7 @@ class CodeStore {
 
     @action setConfig (values) {
         this.config = values;
+        console.log(values)
     }
 
     @action setActiveKey (values) {

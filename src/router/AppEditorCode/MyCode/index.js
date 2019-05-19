@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import AceEditor from 'react-ace';
 import http from '../../../utils/Server';
-import 'brace/mode/java';
+// import `brace/mode/${this.props.store.codeStore.suffixName}`;
 import 'brace/theme/github';
 @withRouter
 @inject('store')
@@ -30,11 +30,13 @@ class MyCode extends Component {
     }
     //获取文件内容
     getContent = ()=>{
-        http.get('/home/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_content&id=' + this.props.store.codeStore.fileName)
-            .then(res=>{
-                this.props.store.codeStore.setEditorContent(res.content);
-                this.props.store.codeStore.setNewEditorContent(res.content);
-            })
+        if (this.props.store.codeStore.folderType === 'file') {
+            http.get('/home/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_content&id=' + this.props.store.codeStore.fileName)
+                .then(res=>{
+                    this.props.store.codeStore.setEditorContent(res.content);
+                    this.props.store.codeStore.setNewEditorContent(res.content);
+                })
+        }
     };
     setContent = (newValue)=>{
         this.props.store.codeStore.setNewEditorContent(newValue);
@@ -43,23 +45,23 @@ class MyCode extends Component {
         console.log(newValue, e);
         this.setContent(newValue)
     };
-    // blur = ()=>{
-    //     this.props.store.codeStore.setMyEditor(this.refs.editor);
-    //     console.log(this.props.store.codeStore.myEditor)
-    // };
+
 
     render () {
         const { fontSize } = this.props;
         return (
             <div className="myCode">
+                <p className="color">
+                    <span>编辑状态：</span>
+                    <span>{this.props.store.codeStore.fileName}</span>
+                </p>
                 <AceEditor
-                    style={{width: '100%', height: '600px'}}
-                    mode="java"
+                    style={{width: '100%', height: '80vh'}}
+                    mode={this.props.store.codeStore.setSuffixName}
                     theme="github"
                     ref="editor"
                     fontSize={fontSize}
                     onChange={this.onChange.bind(this)}
-                    // onBlur={this.blur.bind(this)}
                     value={this.props.store.codeStore.editorContent}
                     name="UNIQUE_ID_OF_DIV"
                     editorProps={{$blockScrolling: true}}

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Inst from '../Inst';
 import {Button, Checkbox, Input, Modal, Select, Table, Tabs} from 'antd';
-// import EditableTable from '../editorTable';
+import EditableTable from '../editorTable';
 import {split as SplitEditor} from 'react-ace';
 import 'brace/mode/json';
 import 'brace/theme/github';
@@ -95,6 +95,9 @@ class AppConfig extends Component {
         ],
         showTempList: []
     };
+    componentDidMount () {
+        console.log(this.props.config)
+    }
 
     //添加模板
     addSingleTemp = (conf, desc, name, version)=>{
@@ -184,6 +187,7 @@ class AppConfig extends Component {
                     <Inst
                         sn={this.props.match.params.sn}
                     />
+
                     <div
                         style={errorCode ? none : block}
                     >
@@ -390,10 +394,10 @@ class AppConfig extends Component {
                                                                                 >|</span>{w.desc}</p>
                                                             {console.log(w.name)}
                                                             {console.log(deviceColumns[w.name])}
-                                                            {/*<EditableTable*/}
-                                                            {/*    tableName={w.name}*/}
-                                                            {/*    deviceColumns={deviceColumns[w.name]}*/}
-                                                            {/*/>*/}
+                                                            <EditableTable
+                                                                tableName={w.name}
+                                                                deviceColumns={deviceColumns[w.name]}
+                                                            />
                                                         </div>
                                                     )
                                                 })
@@ -459,6 +463,7 @@ class AppConfig extends Component {
                             className="message"
                         >此应用不支持配置界面 请使用JSON格式配置</p>
                     </div>
+                    <br/>
                     <Button
                         type="primary"
                         style={errorCode === true || config.length <= 0 ? none : block}
@@ -492,6 +497,7 @@ class AppConfig extends Component {
                         name="UNIQUE_ID_OF_DIV"
                         editorProps={{$blockScrolling: true}}
                     />
+                    <br/>
                     <Button
                         type="primary"
                         onClick={submitData}
