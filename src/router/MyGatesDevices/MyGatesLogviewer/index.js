@@ -5,9 +5,9 @@ import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
 import './style.scss';
 import ReactList from 'react-list';
+let data_len = 0;
 const Search = Input.Search;
 const Option = Select.Option;
-
 @withRouter
 @inject('store') @observer
 class MyGatesLogviewer extends Component {
@@ -22,8 +22,12 @@ class MyGatesLogviewer extends Component {
     }
     componentDidMount (){
         this.t1 = setInterval(()=>this.tick(), 59000);
+        this.refs.content.scrollAround(this.props.store.appStore.data.length)
         this.props.store.appStore.isleave = false;
         this.props.store.appStore.lognum = 0;
+        this.props.store.appStore.tire = this.props.store.appStore.data;
+        this.props.store.appStore.data = [];
+        this.props.store.appStore.data = this.props.store.appStore.tire.concat(this.props.store.appStore.data)
         if (this.props.match.params.sn !== this.props.store.appStore.mqttSN && this.props.store.appStore.mqttSN !== ''){
             this.props.store.appStore.client.end();
             this.props.store.appStore.flag =  true;
@@ -43,6 +47,22 @@ class MyGatesLogviewer extends Component {
                 this.props.store.appStore.client = null;
                 clearInterval(this.t1)
             }
+        }
+    }
+    componentDidUpdate () {
+        if (data_len !== this.props.store.appStore.data.length) {
+            data_len = this.props.store.appStore.data.length;
+            // this.refs.content.props.initialIndex = this.props.store.appStore.scrolltop;
+            console.log(this.refs.content)
+            console.log(this.props.store.appStore.scrolltop)
+            // this.refs.content.initialIndex(this.props.store.appStore.scrolltop)
+            // const box_height = this.refs.content.items.firstChild.clientHeight;
+            // this.refs.content.scrollTo(this.props.store.appStore.scrolltop + box_height)
+            // console.log(this.props.store.appStore.scrolltop, box_height)
+            // document.getElementById('tbody').scrollTop = box_height - this.props.store.appStore.scrolltop;
+            // if (this.props.store.appStore.scrolltop !== 0){
+            //     document.getElementById('tbody').scrollTop = box_height + this.props.store.appStore.scrolltop;
+            // }
         }
     }
     componentWillUnmount (){
@@ -90,7 +110,7 @@ class MyGatesLogviewer extends Component {
                     : <Button
                         onClick={()=>{
                                 clearInterval(this.t1)
-                                this.props.store.appStore.flag = true
+                                this.props.store.appStore.flag = true;
                                 this.props.store.appStore.client.unsubscribe(this.props.match.params.sn + '/log')
                         }}
                       >取消订阅</Button>
@@ -143,20 +163,17 @@ class MyGatesLogviewer extends Component {
                             <div
                                 className="tableContent"
                                 id="tbody"
-                                onScroll={()=>{
-                                    console.log('33333')
-                                    console.log(this.refs.content)
-                                    this.refs.content.scrollTo()
-                                }}
                             >
                                 <div
                                     style={{height: 600}}
                                 >
                                     <ReactList
+                                        pageSize={1}
                                         ref="content"
                                         axis="y"
+                                        type="uniform"
+                                        scrollTo={this.props.store.appStore.scrolltop}
                                         length={data.length}
-                                        scrollTo={data.length}
                                         itemRenderer={(key)=>{
                                             return (<div key={key}>
                                                 <div className="tableHeaders">

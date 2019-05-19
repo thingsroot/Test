@@ -96,7 +96,7 @@ class AppConfig extends Component {
         showTempList: []
     };
     componentDidMount () {
-        console.log(this.props.config)
+        console.log(this.props)
     }
 
     //添加模板

@@ -15,6 +15,7 @@ const VPN  = LoadableComponent(()=>import('./VPN'));
 const Vserial = LoadableComponent(()=>import('./Vserial'));
 const GatewayRecord = LoadableComponent(()=>import('./GatewayRecord'));
 const Logviewer = LoadableComponent(()=>import('./MyGatesLogviewer'));
+const Appconfig = LoadableComponent(()=>import('../AppsInstall/AppConfig'));
 @withRouter
 @inject('store')
 @observer
@@ -157,6 +158,10 @@ class MyGatesDevices extends Component {
                       <PrivateRoute path={`${path}/logviewer`}
                           component={Logviewer}
                           title="我的网关·日志"
+                      />
+                      <PrivateRoute path="/mygatesdevices/appconfig"
+                          component={Appconfig}
+                          title="我的网关·应用配置"
                       />
                       <Redirect from={path}
                           to={`${path}/gateslist`}

@@ -64,7 +64,6 @@ class MyGates extends PureComponent {
                 key: 'dev_name',
                 sorter: (a, b) => a.dev_name.length - b.dev_name.length,
                 render: (props, record)=>{
-                    console.log(props, record)
                     return (
                         <div>
                             {record.dev_name}

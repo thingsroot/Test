@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Switch, Popconfirm, message, Modal, Input } from 'antd';
 import http from '../../../../utils/Server';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import MyGatesAppsUpgrade from '../../../Upgrade';
 import { _getCookie } from '../../../../utils/Session';
@@ -186,11 +186,13 @@ class Action extends Component {
                 >
                     更改名称
                 </Button>
-                <Button
-                    disabled
+                <Link
+                    to="/mygatesdevices/appconfig"
                 >
-                    应用配置
-                </Button>
+                  <Button>
+                      应用配置
+                  </Button>
+                </Link>
                 <Button
                     disabled
                 >

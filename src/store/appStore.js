@@ -41,6 +41,8 @@ class AppStore {
   @observable connected = false;
   @observable searchtype = 'content'
   @observable mqttSN = '';
+  @observable scrolltop = 0;
+  @observable tire = [];
   @action setLogFlag (values) {
     this.logflag = values;
   }
@@ -115,7 +117,7 @@ class AppStore {
                           id: newmessage[2].split(']:')[0] + ']',
                           content: newmessage[2].split(']:')[1]
                       }
-                      arr.unshift(obj)
+                      arr.push(obj)
                           if (this.value) {
                               const newarr = arr.filter(item=>item[this.searchtype].toLowerCase().indexOf(this.value.toLowerCase()) !== -1);
                               this.data = newarr
