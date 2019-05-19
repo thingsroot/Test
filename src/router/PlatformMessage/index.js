@@ -330,9 +330,9 @@ class PlatformMessage extends Component {
                             } else if (obj.channel === 'output') {
                                 sub = v.full_name + '    操作网关设备应用' + obj.data.output + '数据输出'
                             } else if (obj.action === 'Delete') {
-                                sub = v.full_name + '    删除应用'
+                                sub = v.full_name + '    删除了一台网关'
                             } else if (obj.action === 'Add') {
-                                sub = v.full_name + '    添加应用'
+                                sub = v.full_name + '    增加了一台网关'
                             } else {
                                 sub = JSON.stringify(obj)
                             } //output
