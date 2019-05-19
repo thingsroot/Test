@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import http from '../../utils/Server';
-import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input, Icon, Menu, Dropdown, Select } from 'antd';
+import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input, Icon, Menu, Dropdown, Select, Tag } from 'antd';
 import './style.scss';
 import { inject } from 'mobx-react';
 import { Link } from 'react-router-dom';
@@ -62,7 +62,22 @@ class MyGates extends PureComponent {
                 title: '名称',
                 dataIndex: 'dev_name',
                 key: 'dev_name',
-                sorter: (a, b) => a.dev_name.length - b.dev_name.length
+                sorter: (a, b) => a.dev_name.length - b.dev_name.length,
+                render: (props, record)=>{
+                    console.log(props, record)
+                    return (
+                        <div>
+                            {record.dev_name}
+                            {record.owner_type !== 'Cloud Company Group'
+                                ? <Tag
+                                    color="cyan"
+                                    style={{marginLeft: 20}}
+                                  >个人设备</Tag>
+                                : ''
+                            }
+                        </div>
+                    )
+                }
               }, {
                 title: '描述',
                 dataIndex: 'description',
@@ -198,7 +213,11 @@ class MyGates extends PureComponent {
     }
     componentDidMount (){
         http.get('/api/user_groups_list').then(res=>{
-            console.log(res)
+            if (res.ok && res.data[0]){
+                this.setState({
+                    role: res.data[0]
+                })
+            }
         })
         this.getDevicesList(this.state.status)
         timer = setInterval(() => {
@@ -230,13 +249,16 @@ class MyGates extends PureComponent {
         });
       }
       handleOk = (type) => {
-          const { sn, name, desc} = this.state;
+          const { sn, name, desc, index} = this.state;
+          const owner_id = index === 1 ? this.state.role.name : unescape(_getCookie('user_id'));
+          const owner_type = index === 1 ? 'Cloud Company Group' : 'User';
+          console.log(index, owner_id, owner_type)
           const data = {
             'name': sn,
             'dev_name': name,
             'description': desc,
-            'owner_type': this.state.index === 1 ? 'Cloud Company Group' : 'User',
-            'owner_id': this.state.index === 1 ? this.state.role.name : unescape(_getCookie('user_id'))
+            'owner_type': owner_type,
+            'owner_id': owner_id
           };
         this.setState({
             confirmLoading: true
@@ -256,8 +278,8 @@ class MyGates extends PureComponent {
                         name: record.sn,
                         dev_name: record.dev_name,
                         description: record.description,
-                        owner_type: 'User',
-                        owner_id: unescape(_getCookie('user_id'))
+                        owner_type: owner_type,
+                        owner_id: owner_id
                   }).then(res=>{
                       if (res.ok) {
                           message.success('更改成功')
