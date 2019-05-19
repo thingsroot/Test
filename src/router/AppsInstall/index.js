@@ -458,10 +458,6 @@ class MyGatesAppsInstall extends Component {
                                                alt="logo"
                                                onClick={()=>{
                                                    this.getConfig(val);
-                                                   console.log(this.state.config)
-                                                   // if (this.state.config) {
-                                                   //
-                                                   // }
                                                }}
                                            />
                                            <div className="apptitle">
@@ -478,7 +474,20 @@ class MyGatesAppsInstall extends Component {
                                                            item: val
                                                        })
                                                    }}
-                                                   ><Icon type="cloud-download" /></span>
+                                                   ><Icon
+                                                       type="cloud-download"
+                                                       onClick={()=>{
+                                                           if (val.conf_template === null) {
+                                                               this.props.store.codeStore.setActiveKey('2')
+                                                           }
+                                                           console.log(val.pre_configuration)
+                                                           if (val.pre_configuration === null) {
+                                                               this.props.store.codeStore.setInstallConfiguration('{}')
+                                                           } else {
+                                                               this.props.store.codeStore.setInstallConfiguration(val.pre_configuration)
+                                                           }
+                                                       }}
+                                                   /></span>
                                                </div>
                                            </div>
                                         </div>)

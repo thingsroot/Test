@@ -67,7 +67,7 @@ class CodeStore {
     @action setUserBeta (values) {
         this.userBeta = values
     }
-    
+
     @action setSuffixName (values) {
         this.suffixName = values
     }
