@@ -59,7 +59,7 @@ class VPN extends Component {
     }
     check_gate_isbusy = () => {
         const sn = this.props.match.params.sn;
-        fetch('/apis/gate_isbusy', {
+        fetch('http://127.0.0.1:5000/gate_isbusy', {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
@@ -88,7 +88,7 @@ class VPN extends Component {
         this.setState({virtualIp: e.target.value})
     }
     getStatus = ()=>{
-        fetch('/apis/act_result', {
+        fetch('http://127.0.0.1:5000/act_result', {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -111,7 +111,7 @@ class VPN extends Component {
             console.log('请求错误', err);
         })
 
-        fetch('/apis/gate_alive', {
+        fetch('http://127.0.0.1:5000/gate_alive', {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
@@ -129,7 +129,7 @@ class VPN extends Component {
             this.setState({gateStatus: res.message})
         })
 
-        fetch('/apis/status', {
+        fetch('http://127.0.0.1:5000/status', {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -160,7 +160,7 @@ class VPN extends Component {
             }
         })
 
-        fetch('/apis/cloudstatus', {
+        fetch('http://127.0.0.1:5000/cloudstatus', {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
@@ -236,7 +236,7 @@ class VPN extends Component {
         } else if (virtualIp === ''){
             message.error('请输入网卡IP地址')
         } else {
-            fetch('/apis/start', {
+            fetch('http://127.0.0.1:5000/start', {
                 method: 'POST',
                 mode: 'cors',
                 body: JSON.stringify(postinfo),
@@ -248,7 +248,7 @@ class VPN extends Component {
                 return res.json();
             }).then(() => {
                 setTimeout(() => {
-                    fetch('/apis/act_result', {
+                    fetch('http://127.0.0.1:5000/act_result', {
                         method: 'GET',
                         mode: 'cors',
                         headers: {
@@ -272,7 +272,7 @@ class VPN extends Component {
         }
     }
     stopVPN (){
-        fetch('/apis/stop', {
+        fetch('http://127.0.0.1:5000/stop', {
             method: 'POST',
             mode: 'cors',
             headers: {

@@ -30,7 +30,7 @@ class AppConfig extends Component {
                 title: '名称',
                 dataIndex: 'conf_name',
                 key: 'conf_name',
-                render: text => <a href="javascript:;">{text}</a>
+                render: text => <span>{text}</span>
             }, {
                 title: '描述',
                 dataIndex: 'description',
@@ -67,7 +67,7 @@ class AppConfig extends Component {
                 title: '名称',
                 dataIndex: 'conf_name',
                 key: 'conf_name',
-                render: text => <a href="javascript:;">{text}</a>
+                render: text => <span>{text}</span>
             }, {
                 title: '描述',
                 dataIndex: 'description',

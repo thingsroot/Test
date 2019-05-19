@@ -191,6 +191,11 @@ class Action extends Component {
                     应用配置
                 </Button>
                 <Button
+                    disabled={actionSwi}
+                >
+                    应用调试
+                </Button>
+                <Button
                     disabled={record.latestVersion <= record.version || actionSwi}
                     onClick={()=>{
                         this.showModal('visible')

@@ -19,7 +19,7 @@ class LeftNav extends Component {
             }, {
                 icon: 'appstore',
                 text: '应用列表',
-                href: '/AppsList'
+                href: '/appslist'
             }, {
                 icon: 'database',
                 text: '网关设置',
@@ -114,7 +114,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 6 ? 'active' : ''}
-                                ><Icon type="ordered-list"/>&nbsp;&nbsp;日志</li>
+                                >{this.props.store.appStore.lognum !== 0 ? <div className="logcount count">{this.props.store.appStore.lognum}</div> : ''}<Icon type="ordered-list"/>&nbsp;&nbsp;日志</li>
                             </Link>
                         </ul>
                 </div>
