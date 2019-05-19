@@ -348,7 +348,10 @@ class PlatformMessage extends Component {
                             name: v.name,
                             status: v.status,
                             message: v.message,
-                            user: v.user
+                            user: v.user,
+                            fullName: v.full_name,
+                            disposed_by: v.disposed_by
+
                         });
                         source.push(sub);
                     });
