@@ -385,6 +385,7 @@ class PlatformMessage extends Component {
                 filters: this.state.filters,
                 limit: this.state.length
             };
+            console.log(params)
             if (this.state.flag) {
                 this.getUnconfirmed()
             } else {
@@ -421,7 +422,9 @@ class PlatformMessage extends Component {
         this.setState({
             selectValue: text
         }, ()=>{
-            this.tick(this.state.text);
+            if (this.state.text) {
+                this.tick(this.state.text);
+            }
         })
     };
 

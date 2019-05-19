@@ -194,6 +194,7 @@ class MyGatesAppsInstall extends Component {
             let con = val.conf_template.replace(/[\r\n]/g, '');
             let cons = con.replace(/\s+/g, '');
             config = JSON.parse(cons);
+            console.log(config)
         }
         let deviceColumns = [];
         let tableName = [];  //存放表名
@@ -269,7 +270,7 @@ class MyGatesAppsInstall extends Component {
                 addTempList: res.data
             })
         });
-        console.log(obj)
+
         this.setState({
             flag: false,
             item: val,
@@ -286,13 +287,13 @@ class MyGatesAppsInstall extends Component {
             });
             this.props.store.codeStore.setActiveKey('2')
         }
-        this.props.store.codeStore.setInstallConfiguration(val.pre_configuration);
-        console.log(val.pre_configuration);
+        this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
     };
 
     getData = ()=>{
         const { tcp, serial, selectSection, keys } = this.state;
         let sourceCodeData = {};
+        console.log(keys);
         keys.map((item, key)=>{
             key;
             if (item.name === 'Link_type') {
@@ -332,6 +333,7 @@ class MyGatesAppsInstall extends Component {
         });
         if (JSON.stringify(sourceCodeData) !== '{}') {
             this.props.store.codeStore.setInstallConfiguration(JSON.stringify(sourceCodeData))
+            console.log(this.props.store.codeStore.installConfiguration)
         }
 
     };
@@ -340,24 +342,26 @@ class MyGatesAppsInstall extends Component {
         this.getData();
         let { app } = this.state;
         let sn = this.props.match.params.sn;
-        let version = 0;
-        console.log(this.props.store.codeStore.userBeta);
         let url = '';
+        let version = 0;
+        // if (JSON.stringify(this.props.store.codeStore.setInstallConfiguration) === '{}') {
+        //
+        // } else {
+        //
+        // }
         if (this.props.store.codeStore.userBeta === 1) {
             url = '/api/applications_versions_latest?beta=1&app='
         } else {
             url = '/api/applications_versions_latest?app='
         }
         if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
-            message.error('实例名不能为空！')
+            message.error('实例名不能为空！');
             return false;
         }
         http.get(url + app).then(res=>{
-            console.log(url)
-            console.log(res.data)
             version = res.data;
             if (version > 0) {
-                message.success('应用没有正式版本，安装当前最新beta版本!')
+                message.success('应用没有正式版本，安装当前最新beta版本!');
                 let params = {
                     gateway: sn,
                     inst: this.props.store.codeStore.instNames,
@@ -414,7 +418,6 @@ class MyGatesAppsInstall extends Component {
         } else if (key === '2') {
             this.props.store.codeStore.setActiveKey(key);
         }
-
         if (errorCode === true || this.state.config.length === 0) {
             this.props.store.codeStore.setReadOnly(false);
         } else if (this.state.config && this.state.config.length > 0 || errorCode === false) {
@@ -434,7 +437,10 @@ class MyGatesAppsInstall extends Component {
                         className="installbtn"
                         type="primary"
                         onClick={()=>{
-                            this.setState({detail: !detail})
+                            this.setState({detail: !detail});
+                            if (config.length === 0) {
+                                this.props.store.codeStore.setActiveKey('2')
+                            }
                         }}
                     >
                         {
@@ -446,7 +452,8 @@ class MyGatesAppsInstall extends Component {
                             className="back"
                             onClick={()=>{
                                 this.props.store.codeStore.setActiveKey('1');
-                                this.props.store.codeStore.setInstallConfiguration('{}');
+                                this.props.store.codeStore.setInstallConfiguration('');
+                                console.log(this.props.store.codeStore.installConfiguration)
                                 this.setState({
                                     flag: true
                                 })
@@ -528,6 +535,10 @@ class MyGatesAppsInstall extends Component {
                                                alt="logo"
                                                onClick={()=>{
                                                    this.getConfig(val);
+                                                   console.log(this.state.config)
+                                                   // if (this.state.config) {
+                                                   //
+                                                   // }
                                                }}
                                            />
                                            <div className="apptitle">

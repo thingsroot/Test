@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Form, Row, Col, Input, Button, Select, Tabs, message, Checkbox } from 'antd';
+import {Form, Row, Col, Input, Button, Select, Tabs, message, Checkbox, Icon } from 'antd';
 import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
@@ -164,6 +164,15 @@ class AppSettings extends Component {
         const { settingData } = this.props.store.codeStore;
         return (
             <div>
+                <Icon
+                    className="rollback"
+                    style={{top: 85, right: 40}}
+                    type="rollback"
+                    onClick={()=>{
+                        this.props.history.go(-1)
+                    }}
+                />
+                <br/>
                 <Form
                     onSubmit={this.handleSubmit}
                     className="ant-advanced-search-form"

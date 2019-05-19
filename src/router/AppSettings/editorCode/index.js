@@ -42,7 +42,7 @@ class EditorCode extends Component {
                         splits={2}
                         fontSize={18}
                         orientation="beside"
-                        value={[settingData.preConfiguration, settingData.confTemplate]}
+                        value={[settingData.preConfiguration ? settingData.preConfiguration : '', settingData.confTemplate ? settingData.confTemplate : '']}
                         name="UNIQUE_ID_OF_DIV"
                         onChange={this.onChange}
                         editorProps={{$blockScrolling: true}}
