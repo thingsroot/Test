@@ -4,6 +4,7 @@ import http from '../../../utils/Server';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import Action from './action';
+import app from '../../../assets/images/app.png'
 let timer;
 @withRouter
 @inject('store') @observer
@@ -21,13 +22,24 @@ class AppsList extends Component {
             key: 'img',
             width: '100px',
             render: (record)=>{
-              return (
-              <img
-                  src={record}
-                  alt=""
-                  style={{width: 50, height: 50}}
-              />
-              )
+              console.log(record, 'img')
+              if (record) {
+                return (
+                  <img
+                      src={record}
+                      alt=""
+                      style={{width: 50, height: 50}}
+                  />
+                  )
+              } else {
+                return (
+                  <img
+                      src={app}
+                      alt=""
+                      style={{width: 50, height: 50}}
+                  />
+                )
+              }
             }
           }, {
             title: '实例名',
@@ -45,14 +57,21 @@ class AppsList extends Component {
             dataIndex: 'version',
             key: 'version',
             render: (props, record)=>{
-              if (record.latestVersion > props) {
-                return (
-                    <span style={{color: 'blue'}}>
-                     {props} <Icon type="arrow-up"/>
-                    </span>
-                )
+              console.log(record)
+              if (record.data){
+                if (record.latestVersion > props) {
+                  return (
+                      <span style={{color: 'blue'}}>
+                       {props} <Icon type="arrow-up"/>
+                      </span>
+                  )
+                } else {
+                  return <span>{props}</span>
+                }
               } else {
-                return <span>{props}</span>
+                return (
+                  <span style={{color: 'orange'}}>本地</span>
+                )
               }
             }
           }, {

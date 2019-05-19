@@ -104,6 +104,7 @@ class GatesList extends Component {
             devList: res.message,
             loading: false
           })
+          this.props.store.appStore.dev_list = data;
         })
     }
     render () {

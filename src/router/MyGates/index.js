@@ -1,61 +1,24 @@
 import React, { PureComponent } from 'react';
 import http from '../../utils/Server';
-import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input, Icon, Menu, Dropdown } from 'antd';
+import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input, Icon, Menu, Dropdown, Select, Tag } from 'antd';
 import './style.scss';
 import { inject } from 'mobx-react';
 import { Link } from 'react-router-dom';
 import { _getCookie } from '../../utils/Session';
+const Search = Input.Search;
 const TabPane = Tabs.TabPane;
 let timer;
 function getDevicesList (status){
     http.get('/api/gateway_list?status=' + status).then(res=>{
+        const data = status + 'data';
         console.log(res)
         this.setState({
             [status]: res.message,
             loading: false,
-            status
+            status,
+            [data]: res.message
         })
     })
-    // http.get('/api/gateways_list').then(res=>{
-    //     const online = [];
-    //     const offline = [];
-    //     const data = [];
-    //     res.message && res.message.length > 0 && res.message.map((v, i)=>{
-    //         if (v.data) {
-    //             v.data.last_updated = v.data.modified.slice(0, -7);
-    //             if (res.message[i].app.data){
-    //                 v.data.device_apps_num = Object.keys(res.message[i].app.data).length;
-    //             } else {
-    //                 v.data.device_apps_num = 0;
-    //             }
-    //             if (res.message[i].devices.data){
-    //                 v.data.device_devs_num = Object.keys(res.message[i].devices.data).length;
-    //             } else {
-    //                 v.data.device_devs_num = 0;
-    //             }
-    //             if (v.data.device_status === 'ONLINE'){
-    //                 v.data.disabled = false;
-    //                 online.push(v.data)
-    //             } else if (v.data.device_status === 'OFFLINE') {
-    //                 offline.push(v.data)
-    //                 v.data.disabled = true;
-    //             } else {
-    //                 v.data.disabled = true;
-    //             }
-    //             data.push(v.data)
-    //         }
-    //     })
-    //     if (status === 'online'){
-    //         this.props.store.appStore.setGatelist(res.message);
-    //     }
-        // this.setState({
-        //     status,
-        //     data,
-        //     loading: false,
-        //     online,
-        //     offline
-        // })
-    // })
 }
   function confirm (record) {
      if (record.device_status === 'ONLINE'){
@@ -68,36 +31,8 @@ function getDevicesList (status){
             this.getDevicesList(this.state.status)
           })
      }
-//   http.postToken('/api/method/iot_ui.iot_api.remove_gate', {
-//       sn: [record.device_sn]
-//   }).then(res=>{
-//         if (res.message){
-//             message.success('移除网关成功')
-//         }
-//         this.getDevicesList(this.state.status)
-//   })
-//   this.getDevicesList(this.state.status)
 }
-// const menu = (
-//         <Menu>
-//         <Menu.Item key="0">
-//           <a href="#" onClick={()=>{
-//               console.log(this)
-//           }}>更改名称</a>
-//         </Menu.Item>
-//         <Menu.Item key="1">
-//           <a href="#">更改经纬度</a>
-//         </Menu.Item>
-//         <Menu.Item key="2">
-//           <a href="#">查看和操作应用</a>
-//         </Menu.Item>
-//         <Menu.Item key="3">
-//           <a href="#">浏览设备数据</a>
-//         </Menu.Item>
-//         <Menu.Divider />
-//         <Menu.Item key="4">3rd menu item</Menu.Item>
-//       </Menu>
-// )
+
 @inject('store')
 class MyGates extends PureComponent {
     constructor (props){
@@ -106,31 +41,54 @@ class MyGates extends PureComponent {
         this.confirm = confirm.bind(this);
         this.state = {
             online: [],
+            onlinedata: [],
+            offlinedata: [],
             offline: [],
             all: [],
+            alldata: [],
             status: 'online',
             loading: true,
             visible: false,
             confirmLoading: false,
             sn: '',
+            role: {},
             name: '',
             desc: '',
             setName: false,
             record: {},
+            index: 2,
             recordVisible: false,
             columns: [{
                 title: '名称',
                 dataIndex: 'dev_name',
-                key: 'dev_name'
+                key: 'dev_name',
+                sorter: (a, b) => a.dev_name.length - b.dev_name.length,
+                render: (props, record)=>{
+                    console.log(props, record)
+                    return (
+                        <div>
+                            {record.dev_name}
+                            {record.owner_type !== 'Cloud Company Group'
+                                ? <Tag
+                                    color="cyan"
+                                    style={{marginLeft: 20}}
+                                  >个人设备</Tag>
+                                : ''
+                            }
+                        </div>
+                    )
+                }
               }, {
                 title: '描述',
                 dataIndex: 'description',
-                key: 'description'
+                key: 'description',
+                sorter: (a, b) => a.description && b.description && a.description.length - b.description.length
               }, {
                 title: '上线时间',
                 dataIndex: 'last_updated',
                 key: 'last_updated',
-                width: '180px'
+                width: '180px',
+                sorter: (a, b) => a.last_updated && b.last_updated && new Date(a.last_updated) - new Date(b.last_updated)
               }, {
                 title: '状态',
                 key: 'device_status',
@@ -220,7 +178,7 @@ class MyGates extends PureComponent {
                                             this.showModal('setName')
                                         })
                                     }}
-                                >更改名称及经纬度</span>
+                                >网关属性</span>
                                 </Menu.Item>
                                 <Menu.Divider />
                                 <Menu.Item key="4">
@@ -254,6 +212,13 @@ class MyGates extends PureComponent {
         }
     }
     componentDidMount (){
+        http.get('/api/user_groups_list').then(res=>{
+            if (res.ok && res.data[0]){
+                this.setState({
+                    role: res.data[0]
+                })
+            }
+        })
         this.getDevicesList(this.state.status)
         timer = setInterval(() => {
             this.getDevicesList('online')
@@ -273,16 +238,27 @@ class MyGates extends PureComponent {
     showModal = (name) => {
         this.setState({
           [name]: true
+        }, ()=>{
+            if (name === 'visible') {
+                http.get('/api/user_groups_list').then(res=>{
+                    if (res.data && res.data[0]) {
+                        this.setState({role: res.data[0]})
+                    }
+                })
+            }
         });
       }
       handleOk = (type) => {
-          const { sn, name, desc} = this.state;
+          const { sn, name, desc, index} = this.state;
+          const owner_id = index === 1 ? this.state.role.name : unescape(_getCookie('user_id'));
+          const owner_type = index === 1 ? 'Cloud Company Group' : 'User';
+          console.log(index, owner_id, owner_type)
           const data = {
             'name': sn,
             'dev_name': name,
             'description': desc,
-            'owner_type': 'User',
-            'owner_id': unescape(_getCookie('user_id'))
+            'owner_type': owner_type,
+            'owner_id': owner_id
           };
         this.setState({
             confirmLoading: true
@@ -302,8 +278,8 @@ class MyGates extends PureComponent {
                         name: record.sn,
                         dev_name: record.dev_name,
                         description: record.description,
-                        owner_type: 'User',
-                        owner_id: unescape(_getCookie('user_id'))
+                        owner_type: owner_type,
+                        owner_id: owner_id
                   }).then(res=>{
                       if (res.ok) {
                           message.success('更改成功')
@@ -326,6 +302,22 @@ class MyGates extends PureComponent {
           [name]: false
         });
       }
+      filter = (vale)=>{
+        const value = vale.toLowerCase();
+        const name = this.state.status + 'data';
+        const data = this.state[name];
+        console.log(data)
+        const arr = [];
+        data.map(item=>{
+            if (item.dev_name.toLowerCase().indexOf(value) !== -1 || item.sn.indexOf(value) !== -1 || item.description && item.description.toLowerCase().indexOf(value) !== -1){
+                arr.push(item)
+            }
+        })
+        this.setState({
+            [this.state.status]: arr
+        })
+        console.log(arr)
+      }
     render (){
         let { all, online, offline, confirmLoading } = this.state;
         return (
@@ -345,7 +337,7 @@ class MyGates extends PureComponent {
                         top: 0,
                         zIndex: 999
                     }}
-                >添加ThingsLink</Button>
+                >添加网关</Button>
                 <Button
                     type="primary"
                     style={{
@@ -358,8 +350,27 @@ class MyGates extends PureComponent {
                         this.props.history.push('/MyVirtualGates')
                     }}
                 >添加虚拟网关</Button>
+                <div
+                    style={{
+                        display: 'flex',
+                        position: 'absolute',
+                        right: 300,
+                        top: 0,
+                        zIndex: 999,
+                        lineHeight: '30px'
+                    }}
+                >
+                    <span>搜索：</span>
+                    <Search
+                        placeholder="网关名称、描述、序列号"
+                        onSearch={(value) => {
+                            this.filter(value)
+                        }}
+                        style={{ width: 200 }}
+                    />
+                </div>
                 <Modal
-                    title="添加ThingsLink网关"
+                    title="添加网关"
                     visible={this.state.visible}
                     onOk={()=>{
                         this.handleOk('create')
@@ -396,9 +407,41 @@ class MyGates extends PureComponent {
                             placeholder="选填"
                         />
                     </div>
+                    <div className="inputs">
+                        <span>所属：</span>
+                        <div>
+                            <Button
+                                type={this.state.index === 1 ? 'primary' : ''}
+                                onClick={()=>{
+                                    this.setState({
+                                        index: 1
+                                    })
+                                }}
+                                disabled={this.state.role === {}}
+                            >公司</Button>
+                            <Button
+                                type={this.state.index === 2 ? 'primary' : ''}
+                                disabled={this.state.role === {}}
+                                onClick={()=>{
+                                    this.setState({
+                                        index: 2
+                                    })
+                                }}
+                            >个人</Button>
+                        </div>
+                    </div>
+                    <div className="inputs">
+                        <span>组名：</span>
+                        <Select
+                            style={{width: '100%'}}
+                            disabled
+                        >
+
+                        </Select>
+                    </div>
                 </Modal>
                 <Modal
-                    title="更改名称"
+                    title="网关属性"
                     visible={this.state.setName}
                     onOk={()=>{
                         this.handleOk('setName')
@@ -455,6 +498,38 @@ class MyGates extends PureComponent {
                             }}
                             placeholder="选填"
                         />
+                    </div>
+                    <div className="inputs">
+                        <span>所属：</span>
+                        <div>
+                            <Button
+                                type={this.state.index === 1 ? 'primary' : ''}
+                                onClick={()=>{
+                                    this.setState({
+                                        index: 1
+                                    })
+                                }}
+                                disabled={this.state.role === {}}
+                            >公司</Button>
+                            <Button
+                                type={this.state.index === 2 ? 'primary' : ''}
+                                disabled={this.state.role === {}}
+                                onClick={()=>{
+                                    this.setState({
+                                        index: 2
+                                    })
+                                }}
+                            >个人</Button>
+                        </div>
+                    </div>
+                    <div className="inputs">
+                        <span>组名：</span>
+                        <Select
+                            style={{width: '100%'}}
+                            disabled
+                        >
+
+                        </Select>
                     </div>
                 </Modal>
                 <div style={{position: 'relative'}}>

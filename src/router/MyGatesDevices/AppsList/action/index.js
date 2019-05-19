@@ -4,6 +4,7 @@ import http from '../../../../utils/Server';
 import { withRouter } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import MyGatesAppsUpgrade from '../../../Upgrade';
+import { _getCookie } from '../../../../utils/Session';
 let timer;
 function cancel () {
     message.error('You have canceled the update');
@@ -163,20 +164,20 @@ class Action extends Component {
       }
     render () {
         const { actionSwi } = this.props.store.appStore;
-        console.log(actionSwi)
+        console.log(this.props.record)
         const { record } = this.props;
         const { loading, visible, setName, nameValue } = this.state;
         return (
             <div style={{position: 'relative', paddingBottom: 50}}>
               <div style={{lineHeight: '30px', paddingLeft: 20}}>
                 <div>
-                  应用名称:{record.data.data.name}
+                  应用名称:{record.data && record.data.data.name || '本地应用'}
                 </div>
                 <div>
-                  应用开发者：{record.data.data.owner}
+                  应用开发者：{record.data && record.data.data.owner || _getCookie('companies')}
                 </div>
               </div>
-              <div style={{display: 'flex', justifyContent: 'space-around', marginTop: 20, width: 770, position: 'absolute', right: 20, bottom: 15}}>
+              <div style={{display: 'flex', justifyContent: 'space-around', marginTop: 20, minWidth: 840, position: 'absolute', right: 20, bottom: 15}}>
                 <Button
                     disabled={actionSwi}
                     onClick={()=>{
@@ -186,12 +187,12 @@ class Action extends Component {
                     更改名称
                 </Button>
                 <Button
-                    disabled={actionSwi}
+                    disabled
                 >
                     应用配置
                 </Button>
                 <Button
-                    disabled={actionSwi}
+                    disabled
                 >
                     应用调试
                 </Button>
@@ -276,6 +277,9 @@ class Action extends Component {
                         </Button>
                         ]}
                     >
+                      {
+                        console.log(record)
+                      }
                     <MyGatesAppsUpgrade
                         version={record.version}
                         inst={record.device_name}

@@ -169,7 +169,7 @@ class LinkStatus extends Component {
                         const arr = [];
                         res.data && res.data.length > 0 && res.data.map(item=>{
                             if (item.version > this.state.config.skynet_version){
-                                if (config.use_beta){
+                                if (config.enable_beta){
                                     arr.push(item)
                                 } else {
                                     if (item.beta === 0){
@@ -251,6 +251,7 @@ class LinkStatus extends Component {
         }
     }
     setAutoDisabled (record, config){
+        console.log(record, config)
         const type = config ? 0 : 1;
         const inst = record === 'beta' ? 'beta' : 'enable';
         const name = record === 'beta' ? 'gateway' : 'name';
@@ -263,9 +264,11 @@ class LinkStatus extends Component {
                     http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
                         if (result.data){
                             if (result.data.result) {
-                                message.success('开启成功')
+                                message.success(type === 1 ? '开启成功' : '关闭成功')
+                                // this.changeState()
                             } else {
-                                message.error('开启失败')
+                                message.error(type === 1 ? '开启失败' : '关闭失败')
+                                // this.changeState()
                             }
                             clearInterval(this.timer)
                         }
@@ -344,7 +347,7 @@ class LinkStatus extends Component {
       }
     render () {
         const { status, actionSwi } = this.props.store.appStore;
-        const {  flag, title, update, config, newdata, opendata, use_beta, loading, DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, UOLOAD, UOLOAD_VALUE } = this.state;
+        const {  flag, title, update, config, newdata, opendata, loading, DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, UOLOAD, UOLOAD_VALUE } = this.state;
         return (
             <div className="setgateway">
                 <div className={flag && !update ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
@@ -442,11 +445,9 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                checked={config.enable_beta === 1}
+                                checked={status.enable_beta === 1}
                                 onChange={()=>{
-                                    //this.setState({use_beta: !this.state.use_beta})
-                                    this.changeState('use_beta');
-                                    this.setAutoDisabled('beta', use_beta)
+                                    this.setAutoDisabled('beta', status.enable_beta)
                                 }}
                             />
                         </div>
@@ -460,7 +461,7 @@ class LinkStatus extends Component {
                                 checked={config.data_upload}
                                 onChange={()=>{
                                     this.changeState('data_upload')
-                                    this.setAutoDisabled('data', config.data_upload)
+                                    this.setAutoDisabled('data', status.data_upload)
                                 }}
                             />
                         </div>
@@ -537,10 +538,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                checked={config.stat_upload}
+                                checked={status.stat_upload}
                                 onChange={()=>{
                                     this.changeState('stat_upload');
-                                    this.setAutoDisabled('stat', config.stat_upload)
+                                    this.setAutoDisabled('stat', status.stat_upload)
                                 }}
                             />
                         </div>
@@ -551,10 +552,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                checked={config.Net_Manager}
+                                checked={status.Net_Manager}
                                 onChange={()=>{
                                     this.changeState('Net_Manager');
-                                    this.setConfig('Network', config.Net_Manager)
+                                    this.setConfig('Network', status.Net_Manager)
                                 }}
                             />
                         </div>
@@ -565,10 +566,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON"
                                 unCheckedChildren="OFF"
-                                checked={config.p2p_vpn}
+                                checked={status.p2p_vpn}
                                 onChange={()=>{
                                     this.changeState('p2p_vpn');
-                                    this.setConfig('ioe_frpc', config.p2p_vpn)
+                                    this.setConfig('ioe_frpc', status.p2p_vpn)
                                 }}
                             />
                         </div>
