@@ -277,6 +277,9 @@ class Action extends Component {
                         </Button>
                         ]}
                     >
+                      {
+                        console.log(record)
+                      }
                     <MyGatesAppsUpgrade
                         version={record.version}
                         inst={record.device_name}

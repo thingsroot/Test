@@ -2,7 +2,9 @@ import React, { PureComponent } from 'react';
 import http from '../../utils/Server';
 import { Icon, Card } from 'antd';
 import './style.scss';
+import { inject, observer } from 'mobx-react';
 let  timer;
+@observer @inject('store')
 class upgrade extends PureComponent {
     state = {
         newdata: [],
@@ -12,7 +14,7 @@ class upgrade extends PureComponent {
         loading: true
     }
     componentDidMount (){
-        http.get('/api/applications_versions_list?app=' + this.props.app).then(res=>{
+        http.get('/api/applications_versions_list?app=' + this.props.app + '&beta=' + this.props.store.appStore.status.enable_beta).then(res=>{
             const data = []
             console.log(res)
             if (res.data[0].version >= this.props.version){
