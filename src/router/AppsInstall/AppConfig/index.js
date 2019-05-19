@@ -93,7 +93,8 @@ class AppConfig extends Component {
                 )
             }
         ],
-        showTempList: []
+        showTempList: [],
+        selectSection: 'socket'
     };
     componentDidMount () {
         console.log(this.props.config)
@@ -143,15 +144,70 @@ class AppConfig extends Component {
     };
 
     inputChange = (refName)=>{
-        this.refs[refName].value = event.target.value
+        this.refs[refName].state.value = event.target.value
     };
 
     checkedChange = (refName)=>{
-        this.refs[refName].value = event.target.checked
+        this.refs[refName].state.value = event.target.checked
     };
 
     selectChangeValue = (refName)=>{
-        this.refs[refName].value = event.target.innerText
+        this.refs[refName].state.value = event.target.innerText;
+    };
+
+    getData = ()=>{
+        const { tcp, serial, keys } = this.props;
+        const { selectSection} = this.state;
+        let sourceCodeData = {};
+        console.log(keys);
+        keys && keys.length > 0 && keys.map((item, key)=>{
+            key;
+            if (item.name === 'Link_type') {
+                let data = [];
+                if (selectSection === 'socket') {
+                    tcp.map((v, key)=>{
+                        key;
+                        data.push({
+                            [v.name]: this.refs[v.name].state.value === undefined ? v.value : this.refs[v.name].state.value
+                        })
+                    });
+                    sourceCodeData['socket'] = data;
+                } else if (selectSection === 'serial') {
+                    serial.map((v, key)=>{
+                        key;
+                        console.log(v.value)
+                        if (v.value[0] === undefined) {
+                            data.push({
+                                [v.name]: this.refs[v.name].state.value === undefined ? v.value : this.refs[v.name].state.value
+                            })
+                        } else {
+                            data.push({
+                                [v.name]: this.refs[v.name].state.value === undefined ? v.value[0] : this.refs[v.name].state.value
+                            })
+                        }
+                    });
+                    sourceCodeData['serial'] = data;
+                }
+            } else if (item.type === 'table') {
+                sourceCodeData[item.name] = this.props.store.codeStore.allTableData;
+            } else if (item.type === 'templates') {
+                sourceCodeData[item.name] = {};
+            } else if (item.type === 'dropdown') {
+                console.log(item.name)
+                sourceCodeData[item.name] = this.refs[item.name].state.value === undefined ? item.value[0] : this.refs[item.name].state.value;
+            } else if (item.type === 'number' || item.type === 'text') {
+                sourceCodeData[item.name] = this.refs[item.name].state.value === undefined ? item.value : this.refs[item.name].state.value
+            }
+        });
+
+        if (JSON.stringify(sourceCodeData) !== '{}') {
+            this.props.store.codeStore.setInstallConfiguration(JSON.stringify(sourceCodeData))
+        }
+    };
+
+    submitData = ()=>{
+        this.getData();
+        this.props.submitData();
     };
 
     callback = (key)=>{
@@ -161,18 +217,31 @@ class AppConfig extends Component {
         } else if (key === '2') {
             this.props.store.codeStore.setActiveKey(key);
         }
-
-        if (errorCode === true || this.state.config === 0) {
+        console.log(this.props.config)
+        if (errorCode === true || this.props.config.length === 0) {
             this.props.store.codeStore.setReadOnly(false);
-        } else if (this.state.config && this.state.config > 0 || errorCode === false) {
+        } else if (this.props.config && this.props.config.length > 0 || errorCode === false) {
+            this.props.store.codeStore.setReadOnly(true);
             this.getData();
         }
     };
 
+    protocolChange = (val)=>{   //通讯
+        if (val === 'serial') {
+            this.setState({
+                selectSection: 'serial'
+            });
+        } else if (val === 'socket') {
+            this.setState({
+                selectSection: val
+            });
+        }
+    };
+
     render () {
-        const { addTempLists, showTempLists, showTempList, addTempList } = this.state;
+        const { addTempLists, showTempLists, showTempList, selectSection, addTempList } = this.state;
         const { errorCode, installConfiguration } = this.props.store.codeStore;
-        let { config, deviceColumns, serial, tcp, selectSection, submitData } = this.props;
+        let { config, deviceColumns, serial, tcp } = this.props;
 
         return (
             <Tabs
@@ -189,7 +258,7 @@ class AppConfig extends Component {
                     />
 
                     <div
-                        style={errorCode ? none : block}
+                        style={errorCode === false ? block : none}
                     >
                         {
                             config && config.length > 0 && config.map((v, key) => {
@@ -220,6 +289,7 @@ class AppConfig extends Component {
                                                                         defaultValue={a.value ? a.value[0] : ''}
                                                                         style={{width: 300}}
                                                                         onChange={() => {
+                                                                            console.log(a.name)
                                                                             this.selectChangeValue(a.name)
                                                                         }}
                                                                     >
@@ -392,8 +462,6 @@ class AppConfig extends Component {
                                                                                 <span
                                                                                     style={{padding: '0 5px'}}
                                                                                 >|</span>{w.desc}</p>
-                                                            {console.log(w.name)}
-                                                            {console.log(deviceColumns[w.name])}
                                                             <EditableTable
                                                                 tableName={w.name}
                                                                 deviceColumns={deviceColumns[w.name]}
@@ -417,7 +485,6 @@ class AppConfig extends Component {
                                                     style={{width: 300}}
                                                     onChange={this.protocolChange}
                                                 >
-                                                    {console.log(v.value)}
                                                     {v.value && v.value.length > 0 && v.value.map(w => <Option key={w}>{w}</Option>)}
                                                 </Select>
                                                 <Input
@@ -453,7 +520,7 @@ class AppConfig extends Component {
                         }
                     </div>
                     <div
-                        style={errorCode ? block : none}
+                        style={errorCode === false ? none : block}
                         className="message"
                     >
                         数据错误，请使用JSON格式配置！
@@ -467,7 +534,7 @@ class AppConfig extends Component {
                     <Button
                         type="primary"
                         style={errorCode === true || config.length <= 0 ? none : block}
-                        onClick={submitData}
+                        onClick={this.submitData}
                     >提交</Button>
                 </TabPane>
                 <TabPane
@@ -500,7 +567,7 @@ class AppConfig extends Component {
                     <br/>
                     <Button
                         type="primary"
-                        onClick={submitData}
+                        onClick={this.submitData}
                     >提交</Button>
                 </TabPane>
             </Tabs>

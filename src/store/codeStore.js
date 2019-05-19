@@ -55,7 +55,7 @@ class CodeStore {
 
     //安装应用配置
     @observable activeKey = '1';  //配置面板/json源码  active
-    @observable errorCode = {};  //配置面板代码错误
+    @observable errorCode = false;  //配置面板代码错误
     @observable config = [];  //配置面板数据
     @observable installConfiguration = [];  //json源码
     @observable iDeviceColumns = [];  //配置面板表格
@@ -67,7 +67,7 @@ class CodeStore {
     @action setUserBeta (values) {
         this.userBeta = values
     }
-
+    
     @action setSuffixName (values) {
         this.suffixName = values
     }
@@ -86,12 +86,10 @@ class CodeStore {
 
     @action setConfig (values) {
         this.config = values;
-        console.log(values)
     }
 
     @action setActiveKey (values) {
         this.activeKey = values;
-        console.log(values)
     }
 
     @action setInstNames (values) {
@@ -171,13 +169,11 @@ class CodeStore {
     }
     @action setDataSource (values) {
         this.dataSource = values;
-        console.log(values)
     }
     @action setEditorContent (values) {
         this.editorContent = values;
     }
     @action setTreeData (values) {
-        console.log(values)
         this.treeData = values;
     }
     @action setMyEditor (values) {
@@ -196,7 +192,6 @@ class CodeStore {
         this.isChange = !this.isChange
     }
     @action setReadOnly (values) {
-        console.log(values)
         this.readOnly = values
     }
     @action setFileName (values) {
@@ -213,7 +208,6 @@ class CodeStore {
     }
     @action setInstName (values) {
         this.instName = values;
-        console.log(values)
     }
 
 }

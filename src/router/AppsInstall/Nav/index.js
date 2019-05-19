@@ -47,7 +47,6 @@ class Nav extends Component {
 
     render () {
         const { gateList } = this.props.store.appStore;
-        console.log(gateList);
         return (
             <div className="Nav">
                 <ul>

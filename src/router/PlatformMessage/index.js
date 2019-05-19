@@ -215,9 +215,9 @@ class PlatformMessage extends Component {
                         } else if (obj && obj.hasOwnProperty('action')){
                             if (obj.channel === 'app') {
                                 if (obj.action === 'option') {   //开机自启动
-                                    if (obj.data.value === 1) {
+                                    if (obj.data.value === 1 || obj.data.value === '1') {
                                         sub = v.full_name + '  开启应用' + obj.data.inst + '开机自启动'
-                                    } else if (obj.data.value === 0) {
+                                    } else if (obj.data.value === 0 || obj.data.value === '0') {
                                         sub = v.full_name + '  关闭应用' + obj.data.inst + '开机自启动'
                                     } else {
                                         sub = JSON.stringify(obj)
@@ -231,9 +231,9 @@ class PlatformMessage extends Component {
                                 } else if (obj.action === 'conf') {
                                     sub = v.full_name + '   更改应用' + obj.data.inst + '应用配置'
                                 } else if (obj.action === 'upload_comm') {
-                                    if (obj.data.sec === 0) {
+                                    if (obj.data.sec === 0 || obj.data.sec === '0') {
                                         sub = v.full_name + '   停止上传应用' + obj.data.inst + '报文'
-                                    } else if (obj.data.sec === 120) {
+                                    } else if (obj.data.sec !== 0 || obj.data.sec !== '0') {
                                         sub = v.full_name + '   上传应用' + obj.data.inst + '报文'
                                     } else {
                                         sub = JSON.stringify(obj)
@@ -257,33 +257,33 @@ class PlatformMessage extends Component {
                                 }
                             } else if (obj.channel === 'sys') {
                                 if (obj.action === 'enable/beta') {
-                                    if (obj.data === 0) {
+                                    if (obj.data === 0 || obj.data === '0') {
                                         sub = v.full_name + '    关闭网关beta模式'
-                                    } else if (obj.data !== 0) {
+                                    } else if (obj.data !== 0 || obj.data !== '0') {
                                         sub = v.full_name + '    开启网关beta模式'
                                     } else {
                                         sub = JSON.stringify(obj)
                                     }
                                 } else if (obj.action === 'enable/data') {
-                                    if (obj.data === 0) {
+                                    if (obj.data === 0 || obj.data === '0') {
                                         sub = v.full_name + '    关闭网关数据上传'
-                                    } else if (obj.data === 1) {
+                                    } else if (obj.data !== 0 || obj.data === '0') {
                                         sub = v.full_name + '    开启网关数据上传'
                                     } else {
                                         sub = JSON.stringify(obj)
                                     }
                                 } else if (obj.action === 'enable/log') {
-                                    if (obj.data === '') {
+                                    if (obj.data === 0 || obj.data === '0') {
                                         sub = v.full_name + '    关闭网关日志上送'
-                                    } else if (obj.data === 60) {
+                                    } else if (obj.data !== 0 || obj.data !== '0') {
                                         sub = v.full_name + '    开启网关日志上送'
                                     } else {
                                         sub = JSON.stringify(obj)
                                     }
                                 } else if (obj.action === 'enable/comm') {
-                                    if (obj.data === 0) {
+                                    if (obj.data === 0 || obj.data === '0') {
                                         sub = v.full_name + '    停止网关报文上送'
-                                    } else if (obj.data === 60) {
+                                    } else if (obj.data !== 0 || obj.data !== '0') {
                                         sub = v.full_name + '    开启网关报文上送'
                                     } else {
                                         sub = JSON.stringify(obj)
@@ -295,9 +295,9 @@ class PlatformMessage extends Component {
                                 } else if (obj.action === 'cloud_conf') {
                                     sub = v.full_name + '    更新网关云中心配置选项'
                                 } else if (obj.action === 'enable/data_one_short') {
-                                    if (obj.data === '') {
+                                    if (obj.data === 0  || obj.data === '0') {
                                         sub = v.full_name + '    关闭网关临时上传数据'
-                                    } else if (obj.data === 60) {
+                                    } else if (obj.data !== 0 || obj.data !== '0') {
                                         sub = v.full_name + '    开启网关临时上传数据'
                                     } else {
                                         sub = JSON.stringify(obj)

@@ -51,7 +51,6 @@ class MyGatesAppsInstall extends Component {
         dataSourceCode: [],
         errorMessage: '',
         keys: [],
-        selectSection: 'socket',
         tcp: [
             {
                 'name': 'ip',
@@ -172,29 +171,16 @@ class MyGatesAppsInstall extends Component {
         })
     };
 
-    protocolChange = (val)=>{   //通讯
-        if (val === 'serial') {
-            this.setState({
-                selectSection: 'serial'
-            });
-        } else if (val === 'socket') {
-            this.setState({
-                selectSection: val
-            });
-        }
-    };
-
     getConfig = (val)=>{
         this.props.store.codeStore.setActiveKey('1');
-        this.props.store.codeStore.setErrorCode();
+        this.props.store.codeStore.setErrorCode(false);
         this.props.store.codeStore.setInstallConfiguration('{}');
         this.props.store.codeStore.setInstNames('');
+        this.props.store.codeStore.setReadOnly(false);
+        console.log(this.props.store.codeStore.installConfiguration);
         let config = [];
         if (val.conf_template) {
-            let con = val.conf_template.replace(/[\r\n]/g, '');
-            let cons = con.replace(/\s+/g, '');
-            config = JSON.parse(cons);
-            console.log(config)
+            config = JSON.parse(val.conf_template);
         }
         let deviceColumns = [];
         let tableName = [];  //存放表名
@@ -203,19 +189,22 @@ class MyGatesAppsInstall extends Component {
         config && config.length > 0 && config.map((v, key)=>{
             keys.push(v);
             key;
-            if (v.type !== 'templates' ||
-                v.type !== 'table' ||
-                v.type !== 'text' ||
-                v.type !== 'number' ||
-                v.type !== 'dropdown'
+            if (v.type === 'templates' ||
+                v.type === 'text' ||
+                v.type === 'number' ||
+                v.type === 'dropdown' ||
+                v.type === 'section' ||
+                v.type === 'table'
             ) {
+                console.log(v.type)
+            } else {
                 this.props.store.codeStore.setReadOnly(false);
-                this.props.store.codeStore.setErrorCode()
+                this.props.store.codeStore.setErrorCode(true)
             }
-            if (v.child === undefined) {
-                this.props.store.codeStore.setErrorCode();
-                this.props.store.codeStore.setReadOnly(false)
-            }
+            // if (v.child === undefined) {
+            //     this.props.store.codeStore.setErrorCode(true);
+            //     this.props.store.codeStore.setReadOnly(false)
+            // }
             if (v.name === 'device_section') {
                 let tableNameData = {};
                 v.child && v.child.length && v.child.map((w, key1)=>{
@@ -268,7 +257,7 @@ class MyGatesAppsInstall extends Component {
             console.log(res);
             this.setState({
                 addTempList: res.data
-            })
+            });
         });
 
         this.setState({
@@ -280,6 +269,7 @@ class MyGatesAppsInstall extends Component {
             keys: keys,
             app: val.name
         });
+
         if (this.props.match.params.type === '2') {
             this.setState({
                 flag: false,
@@ -288,67 +278,14 @@ class MyGatesAppsInstall extends Component {
             this.props.store.codeStore.setActiveKey('2')
         }
         this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
-    };
-
-    getData = ()=>{
-        const { tcp, serial, selectSection, keys } = this.state;
-        let sourceCodeData = {};
-        console.log(keys);
-        keys.map((item, key)=>{
-            key;
-            if (item.name === 'Link_type') {
-                let data = [];
-                if (selectSection === 'socket') {
-                    tcp.map((v, key)=>{
-                        key;
-                        data.push({
-                            [v.name]: this.refs[v.name].value === undefined ? v.value : this.refs[v.name].value
-                        })
-                    });
-                    sourceCodeData['socket'] = data;
-                } else if (selectSection === 'serial') {
-                    serial.map((v, key)=>{
-                        key;
-                        if (v.value[0] === undefined) {
-                            data.push({
-                                [v.name]: this.refs[v.name].value === undefined ? v.value : this.refs[v.name].value
-                            })
-                        } else {
-                            data.push({
-                                [v.name]: this.refs[v.name].value === undefined ? v.value[0] : this.refs[v.name].value
-                            })
-                        }
-                    });
-                    sourceCodeData['serial'] = data;
-                }
-            } else if (item.type === 'table') {
-                sourceCodeData[item.name] = this.props.store.codeStore.allTableData;
-            } else if (item.type === 'templates') {
-                sourceCodeData[item.name] = {};
-            } else if (item.type === 'dropdown') {
-                sourceCodeData[item.name] = this.refs[item.name].value === undefined ? item.value[0] : this.refs[item.name].value;
-            } else if (item.type === 'number' || item.type === 'text') {
-                sourceCodeData[item.name] = this.refs[item.name].value === undefined ? item.value : this.refs[item.name].value
-            }
-        });
-        if (JSON.stringify(sourceCodeData) !== '{}') {
-            this.props.store.codeStore.setInstallConfiguration(JSON.stringify(sourceCodeData))
-            console.log(this.props.store.codeStore.installConfiguration)
-        }
-
+        console.log(this.props.store.codeStore.installConfiguration)
     };
 
     submitData = ()=>{
-        this.getData();
         let { app } = this.state;
         let sn = this.props.match.params.sn;
         let url = '';
         let version = 0;
-        // if (JSON.stringify(this.props.store.codeStore.setInstallConfiguration) === '{}') {
-        //
-        // } else {
-        //
-        // }
         if (this.props.store.codeStore.userBeta === 1) {
             url = '/api/applications_versions_latest?beta=1&app='
         } else {
@@ -411,22 +348,8 @@ class MyGatesAppsInstall extends Component {
         });
     };
 
-    callback = (key)=>{
-        const { errorCode } = this.props.store.codeStore;
-        if (key === '1') {
-            this.props.store.codeStore.setActiveKey(key);
-        } else if (key === '2') {
-            this.props.store.codeStore.setActiveKey(key);
-        }
-        if (errorCode === true || this.state.config.length === 0) {
-            this.props.store.codeStore.setReadOnly(false);
-        } else if (this.state.config && this.state.config.length > 0 || errorCode === false) {
-            this.getData();
-        }
-    };
-
     render () {
-        const { data, flag, item, detail, config, deviceColumns, selectSection, tcp, serial } = this.state;
+        const { data, flag, item, detail, config, deviceColumns, tcp, serial, keys } = this.state;
 
         return (<div>
             <Status />
@@ -452,7 +375,7 @@ class MyGatesAppsInstall extends Component {
                             className="back"
                             onClick={()=>{
                                 this.props.store.codeStore.setActiveKey('1');
-                                this.props.store.codeStore.setInstallConfiguration('');
+                                this.props.store.codeStore.setInstallConfiguration('{}');
                                 console.log(this.props.store.codeStore.installConfiguration)
                                 this.setState({
                                     flag: true
@@ -496,10 +419,10 @@ class MyGatesAppsInstall extends Component {
                             <AppConfig
                                 tcp={tcp}
                                 serial={serial}
-                                selectSection={selectSection}
                                 config={config}
                                 configuration={this.props.store.codeStore.installConfiguration}
                                 deviceColumns={deviceColumns}
+                                keys={keys}
                                 submitData={this.submitData}
                             />
                         </div>
