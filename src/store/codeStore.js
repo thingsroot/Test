@@ -53,6 +53,65 @@ class CodeStore {
 
     @observable correlationApp = '';
 
+    @observable tcp = [
+        {
+            'name': 'ip',
+            'desc': 'IP地址',
+            'type': 'text',
+            'value': '192.168.1.132'
+        },
+        {
+            'name': 'host',
+            'desc': '端口',
+            'type': 'number',
+            'value': 502
+        },
+        {
+            'name': 'nodelay',
+            'desc': 'Nodelay',
+            'type': 'boolean',
+            'value': true
+        }
+        ];
+    @observable serial = [
+        {
+            'name': 'tty',
+            'desc': '端口',
+            'type': 'dropdown',
+            'value': ['ttymcx0', 'ttymcx1']
+        },
+        {
+            'name': 'baudrate',
+            'desc': '波特率',
+            'type': 'dropdown',
+            'value': [4800, 9600, 115200, 19200]
+        },
+        {
+            'name': 'stop_bits',
+            'desc': '停止位',
+            'type': 'dropdown',
+            'value': [1, 2]
+        },
+        {
+            'name': 'data_bits',
+            'desc': '数据位',
+            'type': 'dropdown',
+            'value': [8, 7]
+        },
+        {
+            'name': 'flow_control',
+            'desc': '流控',
+            'type': 'boolean',
+            'value': false
+        },
+        {
+            'name': 'parity',
+            'desc': '校验',
+            'type': 'dropdown',
+            'value': ['None', 'Even', 'Odd']
+        }
+        ]
+
     //安装应用配置
     @observable activeKey = '1';  //配置面板/json源码  active
     @observable errorCode = false;  //配置面板代码错误

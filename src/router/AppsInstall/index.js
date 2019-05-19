@@ -50,65 +50,7 @@ class MyGatesAppsInstall extends Component {
         SourceCode: [],
         dataSourceCode: [],
         errorMessage: '',
-        keys: [],
-        tcp: [
-            {
-                'name': 'ip',
-                'desc': 'IP地址',
-                'type': 'text',
-                'value': '192.168.1.132'
-            },
-            {
-                'name': 'host',
-                'desc': '端口',
-                'type': 'number',
-                'value': 502
-            },
-            {
-                'name': 'nodelay',
-                'desc': 'Nodelay',
-                'type': 'boolean',
-                'value': true
-            }
-        ],
-        serial: [
-            {
-                'name': 'tty',
-                'desc': '端口',
-                'type': 'dropdown',
-                'value': ['ttymcx0', 'ttymcx1']
-            },
-            {
-                'name': 'baudrate',
-                'desc': '波特率',
-                'type': 'dropdown',
-                'value': [4800, 9600, 115200, 19200]
-            },
-            {
-                'name': 'stop_bits',
-                'desc': '停止位',
-                'type': 'dropdown',
-                'value': [1, 2]
-            },
-            {
-                'name': 'data_bits',
-                'desc': '数据位',
-                'type': 'dropdown',
-                'value': [8, 7]
-            },
-            {
-                'name': 'flow_control',
-                'desc': '流控',
-                'type': 'boolean',
-                'value': false
-            },
-            {
-                'name': 'parity',
-                'desc': '校验',
-                'type': 'dropdown',
-                'value': ['None', 'Even', 'Odd']
-            }
-        ]
+        keys: []
     };
 
     componentDidMount (){
@@ -177,7 +119,6 @@ class MyGatesAppsInstall extends Component {
         this.props.store.codeStore.setInstallConfiguration('{}');
         this.props.store.codeStore.setInstNames('');
         this.props.store.codeStore.setReadOnly(false);
-        console.log(this.props.store.codeStore.installConfiguration);
         let config = [];
         if (val.conf_template) {
             config = JSON.parse(val.conf_template);
@@ -201,10 +142,6 @@ class MyGatesAppsInstall extends Component {
                 this.props.store.codeStore.setReadOnly(false);
                 this.props.store.codeStore.setErrorCode(true)
             }
-            // if (v.child === undefined) {
-            //     this.props.store.codeStore.setErrorCode(true);
-            //     this.props.store.codeStore.setReadOnly(false)
-            // }
             if (v.name === 'device_section') {
                 let tableNameData = {};
                 v.child && v.child.length && v.child.map((w, key1)=>{
@@ -254,7 +191,6 @@ class MyGatesAppsInstall extends Component {
             obj[Object.keys(item)] = Object.values(item)
         });
         http.get('/api/application_configurations_list?app=' + val.name + '&conf_type=Template').then(res=>{
-            console.log(res);
             this.setState({
                 addTempList: res.data
             });
@@ -349,8 +285,7 @@ class MyGatesAppsInstall extends Component {
     };
 
     render () {
-        const { data, flag, item, detail, config, deviceColumns, tcp, serial, keys } = this.state;
-
+        const { data, flag, item, detail, config, deviceColumns, keys } = this.state;
         return (<div>
             <Status />
                 <div className="AppInstall">
@@ -417,10 +352,7 @@ class MyGatesAppsInstall extends Component {
                         </div>
                         <div className={detail ? 'installapp hide' : 'installapp show'}>
                             <AppConfig
-                                tcp={tcp}
-                                serial={serial}
                                 config={config}
-                                configuration={this.props.store.codeStore.installConfiguration}
                                 deviceColumns={deviceColumns}
                                 keys={keys}
                                 submitData={this.submitData}
@@ -480,7 +412,6 @@ class MyGatesAppsInstall extends Component {
                                                            if (val.conf_template === null) {
                                                                this.props.store.codeStore.setActiveKey('2')
                                                            }
-                                                           console.log(val.pre_configuration)
                                                            if (val.pre_configuration === null) {
                                                                this.props.store.codeStore.setInstallConfiguration('{}')
                                                            } else {

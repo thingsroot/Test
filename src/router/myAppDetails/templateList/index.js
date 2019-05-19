@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import http from '../../../utils/Server';
-import { Button, message, Tabs, Modal } from 'antd';
+import { Button, message, Tabs, Modal, Table } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import MyTemplateForm from '../myForm';
 import CopyForm from '../CopyForm';
@@ -22,7 +22,142 @@ class TemplateList extends Component {
         this.state = {
             deleteName: '',
             type: '',
-            conf: ''
+            conf: '',
+            key: '1',
+            columns: [
+                {
+                    title: '模板名称',
+                    dataIndex: 'conf_name',
+                    key: 'conf_name'
+                },
+                {
+                    title: '描述',
+                    dataIndex: 'description',
+                    key: 'description'
+                },
+                {
+                    title: '访问权限',
+                    dataIndex: 'public',
+                    key: 'public',
+                    render: (record) => {
+                        return (
+                            <span>{record.public === 0 ? '个人' : '公开'}</span>
+                        )
+                    }
+                },
+                {
+                    title: '版本',
+                    dataIndex: 'latest_version',
+                    key: 'latest_version'
+                },
+                {
+                    title: '修改时间',
+                    key: 'modified',
+                    dataIndex: 'modified',
+                    render: text => {
+                        return (
+                            <span>{text.substr(0, 19)}</span>
+                        )
+                    }
+                },
+                {
+                    title: '操作',
+                    key: 'action',
+                    width: '26%',
+                    render: (record) => (
+                        <span>
+                            <Button
+                                type="primary"
+                            >
+                                <Link
+                                    to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}
+
+                                >查看</Link>
+                            </Button>
+                            &nbsp;&nbsp;
+                            <Button
+                                onClick={() => {
+                                        this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 2)
+                                    }}
+                            >编辑</Button>
+                            &nbsp;&nbsp;
+                            <Button
+                                type="primary"
+                                onClick={(record) => {
+                                        this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 1)
+                                    }}
+                            >复制</Button>
+                            &nbsp;&nbsp;
+                            <Button
+                                onClick={(record)=>{
+                                    this.getName(record.name)
+                                }}
+                            >删除</Button>
+                        </span>
+                    )
+                }
+            ],
+            columns2: [
+                {
+                    title: '模板名称',
+                    dataIndex: 'conf_name',
+                    key: 'conf_name'
+                },
+                {
+                    title: '描述',
+                    dataIndex: 'description',
+                    key: 'description'
+                },
+                {
+                    title: '访问权限',
+                    dataIndex: 'public',
+                    key: 'public',
+                    render: (record) => {
+                        return (
+                            <span>{record.public === 0 ? '个人' : '公开'}</span>
+                        )
+                    }
+                },
+                {
+                    title: '版本',
+                    dataIndex: 'latest_version',
+                    key: 'latest_version'
+                },
+                {
+                    title: '修改时间',
+                    key: 'modified',
+                    dataIndex: 'modified',
+                    render: text => {
+                        return (
+                            <span>{text.substr(0, 19)}</span>
+                        )
+                    }
+                },
+                {
+                    title: '操作',
+                    key: 'action',
+                    width: '20%',
+                    render: (record) => (
+                        <span>
+                            <Button
+                                type="primary"
+                            >
+                                <Link
+                                    to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}
+
+                                >查看</Link>
+                            </Button>
+                            &nbsp;&nbsp;
+                            <Button
+                                type="primary"
+                                onClick={(record) => {
+                                        this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 1)
+                                    }}
+                            >复制</Button>
+                        </span>
+                    )
+                }
+            ]
         }
     }
 
@@ -92,15 +227,22 @@ class TemplateList extends Component {
             });
     };
 
+    callback = (key)=>{
+        this.setState({
+            key: key
+        })
+    };
+
     render () {
         const { templateList, app } = this.props;
         let myList = this.props.store.codeStore.templateList;
-        const { templateContent, type, conf } = this.state;
+        const { type, conf, key, columns, columns2 } = this.state;
         return (
             <div className="templateList">
                 <Button
                     type="primary"
                     onClick={this.showModal}
+                    style={key === '2' ? none : block}
                 >
                     上传新模板
                 </Button>
@@ -131,78 +273,22 @@ class TemplateList extends Component {
                 >
                     <p>确认删除此模板？</p>
                 </Modal>
-                <Tabs>
+                <Tabs
+                    defaultActiveKey="1"
+                    onChange={this.callback}
+                >
                     <TabPane
                         tab="我的"
                         key="1"
                     >
-                        <ul>
-                            {
-                                myList && myList.length > 0 && myList.map((v, key)=>{
-                                    return <li key={key}>
-                                        <div>
-                                            <p>模板名称：<span className="fontColor">{v.conf_name}</span>
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p>描述：<span className="fontColor">{v.description}</span></p>
-                                        </div>
-                                        <div>
-                                            <div>版本号：<span className="fontColor">{v.latest_version}</span>
-                                                <div style={{float: 'right'}}>
-                                                    <Button
-                                                        size="small"
-                                                        type="primary"
-                                                        style={{fontSize: '12px'}}
-                                                    >
-                                                        <Link
-                                                            to={`/myTemplateDetails/${v.app}/${v.name}/${v.latest_version}`}
-                                                        >
-                                                            查看
-                                                        </Link>
-                                                    </Button>
-                                                    &nbsp;&nbsp;
-                                                    <Button
-                                                        size="small"
-                                                        style={{fontSize: '12px'}}
-                                                        onClick={
-                                                            () => {
-                                                                this.copyContent(v.name, v.conf_name, v.description, v.latest_version, v.public, v.owner_type, 2)
-                                                            }
-                                                        }
-                                                    >
-                                                        编辑
-                                                    </Button>
-                                                    &nbsp;&nbsp;
-                                                    <Button
-                                                        size="small"
-                                                        type="primary"
-                                                        style={{fontSize: '12px'}}
-                                                        onClick={
-                                                            () => {
-                                                                this.copyContent(v.name, v.conf_name, v.description, v.latest_version, v.public, v.owner_type, 1)
-                                                            }
-                                                        }
-                                                    >
-                                                        复制
-                                                        </Button>
-                                                    &nbsp;&nbsp;
-                                                    <Button
-                                                        size="small"
-                                                        style={{fontSize: '12px'}}
-                                                        onClick={()=>{
-                                                            this.getName(v.name)
-                                                        }}
-                                                    >
-                                                        删除
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                })
-                            }
-                        </ul>
+                        {console.log(myList)}
+                        <Table
+                            style={myList === undefined || myList.length === 0 ? none : block}
+                            columns={columns}
+                            dataSource={myList}
+                        >
+
+                        </Table>
                         <p
                             className="empty"
                             style={myList.length > 0 ? none : block}
@@ -214,50 +300,14 @@ class TemplateList extends Component {
                         tab="所有"
                         key="2"
                     >
-                        <ul>
-                            {
-                                templateList && templateList.length > 0 && templateList.map((v, key)=>{
-                                    return <li key={key}>
-                                        <div>
-                                            <p>模板名称：<span className="fontColor">{v.conf_name}</span>
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p>描述：<span className="fontColor">{v.description}</span></p>
-                                        </div>
-                                        <div>
-                                            <div>版本号：<span className="fontColor">{v.latest_version}</span>
-                                                <p style={{float: 'right'}}>
-                                                    <Button
-                                                        type="primary"
-                                                        style={{height: '26px'}}
-                                                    >
-                                                        <Link
-                                                            to={`/myTemplateDetails/${v.app}/${v.name}/${v.latest_version}`}
-                                                        >
-                                                            查看
-                                                        </Link>
-                                                    </Button>
-                                                    <Button
-                                                        style={{height: '26px'}}
-                                                        onClick={
-                                                            () => {
-                                                                this.copyContent(v.app, v.name, v.latest_version)
-                                                            }
-                                                        }
-                                                    >复制</Button>
-                                                </p>
-                                                <input
-                                                    id="templateContent"
-                                                    type="hidden"
-                                                    value={templateContent}
-                                                />
-                                            </div>
-                                        </div>
-                                    </li>
-                                })
-                            }
-                        </ul>
+                        {console.log(templateList)}
+                        <Table
+                            style={templateList === undefined || templateList.length === 0 ? none : block}
+                            columns={columns2}
+                            dataSource={templateList}
+                        >
+
+                        </Table>
                         <p
                             className="empty"
                             style={templateList && templateList.length > 0 ? none : block}

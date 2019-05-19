@@ -96,9 +96,6 @@ class AppConfig extends Component {
         showTempList: [],
         selectSection: 'socket'
     };
-    componentDidMount () {
-        console.log(this.props.config)
-    }
 
     //添加模板
     addSingleTemp = (conf, desc, name, version)=>{
@@ -156,10 +153,10 @@ class AppConfig extends Component {
     };
 
     getData = ()=>{
-        const { tcp, serial, keys } = this.props;
+        const { keys } = this.props;
+        const { tcp, serial } = this.props.store.codeStore;
         const { selectSection} = this.state;
         let sourceCodeData = {};
-        console.log(keys);
         keys && keys.length > 0 && keys.map((item, key)=>{
             key;
             if (item.name === 'Link_type') {
@@ -175,7 +172,6 @@ class AppConfig extends Component {
                 } else if (selectSection === 'serial') {
                     serial.map((v, key)=>{
                         key;
-                        console.log(v.value)
                         if (v.value[0] === undefined) {
                             data.push({
                                 [v.name]: this.refs[v.name].state.value === undefined ? v.value : this.refs[v.name].state.value
@@ -193,7 +189,6 @@ class AppConfig extends Component {
             } else if (item.type === 'templates') {
                 sourceCodeData[item.name] = {};
             } else if (item.type === 'dropdown') {
-                console.log(item.name)
                 sourceCodeData[item.name] = this.refs[item.name].state.value === undefined ? item.value[0] : this.refs[item.name].state.value;
             } else if (item.type === 'number' || item.type === 'text') {
                 sourceCodeData[item.name] = this.refs[item.name].state.value === undefined ? item.value : this.refs[item.name].state.value
@@ -217,7 +212,6 @@ class AppConfig extends Component {
         } else if (key === '2') {
             this.props.store.codeStore.setActiveKey(key);
         }
-        console.log(this.props.config)
         if (errorCode === true || this.props.config.length === 0) {
             this.props.store.codeStore.setReadOnly(false);
         } else if (this.props.config && this.props.config.length > 0 || errorCode === false) {
@@ -240,8 +234,8 @@ class AppConfig extends Component {
 
     render () {
         const { addTempLists, showTempLists, showTempList, selectSection, addTempList } = this.state;
-        const { errorCode, installConfiguration } = this.props.store.codeStore;
-        let { config, deviceColumns, serial, tcp } = this.props;
+        const { errorCode, installConfiguration, serial, tcp } = this.props.store.codeStore;
+        let { config, deviceColumns } = this.props;
 
         return (
             <Tabs
@@ -289,7 +283,6 @@ class AppConfig extends Component {
                                                                         defaultValue={a.value ? a.value[0] : ''}
                                                                         style={{width: 300}}
                                                                         onChange={() => {
-                                                                            console.log(a.name)
                                                                             this.selectChangeValue(a.name)
                                                                         }}
                                                                     >
