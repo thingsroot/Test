@@ -115,9 +115,9 @@ class AppStore {
                           id: newmessage[2].split(']:')[0] + ']',
                           content: newmessage[2].split(']:')[1]
                       }
-                      arr.push(obj)
+                      arr.unshift(obj)
                           if (this.value) {
-                              const newarr = arr.filter(item=>item[this.searchtype].indexOf(this.value) !== -1);
+                              const newarr = arr.filter(item=>item[this.searchtype].toLowerCase().indexOf(this.value.toLowerCase()) !== -1);
                               this.data = newarr
                           } else {
                               this.data = arr;

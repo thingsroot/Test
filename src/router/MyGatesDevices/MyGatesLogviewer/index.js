@@ -60,10 +60,11 @@ class MyGatesLogviewer extends Component {
     handleChange = (value)=> {
         this.props.store.appStore.searchtype =  value.key
       }
-    filter = (value)=>{
+    filter = (valu)=>{
+        const value = valu.toLowerCase();
         if (value) {
             this.props.store.appStore.value = value;
-            this.props.store.appStore.data = this.props.store.appStore.newdata.filter(item=>item[this.props.store.appStore.searchtype].indexOf(value) !== -1)
+            this.props.store.appStore.data = this.props.store.appStore.newdata.filter(item=>item[this.props.store.appStore.searchtype].toLowerCase().indexOf(value) !== -1)
         } else {
             this.props.store.appStore.value = '';
             this.props.store.appStore.data = this.props.store.appStore.newdata;
@@ -142,6 +143,11 @@ class MyGatesLogviewer extends Component {
                             <div
                                 className="tableContent"
                                 id="tbody"
+                                onScroll={()=>{
+                                    console.log('33333')
+                                    console.log(this.refs.content)
+                                    this.refs.content.scrollTo()
+                                }}
                             >
                                 <div
                                     style={{height: 600}}
@@ -150,6 +156,7 @@ class MyGatesLogviewer extends Component {
                                         ref="content"
                                         axis="y"
                                         length={data.length}
+                                        scrollTo={data.length}
                                         itemRenderer={(key)=>{
                                             return (<div key={key}>
                                                 <div className="tableHeaders">
