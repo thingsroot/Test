@@ -22,6 +22,7 @@ class Sign extends PureComponent {
                             const content = item.slice(item.indexOf('=') + 1)
                             _setCookie(name, content, 24)
                         });
+                        _setCookie('companies', res.data.data.companies[0])
                         http.get('/api/developers_read?name=' + _getCookie('user_id'))
                             .then(res=>{
                                 if (!res.error) {
