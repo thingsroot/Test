@@ -187,12 +187,12 @@ class Action extends Component {
                     更改名称
                 </Button>
                 <Button
-                    disabled={actionSwi}
+                    disabled
                 >
                     应用配置
                 </Button>
                 <Button
-                    disabled={actionSwi}
+                    disabled
                 >
                     应用调试
                 </Button>
