@@ -10,8 +10,6 @@ import  'echarts/lib/chart/pie';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/tooltip';
 import './style.scss';
-import { exec_result } from '../../../utils/Session';
-let timer;
 function getMin (i, date) {
     let Dates = new Date(date - i * 60000)
     let min = Dates.getMinutes();
@@ -62,7 +60,8 @@ class LinkStatus extends Component {
     }
     componentWillUnmount () {
         // window.removeEventListener('resize', ()=>{})
-        clearInterval(timer)
+        clearInterval(this.timer)
+        clearInterval(this.timer1)
     }
     getData (sn){
 
@@ -130,8 +129,6 @@ class LinkStatus extends Component {
                 this.myFaultTypeChart2.resize();
             });
         })
-        console.log(this.myFaultTypeChart1)
-        
         const res = this.props.store.appStore.status;
         axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
                 let config = res;
@@ -185,12 +182,12 @@ class LinkStatus extends Component {
             })
         http.get('/api/gateways_beta_read?gateway=' + sn).then(res=>{
             this.setState({use_beta: res.data.use_beta === 1}, ()=>{
-                http.get('/api/applications_versions_latest?app=freeioe&beta=' + (this.state.use_beta ? 1 : 0)).then(res=>{
+                http.get('/api/applications_versions_latest?app=freeioe&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
                         iot_beta: res.data
                     })
                 })
-                http.get('/api/applications_versions_latest?app=openwrt%2Fx86_64_skynet&beta=' + (this.state.use_beta ? 1 : 0)).then(res=>{
+                http.get('/api/applications_versions_latest?app=openwrt%2Fx86_64_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
                         skynet_version: res.data
                     })
@@ -212,15 +209,18 @@ class LinkStatus extends Component {
                 id: `installapp/${this.props.match.params.sn}/${record}/${new Date() * 1}`
             }).then(res=>{
                 if (res.data){
-                    exec_result(res.data)
-                    // setTimeout(() => {
-                    //     http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                    //         console.log(result)
-                    //         if (result.data.result) {
-                    //             message.success('开启成功')
-                    //         }
-                    //     })
-                    // }, 1000);
+                    this.timer = setTimeout(() => {
+                        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                            if (result.data){
+                                if (result.data.result) {
+                                    message.success('开启成功')
+                                } else {
+                                    message.error('开启失败')
+                                }
+                                clearInterval(this.timer)
+                            }
+                        })
+                    }, 1000);
                 }
             })
         } else {
@@ -230,21 +230,23 @@ class LinkStatus extends Component {
                 id: `removeapp/${this.props.match.params.sn}/${record}/${new Date() * 1}`
             }).then(res=>{
                 if (res.data) {
-                    exec_result(res.data)
-                    // setTimeout(() => {
-                    //     http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                    //         console.log(result)
-                    //         if (result.data.result) {
-                    //             message.success('关闭成功')
-                    //         }
-                    //     })
-                    // }, 1000);
+                    this.timer1 = setTimeout(() => {
+                        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                            if (result.data){
+                                if (result.data.result) {
+                                    message.success('关闭成功')
+                                } else {
+                                    message.error('关闭失败')
+                                }
+                                clearInterval(this.timer1)
+                            }
+                        })
+                    }, 1000);
                 }
             })
         }
     }
     setAutoDisabled (record, config){
-        console.log(config)
         const type = config ? 0 : 1;
         const inst = record === 'beta' ? 'beta' : 'enable';
         const name = record === 'beta' ? 'gateway' : 'name';
@@ -253,7 +255,18 @@ class LinkStatus extends Component {
             [inst]: type
         }).then(res=>{
             if (res.data){
-                exec_result(res.data)
+                this.timer = setTimeout(() => {
+                    http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                        if (result.data){
+                            if (result.data.result) {
+                                message.success('开启成功')
+                            } else {
+                                message.error('开启失败')
+                            }
+                            clearInterval(this.timer)
+                        }
+                    })
+                }, 1000);
             }
         })
       }
@@ -276,22 +289,30 @@ class LinkStatus extends Component {
           const data = Object.assign({}, config, {[name]: !config[name]});
         this.setState({
             config: data
-        }, ()=>{
-            console.log(this.state.config);
         })
       }
         onChange (value, type) {
             this.setState({[type]: value})
       }
       buttonOnclick (value, type){
-          console.log(value, type)
           if (type === 'UOLOAD'){
               http.post('/api/gateways_enable_event', {
                   name: this.props.match.params.sn,
                   min_level: this.state[value],
                   id: `enable_event/${this.props.match.params.sn}/min${value}/${new Date() * 1}`
               }).then(res=>{
-                  exec_result(res.data)
+                this.timer = setTimeout(() => {
+                    http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                        if (result.data){
+                            if (result.data.result) {
+                                message.success('开启成功')
+                            } else {
+                                message.error('开启失败')
+                            }
+                            clearInterval(this.timer)
+                        }
+                    })
+                }, 1000);
 
               })
           } else {
@@ -302,7 +323,18 @@ class LinkStatus extends Component {
                 },
                 id: `set${type}/${this.props.match.params.sn}/min${value}/${new Date() * 1}`
             }).then(res=>{
-                exec_result(res.data)
+                this.timer = setTimeout(() => {
+                    http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                        if (result.data){
+                            if (result.data.result) {
+                                message.success('开启成功')
+                            } else {
+                                message.error('开启失败')
+                            }
+                            clearInterval(this.timer)
+                        }
+                    })
+                }, 1000);
             })
           }
       }
@@ -517,7 +549,6 @@ class LinkStatus extends Component {
                                 unCheckedChildren="OFF"
                                 checked={config.Net_Manager}
                                 onChange={()=>{
-                                    console.log(this)
                                     this.changeState('Net_Manager');
                                     this.setConfig('Network', config.Net_Manager)
                                 }}
@@ -638,15 +669,14 @@ class LinkStatus extends Component {
                                                     id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
                                                 }
                                                 http.postToken('/api/gateways_upgrade', data).then(res=>{
-                                                    console.log(res)
-                                                    timer = setInterval(() => {
+                                                    this.timer = setInterval(() => {
                                                         http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
                                                             if (result.ok){
                                                                 message.success('网关固件升级成功')
-                                                                clearInterval(timer)
+                                                                clearInterval(this.timer)
                                                             } else {
                                                                 message.error('网关固件升级失败，请重试')
-                                                                clearInterval(timer)
+                                                                clearInterval(this.timer)
                                                             }
                                                         })
                                                     }, 3000);
