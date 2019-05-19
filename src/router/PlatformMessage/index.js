@@ -640,11 +640,12 @@ class PlatformMessage extends Component {
                         return (
                             <div className="none">
                                 {'全部消息' + messageCount + '条，列表中为确认消息' + unconfirmed + '条，'}
-                                <a
+                                <span
                                     onClick={this.toggleMessage}
+                                    style={{color: 'blue', cursor: 'pointer'}}
                                 >
                                     {flag ? '查看所有' : '查看未确认'}
-                                </a>
+                                </span>
                             </div>
                         )
                     }}

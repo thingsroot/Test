@@ -131,12 +131,22 @@ class MyTree extends Component {
         data.map(item => {
             if (item.children) {
                 return (
-                    <TreeNode title={item.title} key={item.key} dataRef={item}>
+                    <TreeNode
+                        title={item.title}
+                        key={item.key}
+                        dataRef={item}
+                    >
                         {this.renderTreeNodes(item.children)}
                     </TreeNode>
                 );
             }
-            return <TreeNode  title={item.title} key={item.key} dataRef={item} />;
+            return (
+                <TreeNode
+                    title={item.title}
+                    key={item.key}
+                    dataRef={item}
+                />
+            );
         });
 
     render () {

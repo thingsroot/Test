@@ -2,9 +2,9 @@ import React, { PureComponent } from 'react';
 import './style.scss';
 import { Layout, Icon } from 'antd';
 import ContentMain from '../ContentMain';
-const { Header, Content, Sider } = Layout;
 import Siders from '../Siders';
 import HeaderBar from '../HeaderBar';
+const { Header, Content, Sider } = Layout;
 
 const maxHeader = {
     width: '100%',
@@ -34,7 +34,7 @@ const minHeader = {
 
 class App extends PureComponent {
   state = {
-    collapsed: false
+    collapsed: true
   };
   toggle = () => {
     this.setState({

@@ -24,99 +24,99 @@ class ContentMain extends PureComponent {
         return (
             <Switch>
                 <PrivateRoute
-                    path="/Home"
+                    path="/home"
                     component={Home}
                     title={'Dashboard'}
                 />
                 <PrivateRoute
-                    path="/MyGates"
+                    path="/mygates"
                     component={MyGates}
                     title={'我的网关'}
                 />
                 <PrivateRoute
-                    path="/MyApps"
+                    path="/myapps"
                     component={MyApps}
                     title={'我的应用'}
                 />
                 <PrivateRoute
-                    path="/myAppDetails/:name"
+                    path="/myappdetails/:name"
                     component={MyAppDetails}
                     title={'我的应用 · 详情'}
                 />
                 <PrivateRoute
-                    path="/appSettings/:type/:name"
+                    path="/appsettings/:type/:name"
                     component={AppSettings}
                     title={'Dashboard'}
                 />
                 <PrivateRoute
-                    path="/appSettings/:type"
+                    path="/appsettings/:type"
                     component={AppSettings}
                     title={'Dashboard'}
                 />
                 <PrivateRoute
-                    path="/AppEditorCode/:app/:name"
+                    path="/appeditorcode/:app/:name"
                     component={AppEditorCode}
                     title={'Dashboard'}
                 />
                 <PrivateRoute
-                    path="/UserSettings"
+                    path="/userSettings"
                     component={UserSettings}
                     title={'Dashboard'}
                 />
                 <PrivateRoute
-                    path="/MyAccessKey"
+                    path="/myaccesskey"
                     component={MyAccessKey}
                     title={'MyAccessKey'}
                 />
                 <PrivateRoute
-                    path="/MyVirtualGates"
+                    path="/myvirtualgates"
                     component={MyVirtualGates}
                     title={'虚拟网关'}
                 />
                 <PrivateRoute
-                    path="/MyGatesDevices/:sn"
+                    path="/mygatesdevices/:sn"
                     component={MyGatesDevices}
                     title={'设备列表'}
                 />
                 <PrivateRoute
-                    path="/MyGatesAppsInstall/:sn"
+                    path="/mygatesappsinstall/:sn"
                     component={MyGatesAppsInstall}
                     title={'安装应用'}
                 />
                 <PrivateRoute
-                    path="/PlatformMessage"
+                    path="/platformmessage"
                     component={PlatformMessage}
                     title={'平台消息'}
                 />
                 <PrivateRoute
-                    path="/DeviceMessage/:sn"
+                    path="/devicemessage/:sn"
                     component={DeviceMessage}
                     title={'设备消息'}
                 />
 
                 <PrivateRoute
-                    path="/BrowsingHistory/:sn/:vsn"
+                    path="/browsinghistory/:sn/:vsn"
                     component={BrowsingHistory}
                     title={'Dashboard'}
                 />
                 <PrivateRoute
-                    path="/MyGatesDevicesOutputs/:sn/:vsn"
+                    path="/mygatesdevicesoutputs/:sn/:vsn"
                     component={MyGatesDevicesOutputs}
                     title={'数据下置'}
                 />
                 <PrivateRoute
-                    path="/AppsInstall/:sn/:app/:type"
+                    path="/appsinstall/:sn/:app/:type"
                     component={AppsInstall}
                     title={'安装应用'}
                 />
                 <PrivateRoute
-                    path="/MyTemplateDetails/:app/:name/:version"
+                    path="/mytemplatedetails/:app/:name/:version"
                     component={MyTemplateDetails}
                     title={'Dashboard'}
                 />
                 <Redirect
                     from="/"
-                    to="/Home"
+                    to="/home"
                 />
             </Switch>
         );

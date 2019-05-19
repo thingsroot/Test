@@ -15,25 +15,17 @@ class Nav extends Component {
       }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (this.props.match.params.sn !== nextProps.match.params.sn){
-            http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + nextProps.match.params.sn).then(res=>{
-                this.props.store.appStore.setStatus(res.message)
-              })
+          http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
+            this.props.store.appStore.setStatus(res)
+          })
         }
     }
       sendAjax = () => {
-        // http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-        //   this.props.store.appStore.setStatus(res.message)
-        // })
         http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
           this.props.store.appStore.setStatus(res)
         })
-        http.get('/api/gateways_list').then(res=>{
-          const online = [];
-          res.message && res.message.length > 0 && res.message.map((v)=>{
-              if (v.data.device_status === 'ONLINE'){
-                  online.push(v.data)
-              }
-          })
+        http.get('/api/gateway_list?status=online').then(res=>{
+          const online = res.message;
           this.props.store.appStore.setGatelist(online)
         })
         // http.get('/api/method/iot_ui.iot_api.devices_list?filter=online').then(res=>{

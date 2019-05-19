@@ -97,7 +97,6 @@ class MyGatesDevices extends Component {
                         className="listbutton"
                       >
                         <Icon type="swap"/><br />
-                        网关列表
                       </Button>
                 : ''
                   }
@@ -131,11 +130,11 @@ class MyGatesDevices extends Component {
                   </Drawer>
                   <div className="mygateslist">
                     <Switch>
-                      <PrivateRoute path={`${path}/GatesList`}
+                      <PrivateRoute path={`${path}/gateslist`}
                           component={GatesList}
                           title="我的网关·设备列表"
                       />
-                      <PrivateRoute path={`${path}/AppsList`}
+                      <PrivateRoute path={`${path}/appslist`}
                           component={AppsList}
                           title="我的网关·应用列表"
                       />
@@ -143,11 +142,11 @@ class MyGatesDevices extends Component {
                           component={Setgateway}
                           title="我的网关·网关设置"
                       />
-                      <PrivateRoute path={`${path}/VPN`}
+                      <PrivateRoute path={`${path}/vpn`}
                           component={VPN}
                           title="我的网关·vpn通道"
                       />
-                      <PrivateRoute path={`${path}/Vserial`}
+                      <PrivateRoute path={`${path}/vserial`}
                           component={Vserial}
                           title="我的网关·虚拟串口"
                       />
@@ -160,7 +159,7 @@ class MyGatesDevices extends Component {
                           title="我的网关·日志"
                       />
                       <Redirect from={path}
-                          to={`${path}/GatesList`}
+                          to={`${path}/gateslist`}
                       />
                     </Switch>
                   </div>

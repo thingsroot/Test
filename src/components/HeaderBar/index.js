@@ -43,15 +43,15 @@ class Headers extends PureComponent {
               <Dropdown overlay={menu}
                   trigger={['click']}
               >
-                <a className="ant-dropdown-link"
+                <span className="ant-dropdown-link"
                     href="#"
-                    style={{display: 'block', padding: '0 10px'}}
+                    style={{display: 'block', padding: '0 10px', cursor: 'pointer'}}
                 >
                   <Icon type="user"/>
                   {
                     decodeURI(_getCookie('full_name').split(' ')[0])
                   }
-                </a>
+                </span>
               </Dropdown>
             </div>
         );

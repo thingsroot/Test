@@ -23,9 +23,9 @@ class MyAccessKey extends PureComponent {
                             okText="Yes"
                             cancelText="No"
                         >
-                            <a
+                            <span
                                 style={{color: 'blue'}}
-                            >更新</a>
+                            >更新</span>
                         </Popconfirm>
                     )
                 }

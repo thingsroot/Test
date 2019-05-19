@@ -1,57 +1,15 @@
 import React, { Component } from 'react';
 import { withRouter} from 'react-router-dom';
-import { _getCookie } from '../../../utils/Session';
 import { Button, Alert, Input, Select } from 'antd';
-const Search = Input.Search;
+import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
-import mqtt from 'mqtt';
 import './style.scss';
-import iScroll from 'iscroll/build/iscroll-probe';
-let client;
-// const columns = [{
-//     title: '时间',
-//     dataIndex: 'time',
-//     key: 'timer',
-//     width: '200px'
-//   }, {
-//     title: '类型',
-//     dataIndex: 'info',
-//     key: 'info',
-//     width: '100px'
-//   }, {
-//     title: '实例ID',
-//     dataIndex: 'id',
-//     key: 'id',
-//     width: '100px'
-//   }, {
-//     title: '内容',
-//     dataIndex: 'content',
-//     key: 'content'
-//   }];
-let unWill = true;
+import ReactList from 'react-list';
+const Search = Input.Search;
 const Option = Select.Option;
 
-  function getLocalTime (nS) {
-    return new Date(parseInt(nS) * 1000).toLocaleString();
- }
-function makeid () {
-    var text = '';
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (var i = 0; i < 8; i++){
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-}
-function success (){
-    console.log('success')
-}
-
-function error (){
-    console.log('error')
-}
-
 @withRouter
+@inject('store') @observer
 class MyGatesLogviewer extends Component {
     state = {
         data: [],
@@ -63,21 +21,33 @@ class MyGatesLogviewer extends Component {
         searchtype: 'content'
     }
     componentDidMount (){
-        this.t1 = setInterval(()=>this.tick(), 60000);
-        this.myScroll = new iScroll('#tbody', {
-            probeType: 2,
-            mouseWheel: true,
-            scrollbars: true,
-            interactiveScrollbars: true,
-            freeScroll: true,
-            momentum: false,
-            resizePolling: 1,
-            hideScrollbar: true,
-            sanp: true
-        })
+        this.t1 = setInterval(()=>this.tick(), 59000);
+        this.props.store.appStore.isleave = false;
+        this.props.store.appStore.lognum = 0;
+        if (this.props.match.params.sn !== this.props.store.appStore.mqttSN && this.props.store.appStore.mqttSN !== ''){
+            this.props.store.appStore.client.end();
+            this.props.store.appStore.flag =  true;
+            this.props.store.appStore.data =  [];
+            this.props.store.appStore.connected =  false;
+            this.props.store.appStore.client = null;
+            clearInterval(this.t1)
+        }
+    }
+    UNSAFE_componentWillReceiveProps (nextProps) {
+        if (nextProps.location.pathname !== this.props.location.pathname){
+            if (this.props.store.appStore.client) {
+                this.props.store.appStore.client.end();
+                this.props.store.appStore.flag =  true;
+                this.props.store.appStore.data =  [];
+                this.props.store.appStore.connected =  false;
+                this.props.store.appStore.client = null;
+                clearInterval(this.t1)
+            }
+        }
     }
     componentWillUnmount (){
-        unWill = false;
+        clearInterval(this.t1)
+        this.props.store.appStore.isleave = true;
     }
     tick (){
             const data = {
@@ -88,149 +58,45 @@ class MyGatesLogviewer extends Component {
             http.postToken('/api/gateways_enable_log', data)
     }
     handleChange = (value)=> {
-        this.setState({
-            searchtype: value.key
-        })
+        this.props.store.appStore.searchtype =  value.key
       }
-    connect = () =>{
-            const arr = [];
-            const sn = this.props.match.params.sn;
-            const options = {
-            connectTimeout: 4000, // 超时时间
-            // 认证信息
-            clientId: 'webclient-' + makeid(),
-            username: unescape(_getCookie('user_id')),
-            password: unescape(_getCookie('sid')),
-            keepAlive: 6000,
-            timeout: 3,
-            topic: sn + '/log',
-            onSuccess: success,
-            onFailure: error
-      }
-      const topic = sn + '/log';
-      if (!this.state.connected){
-          let number = 0;
-          client = mqtt.connect('ws://ioe.thingsroot.com:8083/mqtt', options)
-            client.on('connect', ()=>{
-                this.setState({flag: false, connected: true})
-                this.tick()
-                client.subscribe(topic)
-            })
-            client.on('message', (topic, message)=>{
-                console.log('111111')
-                if (unWill) {
-                    if (this.state.data && this.state.data.length < 1000){
-                        const newmessage = JSON.parse(message.toString());
-                        arr.push({
-                            time: getLocalTime(newmessage[1]),
-                            type: newmessage[0],
-                            id: newmessage[2].split(']:')[0] + ']',
-                            content: newmessage[2].split(']:')[1]
-                        })
-                        this.setState({
-                            data: arr
-                        })
-                        const obj = `
-                                <div class="tableHeaders">
-                                    <div>${getLocalTime(newmessage[1])}</div>
-                                    <div>${newmessage[0]}</div>
-                                    <div>${newmessage[2].split(']:')[0] + ']'}</div>
-                                    <div>${newmessage[2].split(']:')[1]}</div>
-                                </div>
-                        `
-                       if (this.state.searchflag) {
-                        const height = document.getElementById('tbody').children[0].offsetHeight;
-                        this.refs.content.innerHTML = obj +  this.refs.content.innerHTML;
-                        const newHeight = document.getElementById('tbody').children[0].offsetHeight;
-                        this.myScroll.refresh()
-                        if (this.myScroll.y !== 0) {
-                            this.myScroll.scrollTo(0, this.myScroll.y - (newHeight - height), 0)
-                        }
-                       }
-                    } else {
-                        client.unsubscribe(topic)
-                        this.setState({flag: true, maxNum: true})
-                    }
-                } else {
-                    number++;
-                    console.log(number)
-                }
-           })
-        } else {
-            client.subscribe(topic)
-            this.setState({flag: false})
-        }
-       return client;
-
-    }
     filter = (value)=>{
-        this.setState({
-            value
-        })
         if (value) {
-            console.log(this.state.data)
-            const newarr = this.state.data.filter(item=>item[this.state.searchtype].indexOf(value) !== -1);
-            let html = '';
-            newarr.map(item=>{
-                html =    `
-                <div class="tableHeaders">
-                    <div>${item.time}</div>
-                    <div>${item.type}</div>
-                    <div>${item.id}</div>
-                    <div>${item.content}</div>
-                </div>
-            ` + html;
-            });
-            this.refs.content.innerHTML = html;
-            this.myScroll.refresh();
-            this.setState({
-                searchflag: false
-                })
+            this.props.store.appStore.value = value;
+            this.props.store.appStore.data = this.props.store.appStore.newdata.filter(item=>item[this.props.store.appStore.searchtype].indexOf(value) !== -1)
         } else {
-            let html = '';
-            this.state.data.map(item=>{
-                html =    `
-                    <div class="tableHeaders">
-                        <div padding='10px'>${item.time}</div>
-                        <div>${item.type}</div>
-                        <div>${item.id}</div>
-                        <div>${item.content}</div>
-                    </div>
-                    ` + html
-            });
-            this.refs.content.innerHTML = html;
-            this.myScroll.refresh();
-            this.setState({
-                searchflag: true
-            })
+            this.props.store.appStore.value = '';
+            this.props.store.appStore.data = this.props.store.appStore.newdata;
         }
     }
     onClose = ()=>{
         this.setState({maxNum: false})
     }
     render () {
+        const {data} = this.props.store.appStore;
         return (
-            <div style={{position: 'relative', marginTop: 20}}>
+            <div style={{position: 'relative'}}>
+            {/* <App /> */}
                     {
-                        this.state.flag
+                        this.props.store.appStore.flag
                         ? <Button
                             onClick={()=>{
+                                this.tick()
                                 this.t1;
-                                this.connect()
+                                this.props.store.appStore.connect(this.props.match.params.sn)
                             }}
                           >订阅日志</Button>
                     : <Button
                         onClick={()=>{
                                 clearInterval(this.t1)
-                                this.setState({flag: true})
-                                client.unsubscribe(this.props.match.params.sn + '/log')
+                                this.props.store.appStore.flag = true
+                                this.props.store.appStore.client.unsubscribe(this.props.match.params.sn + '/log')
                         }}
                       >取消订阅</Button>
                     }
                     <Button
                         onClick={()=>{
-                            this.setState({data: []})
-                            this.refs.content.innerHTML = '';
+                            this.props.store.appStore.data = [];
                         }}
                     >清除</Button>
                     <div className="searwrap">
@@ -250,7 +116,7 @@ class MyGatesLogviewer extends Component {
                             enterButton
                         />
                     </div>
-                    <div>当前日志数量：{this.state.data && this.state.data.length}</div>
+                    <div>当前日志数量：{data.length}</div>
                 {
                     this.state.maxNum
                     ? <Alert
@@ -277,8 +143,24 @@ class MyGatesLogviewer extends Component {
                                 className="tableContent"
                                 id="tbody"
                             >
-                                <div ref="content">
-
+                                <div
+                                    style={{height: 600}}
+                                >
+                                    <ReactList
+                                        ref="content"
+                                        axis="y"
+                                        length={data.length}
+                                        itemRenderer={(key)=>{
+                                            return (<div key={key}>
+                                                <div className="tableHeaders">
+                                                    <div>{data[key].time}</div>
+                                                    <div>{data[key].type}</div>
+                                                    <div>{data[key].id}</div>
+                                                    <div>{data[key].content}</div>
+                                                </div>
+                                            </div>)
+                                        }}
+                                    />
                                 </div>
                             </div>
                     </div>

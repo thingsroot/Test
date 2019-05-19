@@ -101,7 +101,9 @@ class Password extends PureComponent {
                         >
                             确定
                         </Button>
-                        <a style={{display: 'inlineBlock', width: '91%', height: '30px', float: 'left'}}>   </a>
+                        <span
+                            style={{display: 'inlineBlock', width: '91%', height: '30px', float: 'left'}}
+                        >   </span>
                     </Form.Item>
                 </Form>
             </div>

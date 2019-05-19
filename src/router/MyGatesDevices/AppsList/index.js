@@ -22,7 +22,9 @@ class AppsList extends Component {
             width: '100px',
             render: (record)=>{
               return (
-              <img src={record}
+              <img
+                  src={record}
+                  alt=""
                   style={{width: 50, height: 50}}
               />
               )

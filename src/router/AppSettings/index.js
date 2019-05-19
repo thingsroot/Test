@@ -173,6 +173,7 @@ class AppSettings extends Component {
                             <div style={{height: '130px'}}>
                                 <label htmlFor="icon_file">
                                     <img
+                                        alt=""
                                         ref="img"
                                         src={this.state.imgSrc}
                                         title="点击切换图片"

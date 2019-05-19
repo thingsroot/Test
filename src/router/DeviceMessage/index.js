@@ -579,11 +579,12 @@ class DevicemMessage extends Component {
                         return (
                             <div className="none">
                                 {'全部消息' + messageCount + '条，列表中未确认消息' + unconfirmed + '条，'}
-                                <a
+                                <span
+                                    style={{color: 'blue', cursor: 'pointer'}}
                                     onClick={this.toggleMessage}
                                 >
                                     {flag ? '查看所有' : '查看未确认'}
-                                </a>
+                                </span>
                             </div>
                         )
                     }}

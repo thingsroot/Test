@@ -59,9 +59,13 @@ class LinkStatus extends Component {
       }
     }
     componentWillUnmount () {
-        // window.removeEventListener('resize', ()=>{})
+        console.log('2')
+        window.removeEventListener('resize', this.resize, 20)
         clearInterval(this.timer)
         clearInterval(this.timer1)
+    }
+    resize () {
+            this.myFaultTypeChart1.resize();
     }
     getData (sn){
 
@@ -72,30 +76,30 @@ class LinkStatus extends Component {
             data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
             }
             let myCharts1 = this.refs.cpu
-            this.myFaultTypeChart1 = echarts.init(myCharts1);
-            this.myFaultTypeChart1.setOption({
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross'
+            if (myCharts1) {
+                this.myFaultTypeChart1 = echarts.init(myCharts1);
+                this.myFaultTypeChart1.setOption({
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross'
+                        }
+                    },
+                    xAxis: {
+                        data: data
+                    },
+                    yAxis: {},
+                    series: [
+                    {
+                        name: '数值',
+                        type: 'line',
+                        color: '#37A2DA',
+                        data: res.message
                     }
-                },
-                xAxis: {
-                    data: data
-                },
-                yAxis: {},
-                series: [
-                  {
-                    name: '数值',
-                    type: 'line',
-                    color: '#37A2DA',
-                    data: res.message
-                  }
-                ]
-            });
-            window.addEventListener('resize', ()=>{
-                this.myFaultTypeChart1.resize();
-            });
+                    ]
+                });
+                window.addEventListener('resize', this.resize, 20);
+                }
         })
         http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
             let data = [];
@@ -104,30 +108,30 @@ class LinkStatus extends Component {
             data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
             }
             let myCharts2 = this.refs.mem
-            this.myFaultTypeChart2 = echarts.init(myCharts2);
-            this.myFaultTypeChart2.setOption({
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross'
+            if (myCharts2) {
+                this.myFaultTypeChart2 = echarts.init(myCharts2);
+                this.myFaultTypeChart2.setOption({
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross'
+                        }
+                    },
+                    xAxis: {
+                        data: data
+                    },
+                    yAxis: {},
+                    series: [
+                    {
+                        name: '数值',
+                        type: 'line',
+                        color: '#37A2DA',
+                        data: res.message
                     }
-                },
-                xAxis: {
-                    data: data
-                },
-                yAxis: {},
-                series: [
-                  {
-                    name: '数值',
-                    type: 'line',
-                    color: '#37A2DA',
-                    data: res.message
-                  }
-                ]
-            });
-            window.addEventListener('resize', ()=>{
-                this.myFaultTypeChart2.resize();
-            });
+                    ]
+                });
+                window.addEventListener('resize', this.resize, 20);
+                }
         })
         const res = this.props.store.appStore.status;
         axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{

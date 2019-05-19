@@ -5,10 +5,14 @@ import CollectionCreateForm from '../upData';
 import {inject, observer} from 'mobx-react';
 
 const block = {
-    display: 'block'
+    display: 'block',
+    color: 'blue',
+    cursor: 'pointer'
 };
 const none = {
-    display: 'none'
+    display: 'none',
+    color: 'blue',
+    cursor: 'pointer'
 };
 @inject('store')
 @observer
@@ -55,7 +59,7 @@ class VersionList extends PureComponent {
                                     </p></div>
                                     <div><p>更新时间：<span className="fontColor">{v.modified.substr(0, 19)}</span></p>
                                         {
-                                            v.meta === 0 ? '' : <a style={this.state.user ? block : none}>发布为正式版本</a>
+                                            v.meta === 0 ? '' : <span style={this.state.user ? block : none}>发布为正式版本</span>
                                         }
                                     </div>
                                     <div><p>更新日志：<span className="fontColor">{v.comment}</span></p></div>

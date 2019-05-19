@@ -164,7 +164,7 @@ class MyGates extends PureComponent {
                   return (
                       <span>
                         <Link to={{
-                            pathname: `/MyGatesDevices/${record.sn}`,
+                            pathname: `/mygatesdevices/${record.sn}`,
                             state: record
                         }}
                         >
@@ -172,7 +172,7 @@ class MyGates extends PureComponent {
                         </Link>
                         <Divider type="vertical" />
                         <Link to={{
-                            pathname: `/MyGatesDevices/${record.sn}/AppsList`,
+                            pathname: `/mygatesdevices/${record.sn}/appslist`,
                             state: record
                         }}
                         >
@@ -185,7 +185,7 @@ class MyGates extends PureComponent {
                                 <Menu>
                                 <Menu.Item key="0">
                                     <Link to={{
-                                        pathname: `/MyGatesDevices/${record.sn}/setgateway`,
+                                        pathname: `/mygatesdevices/${record.sn}/setgateway`,
                                         state: record
                                     }}
                                         style={{color: 'rgba(0, 0, 0, 0.65)'}}
@@ -198,7 +198,7 @@ class MyGates extends PureComponent {
                                 </Menu.Item>
                                 <Menu.Item key="2">
                                     <Link to={{
-                                        pathname: `/MyGatesDevices/${record.sn}/gatewayrecord`,
+                                        pathname: `/mygatesdevices/${record.sn}/gatewayrecord`,
                                         state: record
                                     }}
                                         style={{color: 'rgba(0, 0, 0, 0.65)'}}
@@ -210,7 +210,7 @@ class MyGates extends PureComponent {
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="1">
-                                <a
+                                <span
                                     disabled={record.device_status !== 'ONLINE'}
                                     onClick={()=>{
                                         console.log(record)
@@ -220,7 +220,7 @@ class MyGates extends PureComponent {
                                             this.showModal('setName')
                                         })
                                     }}
-                                >更改名称及经纬度</a>
+                                >更改名称及经纬度</span>
                                 </Menu.Item>
                                 <Menu.Divider />
                                 <Menu.Item key="4">
