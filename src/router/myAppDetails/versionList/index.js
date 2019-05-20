@@ -6,12 +6,10 @@ import {inject, observer} from 'mobx-react';
 
 const block = {
     display: 'block',
-    color: 'blue',
     cursor: 'pointer'
 };
 const none = {
     display: 'none',
-    color: 'blue',
     cursor: 'pointer'
 };
 @inject('store')

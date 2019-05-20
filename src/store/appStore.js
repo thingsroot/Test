@@ -43,6 +43,8 @@ class AppStore {
   @observable mqttSN = '';
   @observable scrolltop = 0;
   @observable tire = [];
+  @observable instflag = true;
+  @observable toggle = true;
   @action setLogFlag (values) {
     this.logflag = values;
   }
@@ -108,15 +110,15 @@ class AppStore {
             this.client.subscribe(topic)
         })
         this.client.on('message', (topic, message)=>{
+                const newmessage = JSON.parse(message.toString());
+                const obj = {
+                    time: getLocalTime(newmessage[1]),
+                    type: newmessage[0],
+                    id: newmessage[2].split(']:')[0] + ']',
+                    content: newmessage[2].split(']:')[1]
+                }
                 if (!this.isleave) {
                     if (this.data && this.data.length < 1000){
-                      const newmessage = JSON.parse(message.toString());
-                      const obj = {
-                          time: getLocalTime(newmessage[1]),
-                          type: newmessage[0],
-                          id: newmessage[2].split(']:')[0] + ']',
-                          content: newmessage[2].split(']:')[1]
-                      }
                       arr.push(obj)
                           if (this.value) {
                               const newarr = arr.filter(item=>item[this.searchtype].toLowerCase().indexOf(this.value.toLowerCase()) !== -1);
@@ -131,8 +133,8 @@ class AppStore {
                       this.maxNum = true
                   }
                 } else {
-                  console.log(this.lognum)
                   this.lognum++;
+                  arr.push(obj)
                 }
       })
       } else {

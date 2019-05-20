@@ -10,9 +10,9 @@ let timer;
 class Status extends Component {
     componentDidMount (){
         this.gatewayRead(this.props.match.params.sn)
-        timer = setInterval(() => {
-            this.gatewayRead(this.props.match.params.sn)
-        }, 5000);
+        // timer = setInterval(() => {
+        //     this.gatewayRead(this.props.match.params.sn)
+        // }, 5000);
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
         if (nextProps.location.pathname !== this.props.location.pathname) {

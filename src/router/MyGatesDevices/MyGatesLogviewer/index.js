@@ -22,12 +22,12 @@ class MyGatesLogviewer extends Component {
     }
     componentDidMount (){
         this.t1 = setInterval(()=>this.tick(), 59000);
-        this.refs.content.scrollAround(this.props.store.appStore.data.length)
+        // this.refs.content.scrollAround(this.props.store.appStore.data.length)
         this.props.store.appStore.isleave = false;
         this.props.store.appStore.lognum = 0;
-        this.props.store.appStore.tire = this.props.store.appStore.data;
-        this.props.store.appStore.data = [];
-        this.props.store.appStore.data = this.props.store.appStore.tire.concat(this.props.store.appStore.data)
+        // this.props.store.appStore.tire = this.props.store.appStore.data;
+        // this.props.store.appStore.data = [];
+        // this.props.store.appStore.data = this.props.store.appStore.tire.concat(this.props.store.appStore.data)
         if (this.props.match.params.sn !== this.props.store.appStore.mqttSN && this.props.store.appStore.mqttSN !== ''){
             this.props.store.appStore.client.end();
             this.props.store.appStore.flag =  true;
@@ -53,8 +53,8 @@ class MyGatesLogviewer extends Component {
         if (data_len !== this.props.store.appStore.data.length) {
             data_len = this.props.store.appStore.data.length;
             // this.refs.content.props.initialIndex = this.props.store.appStore.scrolltop;
-            console.log(this.refs.content)
-            console.log(this.props.store.appStore.scrolltop)
+            // console.log(this.refs.content)
+            // console.log(this.props.store.appStore.scrolltop)
             // this.refs.content.initialIndex(this.props.store.appStore.scrolltop)
             // const box_height = this.refs.content.items.firstChild.clientHeight;
             // this.refs.content.scrollTo(this.props.store.appStore.scrolltop + box_height)
@@ -90,11 +90,19 @@ class MyGatesLogviewer extends Component {
             this.props.store.appStore.data = this.props.store.appStore.newdata;
         }
     }
+    closeEnableLog =()=>{
+        const data = {
+            duration: 0,
+            name: this.props.match.params.sn,
+            id: `sys_enable_log/${this.props.match.params.sn}/${new Date() * 1}`
+        }
+        http.postToken('/api/gateways_enable_log', data)
+    }
     onClose = ()=>{
         this.setState({maxNum: false})
     }
     render () {
-        const {data} = this.props.store.appStore;
+        const { data } = this.props.store.appStore;
         return (
             <div style={{position: 'relative'}}>
             {/* <App /> */}
@@ -109,6 +117,7 @@ class MyGatesLogviewer extends Component {
                           >订阅日志</Button>
                     : <Button
                         onClick={()=>{
+                                this.closeEnableLog()
                                 clearInterval(this.t1)
                                 this.props.store.appStore.flag = true;
                                 this.props.store.appStore.client.unsubscribe(this.props.match.params.sn + '/log')
@@ -117,7 +126,11 @@ class MyGatesLogviewer extends Component {
                     }
                     <Button
                         onClick={()=>{
+                            console.log(this.props.store.appStore.data)
                             this.props.store.appStore.data = [];
+                            this.props.store.appStore.data.length = 0;
+                            console.log(this.props.store.appStore.data)
+
                         }}
                     >清除</Button>
                     <div className="searwrap">
@@ -167,24 +180,26 @@ class MyGatesLogviewer extends Component {
                                 <div
                                     style={{height: 600}}
                                 >
-                                    <ReactList
-                                        pageSize={1}
-                                        ref="content"
-                                        axis="y"
-                                        type="uniform"
-                                        scrollTo={this.props.store.appStore.scrolltop}
-                                        length={data.length}
-                                        itemRenderer={(key)=>{
-                                            return (<div key={key}>
-                                                <div className="tableHeaders">
-                                                    <div>{data[key].time}</div>
-                                                    <div>{data[key].type}</div>
-                                                    <div>{data[key].id}</div>
-                                                    <div>{data[key].content}</div>
-                                                </div>
-                                            </div>)
-                                        }}
-                                    />
+                                    {
+                                        data && data.length > 0 &&
+                                        <ReactList
+                                            pageSize={1}
+                                            ref="content"
+                                            axis="y"
+                                            type="variable"
+                                            length={data.length}
+                                            itemRenderer={(key)=>{
+                                                return (<div key={key}>
+                                                    <div className="tableHeaders">
+                                                        <div>{data[key].time}</div>
+                                                        <div>{data[key].type}</div>
+                                                        <div>{data[key].id}</div>
+                                                        <div>{data[key].content}</div>
+                                                    </div>
+                                                </div>)
+                                            }}
+                                        />
+                                    }
                                 </div>
                             </div>
                     </div>

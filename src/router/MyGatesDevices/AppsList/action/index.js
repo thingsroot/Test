@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Switch, Popconfirm, message, Modal, Input } from 'antd';
 import http from '../../../../utils/Server';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import MyGatesAppsUpgrade from '../../../Upgrade';
 import { _getCookie } from '../../../../utils/Session';
@@ -186,13 +186,20 @@ class Action extends Component {
                 >
                     更改名称
                 </Button>
-                <Link
-                    to="/mygatesdevices/appconfig"
-                >
-                  <Button>
+                  <Button
+                      disabled={!this.props.record.data}
+                      onClick={()=>{
+                          if (this.props.record.data){
+                            this.props.store.appStore.apppage = this.props.record.data.data
+                            this.props.getconfig(this.props.record.data.data)
+                            this.props.store.codeStore.instNames = this.props.record.device_name
+                            this.props.store.codeStore.instflag = false;
+                          }
+                          this.props.store.appStore.toggle = false;
+                      }}
+                  >
                       应用配置
                   </Button>
-                </Link>
                 <Button
                     disabled
                 >
