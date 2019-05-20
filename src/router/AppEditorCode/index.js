@@ -65,10 +65,10 @@ class AppEditorCode extends Component {
                                 })
                             }
                         });
-                    //http
                 } else {
                     http.get('/apis/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
+                            console.log(data.message)
                             if (data.message === 'undefined') {
                                 //工作区为空，不显示title（title还没写）
                                 //暂时还没有版本，请先上传（全局提示）
@@ -116,7 +116,6 @@ class AppEditorCode extends Component {
                     newVersion: newVersion,
                     comment: 'v' + newVersion
                 })
-
             })
     }
 
@@ -230,6 +229,9 @@ class AppEditorCode extends Component {
     //添加文件
     addFile = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
+        if (myFolder === this.props.appName) {
+            myFolder = '/'
+        }
         if (this.props.store.codeStore.addFileName !== '') {
             let url = '/apis/api/method/app_center.editor.editor';
             http.get(url + '?app=' + this.state.app + '&operation=create_node&type=file&id=' +
@@ -462,7 +464,7 @@ class AppEditorCode extends Component {
                     <div className="code">
                         <MyCode
                             fontSize={fontSize}
-                            fileName={this.props.store.codeStore.fileName}
+                            showFileName={this.props.store.codeStore.showFileName}
                             isChange={this.props.store.codeStore.isChange}
                         />
                     </div>
