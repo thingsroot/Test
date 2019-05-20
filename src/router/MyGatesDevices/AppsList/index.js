@@ -119,7 +119,6 @@ class AppsList extends Component {
       }
       componentDidMount () {
         this.fetch(this.props.match.params.sn);
-        this.props.store.codeStore.instflag = true;
         // timer = setInterval(() => {
         //   this.fetch(this.props.match.params.sn)
         // }, 10000);

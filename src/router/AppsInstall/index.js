@@ -54,6 +54,10 @@ class MyGatesAppsInstall extends Component {
     };
 
     componentDidMount (){
+        const pathname = this.props.location.pathname.toLowerCase();
+        if (pathname.indexOf('/appsinstall') !== -1){
+          this.props.store.codeStore.instflag = true;
+        }
         if (this.props.match.params.type === '1') {
             http.get('/api/store_list').then(res=>{
                 this.setState({
