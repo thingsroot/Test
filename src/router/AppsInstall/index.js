@@ -413,6 +413,7 @@ class MyGatesAppsInstall extends Component {
                                                    ><Icon
                                                        type="cloud-download"
                                                        onClick={()=>{
+                                                           this.getConfig(val)
                                                            if (val.conf_template === null) {
                                                                this.props.store.codeStore.setActiveKey('2')
                                                            }
