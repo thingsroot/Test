@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Tree } from 'antd';
+import {message, Modal, Tree} from 'antd';
 import { observer, inject } from 'mobx-react';
 import http from '../../../utils/Server';
 const { TreeNode } = Tree;
@@ -63,7 +63,7 @@ class MyTree extends Component {
 
     getTree =  id => new Promise((resolve => {
         let data = [];
-        http.get('/home/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + id)
+        http.get('/apis/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + id)
             .then(res=>{
                 res.map((v)=>{
                     data.push(v);
@@ -130,32 +130,65 @@ class MyTree extends Component {
     };
 
     onSelect = (selectedKeys, info) => {
-        this.setState({ selectedKeys }, ()=>{
-            this.props.store.codeStore.setFileName(this.state.selectedKeys);
-        });
-        this.props.store.codeStore.setMyFolder(selectedKeys);
-        this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
-        if (selectedKeys[0].indexOf('.') !== -1) {
-            let suffixName = '';
-            switch (selectedKeys[0].substr(selectedKeys[0].indexOf('.') + 1, selectedKeys[0].length)) {
-                case 'js' : suffixName = 'javascript'; break;
-                case 'html' : suffixName = 'html'; break;
-                case 'java' : suffixName = 'java'; break;
-                case 'py' : suffixName = 'python'; break;
-                case 'lua' : suffixName = 'lua'; break;
-                case 'xml' : suffixName = 'xml'; break;
-                case 'rb' : suffixName = 'ruby'; break;
-                case 'sass' : suffixName = 'sass'; break;
-                case 'less' : suffixName = 'sass'; break;
-                case 'md' : suffixName = 'markdown'; break;
-                case 'sql' : suffixName = 'mysql'; break;
-                case 'json' : suffixName = 'json'; break;
-                case 'ts' : suffixName = 'typescript'; break;
-                case 'css' : suffixName = 'css'; break;
+        if (selectedKeys.length > 0 && this.props.store.codeStore.folderType !== 'folder') {
+            if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent){
+                this.props.store.codeStore.setShowFileName(selectedKeys);
+                this.setState({ selectedKeys }, ()=>{
+                    this.props.store.codeStore.setFileName(this.state.selectedKeys);
+                });
+                this.props.store.codeStore.setMyFolder(selectedKeys);
+                this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+            } else {
+                //保存提示
+                Modal.info({
+                    title: '保存提示',
+                    content: (
+                        <div>
+                            <p>'是否保存当前文件?'</p>
+                        </div>
+                    ),
+                    onOk () {
+                        let url = '/apis/api/method/app_center.editor.editor';
+                        http.postToken(url + '?app=' + this.props.app +
+                            '&operation=set_content&id=' + this.props.store.codeStore.fileName +
+                            '&text=' + this.props.store.codeStore.newEditorContent)
+                            .then(res=>{
+                                console.log(res);
+                                message.success('文件保存成功！')
+                            })
+                        this.props.store.codeStore.setShowFileName(selectedKeys);
+                        this.setState({ selectedKeys }, ()=>{
+                            this.props.store.codeStore.setFileName(this.state.selectedKeys);
+                        });
+                        this.props.store.codeStore.setMyFolder(selectedKeys);
+                        this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+                    }
+                });
             }
-            this.props.store.codeStore.setSuffixName(suffixName);
-        } else {
-            this.props.store.codeStore.setSuffixName('text');
+            if (selectedKeys[0].indexOf('.') !== -1) {
+                let suffixName = '';
+                switch (selectedKeys[0].substr(selectedKeys[0].indexOf('.') + 1, selectedKeys[0].length)) {
+                    case 'js' : suffixName = 'javascript'; break;
+                    case 'html' : suffixName = 'html'; break;
+                    case 'java' : suffixName = 'java'; break;
+                    case 'py' : suffixName = 'python'; break;
+                    case 'lua' : suffixName = 'lua'; break;
+                    case 'xml' : suffixName = 'xml'; break;
+                    case 'rb' : suffixName = 'ruby'; break;
+                    case 'scss' : suffixName = 'sass'; break;
+                    case 'less' : suffixName = 'sass'; break;
+                    case 'md' : suffixName = 'markdown'; break;
+                    case 'sql' : suffixName = 'mysql'; break;
+                    case 'json' : suffixName = 'json'; break;
+                    case 'ts' : suffixName = 'typescript'; break;
+                    case 'css' : suffixName = 'css'; break;
+                    default : suffixName = 'java'
+                }
+                this.props.store.codeStore.setSuffixName(suffixName);
+
+            } else {
+                this.props.store.codeStore.setSuffixName('text');
+            }
         }
     };
 
@@ -183,7 +216,7 @@ class MyTree extends Component {
         });
 
     render () {
-        const { appName } = this.props;
+        // const { appName } = this.props;
         return (
             <Tree
                 className="draggable-tree"
@@ -192,7 +225,7 @@ class MyTree extends Component {
                 expandedKeys={this.state.expandedKeys}
                 onSelect={this.onSelect}
                 selectedKeys={this.state.selectedKeys}
-                autoExpandParent={[appName]}
+                // autoExpandParent={[appName]}
             >
                 {this.renderTreeNodes(this.state.arr)}
 

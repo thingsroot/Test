@@ -42,12 +42,12 @@ class AppEditorCode extends Component {
             app: app
         });
         //设备应用和平台应用对比
-        http.get('/home/api/method/app_center.editor.editor_worksapce_version?app=' + app)
+        http.get('/apis/api/method/app_center.editor.editor_worksapce_version?app=' + app)
             .then(res=>{
                 let worksapceVersion = res.message;
                 // console.log(worksapceVersion);
                 if (worksapceVersion && worksapceVersion !== 'undefined') {
-                    http.get('/home/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
+                    http.get('/apis/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
                             let lastVersion = data.message;
                             console.log(lastVersion);
@@ -67,7 +67,7 @@ class AppEditorCode extends Component {
                         });
                     //http
                 } else {
-                    http.get('/home/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
+                    http.get('/apis/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
                             if (data.message === 'undefined') {
                                 //工作区为空，不显示title（title还没写）
@@ -78,7 +78,7 @@ class AppEditorCode extends Component {
                                 })
                             } else if (typeof data.message === 'number' ) {
                                 //初始化工作区域到最新版本
-                                http.get('/home/api/method/app_center.editor.editor_init?app=' + app + '&version=' + data.message)
+                                http.get('/apis/api/method/app_center.editor.editor_init?app=' + app + '&version=' + data.message)
                                     .then(res=>{
                                         let initVersion = res.message;
                                         // console.log(initVersion);
@@ -101,7 +101,7 @@ class AppEditorCode extends Component {
                 }
             });
         //应用版本列表
-        http.get('/home/api/method/app_center.api.get_versions?app=' + app + '&beta=1')
+        http.get('/apis/api/method/app_center.api.get_versions?app=' + app + '&beta=1')
             .then(res=>{
                 let data = [];
                 res.message && res.message.length > 0 && res.message.map((v)=>{
@@ -166,7 +166,7 @@ class AppEditorCode extends Component {
         this.setState({
             visible: false
         });
-        let url = '/home/api/method/app_center.editor.editor_revert';
+        let url = '/apis/api/method/app_center.editor.editor_revert';
         http.postToken(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
             .then(res=>{
                 this.props.store.codeStore.change();
@@ -178,7 +178,7 @@ class AppEditorCode extends Component {
         if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent) {
             message.warning('文件未改动！')
         } else {
-            let url = '/home/api/method/app_center.editor.editor';
+            let url = '/apis/api/method/app_center.editor.editor';
             http.postToken(url + '?app=' + this.state.app +
                 '&operation=set_content&id=' + this.props.store.codeStore.fileName +
                 '&text=' + this.props.store.codeStore.newEditorContent)
@@ -213,7 +213,7 @@ class AppEditorCode extends Component {
         })
     };
     newVersion = ()=>{
-        http.postToken('/home/api/method/app_center.editor.editor_release?app=' + this.state.app +
+        http.postToken('/apis/api/method/app_center.editor.editor_release?app=' + this.state.app +
             '&operation=set_content&version=' + this.state.newVersion +
             '&comment=' + this.state.comment)
             .then(res=>{
@@ -231,7 +231,7 @@ class AppEditorCode extends Component {
     addFile = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
         if (this.props.store.codeStore.addFileName !== '') {
-            let url = '/home/api/method/app_center.editor.editor';
+            let url = '/apis/api/method/app_center.editor.editor';
             http.get(url + '?app=' + this.state.app + '&operation=create_node&type=file&id=' +
                 myFolder + '&text=' + this.props.store.codeStore.addFileName)
                 .then(res=>{
@@ -288,7 +288,7 @@ class AppEditorCode extends Component {
     addFolder = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
         if (this.props.store.codeStore.addFolderName !== '') {
-            let url = '/home/api/method/app_center.editor.editor';
+            let url = '/apis/api/method/app_center.editor.editor';
             if (myFolder === this.props.appName) {
                 myFolder = '/'
             }
@@ -307,7 +307,7 @@ class AppEditorCode extends Component {
         const pro = ()=>{
             return new Promise((resolve, reject) => {
                 let myFolder = this.props.store.codeStore.myFolder[0];
-                let url = '/home/api/method/app_center.editor.editor';
+                let url = '/apis/api/method/app_center.editor.editor';
                 http.get(url + '?app=' + this.state.app + '&operation=delete_node&type=folder&id=' + myFolder)
                     .then(res=>{
                         if (res){
@@ -370,7 +370,7 @@ class AppEditorCode extends Component {
     editorFile = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
         if (this.state.editorFileName !== '') {
-            let url = '/home/api/method/app_center.editor.editor';
+            let url = '/apis/api/method/app_center.editor.editor';
             http.get(url + '?app=' + this.state.app + '&operation=rename_node&type=folder&id=' +
                 myFolder + '&text=' + this.state.editorFileName)
                 .then(res=>{
@@ -390,7 +390,8 @@ class AppEditorCode extends Component {
             fontSize,
             appName,
             optionData,
-            arr
+            arr,
+            app
         } = this.state;
         return (
             <div className="appEditorCode">
@@ -454,6 +455,7 @@ class AppEditorCode extends Component {
                             treeData={arr}
                             appName={appName}
                             getFileName={this.getFileName}
+                            app={app}
                             isChange={this.props.store.codeStore.isChange}
                         />
                     </div>

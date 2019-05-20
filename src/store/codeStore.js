@@ -110,7 +110,9 @@ class CodeStore {
             'type': 'dropdown',
             'value': ['None', 'Even', 'Odd']
         }
-        ]
+        ];
+
+    @observable showFileName = 'version';
 
     //安装应用配置
     @observable activeKey = '1';  //配置面板/json源码  active
@@ -121,10 +123,13 @@ class CodeStore {
 
     @observable userBeta = 0;   //网关是否开启beta模式
 
-    @observable suffixName = '';
+    @observable suffixName = 'java';
 
     @action setUserBeta (values) {
         this.userBeta = values
+    }
+    @action setShowFileName (values) {
+        this.showFileName = values
     }
 
     @action setSuffixName (values) {
