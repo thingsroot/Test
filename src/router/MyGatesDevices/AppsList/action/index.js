@@ -16,7 +16,8 @@ class Action extends Component {
     state = {
         visible: false,
         loading: false,
-        setName: false
+        setName: false,
+        appdebug: false
     }
     componentDidMount (){
         console.log(this.props)
@@ -162,11 +163,37 @@ class Action extends Component {
             }
         })
       }
+      sendForkCreate (record){
+        http.post('/api/applications_forks_create', {
+          name: record.name,
+          version: record.version
+        }).then(res=>{
+          if (res.ok){
+            if (res.message){
+              this.props.history.push('/AppEditorCode/' + record.name + '/' + res.message.app_name);
+              this.setState({appdebug: false})
+            }
+          } else {
+            message.error(res.error)
+            this.setState({appdebug: false})
+          }
+        })
+      }
+      isfork (record){
+        if (record.data){
+          if (record.data.data.owner !== _getCookie('user_id')){
+            this.setState({appdebug: false})
+          } else {
+            this.sendForkCreate(record)
+            console.log('走你~')
+          }
+        }
+      }
     render () {
         const { actionSwi } = this.props.store.appStore;
         console.log(this.props.record)
         const { record } = this.props;
-        const { loading, visible, setName, nameValue } = this.state;
+        const { loading, visible, setName, nameValue, appdebug } = this.state;
         return (
             <div style={{position: 'relative', paddingBottom: 50}}>
               <div style={{lineHeight: '30px', paddingLeft: 20}}>
@@ -201,7 +228,9 @@ class Action extends Component {
                       应用配置
                   </Button>
                 <Button
-                    disabled
+                    onClick={()=>{
+                      this.showModal('appdebug')
+                    }}
                 >
                     应用调试
                 </Button>
@@ -295,6 +324,23 @@ class Action extends Component {
                         sn={this.props.match.params.sn}
                         app={record.name}
                     />
+                    </Modal>
+                    <Modal
+                        visible={appdebug}
+                        title="应用调试"
+                        onOk={()=>{
+                            this.sendForkCreate(record)
+                        }}
+                        destroyOnClose
+                        onCancel={()=>{
+                            this.setState({appdebug: false})
+                        }}
+                    >
+                      {
+                        console.log(record)
+                      }
+                        您不是{record.data && record.data.data.app_name}的应用所有者，如要继续远程调试，会将此应用当前版本克隆一份到您的账户下，而且在代码调试页面编辑的是您克隆的代码，在代码调试页面下载应用会将克隆到你名下的应用覆盖网关中的应用！
+                        如要继续，点击"继续"按钮！
                     </Modal>
                     <Modal
                         visible={setName}
