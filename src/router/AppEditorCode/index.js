@@ -68,15 +68,14 @@ class AppEditorCode extends Component {
                 } else {
                     http.get('/apis/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
-                            console.log(data.message)
-                            if (data.message === 'undefined') {
+                            if (data.message === 0) {
                                 //工作区为空，不显示title（title还没写）
                                 //暂时还没有版本，请先上传（全局提示）
                                 this.info('版本提示', '暂时还没有版本，请先上传!');
                                 this.setState({
                                     version: ''
                                 })
-                            } else if (typeof data.message === 'number' ) {
+                            } else if (data.message > 0 ) {
                                 //初始化工作区域到最新版本
                                 http.get('/apis/api/method/app_center.editor.editor_init?app=' + app + '&version=' + data.message)
                                     .then(res=>{

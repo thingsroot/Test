@@ -22,18 +22,21 @@ class MyTree extends Component {
         }
     }
     componentDidMount () {
+        this.setState({
+            a: 1,
+            arr: []
+        });
         this.getTree('#');
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (this.props.isChange !== nextProps.isChange){
-            setTimeout(()=>{
-                this.getTree('#').then(data=>{
-                    console.log(data);
-                    this.setState({
-                        arr: data
-                    })
-                });
-            }, 0)
+            this.setState({
+                a: 1,
+                arr: []
+            }, ()=>{
+                console.log(this.state.arr);
+                this.getTree('#')
+            });
         }
     }
 
@@ -82,7 +85,8 @@ class MyTree extends Component {
                     key: this.props.appName,
                     children: arr
                 }
-            ]
+            ];
+            console.log(arr)
             this.setState({
                 arr: data,
                 a: this.state.a + 1
@@ -204,15 +208,16 @@ class MyTree extends Component {
         return (
             <Tree
                 className="draggable-tree"
-                defaultExpandAll={this.state.defaultExpandAll}
+                defaultExpandAll
+                autoExpandParent
                 onExpand={this.onExpand}
                 expandedKeys={this.state.expandedKeys}
                 onSelect={this.onSelect}
                 selectedKeys={this.state.selectedKeys}
-                // autoExpandParent={[appName]}
             >
-                {this.renderTreeNodes(this.state.arr)}
-
+                {
+                    this.state.arr.length > 0 ? this.renderTreeNodes(this.state.arr) : ''
+                }
             </Tree>
         );
     }
