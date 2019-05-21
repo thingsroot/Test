@@ -194,7 +194,7 @@ class MyTree extends Component {
 
     renderTreeNodes = data =>
         data.map(item => {
-
+            console.log(item)
             if (item.children) {
                 return (
                     <TreeNode

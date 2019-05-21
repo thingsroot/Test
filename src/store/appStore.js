@@ -45,6 +45,7 @@ class AppStore {
   @observable tire = [];
   @observable instflag = true;
   @observable toggle = true;
+  @observable arr = [];
   @action setLogFlag (values) {
     this.logflag = values;
   }
@@ -80,6 +81,9 @@ class AppStore {
     const localUsers = localStorage['users'] ? JSON.parse(localStorage['users']) : []
     this.users = [{username: 'admin', password: 'admin'}, ...localUsers]
   }
+  @action setData (data){
+    this.data = data;
+  }
   isCloses (_this){
     console.log(_this.props.match.params.sn)
     setTimeout(() => {
@@ -88,7 +92,6 @@ class AppStore {
   }
   connect (sn){
     this.mqttSN = sn;
-    const arr = [];
     const options = {
     connectTimeout: 4000, // 超时时间
     // 认证信息
@@ -107,7 +110,7 @@ class AppStore {
         this.client.on('connect', ()=>{
             this.flag = false;
             this.connected = true;
-            this.client.subscribe(topic)
+            this.client.subscribe(topic, 1)
         })
         this.client.on('message', (topic, message)=>{
                 const newmessage = JSON.parse(message.toString());
@@ -119,26 +122,28 @@ class AppStore {
                 }
                 if (!this.isleave) {
                     if (this.data && this.data.length < 1000){
-                      arr.push(obj)
+                      this.arr.unshift(obj)
                           if (this.value) {
-                              const newarr = arr.filter(item=>item[this.searchtype].toLowerCase().indexOf(this.value.toLowerCase()) !== -1);
+                              const newarr = this.arr.filter(item=>item[this.searchtype].toLowerCase().indexOf(this.value.toLowerCase()) !== -1);
                               this.data = newarr
                           } else {
-                              this.data = arr;
-                              this.newdata = arr
+                              this.data = this.arr;
+                              this.newdata = this.arr
                           }
                   } else {
                       this.client.unsubscribe(topic)
                       this.flag = true
                       this.maxNum = true
+                      this.arr = [];
                   }
                 } else {
                   this.lognum++;
-                  arr.push(obj)
+                  this.arr.unshift(obj)
                 }
       })
       } else {
           this.client.subscribe(topic)
+          this.arr = [];
           this.flag = false;
       }
     }
