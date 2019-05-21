@@ -65,18 +65,17 @@ class AppEditorCode extends Component {
                                 })
                             }
                         });
-                    //http
                 } else {
                     http.get('/apis/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
-                            if (data.message === 'undefined') {
+                            if (data.message === 0) {
                                 //工作区为空，不显示title（title还没写）
                                 //暂时还没有版本，请先上传（全局提示）
                                 this.info('版本提示', '暂时还没有版本，请先上传!');
                                 this.setState({
                                     version: ''
                                 })
-                            } else if (typeof data.message === 'number' ) {
+                            } else if (data.message > 0 ) {
                                 //初始化工作区域到最新版本
                                 http.get('/apis/api/method/app_center.editor.editor_init?app=' + app + '&version=' + data.message)
                                     .then(res=>{
@@ -116,7 +115,6 @@ class AppEditorCode extends Component {
                     newVersion: newVersion,
                     comment: 'v' + newVersion
                 })
-
             })
     }
 
@@ -230,6 +228,9 @@ class AppEditorCode extends Component {
     //添加文件
     addFile = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
+        if (myFolder === this.props.appName) {
+            myFolder = '/'
+        }
         if (this.props.store.codeStore.addFileName !== '') {
             let url = '/apis/api/method/app_center.editor.editor';
             http.get(url + '?app=' + this.state.app + '&operation=create_node&type=file&id=' +
@@ -462,7 +463,7 @@ class AppEditorCode extends Component {
                     <div className="code">
                         <MyCode
                             fontSize={fontSize}
-                            fileName={this.props.store.codeStore.fileName}
+                            showFileName={this.props.store.codeStore.showFileName}
                             isChange={this.props.store.codeStore.isChange}
                         />
                     </div>

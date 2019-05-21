@@ -38,14 +38,14 @@ class MyCode extends Component {
 
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (this.props.fileName !== nextProps.fileName || this.props.isChange !== nextProps.isChange){
+        if (this.props.showFileName !== nextProps.showFileName || this.props.isChange !== nextProps.isChange){
             this.getContent();
         }
     }
     //获取文件内容
     getContent = ()=>{
         if (this.props.store.codeStore.folderType === 'file') {
-            http.get('/apis/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_content&id=' + this.props.store.codeStore.fileName)
+            http.get('/apis/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_content&id=' + this.props.store.codeStore.showFileName)
                 .then(res=>{
                     this.props.store.codeStore.setEditorContent(res.content);
                     this.props.store.codeStore.setNewEditorContent(res.content);
@@ -59,7 +59,6 @@ class MyCode extends Component {
         this.setContent(newValue)
     };
 
-
     render () {
         const { fontSize } = this.props;
 
@@ -72,7 +71,7 @@ class MyCode extends Component {
                 <AceEditor
                     style={{width: '100%', height: '80vh'}}
                     mode={this.props.store.codeStore.suffixName}
-                    // mode="sass"
+                    // mode="json"
                     theme="github"
                     ref="editor"
                     fontSize={fontSize}

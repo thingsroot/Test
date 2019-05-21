@@ -5,30 +5,6 @@ import { observer, inject } from 'mobx-react';
 import http from '../../../utils/Server';
 const { TreeNode } = Tree;
 
-// function format (list) {
-//     let data = [];
-//     for (var i = 0; i < list.length; i++){
-//         if (list[i].children){
-//             if (list[i].childrenData){
-//                 data.push({
-//                     title: list[i].text,
-//                     key: list[i].id,
-//                     type: list[i].type,
-//                     isLeaf: false,
-//                     children: format(list[i].childrenData)
-//                 })
-//             }
-//         } else {
-//             data.push({
-//                 title: list[i].text,
-//                 key: list[i].id,
-//                 type: list[i].type,
-//                 isLeaf: true
-//             })
-//         }
-//     }
-//     return data;
-// }
 @withRouter
 @inject('store')
 @observer
@@ -46,18 +22,21 @@ class MyTree extends Component {
         }
     }
     componentDidMount () {
+        this.setState({
+            a: 1,
+            arr: []
+        });
         this.getTree('#');
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (this.props.isChange !== nextProps.isChange){
-            setTimeout(()=>{
-                this.getTree('#').then(data=>{
-                    console.log(data);
-                    this.setState({
-                        arr: data
-                    })
-                });
-            }, 0)
+            this.setState({
+                a: 1,
+                arr: []
+            }, ()=>{
+                console.log(this.state.arr);
+                this.getTree('#')
+            });
         }
     }
 
@@ -106,7 +85,8 @@ class MyTree extends Component {
                     key: this.props.appName,
                     children: arr
                 }
-            ]
+            ];
+            console.log(arr)
             this.setState({
                 arr: data,
                 a: this.state.a + 1
@@ -130,64 +110,72 @@ class MyTree extends Component {
     };
 
     onSelect = (selectedKeys, info) => {
-        if (selectedKeys.length > 0 && this.props.store.codeStore.folderType !== 'folder') {
-            if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent){
-                this.props.store.codeStore.setShowFileName(selectedKeys);
+        if (selectedKeys.length > 0) {
+            if (info.node.props.dataRef.type !== 'folder') {
+                if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent){
+                    this.props.store.codeStore.setShowFileName(selectedKeys);
+                    this.setState({ selectedKeys }, ()=>{
+                        this.props.store.codeStore.setFileName(this.state.selectedKeys);
+                    });
+                    this.props.store.codeStore.setMyFolder(selectedKeys);
+                    this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+                } else {
+                    //保存提示
+                    Modal.info({
+                        title: '保存提示',
+                        content: (
+                            <div>
+                                <p>'是否保存当前文件?'</p>
+                            </div>
+                        ),
+                        onOk () {
+                            let url = '/apis/api/method/app_center.editor.editor';
+                            http.postToken(url + '?app=' + this.props.app +
+                                '&operation=set_content&id=' + this.props.store.codeStore.fileName +
+                                '&text=' + this.props.store.codeStore.newEditorContent)
+                                .then(res=>{
+                                    console.log(res);
+                                    message.success('文件保存成功！')
+                                })
+                            this.props.store.codeStore.setShowFileName(selectedKeys);
+                            this.setState({ selectedKeys }, ()=>{
+                                this.props.store.codeStore.setFileName(this.state.selectedKeys);
+                            });
+                            this.props.store.codeStore.setMyFolder(selectedKeys);
+                            this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+                        }
+                    });
+                }
+                if (selectedKeys[0].indexOf('.') !== -1) {
+                    let suffixName = '';
+                    switch (selectedKeys[0].substr(selectedKeys[0].indexOf('.') + 1, selectedKeys[0].length)) {
+                        case 'js' : suffixName = 'javascript'; break;
+                        case 'html' : suffixName = 'html'; break;
+                        case 'java' : suffixName = 'java'; break;
+                        case 'py' : suffixName = 'python'; break;
+                        case 'lua' : suffixName = 'lua'; break;
+                        case 'xml' : suffixName = 'xml'; break;
+                        case 'rb' : suffixName = 'ruby'; break;
+                        case 'scss' : suffixName = 'sass'; break;
+                        case 'less' : suffixName = 'sass'; break;
+                        case 'md' : suffixName = 'markdown'; break;
+                        case 'sql' : suffixName = 'mysql'; break;
+                        case 'json' : suffixName = 'json'; break;
+                        case 'ts' : suffixName = 'typescript'; break;
+                        case 'css' : suffixName = 'css'; break;
+                        default : suffixName = 'java'
+                    }
+                    this.props.store.codeStore.setSuffixName(suffixName);
+
+                } else {
+                    this.props.store.codeStore.setSuffixName('text');
+                }
+            } else {
                 this.setState({ selectedKeys }, ()=>{
                     this.props.store.codeStore.setFileName(this.state.selectedKeys);
                 });
                 this.props.store.codeStore.setMyFolder(selectedKeys);
                 this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
-            } else {
-                //保存提示
-                Modal.info({
-                    title: '保存提示',
-                    content: (
-                        <div>
-                            <p>'是否保存当前文件?'</p>
-                        </div>
-                    ),
-                    onOk () {
-                        let url = '/apis/api/method/app_center.editor.editor';
-                        http.postToken(url + '?app=' + this.props.app +
-                            '&operation=set_content&id=' + this.props.store.codeStore.fileName +
-                            '&text=' + this.props.store.codeStore.newEditorContent)
-                            .then(res=>{
-                                console.log(res);
-                                message.success('文件保存成功！')
-                            })
-                        this.props.store.codeStore.setShowFileName(selectedKeys);
-                        this.setState({ selectedKeys }, ()=>{
-                            this.props.store.codeStore.setFileName(this.state.selectedKeys);
-                        });
-                        this.props.store.codeStore.setMyFolder(selectedKeys);
-                        this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
-                    }
-                });
-            }
-            if (selectedKeys[0].indexOf('.') !== -1) {
-                let suffixName = '';
-                switch (selectedKeys[0].substr(selectedKeys[0].indexOf('.') + 1, selectedKeys[0].length)) {
-                    case 'js' : suffixName = 'javascript'; break;
-                    case 'html' : suffixName = 'html'; break;
-                    case 'java' : suffixName = 'java'; break;
-                    case 'py' : suffixName = 'python'; break;
-                    case 'lua' : suffixName = 'lua'; break;
-                    case 'xml' : suffixName = 'xml'; break;
-                    case 'rb' : suffixName = 'ruby'; break;
-                    case 'scss' : suffixName = 'sass'; break;
-                    case 'less' : suffixName = 'sass'; break;
-                    case 'md' : suffixName = 'markdown'; break;
-                    case 'sql' : suffixName = 'mysql'; break;
-                    case 'json' : suffixName = 'json'; break;
-                    case 'ts' : suffixName = 'typescript'; break;
-                    case 'css' : suffixName = 'css'; break;
-                    default : suffixName = 'java'
-                }
-                this.props.store.codeStore.setSuffixName(suffixName);
-
-            } else {
-                this.props.store.codeStore.setSuffixName('text');
             }
         }
     };
@@ -220,15 +208,16 @@ class MyTree extends Component {
         return (
             <Tree
                 className="draggable-tree"
-                defaultExpandAll={this.state.defaultExpandAll}
+                defaultExpandAll
+                autoExpandParent
                 onExpand={this.onExpand}
                 expandedKeys={this.state.expandedKeys}
                 onSelect={this.onSelect}
                 selectedKeys={this.state.selectedKeys}
-                // autoExpandParent={[appName]}
             >
-                {this.renderTreeNodes(this.state.arr)}
-
+                {
+                    this.state.arr.length > 0 ? this.renderTreeNodes(this.state.arr) : ''
+                }
             </Tree>
         );
     }
