@@ -1,29 +1,29 @@
 import http from './Server';
 import { message } from 'antd';
 const LOGIN_COOKIE_NAME = 'T&R_auth_token';
-export function exec_result (id) {
-  let num = 0;
-  let timer;
-  function getResult (){
-    http.get('/api/gateways_exec_result?id=' + id).then(res=>{
-      if (res.data  && res.data.result === true && res.data.message === 'Done'){
-        message.success('执行成功')
-        clearInterval(timer)
-      }
-      if (res.data && res.data.result === false){
-        clearInterval(timer)
-        message.error(res.data.message)
-      }
-    })
-  }
-  timer = setInterval(() => {
-    getResult()
-    if (num === 300){
-      clearInterval(timer);
-      message.error('执行失败，请重试')
-    }
-  }, 1000);
-}
+// export function exec_result (id) {
+//   let num = 0;
+//   let timer;
+//   function getResult (){
+//     http.get('/api/gateways_exec_result?id=' + id).then(res=>{
+//       if (res.data  && res.data.result === true && res.data.message === 'Done'){
+//         message.success('执行成功')
+//         clearInterval(timer)
+//       }
+//       if (res.data && res.data.result === false){
+//         clearInterval(timer)
+//         message.error(res.data.message)
+//       }
+//     })
+//   }
+//   timer = setInterval(() => {
+//     getResult()
+//     if (num === 300){
+//       clearInterval(timer);
+//       message.error('执行失败，请重试')
+//     }
+//   }, 1000);
+// }
 export function _getCookie (name) {
   let start, end
   if (document.cookie.length > 0) {
@@ -116,6 +116,18 @@ export function deviceAppOption (appName, option, value, gateSn, type, sn){
       device: gateSn,
       id: id
   }).then(()=>{
-    exec_result(id)
+    let timer = setInterval(() => {
+      http.get('/api/gateways_exec_result?id=' + id).then(result=>{
+        if (result.ok && result.data){
+          if (result.data.result){
+            message.success('应用配置成功')
+            clearInterval(timer)
+          } else {
+            message.error('应用配置失败')
+            clearInterval(timer)
+          }
+        }
+      })
+    }, 3000);
   })
 }

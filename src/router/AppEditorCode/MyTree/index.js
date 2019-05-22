@@ -62,12 +62,13 @@ class MyTree extends Component {
         return (
             <div>
                 {
-                    treeData.length > 0 ? <Tree
+                    treeData.length > 0
+                    ? <Tree
                         onExpand={this.onExpand}
                         expandedKeys={this.state.expandedKeys}
                         onSelect={onSelect}
                         selectedKeys={selectedKeys}
-                        >
+                      >
                         {this.renderTreeNodes(treeData)}
                     </Tree> : ''
                 }

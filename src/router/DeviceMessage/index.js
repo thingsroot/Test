@@ -82,6 +82,8 @@ class DevicemMessage extends Component {
         sync: false
     };
     componentDidMount (){
+        const pathname = this.props.location.pathname.toLowerCase();
+        console.log(pathname)
         let hours = Date.parse(new Date()) - 24 * 60 * 60 * 1000;
         let time = this.timestampToTime(hours);
         let params = {
@@ -93,7 +95,7 @@ class DevicemMessage extends Component {
                 creation: ['>', time]
             }
         };
-        if (this.props.match.params.sn && this.props.match.params.sn !== '1'){
+        if (this.props.match.params.sn && this.props.match.params.sn !== '1' && pathname.indexOf('/devicemessage') === -1){
             this.setState({
                 isgateway: true
             }, ()=>{

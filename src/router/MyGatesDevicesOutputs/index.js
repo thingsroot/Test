@@ -3,8 +3,6 @@ import { withRouter } from 'react-router';
 import { inject, observer} from 'mobx-react';
 import http from '../../utils/Server';
 import { Table, Button, Modal, Input, message } from 'antd';
-import { exec_result } from '../../utils/Session';
-//import GatesStatus from '../../common/GatesStatus';
 import './style.scss';
 @withRouter
 @inject('store') @observer
@@ -86,7 +84,19 @@ class MyGatesDevicesOutputs extends PureComponent {
             id: id
         }).then(res=>{
             if (res.data === id){
-                exec_result(id)
+                this.timer = setInterval(() => {
+                    http.get('/api/gateways_exec_result?id=' + id).then(result=>{
+                      if (result.ok && result.data){
+                        if (result.data.result){
+                          message.success('应用配置成功')
+                          clearInterval(this.timer)
+                        } else {
+                          message.error('应用配置失败')
+                          clearInterval(this.timer)
+                        }
+                      }
+                    })
+                  }, 3000);
             } else {
                 message.error('提交错误')
             }
