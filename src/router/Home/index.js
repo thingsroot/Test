@@ -7,6 +7,7 @@ import  'echarts/lib/chart/pie';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/tooltip';
 import { Tabs, Table } from 'antd';
+import { Link } from 'react-router-dom';
 import http from '../../utils/Server';
 
 const show = {
@@ -28,15 +29,12 @@ const todayColumns = [{
     key: 'name',
     render: (text, record)=>{
         return (
-            <span
+            <Link
                 style={{cursor: 'pointer'}}
-                onClick={()=>{
-                    console.log(record);
-                    window.location.href = `/DeviceMessage/${record.sn}`
-                }}
+                to={`/DeviceMessage/${record.sn}`}
             >
             {text}
-        </span>
+        </Link>
         )
     }
 }, {
@@ -66,15 +64,12 @@ const weekColumns = [{
     key: 'name',
     render: (text, record)=>{
         return (
-            <span
+            <Link
                 style={{cursor: 'pointer'}}
-                onClick={()=>{
-                    console.log(record);
-                    window.location.href = `/DeviceMessage/${record.sn}`
-                }}
+                to={`/DeviceMessage/${record.sn}`}
             >
             {text}
-        </span>
+        </Link>
         )
     }
 }, {
@@ -93,15 +88,6 @@ const weekColumns = [{
     className: 'thWidth',
     key: 'today'
 }];
-function getMin (i, date){
-    let Dates = new Date(date - i * 60000);
-    let min = Dates.getMinutes();
-    if (min < 10){
-        return '0' + min
-    } else {
-        return min;
-    }
-}
 
 function compare (property){
     return function (a, b) {
@@ -117,7 +103,10 @@ class Home extends PureComponent {
         weekData: [],
         pieData: [],
         barData: [],
-        timeData: []
+        timeData: [],
+        myFaultTypeChart: '',
+        myGatesChart: '',
+        myOnlineChart: ''
     };
 
     componentDidMount () {
@@ -127,9 +116,10 @@ class Home extends PureComponent {
             this.setState({
                 pieData: res.message
             });
-            if (this.state.pieData) {
-                let myGatesChart = echarts.init(document.getElementById('gatesMain'));
-                myGatesChart.setOption({
+            let gatesMain = this.refs.gatesMain;
+            if (this.state.pieData && gatesMain) {
+                this.myGatesChart = echarts.init(gatesMain);
+                this.myGatesChart.setOption({
                     tooltip: {
                         trigger: 'item',
                         formatter: '{a} <br/>{b} : {c} ({d}%)'
@@ -148,9 +138,7 @@ class Home extends PureComponent {
                         ]
                     }]
                 });
-                window.addEventListener('resize', ()=>{
-                    myGatesChart.resize();
-                });
+                window.addEventListener('resize', this.echarts1);
             }
         });
         // 在线数据
@@ -158,34 +146,30 @@ class Home extends PureComponent {
             this.setState({
                 timeData: res.message
             });
-            if (this.state.timeData) {
-                let online = [];
-                let offline = [];
-                this.state.timeData.map((v)=>{
-                    online.push(v.online);
-                    offline.push(v.offline);
-                });
-                let myOnlineChart = echarts.init(document.getElementById('onlineMain'));
-                let data = [];
-                const date = new Date() * 1;
-                for (var i = 0;i < 143;i++){
-                    data.unshift(new Date(date - (i * 14400)).getHours() + ':' + getMin(i, date));
-                }
-                myOnlineChart.setOption({
+            let onlineMain = this.refs.onlineMain;
+            if (this.state.timeData && onlineMain) {
+                this.myOnlineChart = echarts.init(onlineMain);
+                this.myOnlineChart.setOption({
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: {
-                            type: 'cross'
+                            animation: false
                         }
                     },
                     xAxis: {
-                        data: data
+                        type: 'time',
+                        splitLine: {
+                            show: false
+                        }
                     },
                     yAxis: {},
                     series: [{
                         name: 'Online',
                         type: 'line',
-                        data: online,
+                        smooth: true,
+                        data: this.state.timeData.map(function (item) {
+                            return [new Date(item.time), item.online];
+                        }),
                         lineStyle: {
                             color: '#50a3ba'
                         }
@@ -193,15 +177,16 @@ class Home extends PureComponent {
                         {
                             name: 'Offline',
                             type: 'line',
-                            data: offline,
+                            smooth: true,
+                            data: this.state.timeData.map(function (item) {
+                                return [new Date(item.time), item.offline];
+                            }),
                             lineStyle: {
                                 color: '#eac736'
                             }
                         }]
                 });
-                window.addEventListener('resize', ()=>{
-                    myOnlineChart.resize();
-                });
+                window.addEventListener('resize', this.echarts2);
             }
         });
         //柱状图数据
@@ -209,7 +194,8 @@ class Home extends PureComponent {
             this.setState({
                 barData: res.message
             });
-            if (this.state.barData) {
+            let faultTypeMain = this.refs.faultTypeMain;
+            if (this.state.barData && faultTypeMain) {
                 let data1 = [];
                 let data2 = [];
                 let data3 = [];
@@ -220,8 +206,9 @@ class Home extends PureComponent {
                     data3.push(v['通讯']);
                     data4.push(v['数据']);
                 });
-                let myFaultTypeChart = echarts.init(document.getElementById('faultTypeMain'));
-                myFaultTypeChart.setOption({
+
+                this.myFaultTypeChart = echarts.init(faultTypeMain);
+                this.myFaultTypeChart.setOption({
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: {
@@ -257,9 +244,7 @@ class Home extends PureComponent {
                         data: data4
                     }]
                 });
-                window.addEventListener('resize', ()=>{
-                    myFaultTypeChart.resize();
-                });
+                window.addEventListener('resize', this.echarts3);
             }
         });
 
@@ -323,6 +308,23 @@ class Home extends PureComponent {
             }
         });
     }
+
+    componentWillUnmount () {
+        window.removeEventListener('resize', this.echarts1);
+        window.removeEventListener('resize', this.echarts2);
+        window.removeEventListener('resize', this.echarts3);
+    }
+
+    echarts1 = ()=>{
+        this.myGatesChart.resize();
+    };
+    echarts2 = ()=>{
+        this.myOnlineChart.resize();
+    };
+    echarts3 = ()=>{
+        this.myFaultTypeChart.resize();
+    };
+
     render () {
         let todayData = this.state.todayData;
         let weekData = this.state.weekData;
@@ -332,29 +334,35 @@ class Home extends PureComponent {
         return (
             <div className="home">
                 <div className="main">
-                    <div className="echarts"
+                    <div
+                        className="echarts"
                         style={{width: '49%'}}
                     >
                         <p>在线统计</p>
-                        <div id="onlineMain"
+                        <div
+                            ref="onlineMain"
                             style={{width: '97%',
-                            height: 320}}
+                                 height: 320}}
                         >  </div>
-                        <div className="tips"
+                        <div
+                            className="tips"
                             style={this.state.timeData && this.state.timeData.length > 0 ? hide : show}
                         >
                             暂时没有数据
                         </div>
                     </div>
-                    <div className="echarts"
+                    <div
+                        className="echarts"
                         style={{width: '49%'}}
                     >
                         <p>故障统计</p>
                         <div id="">
-                            <Tabs onChange={callback}
+                            <Tabs
+                                onChange={callback}
                                 type="card"
                             >
-                                <TabPane tab="前10的网关"
+                                <TabPane
+                                    tab="前10的网关"
                                     key="1"
                                 >
                                     <Table
@@ -368,7 +376,8 @@ class Home extends PureComponent {
                                         locale={{emptyText: '恭喜你,今天沒有发生故障'}}
                                     />
                                 </TabPane>
-                                <TabPane tab="一周内故障最多"
+                                <TabPane
+                                    tab="一周内故障最多"
                                     key="2"
                                 >
                                     <Table
@@ -385,27 +394,33 @@ class Home extends PureComponent {
                             </Tabs>
                         </div>
                     </div>
-                    <div className="echarts"
+                    <div
+                        className="echarts"
                         style={{width: '49%'}}
                     >
                         <p>网关型号统计</p>
-                        <div id="gatesMain"
+                        <div
+                            ref="gatesMain"
                             style={{width: '97%', height: 350}}
                         >  </div>
-                        <div className="tips"
+                        <div
+                            className="tips"
                             style={this.state.pieData !== undefined ? hide : show}
                         >
                             暂时没有数据
                         </div>
                     </div>
-                    <div className="echarts"
+                    <div
+                        className="echarts"
                         style={{width: '49%'}}
                     >
                         <p>故障类型统计</p>
-                        <div id="faultTypeMain"
+                        <div
+                            ref="faultTypeMain"
                             style={{width: '97%', height: 350}}
                         >  </div>
-                        <div className="tips"
+                        <div
+                            className="tips"
                             style={this.state.barData && this.state.barData.length > 0 ? hide : show}
                         >
                             暂时没有数据
