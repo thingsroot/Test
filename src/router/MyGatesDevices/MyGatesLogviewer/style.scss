@@ -28,14 +28,8 @@
             padding: 10px;
         }
     }
-}
-.searwrap{
-    position: absolute;
-    right:0;
-    top:0;
-    display: flex;
-    width: 300px;
-}
+
+
 .tableHeaders{
     display: flex;
     width: 100%;
@@ -79,3 +73,11 @@
     width: 100%;
     text-align: center;
   }
+}
+.searwrap{
+    position: absolute;
+    right:0;
+    top:0;
+    display: flex;
+    width: 300px;
+}

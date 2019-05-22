@@ -1,7 +1,9 @@
 import appStore from './appStore';
 import codeStore from './codeStore';
+import messageStore from './messageStore';
 const store = {
     appStore,
-    codeStore
+    codeStore,
+    messageStore
 };
 export default store

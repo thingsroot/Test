@@ -15,7 +15,10 @@ const VPN  = LoadableComponent(()=>import('./VPN'));
 const Vserial = LoadableComponent(()=>import('./Vserial'));
 const GatewayRecord = LoadableComponent(()=>import('./GatewayRecord'));
 const Logviewer = LoadableComponent(()=>import('./MyGatesLogviewer'));
+const Comm = LoadableComponent(()=>import('./MyGatesComm'));
 const Appconfig = LoadableComponent(()=>import('../AppsInstall/AppConfig'));
+const Platformevent = LoadableComponent(()=>import('../PlatformMessage'));
+const Devicesevent = LoadableComponent(()=>import('../DeviceMessage'));
 @withRouter
 @inject('store')
 @observer
@@ -158,6 +161,18 @@ class MyGatesDevices extends Component {
                       <PrivateRoute path={`${path}/logviewer`}
                           component={Logviewer}
                           title="我的网关·日志"
+                      />
+                      <PrivateRoute path={`${path}/message`}
+                          component={Comm}
+                          title="我的网关·报文"
+                      />
+                      <PrivateRoute path={`${path}/platformevent`}
+                          component={Platformevent}
+                          title="我的网关·平台事件"
+                      />
+                      <PrivateRoute path={`${path}/devicesevent`}
+                          component={Devicesevent}
+                          title="我的网关·设备事件"
                       />
                       <PrivateRoute path="/mygatesdevices/appconfig"
                           component={Appconfig}

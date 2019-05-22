@@ -26,12 +26,12 @@ class MyGatesLogviewer extends Component {
     }
     componentDidMount (){
         this.t1 = setInterval(()=>this.tick(), 59000);
-        // this.refs.content.scrollAround(this.props.store.appStore.data.length)
-        this.props.store.appStore.isleave = false;
-        this.props.store.appStore.lognum = 0;
-        // this.props.store.appStore.tire = this.props.store.appStore.data;
-        // this.props.store.appStore.data = [];
-        // this.props.store.appStore.data = this.props.store.appStore.tire.concat(this.props.store.appStore.data)
+        // this.refs.content.scrollAround(this.props.store.messageStore.data.length)
+        this.props.store.messageStore.messageisleave = false;
+        this.props.store.messageStore.commnum = 0;
+        // this.props.store.messageStore.tire = this.props.store.messageStore.data;
+        // this.props.store.messageStore.data = [];
+        // this.props.store.messageStore.data = this.props.store.messageStore.tire.concat(this.props.store.messageStore.data)
         console.log(this.props)
         const pathname = this.props.location.pathname.toLowerCase();
         if (pathname.indexOf('message') !== -1){
@@ -45,108 +45,111 @@ class MyGatesLogviewer extends Component {
                 type: '/log'
             })
         }
-        if (this.props.match.params.sn !== this.props.store.appStore.mqttSN && this.props.store.appStore.mqttSN !== ''){
-            this.props.store.appStore.client.end();
-            this.props.store.appStore.flag =  true;
-            this.props.store.appStore.data =  [];
-            this.props.store.appStore.connected =  false;
-            this.props.store.appStore.client = null;
+        if (this.props.match.params.sn !== this.props.store.messageStore.mqttSN && this.props.store.messageStore.mqttSN !== ''){
+            this.props.store.messageStore.client.end();
+            this.props.store.messageStore.flag =  true;
+            this.props.store.messageStore.data =  [];
+            this.props.store.messageStore.connected =  false;
+            this.props.store.messageStore.client = null;
             clearInterval(this.t1)
         }
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
         if (nextProps.location.pathname !== this.props.location.pathname){
-            if (this.props.store.appStore.client) {
-                this.props.store.appStore.client.end();
-                this.props.store.appStore.flag =  true;
-                this.props.store.appStore.data =  [];
-                this.props.store.appStore.connected =  false;
-                this.props.store.appStore.client = null;
+            if (this.props.store.messageStore.client) {
+                this.props.store.messageStore.client.end();
+                this.props.store.messageStore.flag =  true;
+                this.props.store.messageStore.data =  [];
+                this.props.store.messageStore.connected =  false;
+                this.props.store.messageStore.client = null;
                 clearInterval(this.t1)
             }
         }
     }
     componentDidUpdate () {
-        if (data_len !== this.props.store.appStore.data.length) {
-            data_len = this.props.store.appStore.data.length;
-            // this.refs.content.props.initialIndex = this.props.store.appStore.scrolltop;
+        if (data_len !== this.props.store.messageStore.data.length) {
+            data_len = this.props.store.messageStore.data.length;
+            // this.refs.content.props.initialIndex = this.props.store.messageStore.scrolltop;
             // console.log(this.refs.content)
-            // console.log(this.props.store.appStore.scrolltop)
-            // this.refs.content.initialIndex(this.props.store.appStore.scrolltop)
+            // console.log(this.props.store.messageStore.scrolltop)
+            // this.refs.content.initialIndex(this.props.store.messageStore.scrolltop)
             // const box_height = this.refs.content.items.firstChild.clientHeight;
-            // this.refs.content.scrollTo(this.props.store.appStore.scrolltop + box_height)
-            // console.log(this.props.store.appStore.scrolltop, box_height)
-            // document.getElementById('tbody').scrollTop = box_height - this.props.store.appStore.scrolltop;
-            // if (this.props.store.appStore.scrolltop !== 0){
-            //     document.getElementById('tbody').scrollTop = box_height + this.props.store.appStore.scrolltop;
+            // this.refs.content.scrollTo(this.props.store.messageStore.scrolltop + box_height)
+            // console.log(this.props.store.messageStore.scrolltop, box_height)
+            // document.getElementById('tbody').scrollTop = box_height - this.props.store.messageStore.scrolltop;
+            // if (this.props.store.messageStore.scrolltop !== 0){
+            //     document.getElementById('tbody').scrollTop = box_height + this.props.store.messageStore.scrolltop;
             // }
         }
     }
     componentWillUnmount (){
         clearInterval(this.t1)
-        this.props.store.appStore.isleave = true;
+        this.props.store.messageStore.messageisleave = true;
     }
     tick (){
             const data = {
                 duration: 60,
                 name: this.props.match.params.sn,
-                id: `sys_enable_log/${this.props.match.params.sn}/${new Date() * 1}`
+                id: `sys_enable_comm/${this.props.match.params.sn}/${new Date() * 1}`
             }
-            http.postToken('/api/gateways_enable_log', data)
+            http.postToken('/api/gateways_enable_comm', data)
     }
     handleChange = (value)=> {
-        this.props.store.appStore.searchtype =  value.key
+        this.props.store.messageStore.searchtype =  value.key
       }
     filter = (valu)=>{
         const value = valu.toLowerCase();
         if (value) {
-            this.props.store.appStore.value = value;
-            this.props.store.appStore.data = this.props.store.appStore.newdata.filter(item=>item[this.props.store.appStore.searchtype].toLowerCase().indexOf(value) !== -1)
+            this.props.store.messageStore.value = value;
+            this.props.store.messageStore.data = this.props.store.messageStore.newdata.filter(item=>item[this.props.store.messageStore.searchtype].toLowerCase().indexOf(value) !== -1)
         } else {
-            this.props.store.appStore.value = '';
-            this.props.store.appStore.data = this.props.store.appStore.newdata;
+            this.props.store.messageStore.value = '';
+            this.props.store.messageStore.data = this.props.store.messageStore.newdata;
         }
     }
     closeEnableLog =()=>{
         const data = {
             duration: 0,
             name: this.props.match.params.sn,
-            id: `sys_enable_log/${this.props.match.params.sn}/${new Date() * 1}`
+            id: `sys_enable_comm/${this.props.match.params.sn}/${new Date() * 1}`
         }
-        http.postToken('/api/gateways_enable_log', data)
+        http.postToken('/api/gateways_enable_comm', data)
     }
     onClose = ()=>{
         this.setState({maxNum: false})
     }
     render () {
-        const { data } = this.props.store.appStore;
+        const  data  = this.props.store.messageStore.messagedata;
         return (
-            <div style={{position: 'relative'}}>
+            <div
+                style={{position: 'relative'}}
+                className="messagewrap"
+            >
                     {
-                        this.props.store.appStore.flag
+                        this.props.store.messageStore.messageflag
                         ? <Button
                             onClick={()=>{
                                 this.tick()
                                 this.t1;
-                                this.props.store.appStore.connect(this.props.match.params.sn, this.state.type)
+                                this.props.store.messageStore.connect(this.props.match.params.sn, this.state.type)
                             }}
                           >订阅{this.state.title}</Button>
                     : <Button
                         onClick={()=>{
                                 this.closeEnableLog()
                                 clearInterval(this.t1)
-                                this.props.store.appStore.flag = true;
-                                this.props.store.appStore.client.end()
-                                this.props.store.appStore.connected = false;
+                                this.props.store.messageStore.messageflag = true;
+                                this.props.store.messageStore.client.end()
+                                this.props.store.messageStore.connected = false;
                                 // this.refs.content.innerHTML = '';
                         }}
                       >取消订阅</Button>
                     }
                     <Button
                         onClick={()=>{
-                            this.props.store.appStore.newdata = [];
-                            this.props.store.appStore.arr = [];
-                            this.props.store.appStore.data = [];
+                            this.props.store.messageStore.messagedata = [];
+                            this.props.store.messageStore.arr = [];
+                            // this.props.store.messageStore.data = [];
                         }}
                     >清除</Button>
                     <div className="searwrap">
@@ -166,7 +169,7 @@ class MyGatesLogviewer extends Component {
                             enterButton
                         />
                     </div>
-                    <div>当前日志数量：{data.length}</div>
+                    <div>当前报文数量：{data.length}</div>
                 {
                     this.state.maxNum
                     ? <Alert
@@ -180,21 +183,20 @@ class MyGatesLogviewer extends Component {
                 }
                 <div
                     ref="table"
-                    className="logview"
                 >
                     <div style={{width: '100%'}}>
                         <div className="tableHeaders">
                             <div>时间</div>
-                            <div>类型</div>
-                            <div>实例ID</div>
-                            <div>内容</div>
+                            <div>设备ID</div>
+                            <div>方向</div>
+                            <div>报文</div>
                         </div>
                             <div
                                 className="tableContent"
                                 id="tbody"
                             >
                                 <div
-                                    style={{height: 600, overflowY: 'auto'}}
+                                    style={{height: 600, overflowY: 'auto', width: '100%'}}
                                 >
                                     <ReactList
                                         pageSize={1}
@@ -206,8 +208,8 @@ class MyGatesLogviewer extends Component {
                                             return (<div key={key}>
                                                 <div className="tableHeaders">
                                                     <div>{data[key].time}</div>
-                                                    <div>{data[key].type}</div>
                                                     <div>{data[key].id}</div>
+                                                    <div>{data[key].direction}</div>
                                                     <div>{data[key].content}</div>
                                                 </div>
                                             </div>)

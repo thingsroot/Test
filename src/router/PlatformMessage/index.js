@@ -29,6 +29,7 @@ class PlatformMessage extends Component {
         dataSource: [],
         selectValue: 'title',
         text: '',
+        isgateway: false,
         platform: [],
         loading: false,
         selectedRowKeys: [],
@@ -86,6 +87,16 @@ class PlatformMessage extends Component {
                 creation: ['>', time]
             }
         };
+        if (this.props.match.params.sn) {
+            this.setState({
+                isgateway: true
+                // selectValue: 'device'
+            }, ()=>{
+                params.filters.device = this.props.match.params.sn
+                // this.tick(this.props.match.params.sn)
+            })
+        }
+        console.log(this.props.match.params.sn)
         this.setState({
             category: params.category,
             name: params.name,
@@ -96,7 +107,22 @@ class PlatformMessage extends Component {
             this.getMessageList(params);
         });
     }
+    UNSAFE_componentWillReceiveProps (nextProps){
+        if (nextProps.match.params.sn !== this.props.match.params.sn){
+            this.setState({
+                filters: {...this.state.filters, device: nextProps.match.params.sn + ''}
+            }, ()=>{
+                this.getMessageList({
+                    category: this.state.category,
+                    name: this.state.name,
+                    start: this.state.start,
+                    length: this.state.length,
+                    filters: this.state.filters
+                })
+            })
+        }
 
+    }
     onChange = (pagination, filters, sorter)=>{
         console.log('params', pagination, filters, sorter)
     };
@@ -183,6 +209,7 @@ class PlatformMessage extends Component {
     };
     //获取消息列表
     getMessageList = (params)=>{
+        console.log(params)
         this.setState({
             loading: true,
             unconfirmed: 0
@@ -419,6 +446,7 @@ class PlatformMessage extends Component {
     };
     //搜索框改变值
     getSelect = (text)=>{
+        console.log(text)
         this.setState({
             selectValue: text
         }, ()=>{
@@ -546,7 +574,7 @@ class PlatformMessage extends Component {
     };
     render () {
         let { selectedRowKeys, columns, category, flag,
-            unconfirmed, messageCount } = this.state;
+            unconfirmed, messageCount, isgateway } = this.state;
         const { platformData } = this.props.store.codeStore;
         const rowSelection = {
             selectedRowKeys,
@@ -554,7 +582,9 @@ class PlatformMessage extends Component {
         };
         return (
             <div className="platformMessage">
-                <div className="searchBox flex">
+                {
+                    !isgateway
+                    ? <div className="searchBox flex">
                     <div style={{minWidth: 250}}>
                         <Button onClick={()=>{
                             this.confMessage(selectedRowKeys)
@@ -626,6 +656,8 @@ class PlatformMessage extends Component {
                     </div>
 
                 </div>
+                : ''
+                }
                 <Table
                     rowSelection={rowSelection}
                     columns={columns}
@@ -645,12 +677,12 @@ class PlatformMessage extends Component {
                     footer={() => {
                         return (
                             <div className="none">
-                                {'全部消息' + messageCount + '条，列表中为确认消息' + unconfirmed + '条，'}
+                                {!isgateway ? '全部消息' + messageCount + '条，列表中为确认消息' + unconfirmed + '条，' : ''}
                                 <span
                                     onClick={this.toggleMessage}
                                     style={{color: 'blue', cursor: 'pointer'}}
                                 >
-                                    {flag ? '查看所有' : '查看未确认'}
+                                    {!isgateway ? flag ? '查看所有' : '查看未确认' : ''}
                                 </span>
                             </div>
                         )

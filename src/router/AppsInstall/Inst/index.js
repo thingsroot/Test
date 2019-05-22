@@ -49,7 +49,7 @@ class Inst extends React.Component {
                 <p style={{lineHeight: '50px'}}>
                     <span className="spanStyle">实例名：</span>
                     <Input
-                        // disabled={!this.props.store.codeStore.instflag}
+                        disabled={!this.props.store.codeStore.instflag}
                         type="text"
                         style={{width: '300px'}}
                         value={this.props.store.codeStore.instNames}

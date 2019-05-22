@@ -57,6 +57,18 @@ class LeftNav extends Component {
             this.setState({
                 index: 6
             })
+        } else if (pathname.indexOf('/message') !== -1){
+            this.setState({
+                index: 7
+            })
+        } else if (pathname.indexOf('/platformevent') !== -1){
+            this.setState({
+                index: 8
+            })
+        } else if (pathname.indexOf('/devicesevent') !== -1){
+            this.setState({
+                index: 9
+            })
         }
     }
     setIndex (key){
@@ -114,7 +126,37 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 6 ? 'active' : ''}
-                                >{this.props.store.appStore.lognum !== 0 ? <div className="logcount count">{this.props.store.appStore.lognum}</div> : ''}<Icon type="ordered-list"/>&nbsp;&nbsp;日志</li>
+                                >{this.props.store.appStore.lognum !== 0 ? <div className="logcount count">{this.props.store.appStore.lognum}</div> : ''}<Icon type="ordered-list"/>&nbsp;&nbsp;网关日志</li>
+                            </Link>
+                            <Link
+                                to={`${url}/message`}
+                                onClick={()=>{
+                                    this.setState({index: 7})
+                                }}
+                            >
+                                <li
+                                    className={index === 7 ? 'active' : ''}
+                                >{this.props.store.messageStore.commnum !== 0 ? <div className="logcount count">{this.props.store.messageStore.commnum}</div> : ''}<Icon type="select"/>&nbsp;&nbsp;网关报文</li>
+                            </Link>
+                            <Link
+                                to={`${url}/platformevent`}
+                                onClick={()=>{
+                                    this.setState({index: 8})
+                                }}
+                            >
+                                <li
+                                    className={index === 8 ? 'active' : ''}
+                                ><Icon type="desktop"/>&nbsp;&nbsp;平台事件</li>
+                            </Link>
+                            <Link
+                                to={`${url}/devicesevent`}
+                                onClick={()=>{
+                                    this.setState({index: 9})
+                                }}
+                            >
+                                <li
+                                    className={index === 9 ? 'active' : ''}
+                                ><Icon type="message"/>&nbsp;&nbsp;设备事件</li>
                             </Link>
                         </ul>
                 </div>

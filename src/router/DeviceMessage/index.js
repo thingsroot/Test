@@ -31,6 +31,7 @@ class DevicemMessage extends Component {
         dataSource: [],
         selectValue: '',
         text: '',
+        isgateway: false,
         loading: false,
         selectedRowKeys: [],
         columns: [
@@ -92,6 +93,13 @@ class DevicemMessage extends Component {
                 creation: ['>', time]
             }
         };
+        if (this.props.match.params.sn && this.props.match.params.sn !== '1'){
+            this.setState({
+                isgateway: true
+            }, ()=>{
+                params.filters.device = this.props.match.params.sn
+            })
+        }
         this.setState({
             category: params.category,
             name: params.name,
@@ -112,7 +120,22 @@ class DevicemMessage extends Component {
             });
         }
     }
+    UNSAFE_componentWillReceiveProps (nextProps){
+        if (nextProps.match.params.sn !== this.props.match.params.sn){
+            this.setState({
+                filters: {...this.state.filters, device: nextProps.match.params.sn + ''}
+            }, ()=>{
+                this.getMessageList({
+                    category: this.state.category,
+                    name: this.state.name,
+                    start: this.state.start,
+                    length: this.state.length,
+                    filters: this.state.filters
+                })
+            })
+        }
 
+    }
     onSelectChange = (selectedRowKeys) => {
         this.setState({ selectedRowKeys });
     };
@@ -474,14 +497,16 @@ class DevicemMessage extends Component {
 
     render () {
         let { selectedRowKeys, columns, category, flag,
-            messageCount, unconfirmed } = this.state;
+            messageCount, unconfirmed, isgateway } = this.state;
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange
         };
         return (
             <div className="deviceMessage">
-                <div className="searchBox flex">
+                {
+                    !isgateway
+                    ? <div className="searchBox flex">
                     <div style={{minWidth: 280}}>
                         <Button onClick={()=>{
                             this.confMessage(selectedRowKeys)
@@ -563,6 +588,8 @@ class DevicemMessage extends Component {
                         />
                     </div>
                 </div>
+                : ''
+                }
                 <Table
                     rowSelection={rowSelection}
                     columns={columns}
@@ -582,15 +609,17 @@ class DevicemMessage extends Component {
                     rowKey="name"
                     footer={() => {
                         return (
-                            <div className="none">
-                                {'全部消息' + messageCount + '条，列表中未确认消息' + unconfirmed + '条，'}
-                                <span
-                                    style={{color: 'blue', cursor: 'pointer'}}
-                                    onClick={this.toggleMessage}
-                                >
-                                    {flag ? '查看所有' : '查看未确认'}
-                                </span>
-                            </div>
+                            isgateway
+                            ? ''
+                            : <div className="none">
+                            {'全部消息' + messageCount + '条，列表中未确认消息' + unconfirmed + '条，'}
+                            <span
+                                style={{color: 'blue', cursor: 'pointer'}}
+                                onClick={this.toggleMessage}
+                            >
+                                {flag ? '查看所有' : '查看未确认'}
+                            </span>
+                        </div>
                         )
                     }}
                 />
