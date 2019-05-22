@@ -5,11 +5,13 @@ import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
 import './style.scss';
 import ReactList from 'react-list';
+// import App from './action';
 let data_len = 0;
 const Search = Input.Search;
 const Option = Select.Option;
 @withRouter
-@inject('store') @observer
+@inject('store')
+@observer
 class MyGatesLogviewer extends Component {
     state = {
         data: [],
@@ -105,7 +107,6 @@ class MyGatesLogviewer extends Component {
         const { data } = this.props.store.appStore;
         return (
             <div style={{position: 'relative'}}>
-            {/* <App /> */}
                     {
                         this.props.store.appStore.flag
                         ? <Button
@@ -120,17 +121,17 @@ class MyGatesLogviewer extends Component {
                                 this.closeEnableLog()
                                 clearInterval(this.t1)
                                 this.props.store.appStore.flag = true;
-                                this.props.store.appStore.client.unsubscribe(this.props.match.params.sn + '/log')
+                                this.props.store.appStore.client.end()
+                                this.props.store.appStore.connected = false;
+                                // this.refs.content.innerHTML = '';
                         }}
                       >取消订阅</Button>
                     }
                     <Button
                         onClick={()=>{
-                            console.log(this.props.store.appStore.data)
+                            this.props.store.appStore.newdata = [];
+                            this.props.store.appStore.arr = [];
                             this.props.store.appStore.data = [];
-                            this.props.store.appStore.data.length = 0;
-                            console.log(this.props.store.appStore.data)
-
                         }}
                     >清除</Button>
                     <div className="searwrap">
@@ -178,28 +179,25 @@ class MyGatesLogviewer extends Component {
                                 id="tbody"
                             >
                                 <div
-                                    style={{height: 600}}
+                                    style={{height: 600, overflowY: 'auto'}}
                                 >
-                                    {
-                                        data && data.length > 0 &&
-                                        <ReactList
-                                            pageSize={1}
-                                            ref="content"
-                                            axis="y"
-                                            type="variable"
-                                            length={data.length}
-                                            itemRenderer={(key)=>{
-                                                return (<div key={key}>
-                                                    <div className="tableHeaders">
-                                                        <div>{data[key].time}</div>
-                                                        <div>{data[key].type}</div>
-                                                        <div>{data[key].id}</div>
-                                                        <div>{data[key].content}</div>
-                                                    </div>
-                                                </div>)
-                                            }}
-                                        />
-                                    }
+                                    <ReactList
+                                        pageSize={1}
+                                        ref="content"
+                                        axis="y"
+                                        type="simple"
+                                        length={data.length}
+                                        itemRenderer={(key)=>{
+                                            return (<div key={key}>
+                                                <div className="tableHeaders">
+                                                    <div>{data[key].time}</div>
+                                                    <div>{data[key].type}</div>
+                                                    <div>{data[key].id}</div>
+                                                    <div>{data[key].content}</div>
+                                                </div>
+                                            </div>)
+                                        }}
+                                    />
                                 </div>
                             </div>
                     </div>

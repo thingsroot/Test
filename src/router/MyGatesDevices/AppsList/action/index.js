@@ -170,7 +170,7 @@ class Action extends Component {
         }).then(res=>{
           if (res.ok){
             if (res.message){
-              this.props.history.push('/AppEditorCode/' + record.name + '/' + res.message.app_name);
+              this.props.history.push('/AppEditorCode/' + res.message.name + '/' + res.message.app_name);
               this.setState({appdebug: false})
             }
           } else {

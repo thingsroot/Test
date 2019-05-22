@@ -523,6 +523,9 @@ class AppConfig extends Component {
                     >
                         数据错误，请使用JSON格式配置！
                     </div>
+                    {
+                        console.log(config)
+                    }
                     <div style={config && config.length > 0 ? none : block}>
                         <p
                             className="message"
