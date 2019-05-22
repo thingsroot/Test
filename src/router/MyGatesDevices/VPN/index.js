@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Input, Select, Button, Icon, Table, message } from 'antd';
 import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
-import { apply_AccessKey, exec_result } from '../../../utils/Session';
+import { apply_AccessKey } from '../../../utils/Session';
 import './style.scss';
 const Option = Select.Option;
 const columns = [{
@@ -361,7 +361,21 @@ class VPN extends Component {
                                     inst: 'ioe_frpc',
                                     id: `start${this.props.match.params.sn}/ioe_frpc/${new Date() * 1}`
                                 }).then(res=>{
-                                    exec_result(res.data)
+                                    if (res.ok && res.data){
+                                        this.timer = setInterval(() => {
+                                            http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                                              if (result.ok && result.data){
+                                                if (result.data.result){
+                                                  message.success('应用配置成功')
+                                                  clearInterval(this.timer)
+                                                } else {
+                                                  message.error('应用配置失败')
+                                                  clearInterval(this.timer)
+                                                }
+                                              }
+                                            })
+                                          }, 3000);
+                                    }
                                 })
                             }}
                         ><Icon type="sync"/></Button>
