@@ -35,10 +35,9 @@ class MyCode extends Component {
     }
     componentDidMount () {
         this.getContent();
-
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (this.props.showFileName !== nextProps.showFileName || this.props.isChange !== nextProps.isChange){
+        if (this.props.showFileName !== nextProps.showFileName){
             this.getContent();
         }
     }

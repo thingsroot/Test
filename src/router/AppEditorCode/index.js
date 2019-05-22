@@ -31,7 +31,9 @@ class AppEditorCode extends Component {
             isAddFolderShow: false,
             isEditorFileShow: false,
             arr: [],
-            a: 1
+            a: 1,
+            selectedKeys: ['version'],
+            treeNode: {}
         }
     }
     componentDidMount () {
@@ -115,8 +117,77 @@ class AppEditorCode extends Component {
                     newVersion: newVersion,
                     comment: 'v' + newVersion
                 })
-            })
+            });
+        this.setState({
+            a: 1,
+            arr: []
+        }, ()=>{
+            this.getTree('#')
+        });
+
     }
+
+    getTree =  id => new Promise((resolve => {
+        let data = [];
+        http.get('/apis/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + id)
+            .then(res=>{
+                res.map((v)=>{
+                    data.push(v);
+                });
+                resolve(this.format(data, this.state.a))
+            });
+    }));
+
+    format = (list, a)=>{
+        let arr = [];
+        list && list.length > 0 && list.map((v, key)=>{
+            key;
+            console.log(v.id);
+            if (v.children === true){
+                this.getTree(v.id).then(data=>{
+                    let a = {
+                        children: data,
+                        title: v.text,
+                        isLeaf: !v.children,
+                        type: v.type,
+                        key: v.id
+                    };
+                    arr.push(a);
+                })
+            } else {
+                let a = {
+                    title: v.text,
+                    isLeaf: !v.children,
+                    type: v.type,
+                    key: v.id
+                };
+                arr.push(a);
+            }
+        });
+        if (a === 1) {
+            let data = [
+                {
+                    title: this.state.appName,
+                    isLeaf: false,
+                    type: 'folder',
+                    key: this.state.appName,
+                    children: arr
+                }
+            ];
+            console.log(arr);
+            this.setState({
+                arr: data,
+                a: this.state.a + 1
+            }, ()=>{
+                this.props.store.codeStore.setTreeData(this.state.arr);
+            });
+        }
+        this.setState({
+            a: this.state.a + 1
+        });
+
+        return arr;
+    };
 
     //提示弹框
     info = (title, content)=>{
@@ -228,7 +299,7 @@ class AppEditorCode extends Component {
     //添加文件
     addFile = ()=>{
         let myFolder = this.props.store.codeStore.myFolder[0];
-        if (myFolder === this.props.appName) {
+        if (myFolder === this.state.appName) {
             myFolder = '/'
         }
         if (this.props.store.codeStore.addFileName !== '') {
@@ -236,13 +307,18 @@ class AppEditorCode extends Component {
             http.get(url + '?app=' + this.state.app + '&operation=create_node&type=file&id=' +
                 myFolder + '&text=' + this.props.store.codeStore.addFileName)
                 .then(res=>{
-                    res
-                    this.props.store.codeStore.change();
-                    message.success('创建文件成功！');
-                })
-                .catch(err=>{
-                    err;
-                    message.error('创建文件失败！');
+                    let newData = {
+                        children: [],
+                        title: this.props.store.codeStore.addFileName,
+                        isLeaf: false,
+                        type: 'file',
+                        key: res.id
+                    };
+                    let treeNode = this.state.treeNode;
+                    treeNode.node.props.dataRef.children.push(newData);
+                    this.setState({
+                        arr: [...this.state.arr]
+                    })
                 });
             this.addFileHide();
         } else {
@@ -269,6 +345,7 @@ class AppEditorCode extends Component {
     };
 
     //添加文件夹
+
     addFolderShow = ()=>{
         if (this.props.store.codeStore.folderType === 'folder') {
             this.setState({
@@ -290,36 +367,60 @@ class AppEditorCode extends Component {
         let myFolder = this.props.store.codeStore.myFolder[0];
         if (this.props.store.codeStore.addFolderName !== '') {
             let url = '/apis/api/method/app_center.editor.editor';
-            if (myFolder === this.props.appName) {
+            if (myFolder === this.state.appName) {
                 myFolder = '/'
             }
             http.get(url + '?app=' + this.state.app + '&operation=create_node&type=folder&id=' +
                 myFolder + '&text=' + this.props.store.codeStore.addFolderName)
                 .then(res=>{
                     res;
-                    this.props.store.codeStore.change()
+                    let newData = {
+                        children: [],
+                        title: this.props.store.codeStore.addFolderName,
+                        isLeaf: false,
+                        type: 'folder',
+                        key: res.id
+                    };
+                    let treeNode = this.state.treeNode;
+                    treeNode.node.props.dataRef.children.push(newData);
+                    this.setState({
+                        arr: [...this.state.arr]
+                    })
                 });
             message.success('创建文件夹成功');
             this.addFolderHide();
         }
     };
-    //删除文件
+    renderTreeNodes = (data, delData)=>data.map((item, i) => {
+        if (delData !== '0') {
+                //如果循环的节点数据中有跟你传过来要删的数据delData.key相同的 那就将这条数据丛树节点删掉
+                if (item.key === delData.node.props.dataRef.key) {
+                    data.splice(i, 1);
+                    this.setState({
+                        delData: '0'
+                    });
+                }
+            }
+        if (item.children) {
+            this.renderTreeNodes(item.children, this.state.treeNode)
+        }
+        this.setState({
+            treeData: data
+        });
+        return data;
+    });
+
     showConfirm = (content)=>{
         const pro = ()=>{
-            return new Promise((resolve, reject) => {
+            return new Promise(() => {
                 let myFolder = this.props.store.codeStore.myFolder[0];
                 let url = '/apis/api/method/app_center.editor.editor';
                 http.get(url + '?app=' + this.state.app + '&operation=delete_node&type=folder&id=' + myFolder)
                     .then(res=>{
-                        if (res){
-                            resolve(true);
-                        } else {
-                            reject(false);
-                        }
-                        this.props.store.codeStore.change()
+                        res;
+                        this.renderTreeNodes(this.state.arr, this.state.treeNode);
                     });
-            }).catch(() =>{
-            });
+            })
         };
         confirm({
             title: '提示信息',
@@ -348,6 +449,37 @@ class AppEditorCode extends Component {
         }
     };
 
+    showConfirm = (content)=>{
+        const pro = ()=>{
+            return new Promise(() => {
+                let url = '/apis/api/method/app_center.editor.editor';
+                http.postToken(url + '?app=' + this.state.app +
+                    '&operation=set_content&id=' + this.props.store.codeStore.fileName +
+                    '&text=' + this.props.store.codeStore.newEditorContent)
+                    .then(res=>{
+                        res
+                    })
+            })
+        };
+        confirm({
+            title: '提示信息',
+            okText: '确定',
+            cancelText: '取消',
+            content: content,
+            onOk () {
+                pro().then(res=>{
+                    if (res.status === 'OK') {
+                        message.success('保存成功！')
+                    } else {
+                        message.error('保存失败！')
+                    }
+                })
+            },
+            onCancel () {}
+        });
+    };
+
+
     //编辑文件名称
     editorFileShow = ()=>{
         if (this.props.store.codeStore.folderType) {
@@ -375,10 +507,19 @@ class AppEditorCode extends Component {
             http.get(url + '?app=' + this.state.app + '&operation=rename_node&type=folder&id=' +
                 myFolder + '&text=' + this.state.editorFileName)
                 .then(res=>{
-                    console.log(res);
-                    this.props.store.codeStore.change()
-                });
-            message.success('编辑文件成功');
+                    res;
+                    let treeNode = this.state.treeNode;
+                    treeNode.node.props.dataRef.title = this.state.editorFileName;
+                    this.setState({
+                        arr: [...this.state.arr]
+                    });
+                    message.success('编辑文件成功');
+                })
+                .catch(err=>{
+                    err;
+                    message.error('编辑文件失败');
+                })
+
             this.addFolderHide();
         } else {
             message.warning('请输入文件名！')
@@ -386,13 +527,101 @@ class AppEditorCode extends Component {
         this.editorFileHide()
     };
 
+    onSelect = (selectedKeys, info) => {
+        if (selectedKeys.length > 0) {
+            if (info.node.props.dataRef.type === 'file') {
+                if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent){
+                    this.props.store.codeStore.setEditorContent(this.props.store.codeStore.newEditorContent)
+                    this.props.store.codeStore.setShowFileName(selectedKeys);
+                    this.setState({ selectedKeys }, ()=>{
+                        this.props.store.codeStore.setFileName(this.state.selectedKeys);
+                    });
+                    this.props.store.codeStore.setMyFolder(selectedKeys);
+                    this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+                } else {
+                    this.props.store.codeStore.setEditorContent(this.props.store.codeStore.newEditorContent);
+                    //保存提示
+                    const pro = ()=>{
+                        return new Promise(() => {
+                            let myFolder = this.props.store.codeStore.myFolder[0];
+                            let url = '/apis/api/method/app_center.editor.editor';
+                            http.get(url + '?app=' + this.state.app + '&operation=delete_node&type=folder&id=' + myFolder)
+                                .then(res=>{
+                                    res;
+                                    this.renderTreeNodes(this.state.arr, this.state.treeNode);
+                                });
+                        })
+                    };
+                    const cancel = ()=>{
+                        this.props.store.codeStore.setEditorContent(this.props.store.codeStore.newEditorContent)
+                        this.props.store.codeStore.setShowFileName(selectedKeys);
+                        this.setState({ selectedKeys }, ()=>{
+                            this.props.store.codeStore.setFileName(this.state.selectedKeys);
+                        });
+                        this.props.store.codeStore.setMyFolder(selectedKeys);
+                        this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+                    };
+                    confirm({
+                        title: '提示信息',
+                        okText: '确定',
+                        cancelText: '取消',
+                        content: '是否保存当前文件？',
+                        onOk () {
+                            pro().then(res=>{
+                                res;
+                                message.success('保存成功！')
+                            }).catch(req=>{
+                                req;
+                                message.error('保存失败！')
+                            })
+                        },
+                        onCancel () {
+                            cancel()
+                        }
+                    });
+                }
+                if (selectedKeys[0].indexOf('.') !== -1) {
+                    let suffixName = '';
+                    switch (selectedKeys[0].substr(selectedKeys[0].indexOf('.') + 1, selectedKeys[0].length)) {
+                        case 'js' : suffixName = 'javascript'; break;
+                        case 'html' : suffixName = 'html'; break;
+                        case 'java' : suffixName = 'java'; break;
+                        case 'py' : suffixName = 'python'; break;
+                        case 'lua' : suffixName = 'lua'; break;
+                        case 'xml' : suffixName = 'xml'; break;
+                        case 'rb' : suffixName = 'ruby'; break;
+                        case 'scss' : suffixName = 'sass'; break;
+                        case 'less' : suffixName = 'sass'; break;
+                        case 'md' : suffixName = 'markdown'; break;
+                        case 'sql' : suffixName = 'mysql'; break;
+                        case 'json' : suffixName = 'json'; break;
+                        case 'ts' : suffixName = 'typescript'; break;
+                        case 'css' : suffixName = 'css'; break;
+                        default : suffixName = 'java'
+                    }
+                    this.props.store.codeStore.setSuffixName(suffixName);
+
+                } else {
+                    this.props.store.codeStore.setSuffixName('text');
+                }
+            } else if (info.node.props.dataRef.type === 'folder') {
+                this.setState({ selectedKeys }, ()=>{
+                    this.props.store.codeStore.setFileName(this.state.selectedKeys);
+                });
+                this.props.store.codeStore.setMyFolder(selectedKeys);
+                this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+            }
+        }
+    };
+
     render () {
         const {
             fontSize,
-            appName,
             optionData,
             arr,
-            app
+            app,
+            selectedKeys,
+            appName
         } = this.state;
         return (
             <div className="appEditorCode">
@@ -454,10 +683,11 @@ class AppEditorCode extends Component {
                     <div className="tree">
                         <MyTree
                             treeData={arr}
-                            appName={appName}
                             getFileName={this.getFileName}
                             app={app}
-                            isChange={this.props.store.codeStore.isChange}
+                            onSelect={this.onSelect}
+                            selectedKeys={selectedKeys}
+                            appName={appName}
                         />
                     </div>
                     <div className="code">

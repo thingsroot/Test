@@ -169,7 +169,7 @@ class Home extends PureComponent {
                 let data = [];
                 const date = new Date() * 1;
                 for (var i = 0;i < 143;i++){
-                    data.unshift(new Date(date - (i * 90 * 60000)).getHours() + ':' + getMin(i, date));
+                    data.unshift(new Date(date - (i * 14400)).getHours() + ':' + getMin(i, date));
                 }
                 myOnlineChart.setOption({
                     tooltip: {
