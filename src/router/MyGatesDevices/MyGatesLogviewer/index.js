@@ -32,7 +32,6 @@ class MyGatesLogviewer extends Component {
         // this.props.store.appStore.tire = this.props.store.appStore.data;
         // this.props.store.appStore.data = [];
         // this.props.store.appStore.data = this.props.store.appStore.tire.concat(this.props.store.appStore.data)
-        console.log(this.props)
         const pathname = this.props.location.pathname.toLowerCase();
         if (pathname.indexOf('message') !== -1){
             this.setState({

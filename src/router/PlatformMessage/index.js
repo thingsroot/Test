@@ -96,7 +96,6 @@ class PlatformMessage extends Component {
                 // this.tick(this.props.match.params.sn)
             })
         }
-        console.log(this.props.match.params.sn)
         this.setState({
             category: params.category,
             name: params.name,
@@ -194,7 +193,6 @@ class PlatformMessage extends Component {
                     v.disposed = 1;
                 }
             });
-            console.log(platform);
             this.props.store.codeStore.setPlatformData(platform);
             this.props.store.codeStore.setTableData(platform);
             this.setState({
@@ -209,7 +207,6 @@ class PlatformMessage extends Component {
     };
     //获取消息列表
     getMessageList = (params)=>{
-        console.log(params)
         this.setState({
             loading: true,
             unconfirmed: 0
@@ -412,7 +409,6 @@ class PlatformMessage extends Component {
                 filters: this.state.filters,
                 limit: this.state.length
             };
-            console.log(params)
             if (this.state.flag) {
                 this.getUnconfirmed()
             } else {
@@ -446,7 +442,6 @@ class PlatformMessage extends Component {
     };
     //搜索框改变值
     getSelect = (text)=>{
-        console.log(text)
         this.setState({
             selectValue: text
         }, ()=>{
@@ -508,7 +503,6 @@ class PlatformMessage extends Component {
             limit: num,
             filters: this.state.filters
         };
-        console.log(params);
         this.setState({
             length: params.limit
         });
@@ -526,7 +520,6 @@ class PlatformMessage extends Component {
                 limit: this.state.length
             };
             params['filters'] = filters;
-            console.log(params)
             this.setState({
                 filters: params.filters
             });
@@ -569,7 +562,6 @@ class PlatformMessage extends Component {
             limit: this.state.length,
             filters: this.state.filters
         };
-        console.log(params);
         this.getMessageList(params)
     };
     render () {

@@ -8,7 +8,8 @@ const MyIcon = Icon.createFromIconfontCN({
     scriptUrl: '//at.alicdn.com/t/font_1163855_qf16uefhcsb.js'
 })
 @withRouter
-@inject('store') @observer
+@inject('store')
+@observer
 class LeftNav extends Component {
     state = {
         list: [

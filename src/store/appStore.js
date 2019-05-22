@@ -84,12 +84,6 @@ class AppStore {
   @action setData (data){
     this.data = data;
   }
-  isCloses (_this){
-    console.log(_this.props.match.params.sn)
-    setTimeout(() => {
-        console.log(_this.props.match.params.sn)
-    }, 3000);
-  }
   connect (sn){
     this.mqttSN = sn;
     const options = {

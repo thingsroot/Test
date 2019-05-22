@@ -4,7 +4,8 @@ import { withRouter, Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import './style.scss';
 @withRouter
-@inject('store') @observer
+@inject('store')
+@observer
 class Nav extends Component {
     state = {
         visible: false,

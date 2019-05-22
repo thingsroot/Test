@@ -63,7 +63,6 @@ class MyGatesDevices extends Component {
       this.props.store.appStore.setDevlen(res.length);
     })
     http.get('/api/gateway_list?status=online').then(res=>{
-      console.log(res.message)
       this.props.store.appStore.setGatelist(res.message)
   })
   }

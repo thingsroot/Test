@@ -3,7 +3,8 @@ import { withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import './style.scss';
 @withRouter
-@inject('store') @observer
+@inject('store')
+@observer
 class GatesStatus extends Component {
     render () {
         const { vsn } = this.props.match.params;

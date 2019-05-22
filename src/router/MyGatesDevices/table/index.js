@@ -101,7 +101,6 @@ let myFaultTypeChart;
         _: new Date() * 1
       }
       http.get(`/api/gateways_historical_data?sn=${data.sn}&vsn=${data.vsn}&tag=${data.name}&vt=${data.vt}&time_condition=time > now() - 10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
-        console.log(res)
         const { myCharts } = this.refs;
         let data = [];
         const date = new Date() * 1;

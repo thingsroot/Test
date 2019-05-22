@@ -10,8 +10,8 @@ function cancel () {
     message.error('You have canceled the update');
   }
 @withRouter
-@observer
 @inject('store')
+@observer
 class Action extends Component {
     state = {
         visible: false,
@@ -19,15 +19,11 @@ class Action extends Component {
         setName: false,
         appdebug: false
     }
-    componentDidMount (){
-        console.log(this.props)
-    }
     componentWillUnmount (){
       clearInterval(this.t1);
       clearInterval(timer)
     }
     confirm = (record, sn)=>{
-        console.log(this)
        if (!this.props.store.appStore.actionSwi) {
         const data = {
           gateway: sn,
@@ -35,7 +31,6 @@ class Action extends Component {
           id: `app_remove/${sn}/${record.device_name}/${new Date() * 1}`
         }
         http.postToken('/api/gateways_applications_remove', data).then(res=>{
-          console.log(res)
           if (res.data){
             timer = setInterval(() => {
               http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
@@ -56,8 +51,7 @@ class Action extends Component {
         })
        }
       }
-      handleCancel = e => {
-        console.log(e);
+      handleCancel = () => {
         this.setState({
           visible: false
         });
@@ -65,8 +59,6 @@ class Action extends Component {
       showModal = (type) => {
         this.setState({
           [type]: true
-        }, ()=>{
-            console.log(this.state.visible)
         });
       }
       setAutoDisabled (record, props){
@@ -99,7 +91,6 @@ class Action extends Component {
       }
       handleOk = () => {
         const {record} = this.props;
-        console.log(record)
         this.setState({ visible: true });
         const data = {
           gateway: this.props.match.params.sn,
@@ -185,13 +176,11 @@ class Action extends Component {
             this.setState({appdebug: false})
           } else {
             this.sendForkCreate(record)
-            console.log('走你~')
           }
         }
       }
     render () {
         const { actionSwi } = this.props.store.appStore;
-        console.log(this.props.record)
         const { record } = this.props;
         const { loading, visible, setName, nameValue, appdebug } = this.state;
         return (
@@ -315,9 +304,6 @@ class Action extends Component {
                         </Button>
                         ]}
                     >
-                      {
-                        console.log(record)
-                      }
                     <MyGatesAppsUpgrade
                         version={record.version}
                         inst={record.device_name}
@@ -336,9 +322,6 @@ class Action extends Component {
                             this.setState({appdebug: false})
                         }}
                     >
-                      {
-                        console.log(record)
-                      }
                         您不是{record.data && record.data.data.app_name}的应用所有者，如要继续远程调试，会将此应用当前版本克隆一份到您的账户下，而且在代码调试页面编辑的是您克隆的代码，在代码调试页面下载应用会将克隆到你名下的应用覆盖网关中的应用！
                         如要继续，点击"继续"按钮！
                     </Modal>

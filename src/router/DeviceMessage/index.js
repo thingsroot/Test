@@ -83,7 +83,6 @@ class DevicemMessage extends Component {
     };
     componentDidMount (){
         const pathname = this.props.location.pathname.toLowerCase();
-        console.log(pathname)
         let hours = Date.parse(new Date()) - 24 * 60 * 60 * 1000;
         let time = this.timestampToTime(hours);
         let params = {
@@ -427,7 +426,6 @@ class DevicemMessage extends Component {
     };
     //等级筛选
     gradeChange = (value)=>{
-        console.log(value);
         if (value !== '') {
             let filters = this.state.filters;
             filters['event_level'] = value;

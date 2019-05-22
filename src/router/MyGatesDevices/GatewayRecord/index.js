@@ -52,7 +52,6 @@ class GatewayOnlineRecord extends Component {
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        console.log(nextProps)
         if (nextProps.location.pathname !== this.props.location.pathname){
             this.setState({
                 loading: true
@@ -63,7 +62,6 @@ class GatewayOnlineRecord extends Component {
     }
     fetch = (sn, type) => {
         http.get('/api/gateway_online_record?sn=' + sn + '&type=' + type).then(res=>{
-            // console.log(res)
             if (res.ok) {
                 const data = [];
                 res.data && res.data.length > 0 && res.data.map(item=>{
@@ -72,8 +70,6 @@ class GatewayOnlineRecord extends Component {
                         number: item[1]
                     })
                 })
-                console.log(data)
-                console.log('11111111111111')
                 this.setState({
                     [type]: data,
                     loading: false,
@@ -108,7 +104,6 @@ class GatewayOnlineRecord extends Component {
                             rowKey="timer"
                             dataSource={gate_wanip}
                         />
-                        {console.log(gate_wanip)}
                     </TabPane>
                     <TabPane
                         tab="网关重连记录"

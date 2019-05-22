@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import http from '../../utils/Server';
 import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input, Icon, Menu, Dropdown, Select, Tag } from 'antd';
 import './style.scss';
-import { inject } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { Link } from 'react-router-dom';
 import { _getCookie } from '../../utils/Session';
 const Search = Input.Search;
@@ -11,7 +11,6 @@ let timer;
 function getDevicesList (status){
     http.get('/api/gateway_list?status=' + status).then(res=>{
         const data = status + 'data';
-        console.log(res)
         this.setState({
             [status]: res.message,
             loading: false,
@@ -34,6 +33,7 @@ function getDevicesList (status){
 }
 
 @inject('store')
+@observer
 class MyGates extends PureComponent {
     constructor (props){
         super(props)
@@ -170,7 +170,6 @@ class MyGates extends PureComponent {
                                 <span
                                     disabled={record.device_status !== 'ONLINE'}
                                     onClick={()=>{
-                                        console.log(record)
                                         this.setState({
                                             record
                                         }, ()=>{
@@ -251,7 +250,6 @@ class MyGates extends PureComponent {
           const { sn, name, desc, index} = this.state;
           const owner_id = index === 1 ? this.state.role.name : unescape(_getCookie('user_id'));
           const owner_type = index === 1 ? 'Cloud Company Group' : 'User';
-          console.log(index, owner_id, owner_type)
           const data = {
             'name': sn,
             'dev_name': name,
@@ -305,7 +303,6 @@ class MyGates extends PureComponent {
         const value = vale.toLowerCase();
         const name = this.state.status + 'data';
         const data = this.state[name];
-        console.log(data)
         const arr = [];
         data.map(item=>{
             if (item.dev_name.toLowerCase().indexOf(value) !== -1 || item.sn.indexOf(value) !== -1 || item.description && item.description.toLowerCase().indexOf(value) !== -1){
@@ -315,7 +312,6 @@ class MyGates extends PureComponent {
         this.setState({
             [this.state.status]: arr
         })
-        console.log(arr)
       }
     render (){
         let { all, online, offline, confirmLoading } = this.state;

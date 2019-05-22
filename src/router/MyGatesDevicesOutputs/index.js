@@ -1,12 +1,13 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { inject, observer} from 'mobx-react';
 import http from '../../utils/Server';
 import { Table, Button, Modal, Input, message } from 'antd';
 import './style.scss';
 @withRouter
-@inject('store') @observer
-class MyGatesDevicesOutputs extends PureComponent {
+@inject('store')
+@observer
+class MyGatesDevicesOutputs extends Component {
     state = {
         data: [],
         visible: false,
@@ -114,9 +115,9 @@ class MyGatesDevicesOutputs extends PureComponent {
         const { data } = this.state;
         return (
             <div>
-                {/* <GatesStatus /> */}
                 <Table
                     bordered
+                    rowKey="name"
                     columns={this.state.columns}
                     dataSource={data ? data : []}
                 />
