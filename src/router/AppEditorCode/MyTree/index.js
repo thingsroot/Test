@@ -61,8 +61,6 @@ class MyTree extends Component {
         const { selectedKeys, treeData, onSelect } = this.props;
         return (
             <div>
-                {console.log(treeData)}
-                {console.log(treeData.length)}
                 {
                     treeData.length > 0 ? <Tree
                         onExpand={this.onExpand}
