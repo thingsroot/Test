@@ -82,7 +82,7 @@ class DevicemMessage extends Component {
         sync: false
     };
     componentDidMount (){
-        let hours = Date.parse(new Date()) - 24 * 60 * 60 * 1000;
+        let hours = Date.parse(new Date()) - 168 * 60 * 60 * 1000;
         let time = this.timestampToTime(hours);
         let params = {
             category: 'user',
