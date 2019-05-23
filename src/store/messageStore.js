@@ -56,7 +56,6 @@ class messageStore {
                         if(i > 0 && i % 8 == 0)
                             out += "\r\n";*/
     }
-    console.log(out)
     return out;
   }
   base64DecodeChars = new Array(
@@ -75,7 +74,6 @@ class messageStore {
     len = str.length;
     i = 0;
     out = '';
-    console.log(str)
     while (i < len) {
         /* c1 */
         do {
@@ -153,7 +151,6 @@ class messageStore {
             }
             this.connected = true;
             this.client.subscribe(topic, 1)
-            console.log(topic)
         })
         this.client.on('message', (topic, message)=>{
                 const newmessage = JSON.parse(message.toString());
