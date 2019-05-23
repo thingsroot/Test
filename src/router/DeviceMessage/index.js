@@ -83,10 +83,6 @@ class DevicemMessage extends Component {
     };
     componentDidMount (){
         const pathname = this.props.location.pathname.toLowerCase();
-<<<<<<< HEAD
-        console.log(pathname);
-=======
->>>>>>> 1470c093bee17420182184dd6b8fd3a2ef03b9bd
         let hours = Date.parse(new Date()) - 24 * 60 * 60 * 1000;
         let time = this.timestampToTime(hours);
         let params = {
