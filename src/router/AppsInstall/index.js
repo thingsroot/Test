@@ -124,7 +124,7 @@ class MyGatesAppsInstall extends Component {
         this.props.store.codeStore.setInstNames('');
         this.props.store.codeStore.setReadOnly(false);
         let config = [];
-        if (val.conf_template) {
+        if (val.conf_template && val.conf_template[0] === '[') {
             config = JSON.parse(val.conf_template);
         }
         let deviceColumns = [];

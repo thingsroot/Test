@@ -47,7 +47,6 @@ class AppEditorCode extends Component {
         http.get('/apis/api/method/app_center.editor.editor_worksapce_version?app=' + app)
             .then(res=>{
                 let worksapceVersion = res.message;
-                // console.log(worksapceVersion);
                 if (worksapceVersion && worksapceVersion !== 'undefined') {
                     http.get('/apis/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
                         .then(data=>{
@@ -141,8 +140,8 @@ class AppEditorCode extends Component {
     format = (list, a)=>{
         let arr = [];
         list && list.length > 0 && list.map((v, key)=>{
+            console.log(v.icon.substr(v.icon.indexOf('.') + 1, v.icon.length))
             key;
-            console.log(v.id);
             if (v.children === true){
                 this.getTree(v.id).then(data=>{
                     let a = {
@@ -150,7 +149,8 @@ class AppEditorCode extends Component {
                         title: v.text,
                         isLeaf: !v.children,
                         type: v.type,
-                        key: v.id
+                        key: v.id,
+                        icon: v.icon.substr(v.icon.indexOf('.') + 1, v.icon.length)
                     };
                     arr.push(a);
                 })
@@ -159,7 +159,8 @@ class AppEditorCode extends Component {
                     title: v.text,
                     isLeaf: !v.children,
                     type: v.type,
-                    key: v.id
+                    key: v.id,
+                    icon: v.icon.substr(v.icon.indexOf('.') + 1, v.icon.length)
                 };
                 arr.push(a);
             }
@@ -171,10 +172,10 @@ class AppEditorCode extends Component {
                     isLeaf: false,
                     type: 'folder',
                     key: this.state.appName,
-                    children: arr
+                    children: arr,
+                    icon: 'folder'
                 }
             ];
-            console.log(arr);
             this.setState({
                 arr: data,
                 a: this.state.a + 1
@@ -241,7 +242,8 @@ class AppEditorCode extends Component {
                 this.props.store.codeStore.change();
                 message.success(res.message);
             })
-    };//重置版本结束
+    };
+    //重置版本结束
     //保存文件
     saveFile = ()=>{
         if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent) {
@@ -308,11 +310,11 @@ class AppEditorCode extends Component {
                 myFolder + '&text=' + this.props.store.codeStore.addFileName)
                 .then(res=>{
                     let newData = {
-                        children: [],
                         title: this.props.store.codeStore.addFileName,
-                        isLeaf: false,
+                        isLeaf: true,
                         type: 'file',
-                        key: res.id
+                        key: res.id,
+                        icon: 'no'
                     };
                     let treeNode = this.state.treeNode;
                     treeNode.node.props.dataRef.children.push(newData);
@@ -379,9 +381,11 @@ class AppEditorCode extends Component {
                         title: this.props.store.codeStore.addFolderName,
                         isLeaf: false,
                         type: 'folder',
-                        key: res.id
+                        key: res.id,
+                        icon: 'folder'
                     };
                     let treeNode = this.state.treeNode;
+                    console.log(treeNode);
                     treeNode.node.props.dataRef.children.push(newData);
                     this.setState({
                         arr: [...this.state.arr]
@@ -391,21 +395,24 @@ class AppEditorCode extends Component {
             this.addFolderHide();
         }
     };
+    //删除节点
     renderTreeNodes = (data, delData)=>data.map((item, i) => {
         if (delData !== '0') {
-                //如果循环的节点数据中有跟你传过来要删的数据delData.key相同的 那就将这条数据丛树节点删掉
-                if (item.key === delData.node.props.dataRef.key) {
-                    data.splice(i, 1);
-                    this.setState({
-                        delData: '0'
-                    });
-                }
+            //如果循环的节点数据中有跟你传过来要删的数据delData.key相同的 那就将这条数据丛树节点删掉
+            console.log()
+            console.log(delData.node.props.dataRef.key)
+            if (item.key === delData.node.props.dataRef.key) {
+                data.splice(i, 1);
+                this.setState({
+                    delData: '0'
+                });
             }
+        }
         if (item.children) {
             this.renderTreeNodes(item.children, this.state.treeNode)
         }
         this.setState({
-            treeData: data
+            arr: data
         });
         return data;
     });
@@ -448,37 +455,6 @@ class AppEditorCode extends Component {
             message.warning('请选择文件！')
         }
     };
-
-    showConfirm = (content)=>{
-        const pro = ()=>{
-            return new Promise(() => {
-                let url = '/apis/api/method/app_center.editor.editor';
-                http.postToken(url + '?app=' + this.state.app +
-                    '&operation=set_content&id=' + this.props.store.codeStore.fileName +
-                    '&text=' + this.props.store.codeStore.newEditorContent)
-                    .then(res=>{
-                        res
-                    })
-            })
-        };
-        confirm({
-            title: '提示信息',
-            okText: '确定',
-            cancelText: '取消',
-            content: content,
-            onOk () {
-                pro().then(res=>{
-                    if (res.status === 'OK') {
-                        message.success('保存成功！')
-                    } else {
-                        message.error('保存失败！')
-                    }
-                })
-            },
-            onCancel () {}
-        });
-    };
-
 
     //编辑文件名称
     editorFileShow = ()=>{
@@ -527,39 +503,72 @@ class AppEditorCode extends Component {
         this.editorFileHide()
     };
 
+    set = (selectedKeys, info)=>{
+        this.props.store.codeStore.setEditorContent(this.props.store.codeStore.newEditorContent)
+        this.props.store.codeStore.setShowFileName(selectedKeys);
+        this.setState({ selectedKeys }, ()=>{
+            this.props.store.codeStore.setFileName(this.state.selectedKeys);
+        });
+        this.props.store.codeStore.setMyFolder(selectedKeys);
+        this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+        if (selectedKeys[0].indexOf('.') !== -1) {
+            let suffixName = '';
+            switch (selectedKeys[0].substr(selectedKeys[0].indexOf('.') + 1, selectedKeys[0].length)) {
+                case 'js' : suffixName = 'javascript'; break;
+                case 'html' : suffixName = 'html'; break;
+                case 'java' : suffixName = 'java'; break;
+                case 'py' : suffixName = 'python'; break;
+                case 'lua' : suffixName = 'lua'; break;
+                case 'xml' : suffixName = 'xml'; break;
+                case 'rb' : suffixName = 'ruby'; break;
+                case 'scss' : suffixName = 'sass'; break;
+                case 'less' : suffixName = 'sass'; break;
+                case 'md' : suffixName = 'markdown'; break;
+                case 'sql' : suffixName = 'mysql'; break;
+                case 'json' : suffixName = 'json'; break;
+                case 'ts' : suffixName = 'typescript'; break;
+                case 'css' : suffixName = 'css'; break;
+                case '' : suffixName = 'javascript'; break;
+                default : suffixName = 'java'
+            }
+            this.props.store.codeStore.setSuffixName(suffixName);
+
+        } else {
+            this.props.store.codeStore.setSuffixName('text');
+        }
+    }
+
     onSelect = (selectedKeys, info) => {
+        console.log(this.props.store.codeStore.newEditorContent[0]);
+        this.setState({
+            treeNode: info
+        });
         if (selectedKeys.length > 0) {
             if (info.node.props.dataRef.type === 'file') {
                 if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent){
-                    this.props.store.codeStore.setEditorContent(this.props.store.codeStore.newEditorContent)
-                    this.props.store.codeStore.setShowFileName(selectedKeys);
-                    this.setState({ selectedKeys }, ()=>{
-                        this.props.store.codeStore.setFileName(this.state.selectedKeys);
-                    });
-                    this.props.store.codeStore.setMyFolder(selectedKeys);
-                    this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+                    this.set(selectedKeys, info)
                 } else {
-                    this.props.store.codeStore.setEditorContent(this.props.store.codeStore.newEditorContent);
+                    // this.props.store.codeStore.setEditorContent(this.props.store.codeStore.newEditorContent);
                     //保存提示
                     const pro = ()=>{
                         return new Promise(() => {
-                            let myFolder = this.props.store.codeStore.myFolder[0];
+                            console.log(this.props.store.codeStore.newEditorContent[0])
                             let url = '/apis/api/method/app_center.editor.editor';
-                            http.get(url + '?app=' + this.state.app + '&operation=delete_node&type=folder&id=' + myFolder)
+                            let params = {
+                                app: this.state.app,
+                                operation: 'set_content',
+                                id: this.props.store.codeStore.fileName,
+                                text: this.props.store.codeStore.newEditorContent[0]
+                            };
+                            http.postToken(url, params)
                                 .then(res=>{
                                     res;
-                                    this.renderTreeNodes(this.state.arr, this.state.treeNode);
-                                });
+                                    this.set(selectedKeys, info)
+                                })
                         })
                     };
                     const cancel = ()=>{
-                        this.props.store.codeStore.setEditorContent(this.props.store.codeStore.newEditorContent)
-                        this.props.store.codeStore.setShowFileName(selectedKeys);
-                        this.setState({ selectedKeys }, ()=>{
-                            this.props.store.codeStore.setFileName(this.state.selectedKeys);
-                        });
-                        this.props.store.codeStore.setMyFolder(selectedKeys);
-                        this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+                        this.set(selectedKeys, info)
                     };
                     confirm({
                         title: '提示信息',
@@ -579,30 +588,6 @@ class AppEditorCode extends Component {
                             cancel()
                         }
                     });
-                }
-                if (selectedKeys[0].indexOf('.') !== -1) {
-                    let suffixName = '';
-                    switch (selectedKeys[0].substr(selectedKeys[0].indexOf('.') + 1, selectedKeys[0].length)) {
-                        case 'js' : suffixName = 'javascript'; break;
-                        case 'html' : suffixName = 'html'; break;
-                        case 'java' : suffixName = 'java'; break;
-                        case 'py' : suffixName = 'python'; break;
-                        case 'lua' : suffixName = 'lua'; break;
-                        case 'xml' : suffixName = 'xml'; break;
-                        case 'rb' : suffixName = 'ruby'; break;
-                        case 'scss' : suffixName = 'sass'; break;
-                        case 'less' : suffixName = 'sass'; break;
-                        case 'md' : suffixName = 'markdown'; break;
-                        case 'sql' : suffixName = 'mysql'; break;
-                        case 'json' : suffixName = 'json'; break;
-                        case 'ts' : suffixName = 'typescript'; break;
-                        case 'css' : suffixName = 'css'; break;
-                        default : suffixName = 'java'
-                    }
-                    this.props.store.codeStore.setSuffixName(suffixName);
-
-                } else {
-                    this.props.store.codeStore.setSuffixName('text');
                 }
             } else if (info.node.props.dataRef.type === 'folder') {
                 this.setState({ selectedKeys }, ()=>{
@@ -666,10 +651,17 @@ class AppEditorCode extends Component {
                             onClick={this.show}
                         />
                         {/*<Icon*/}
-                            {/*type="undo"*/}
-                            {/*onClick={this.undo}*/}
+                        {/*type="undo"*/}
+                        {/*onClick={this.undo}*/}
                         {/*/>*/}
                         {/*<Icon type="redo" onClick={this.keyPress} />*/}
+                        <Icon
+                            style={{position: 'absolute', right: 60, top: 85}}
+                            type="cloud-upload"
+                            onClick={()=>{
+                                console.log('1')
+                            }}
+                        />
                         <Icon
                             style={{position: 'absolute', right: 30, top: 85}}
                             type="rollback"
@@ -677,6 +669,7 @@ class AppEditorCode extends Component {
                                 this.props.history.go(-1)
                             }}
                         />
+
                     </p>
                 </div>
                 <div className="main">

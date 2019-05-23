@@ -47,17 +47,10 @@ class MyAppDetails extends Component {
     }
 
     getDetails = (app)=>{
-        http.get('/api/gateways_list')
+        http.get('/api/gateway_list?status=online')
             .then(res=>{
-                const online = [];
-                res.message && res.message.length > 0 && res.message.map((v)=>{
-                    if (v.data.device_status === 'ONLINE'){
-                        online.push(v.data)
-                    }
-                });
-                console.log(online[0].sn);
                 this.setState({
-                    onLine: online[0].name
+                    onLine: res.message[0].name
                 })
             });
         http.get('/api/applications_read?app=' + app).then(res=>{
