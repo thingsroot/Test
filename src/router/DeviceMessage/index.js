@@ -24,7 +24,7 @@ class DevicemMessage extends Component {
         category: '',
         user: '',
         start: 0,
-        length: 100,
+        length: 1000,
         filters: {},
         tableData: [],
         deviceData: [],
@@ -98,8 +98,14 @@ class DevicemMessage extends Component {
             this.setState({
                 isgateway: true
             }, ()=>{
-                params.filters.device = this.props.match.params.sn
+                let times = Date.parse(new Date()) - 168 * 60 * 60 * 1000;
+                params.filters.device = this.props.match.params.sn;
+                params.filters.creation = ['>', this.timestampToTime(times)]
             })
+        } else if (this.props.match.params.sn && this.props.match.params.sn !== '1') {
+            let times = Date.parse(new Date()) - this.props.match.params.time * 60 * 60 * 1000;
+            params.filters.device = this.props.match.params.sn;
+            params.filters.creation = ['>', this.timestampToTime(times)]
         }
         this.setState({
             category: params.category,
@@ -545,8 +551,8 @@ class DevicemMessage extends Component {
                             <Option value="99">等级：致命</Option>
                         </Select>
                         <Select
-                            defaultValue="记录数：100"
-                            style={{ width: 130 }}
+                            defaultValue={this.props.match.params.time ? '记录数：1000' : '记录数：100'}
+                            style={{ width: 140 }}
                             onChange={this.messageTotal}
                         >
                             <Option value="100">记录数：100</Option>
@@ -554,7 +560,7 @@ class DevicemMessage extends Component {
                             <Option value="500">记录数：500</Option>
                         </Select>
                         <Select
-                            defaultValue="时间：24小时"
+                            defaultValue={this.props.match.params.time === '168' ? '时间：一周' : '时间：24小时'}
                             style={{ width: 140 }}
                             onChange={this.messageTime}
                         >
@@ -562,6 +568,7 @@ class DevicemMessage extends Component {
                             <Option value="6">时间：6小时</Option>
                             <Option value="24">时间：24小时</Option>
                             <Option value="72">时间：72小时</Option>
+                            <Option value="168">时间：一周</Option>
                         </Select>
                         &nbsp; &nbsp;
                         <InputGroup compact>

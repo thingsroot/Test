@@ -89,7 +89,7 @@ class ContentMain extends PureComponent {
                     title={'平台消息'}
                 />
                 <PrivateRoute
-                    path="/devicemessage/:sn"
+                    path="/devicemessage/:sn/:time"
                     component={DeviceMessage}
                     title={'设备消息'}
                 />
