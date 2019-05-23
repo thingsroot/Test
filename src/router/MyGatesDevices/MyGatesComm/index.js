@@ -53,8 +53,9 @@ class MyGatesLogviewer extends Component {
         if (nextProps.location.pathname !== this.props.location.pathname){
             if (this.props.store.messageStore.client) {
                 this.props.store.messageStore.client.end();
-                this.props.store.messageStore.flag =  true;
+                this.props.store.messageStore.messageflag =  true;
                 this.props.store.messageStore.data =  [];
+                this.props.store.messageStore.messagedata =  [];
                 this.props.store.messageStore.connected =  false;
                 this.props.store.messageStore.client = null;
                 clearInterval(this.t1)
