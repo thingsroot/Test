@@ -116,7 +116,7 @@ class AppStore {
                 }
                 if (!this.isleave) {
                     if (this.data && this.data.length < 1000){
-                      this.arr.unshift(obj)
+                      this.arr.push(obj)
                           if (this.value) {
                               const newarr = this.arr.filter(item=>item[this.searchtype].toLowerCase().indexOf(this.value.toLowerCase()) !== -1);
                               this.data = newarr
@@ -132,7 +132,7 @@ class AppStore {
                   }
                 } else {
                   this.lognum++;
-                  this.arr.unshift(obj)
+                  this.arr.push(obj)
                 }
       })
       } else {

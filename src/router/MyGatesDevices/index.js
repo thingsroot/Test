@@ -109,6 +109,7 @@ class MyGatesDevices extends Component {
                       closable={false}
                       onClose={this.onClose}
                       visible={this.state.visible}
+                      width="400"
                   >
                   <ul>
                     {
@@ -123,7 +124,7 @@ class MyGatesDevices extends Component {
                                 className={status.sn === v.sn ? 'gateslist gateslistactive' : 'gateslist'}
                             >
                               <span></span>
-                              <p>{v.dev_name}</p>
+                              <p>{v.dev_name}(&nbsp;<i>{v.description}</i>&nbsp;)</p>
                             </li>
                         </Link>
                         )

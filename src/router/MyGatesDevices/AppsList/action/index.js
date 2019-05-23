@@ -157,7 +157,7 @@ class Action extends Component {
       sendForkCreate (record){
         http.post('/api/applications_forks_create', {
           name: record.name,
-          version: record.version
+          version: Number(record.version)
         }).then(res=>{
           if (res.ok){
             if (res.message){

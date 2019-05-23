@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Table, Select } from 'antd';
+import { Input, Table, Select, Button, Icon } from 'antd';
 import Status from '../../common/status';
 import axios from 'axios';
 import './style.scss';
@@ -224,6 +224,15 @@ class BrowsingHistory extends Component {
                         />
                     </div>
                     <div className="historyright">
+                        <Button
+                            style={{position: 'absolute', right: 20, top: 5}}
+                            onClick={()=>{
+                              this.props.history.go(-1)
+                            }}
+                        >
+                          后退
+                          <Icon type="rollback"/>
+                        </Button>
                         <div>
                           取值方式：
                             <Select defaultValue="raw"
