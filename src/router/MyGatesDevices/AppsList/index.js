@@ -305,7 +305,7 @@ class AppsList extends Component {
                   <Table
                       rowKey="sn"
                       columns={this.state.columns}
-                      dataSource={this.state.data}
+                      dataSource={this.state.data && this.state.data.length > 1 ? this.state.data : []}
                       pagination={this.state.pagination}
                       loading={loading}
                       onChange={this.handleTableChange}
