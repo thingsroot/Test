@@ -26,13 +26,8 @@ class MyGatesLogviewer extends Component {
     }
     componentDidMount (){
         this.t1 = setInterval(()=>this.tick(), 59000);
-        // this.refs.content.scrollAround(this.props.store.messageStore.data.length)
         this.props.store.messageStore.messageisleave = false;
         this.props.store.messageStore.commnum = 0;
-        // this.props.store.messageStore.tire = this.props.store.messageStore.data;
-        // this.props.store.messageStore.data = [];
-        // this.props.store.messageStore.data = this.props.store.messageStore.tire.concat(this.props.store.messageStore.data)
-        console.log(this.props)
         const pathname = this.props.location.pathname.toLowerCase();
         if (pathname.indexOf('message') !== -1){
             this.setState({
@@ -69,17 +64,6 @@ class MyGatesLogviewer extends Component {
     componentDidUpdate () {
         if (data_len !== this.props.store.messageStore.data.length) {
             data_len = this.props.store.messageStore.data.length;
-            // this.refs.content.props.initialIndex = this.props.store.messageStore.scrolltop;
-            // console.log(this.refs.content)
-            // console.log(this.props.store.messageStore.scrolltop)
-            // this.refs.content.initialIndex(this.props.store.messageStore.scrolltop)
-            // const box_height = this.refs.content.items.firstChild.clientHeight;
-            // this.refs.content.scrollTo(this.props.store.messageStore.scrolltop + box_height)
-            // console.log(this.props.store.messageStore.scrolltop, box_height)
-            // document.getElementById('tbody').scrollTop = box_height - this.props.store.messageStore.scrolltop;
-            // if (this.props.store.messageStore.scrolltop !== 0){
-            //     document.getElementById('tbody').scrollTop = box_height + this.props.store.messageStore.scrolltop;
-            // }
         }
     }
     componentWillUnmount (){

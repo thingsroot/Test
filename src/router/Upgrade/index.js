@@ -1,11 +1,12 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import http from '../../utils/Server';
 import { Icon, Card } from 'antd';
 import './style.scss';
 import { inject, observer } from 'mobx-react';
 let  timer;
-@observer @inject('store')
-class upgrade extends PureComponent {
+@inject('store')
+@observer
+class upgrade extends Component {
     state = {
         newdata: [],
         title: '',

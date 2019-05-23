@@ -204,12 +204,10 @@ class AppConfig extends Component {
 
     submitData = ()=>{
         this.getData();
-        console.log(this.props.store.codeStore.installConfiguration)
         this.props.submitData();
     };
 
     callback = (key)=>{
-        console.log(this.props.store.codeStore.activeKey)
         const { errorCode } = this.props.store.codeStore;
         if (key === '1') {
             this.props.store.codeStore.setActiveKey(key);
@@ -523,9 +521,6 @@ class AppConfig extends Component {
                     >
                         数据错误，请使用JSON格式配置！
                     </div>
-                    {
-                        console.log(config)
-                    }
                     <div style={config && config.length > 0 ? none : block}>
                         <p
                             className="message"

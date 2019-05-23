@@ -144,7 +144,6 @@ class Vserial extends Component {
   if (!this.state.connected){
       client = mqtt.connect('ws://127.0.0.1:7884/mqtt', options)
         client.on('connect', ()=>{
-            console.log('连接成功')
             this.setState({
                 connect_flag: true
             })
@@ -155,10 +154,8 @@ class Vserial extends Component {
         client.on('message', (topic, message)=>{
 
             if (message && message.length > 0){
-                // console.log(JSON.parse(message.toString()))
                 if (this.state.message !== message.toString()){
                     const newMessage = JSON.parse(message.toString());
-                    console.log(newMessage)
                     const data = [{
                         parame: '',
                         status: '已关闭',
@@ -171,8 +168,6 @@ class Vserial extends Component {
                     this.setState({
                         message: newMessage,
                         data: data
-                    }, ()=>{
-                        console.log(this.state.data)
                     })
                 }
             }
@@ -201,16 +196,12 @@ class Vserial extends Component {
 
 }
     changeStatus = (value, name)=>{
-        console.log(value, name)
         this.setState({
             [name]: value
-        }, ()=>{
-            console.log(this.state[name])
         })
     }
     render () {
         const { SerialPort, flag, logFlag, message } = this.state;
-        console.log(message)
         return (
             <div>
                 <div className="wrapper">

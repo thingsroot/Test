@@ -19,7 +19,8 @@ import './style.scss';
 // };
 let timer;
 @withRouter
-@inject('store') @observer
+@inject('store')
+@observer
 class AppsList extends Component {
       constructor (props){
         super(props)
@@ -165,7 +166,6 @@ class AppsList extends Component {
         })
       }
       getConfig = (val)=>{
-        console.log(val)
         this.props.store.codeStore.setActiveKey('1');
         this.props.store.codeStore.setErrorCode(false);
         this.props.store.codeStore.setInstallConfiguration('{}');
@@ -189,7 +189,7 @@ class AppsList extends Component {
                 v.type === 'section' ||
                 v.type === 'table'
             ) {
-                console.log(v.type)
+                return false;
             } else {
                 this.props.store.codeStore.setReadOnly(false);
                 this.props.store.codeStore.setErrorCode(true)
@@ -266,7 +266,6 @@ class AppsList extends Component {
             this.props.store.codeStore.setActiveKey('2')
         }
         this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
-        console.log(this.props.store.codeStore.installConfiguration)
     };
 
     submitData = ()=>{

@@ -59,7 +59,6 @@ class LinkStatus extends Component {
       }
     }
     componentWillUnmount () {
-        console.log('2')
         window.removeEventListener('resize', this.resize, 20)
         clearInterval(this.timer)
         clearInterval(this.timer1)
@@ -251,7 +250,6 @@ class LinkStatus extends Component {
         }
     }
     setAutoDisabled (record, config){
-        console.log(record, config)
         const type = config ? 0 : 1;
         const inst = record === 'beta' ? 'beta' : 'enable';
         const name = record === 'beta' ? 'gateway' : 'name';
