@@ -165,8 +165,21 @@ class Action extends Component {
               this.setState({appdebug: false})
             }
           } else {
-            message.error(res.error)
-            this.setState({appdebug: false})
+            if (res.error && res.error.indexOf('已经克隆过') !== -1){
+              http.get('/api/applications_forks_list?name=' + record.name + '&version=' + record.version).then(result=>{
+                if (result.ok){
+                  if (result.data && result.data.length > 0){
+                    this.props.history.push('/AppEditorCode/' + result.data[0].name + '/' + result.data[0].app_name);
+                    this.setState({appdebug: false})
+                  } else {
+                    this.setState({appdebug: false})
+                  }
+                }
+              })
+            } else {
+              message.error(res.error)
+              this.setState({appdebug: false})
+            }
           }
         })
       }
