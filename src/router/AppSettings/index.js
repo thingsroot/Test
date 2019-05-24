@@ -215,8 +215,8 @@ class AppSettings extends Component {
                                 <Form.Item label="应用ID">
                                     {getFieldDecorator('code_name', {
                                         rules: [{ required: true, message: '不能为空！' }, {
-                                            pattern: /^[a-zA-Z]+$/,
-                                            message: '只能填写字母！'
+                                            pattern: /^[0-9a-zA-Z_]{1,}$/,
+                                            message: '应用ID须包含字母，数字或特殊字符！'
                                         }],
                                         initialValue: settingData.codeName ? settingData.codeName : ''
                                     })(

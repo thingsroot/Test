@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { split as SplitEditor} from 'react-ace';
 import 'brace/mode/java';
-import 'brace/theme/github';
+import 'brace/theme/tomorrow';
 import {inject, observer} from 'mobx-react';
 const style = {
     flexGrow: 1,
@@ -38,7 +38,7 @@ class EditorCode extends Component {
                     <SplitEditor
                         style={{width: '100%'}}
                         mode="java"
-                        theme="github"
+                        theme="tomorrow"
                         splits={2}
                         fontSize={18}
                         orientation="beside"

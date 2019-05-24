@@ -1,22 +1,22 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
-import AceEditor from 'react-ace';
+import { split as SplitEditor} from 'react-ace';
 import http from '../../../utils/Server';
-import 'brace/mode/javascript';
-import 'brace/mode/html';
-import 'brace/mode/java';
-import 'brace/mode/python';
-import 'brace/mode/lua';
-import 'brace/mode/xml';
-import 'brace/mode/ruby';
+import 'brace/mode/javascript';//
+import 'brace/mode/html';//
+import 'brace/mode/java';//
+import 'brace/mode/python';//
+import 'brace/mode/lua';//
+import 'brace/mode/xml';//
+import 'brace/mode/ruby';//
 import 'brace/mode/sass';
-import 'brace/mode/markdown';
+import 'brace/mode/markdown';//
 import 'brace/mode/mysql';
-import 'brace/mode/json';
-import 'brace/mode/css';
+import 'brace/mode/json';//
+import 'brace/mode/css';//
 import 'brace/mode/typescript';
-import 'brace/theme/github';
+import 'brace/theme/tomorrow';//
 @withRouter
 @inject('store')
 @observer
@@ -51,11 +51,9 @@ class MyCode extends Component {
                 })
         }
     };
-    setContent = (newValue)=>{
-        this.props.store.codeStore.setNewEditorContent(newValue);
-    };
+
     onChange = (newValue)=>{
-        this.setContent(newValue)
+        this.props.store.codeStore.setNewEditorContent(newValue);
     };
 
     render () {
@@ -67,15 +65,17 @@ class MyCode extends Component {
                     <span>编辑状态：</span>
                     <span>{this.props.store.codeStore.showFileName}</span>
                 </p>
-                <AceEditor
+                <SplitEditor
                     style={{width: '100%', height: '80vh'}}
                     mode={this.props.store.codeStore.suffixName}
-                    // mode="json"
-                    theme="github"
+                    splits={1}
+                    theme="tomorrow"
                     ref="editor"
                     fontSize={fontSize}
-                    onChange={this.onChange.bind(this)}
-                    value={this.props.store.codeStore.editorContent}
+                    onChange={this.onChange}
+                    value={typeof this.props.store.codeStore.editorContent === 'string'
+                        ? [this.props.store.codeStore.editorContent]
+                        : [JSON.stringify(this.props.store.codeStore.editorContent)]}
                     name="UNIQUE_ID_OF_DIV"
                     editorProps={{$blockScrolling: true}}
                 />

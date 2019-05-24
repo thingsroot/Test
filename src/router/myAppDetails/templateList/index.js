@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import http from '../../../utils/Server';
-import { Button, message, Tabs, Modal, Table } from 'antd';
+import { Button, message, Tabs, Modal, Table, Divider } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import MyTemplateForm from '../myForm';
 import CopyForm from '../CopyForm';
@@ -66,33 +66,31 @@ class TemplateList extends Component {
                     width: '26%',
                     render: (record) => (
                         <span>
-                            <Button
-                                type="primary"
-                            >
-                                <Link
-                                    to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}
-
-                                >查看</Link>
-                            </Button>
-                            &nbsp;&nbsp;
-                            <Button
+                            <Link
+                                className="mybutton"
+                                to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}
+                            >查看</Link>
+                            <Divider type="vertical" />
+                            <a
+                                className="mybutton"
                                 onClick={() => {
                                         this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 2)
                                     }}
-                            >编辑</Button>
-                            &nbsp;&nbsp;
-                            <Button
-                                type="primary"
+                            >编辑</a>
+                            <Divider type="vertical" />
+                            <a
+                                className="mybutton"
                                 onClick={(record) => {
                                         this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 1)
                                     }}
-                            >复制</Button>
-                            &nbsp;&nbsp;
-                            <Button
+                            >复制</a>
+                            <Divider type="vertical" />
+                            <a
+                                className="mybutton"
                                 onClick={(record)=>{
                                     this.getName(record.name)
                                 }}
-                            >删除</Button>
+                            >删除</a>
                         </span>
                     )
                 }
@@ -139,21 +137,17 @@ class TemplateList extends Component {
                     width: '20%',
                     render: (record) => (
                         <span>
-                            <Button
-                                type="primary"
-                            >
-                                <Link
-                                    to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}
-
-                                >查看</Link>
-                            </Button>
-                            &nbsp;&nbsp;
-                            <Button
-                                type="primary"
+                            <Link
+                                className="mybutton"
+                                to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}
+                            >查看</Link>
+                            <Divider type="vertical" />
+                            <a
+                                className="mybutton"
                                 onClick={(record) => {
                                         this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 1)
                                     }}
-                            >复制</Button>
+                            >复制</a>
                         </span>
                     )
                 }
@@ -300,7 +294,6 @@ class TemplateList extends Component {
                         tab="所有"
                         key="2"
                     >
-                        {console.log(templateList)}
                         <Table
                             style={templateList === undefined || templateList.length === 0 ? none : block}
                             columns={columns2}
