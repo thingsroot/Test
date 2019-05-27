@@ -143,9 +143,9 @@ class LinkStatus extends Component {
                 this.setState({
                     config,
                     loading: false,
-                    DATA_UPLOAD_PERIOD_VALUE: config.data_upload_period,
-                    COV_TTL_VALUE: config.data_upload_cov_ttl,
-                    UOLOAD_VALUE: config.event_upload
+                    DATA_UPLOAD_PERIOD_VALUE: this.props.store.appStore.status.data_upload_period,
+                    COV_TTL_VALUE: this.props.store.appStore.status.data_upload_cov_ttl,
+                    UOLOAD_VALUE: this.props.store.appStore.status.event_upload
                 }, ()=>{
                     http.get('/api/applications_versions_list?app=FreeIOE&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                         const arr = [];
@@ -366,20 +366,20 @@ class LinkStatus extends Component {
                             >
                             <p><b>序列号：</b>{status.sn}</p>
                             <p><b>位置：</b> {config.address} </p>
-                            <p><b>名称：</b>{config.dev_name}</p>
-                            <p><b>描述：</b>{config.description}</p>
-                            <p><b>型号：</b>{config.model ? config.model : 'Q102'}</p>
+                            <p><b>名称：</b>{status.dev_name}</p>
+                            <p><b>描述：</b>{status.description}</p>
+                            <p><b>型号：</b>{status.model ? status.model : 'Q102'}</p>
                             </Card>
                             <Card title="| 配置信息"
                                 bordered={false}
                                 style={{ width: '100%' }}
                                 loading={loading}
                             >
-                            <p><b>CPU:</b>{config.cpu}</p>
-                            <p><b>内存:</b>{config.ram}</p>
-                            <p><b>存储:</b>{config.rom}</p>
-                            <p><b>操作系统:</b>{config.os}</p>
-                            <p><b>核心软件:</b>{config.skynet_version}{this.state.skynet_version > config.skynet_version
+                            <p><b>CPU:</b>{status.cpu}</p>
+                            <p><b>内存:</b>{status.ram}</p>
+                            <p><b>存储:</b>{status.rom}</p>
+                            <p><b>操作系统:</b>{status.os}</p>
+                            <p><b>核心软件:</b>{status.skynet_version}{this.state.skynet_version > status.skynet_version
                             ? <Link
                                 to="#"
                                 style={{marginLeft: 200}}
@@ -439,11 +439,12 @@ class LinkStatus extends Component {
                                 调试模式 [*开启后可安装测试版本软件]
                             </span>
                             <Switch
-                                checkedChildren="ON"
+                                checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
                                 checked={status.enable_beta === 1}
                                 onChange={()=>{
-                                    this.setAutoDisabled('beta', status.enable_beta)
+                                    this.setAutoDisabled('beta', status.enable_beta === 1)
+                                    status.enable_beta = status.enable_beta === 1 ? 0 : 1
                                 }}
                             />
                         </div>
@@ -452,7 +453,7 @@ class LinkStatus extends Component {
                                 数据上传 [*开启后设备数据会传到当前平台]
                             </span>
                             <Switch
-                                checkedChildren="ON"
+                                checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
                                 checked={config.data_upload}
                                 onChange={()=>{
@@ -532,7 +533,7 @@ class LinkStatus extends Component {
                                 统计上传 [*开启后统计数据传到当前平台]
                             </span>
                             <Switch
-                                checkedChildren="ON"
+                                checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
                                 checked={status.stat_upload}
                                 onChange={()=>{
@@ -546,7 +547,7 @@ class LinkStatus extends Component {
                                 网络配置
                             </span>
                             <Switch
-                                checkedChildren="ON"
+                                checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
                                 checked={status.Net_Manager}
                                 onChange={()=>{
@@ -560,7 +561,7 @@ class LinkStatus extends Component {
                                 虚拟网络 [*开启后可建立点对点VPN]
                             </span>
                             <Switch
-                                checkedChildren="ON"
+                                checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
                                 checked={status.p2p_vpn}
                                 onChange={()=>{
