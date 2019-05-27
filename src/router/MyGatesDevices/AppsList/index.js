@@ -158,11 +158,19 @@ class AppsList extends Component {
         const pagination = { ...this.state.pagination };
         http.get('/api/gateways_app_list?gateway=' + sn + '&beta=' + this.props.store.appStore.status.enable_beta).then(res=>{
           this.props.store.appStore.setApplen(res.message && res.message.length)
-          this.setState({
-            data: res.message,
-            loading: false,
-            pagination
-          })
+          if (res.ok){
+            this.setState({
+              data: res.message,
+              loading: false,
+              pagination
+            })
+          } else {
+            this.setState({
+              data: [],
+              loading: false,
+              pagination
+            })
+          }
         })
       }
       getConfig = (val)=>{

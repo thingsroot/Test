@@ -67,9 +67,8 @@ class LinkStatus extends Component {
         this.myFaultTypeChart1 && this.myFaultTypeChart1.resize();
         this.myFaultTypeChart2 && this.myFaultTypeChart2.resize();
     }
-    getData (sn){
-
-        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+    getData (){
+        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
             let data = [];
             const date = new Date() * 1;
             for (var i = 0;i < 10;i++){
@@ -101,7 +100,7 @@ class LinkStatus extends Component {
                 window.addEventListener('resize', this.resize, 20);
                 }
         })
-        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
             let data = [];
             const date = new Date() * 1;
             for (var i = 0;i < 10;i++){
@@ -148,7 +147,7 @@ class LinkStatus extends Component {
                     COV_TTL_VALUE: config.data_upload_cov_ttl,
                     UOLOAD_VALUE: config.event_upload
                 }, ()=>{
-                    http.get('/api/applications_versions_list?app=FreeIOE').then(res=>{
+                    http.get('/api/applications_versions_list?app=FreeIOE&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                         const arr = [];
                         res.data && res.data.length > 0 && res.data.map(item=>{
                             if (item.version > this.state.config.version){
@@ -165,7 +164,7 @@ class LinkStatus extends Component {
                             newdata: arr
                         })
                     })
-                    http.get('/api/applications_versions_list?app=openwrt%2Fx86_64_skynet').then(res=>{
+                    http.get('/api/applications_versions_list?app=' + this.state.config.platform + '_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                         const arr = [];
                         res.data && res.data.length > 0 && res.data.map(item=>{
                             if (item.version > this.state.config.skynet_version){
@@ -184,20 +183,18 @@ class LinkStatus extends Component {
                     })
                 })
             })
-        http.get('/api/gateways_beta_read?gateway=' + sn).then(res=>{
-            this.setState({use_beta: res.data.use_beta === 1}, ()=>{
+            this.setState({use_beta: this.state.config.enable_beta}, ()=>{
                 http.get('/api/applications_versions_latest?app=freeioe&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
                         iot_beta: res.data
                     })
                 })
-                http.get('/api/applications_versions_latest?app=openwrt%2Fx86_64_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
+                http.get('/api/applications_versions_latest?app=' + this.state.config.platform + '_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
                         skynet_version: res.data
                     })
                 })
             })
-        })
     }
     setConfig (record, config){
         if (!config) {
@@ -648,26 +645,39 @@ class LinkStatus extends Component {
                                                 : <span>{this.state.iot_beta}</span>
                                             }</p>
                                         </div>
-                                        <div className="Icon"
-                                            style={{marginLeft: 100}}
-                                        >
-                                            <Icon type="setting" />
-                                        </div>
-                                        <div>
-                                            <h3>openwrt x86_64_skynet</h3>
-                                            <p>
-                                                {config.skynet_version < this.state.skynet_version ? <span>{config.skynet_version} -> {this.state.skynet_version}</span> : <span>{this.state.skynet_version}</span>}</p>
-                                            <span>{title === 'FreeIOE' ? config.version === this.state.iot_beta ? '已经是最新版' : '可升级到最新版' : config.skynet_version === this.state.skynet_version ? '已经是最新版' : '可升级到最新版'}</span>
-                                        </div>
+                                        {
+                                            config.skynet_version >= this.state.skynet_version
+                                            ? ''
+                                            : <div style={{display: 'flex'}}>
+                                                    <div className="Icon"
+                                                        style={{marginLeft: 100}}
+                                                    >
+                                                    <Icon type="setting" />
+                                                </div>
+                                                <div>
+                                                    <h3>openwrt x86_64_skynet</h3>
+                                                    <p>
+                                                        {config.skynet_version < this.state.skynet_version ? <span>{config.skynet_version} -> {this.state.skynet_version}</span> : <span>{this.state.skynet_version}</span>}</p>
+                                                    <span>{title === 'FreeIOE' ? config.version === this.state.iot_beta ? '已经是最新版' : '可升级到最新版' : config.skynet_version === this.state.skynet_version ? '已经是最新版' : '可升级到最新版'}</span>
+                                                </div>
+                                              </div>
+                                        }
                                     </div>
                                     {
                                         config.version < this.state.iot_beta || config.skynet_version < this.state.skynet_version
                                         ? <Button
                                             disabled={actionSwi}
                                             onClick={()=>{
-                                                const data = {
+                                                const data = config.skynet_version < this.state.skynet_version
+                                                ? {
                                                     name: this.props.match.params.sn,
                                                     skynet_version: this.state.skynet_version,
+                                                    version: this.state.iot_beta,
+                                                    no_ack: 1,
+                                                    id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
+                                                }
+                                                : {
+                                                    name: this.props.match.params.sn,
                                                     version: this.state.iot_beta,
                                                     no_ack: 1,
                                                     id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
@@ -709,7 +719,11 @@ class LinkStatus extends Component {
                                 }
                             </div>
                             <div style={{width: '50%', padding: 10}}>
-                            <h1>openwrt x86_64_skynet</h1>
+                            {
+                                config.skynet_version < this.state.skynet_version
+                                ? <h1>{this.state.config.platform}_skynet</h1>
+                                : ''
+                            }
                                 {
                                     opendata && opendata.length > 0 && opendata.map((v, i)=>{
                                         return (
