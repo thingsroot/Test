@@ -27,8 +27,8 @@ class Action extends Component {
        if (!this.props.store.appStore.actionSwi) {
         const data = {
           gateway: sn,
-          inst: record.device_name,
-          id: `app_remove/${sn}/${record.device_name}/${new Date() * 1}`
+          inst: record.inst_name,
+          id: `app_remove/${sn}/${record.inst_name}/${new Date() * 1}`
         }
         http.postToken('/api/gateways_applications_remove', data).then(res=>{
           if (res.data){
@@ -66,7 +66,7 @@ class Action extends Component {
         let type = props ? 0 : 1;
         const data = {
           gateway: sn,
-          inst: record.device_name,
+          inst: record.inst_name,
           option: 'auto',
           value: type,
           id: `option/${sn}/${record.sn}/${new Date() * 1}`
@@ -95,7 +95,7 @@ class Action extends Component {
         const data = {
           gateway: this.props.match.params.sn,
           app: record.name,
-          inst: record.device_name,
+          inst: record.inst_name,
           version: record.latestVersion,
           conf: {},
           id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
@@ -128,12 +128,12 @@ class Action extends Component {
         }
           const data = type === 'stop' || type === 'restart' ? {
             gateway: this.props.match.params.sn,
-            inst: this.props.record.device_name,
+            inst: this.props.record.inst_name,
             reason: 'reason',
             id: `gateways/${type}/${this.props.match.params.sn}/${new Date() * 1}`
         } : {
             gateway: this.props.match.params.sn,
-            inst: this.props.record.device_name,
+            inst: this.props.record.inst_name,
             id: `gateways/${type}/${this.props.match.params.sn}/${new Date() * 1}`
         }
         http.post('/api/gateways_applications_' + type, data).then(res=>{
@@ -221,7 +221,7 @@ class Action extends Component {
                           if (this.props.record.data){
                             this.props.store.appStore.apppage = this.props.record.data.data
                             this.props.getconfig(this.props.record.data.data)
-                            this.props.store.codeStore.instNames = this.props.record.device_name
+                            this.props.store.codeStore.instNames = this.props.record.inst_name
                             this.props.store.codeStore.instflag = false;
                           }
                           this.props.store.appStore.toggle = false;
@@ -319,7 +319,7 @@ class Action extends Component {
                     >
                     <MyGatesAppsUpgrade
                         version={record.version}
-                        inst={record.device_name}
+                        inst={record.inst_name}
                         sn={this.props.match.params.sn}
                         app={record.name}
                     />
@@ -345,7 +345,7 @@ class Action extends Component {
                             // this.setState({setName: false})
                             http.post('/api/gateways_applications_rename', {
                                 gateway: this.props.match.params.sn,
-                                inst: record.device_name,
+                                inst: record.inst_name,
                                 new_name: nameValue,
                                 id: `gateway/rename/${nameValue}/${new Date() * 1}`
                             })
@@ -357,7 +357,7 @@ class Action extends Component {
                     >
                         <span>实例名: </span>
                         <Input
-                            defaultValue={record.device_name}
+                            defaultValue={record.inst_name}
                             onChange={(e)=>{
                                 this.setState({nameValue: e.target.value})
                             }}

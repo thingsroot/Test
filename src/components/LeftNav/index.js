@@ -12,6 +12,8 @@ const MyIcon = Icon.createFromIconfontCN({
 @observer
 class LeftNav extends Component {
     state = {
+        lognum: 0,
+        comnum: 0,
         list: [
             {
                 icon: 'profile',
@@ -30,9 +32,9 @@ class LeftNav extends Component {
         index: 0
     }
     componentDidMount (){
-        // http.get('/api/method/iot_ui.iot_api.gate_info?sn=' + this.props.match.params.sn).then(res=>{
-        //     this.props.store.appStore.setStatus(res.message)
-        //   })
+        this.t1 = setInterval(() => {
+            this.getNum()
+        }, 500);
         const pathname = this.props.location.pathname.toLowerCase();
         if (pathname.indexOf('/gateslist') !== -1) {
             this.setState({
@@ -72,10 +74,25 @@ class LeftNav extends Component {
             })
         }
     }
+    componentWillUnmount (){
+        clearInterval(this.t1)
+    }
     setIndex (key){
         this.setState({
             index: key
         })
+    }
+    getNum (){
+        if (this.props.store.messageStore.commnum !== 0){
+            this.setState({
+                comnum: this.props.store.messageStore.commnum
+            })
+        }
+        if (this.props.store.appStore.lognum !== 0 && this.props.store.appStore.lognum !== this.state.lognum) {
+            this.setState({
+                lognum: this.props.store.appStore.lognum
+            })
+        }
     }
     render () {
         const { list, index } = this.state;
@@ -127,7 +144,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 6 ? 'active' : ''}
-                                >{this.props.store.appStore.lognum !== 0 ? <div className="logcount count">{this.props.store.appStore.lognum}</div> : ''}<Icon type="ordered-list"/>&nbsp;&nbsp;网关日志</li>
+                                >{this.state.lognum !== 0 ? <div className="logcount count">{this.state.lognum}</div> : ''}<Icon type="ordered-list"/>&nbsp;&nbsp;网关日志</li>
                             </Link>
                             <Link
                                 to={`${url}/message`}
@@ -137,7 +154,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 7 ? 'active' : ''}
-                                >{this.props.store.messageStore.commnum !== 0 ? <div className="logcount count">{this.props.store.messageStore.commnum}</div> : ''}<Icon type="select"/>&nbsp;&nbsp;网关报文</li>
+                                >{this.state.commnum !== 0 ? <div className="logcount count">{this.state.commnum}</div> : ''}<Icon type="select"/>&nbsp;&nbsp;网关报文</li>
                             </Link>
                             <Link
                                 to={`${url}/platformevent`}

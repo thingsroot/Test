@@ -64,7 +64,8 @@ class LinkStatus extends Component {
         clearInterval(this.timer1)
     }
     resize () {
-            this.myFaultTypeChart1.resize();
+        this.myFaultTypeChart1 && this.myFaultTypeChart1.resize();
+        this.myFaultTypeChart2 && this.myFaultTypeChart2.resize();
     }
     getData (sn){
 
