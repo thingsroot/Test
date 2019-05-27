@@ -387,7 +387,7 @@ class LinkStatus extends Component {
                                     this.setState({update: false, flag: false, title: 'openwrt x86_64_skynet'})
                                 }}
                               >发现新版本></Link> : ''}</p>
-                            <p><b>业务软件:</b>{config.version}{this.state.iot_beta > config.version
+                            <p><b>业务软件:</b>{status.version}{this.state.iot_beta > status.version
                             ? <Link
                                 to="#"
                                 style={{marginLeft: 200}}
@@ -396,10 +396,10 @@ class LinkStatus extends Component {
                                 }}
                               >发现新版本></Link> : ''}</p>
                             {/* <p><b>公网IP:</b>{config.public_ip}</p> */}
-                            <p><b>调试模式:</b>{config.enable_beta === 1 ? '开启' : '关闭'}</p>
-                            <p><b>数据上传:</b>{config.data_upload ? '开启' : '关闭'}</p>
-                            <p><b>统计上传:</b>{config.stat_upload ? '开启' : '关闭'}</p>
-                            <p><b>日志上传:</b>{config.event_upload}</p>
+                            <p><b>调试模式:</b>{status.enable_beta === 1 ? '开启' : '关闭'}</p>
+                            <p><b>数据上传:</b>{status.data_upload ? '开启' : '关闭'}</p>
+                            <p><b>统计上传:</b>{status.stat_upload ? '开启' : '关闭'}</p>
+                            <p><b>日志上传:</b>{status.event_upload}</p>
                             </Card>
                         </div>
                     </div>
