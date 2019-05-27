@@ -189,7 +189,7 @@ class LinkStatus extends Component {
                         iot_beta: res.data
                     })
                 })
-                http.get('/api/applications_versions_latest?app=' + this.state.config.platform + '_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
+                http.get('/api/applications_versions_latest?app=' + this.props.store.appStore.status.platform + '_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
                         skynet_version: res.data
                     })
