@@ -63,7 +63,7 @@ class AppsList extends Component {
             }
           }, {
             title: '实例名',
-            dataIndex: 'device_name',
+            dataIndex: 'inst_name',
             sorter: true,
             //render: name => `${name} ${name}`,
             width: '20%',
@@ -305,7 +305,7 @@ class AppsList extends Component {
                   <Table
                       rowKey="sn"
                       columns={this.state.columns}
-                      dataSource={this.state.data && this.state.data.length > 1 ? this.state.data : []}
+                      dataSource={this.state.data && this.state.data.length > 0 ? this.state.data : []}
                       pagination={this.state.pagination}
                       loading={loading}
                       onChange={this.handleTableChange}
