@@ -59,6 +59,7 @@ class MyGatesLogviewer extends Component {
                 this.props.store.messageStore.connected =  false;
                 this.props.store.messageStore.client = null;
                 clearInterval(this.t1)
+                this.tick('0')
             }
         }
     }
@@ -69,11 +70,12 @@ class MyGatesLogviewer extends Component {
     }
     componentWillUnmount (){
         clearInterval(this.t1)
+        this.tick(180)
         this.props.store.messageStore.messageisleave = true;
     }
-    tick (){
+    tick (time){
             const data = {
-                duration: 60,
+                duration: time || 60,
                 name: this.props.match.params.sn,
                 id: `sys_enable_comm/${this.props.match.params.sn}/${new Date() * 1}`
             }
