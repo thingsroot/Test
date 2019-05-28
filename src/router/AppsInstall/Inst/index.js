@@ -9,8 +9,19 @@ import http from '../../../utils/Server';
 class Inst extends React.Component {
     componentDidMount (){
         const pathname = this.props.location.pathname.toLowerCase();
-        if (pathname.indexOf('/appsinstall') !== -1){
+        if (pathname.indexOf('/appsinstall') === -1){
           this.props.store.codeStore.instflag = true;
+        } else {
+            this.props.store.codeStore.instflag = false;
+        }
+        console.log(pathname.indexOf('/appsinstall'))
+    }
+    UNSAFE_componentWillReceiveProps (nextProps){
+        const pathname = nextProps.location.pathname.toLowerCase();
+        if (pathname.indexOf('/appsinstall') === -1){
+          this.props.store.codeStore.instflag = true;
+        } else {
+            this.props.store.codeStore.instflag = false;
         }
     }
     instBlur = ()=>{
@@ -56,7 +67,7 @@ class Inst extends React.Component {
                 <p style={{lineHeight: '50px'}}>
                     <span className="spanStyle">实例名：</span>
                     <Input
-                        disabled={!this.props.store.codeStore.instflag}
+                        disabled={this.props.store.codeStore.instflag}
                         type="text"
                         style={{width: '300px'}}
                         value={this.props.store.codeStore.instNames}
