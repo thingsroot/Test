@@ -14,7 +14,6 @@ class Inst extends React.Component {
         } else {
             this.props.store.codeStore.instflag = false;
         }
-        console.log(pathname.indexOf('/appsinstall'))
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         const pathname = nextProps.location.pathname.toLowerCase();
