@@ -1,11 +1,18 @@
 import React from 'react';
 import {inject, observer} from 'mobx-react';
 import {Input} from 'antd';
+import {withRouter} from 'react-router-dom'
 import http from '../../../utils/Server';
-
+@withRouter
 @inject('store')
 @observer
 class Inst extends React.Component {
+    componentDidMount (){
+        const pathname = this.props.location.pathname.toLowerCase();
+        if (pathname.indexOf('/appsinstall') !== -1){
+          this.props.store.codeStore.instflag = true;
+        }
+    }
     instBlur = ()=>{
         if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
             this.props.store.codeStore.setErrorMessage('实例名不能为空')

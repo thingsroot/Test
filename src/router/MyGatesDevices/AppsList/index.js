@@ -64,14 +64,8 @@ class AppsList extends Component {
           }, {
             title: '实例名',
             dataIndex: 'inst_name',
-            sorter: true,
-            //render: name => `${name} ${name}`,
-            width: '20%',
-            action: (record)=>{
-              return (
-                <Button>{record}</Button>
-              )
-            }
+            sorter: (a, b) => a.inst_name.length - b.inst_name.length,
+            width: '20%'
           }, {
             title: '版本',
             dataIndex: 'version',
@@ -140,20 +134,20 @@ class AppsList extends Component {
       componentWillUnmount (){
         clearInterval(timer)
       }
-      handleTableChange = (pagination, filters, sorter) => {
-        const pager = { ...this.state.pagination };
-        pager.current = pagination.current;
-        this.setState({
-          pagination: pager
-        });
-        this.fetch({
-          results: pagination.pageSize,
-          page: pagination.current,
-          sortField: sorter.field,
-          sortOrder: sorter.order,
-          ...filters
-        });
-      }
+      // handleTableChange = (pagination, filters) => {
+      //   const pager = { ...this.state.pagination };
+      //   pager.current = pagination.current;
+      //   this.setState({
+      //     pagination: pager
+      //   });
+      //   this.fetch({
+      //     results: pagination.pageSize,
+      //     page: pagination.current,
+      //     // sortField: sorter.field,
+      //     // sortOrder: sorter.order,
+      //     ...filters
+      //   });
+      // }
       fetch = (sn) => {
         const pagination = { ...this.state.pagination };
         http.get('/api/gateways_app_list?gateway=' + sn + '&beta=' + this.props.store.appStore.status.enable_beta).then(res=>{
