@@ -17,7 +17,6 @@ class upgrade extends Component {
     componentDidMount (){
         http.get('/api/applications_versions_list?app=' + this.props.app + '&beta=' + this.props.store.appStore.status.enable_beta).then(res=>{
             const data = []
-            console.log(res)
             if (res.data[0].version >= this.props.version){
                 res.data.map(item=>{
                     if (item.version > this.props.version) {
@@ -66,12 +65,12 @@ class upgrade extends Component {
                                         <Card
                                             title={`应用名称：${v.app_name}`}
                                             key={i}
-                                            style={{marginTop: 10}}
+                                            style={{marginTop: 10, lineHeight: '30px'}}
                                             loading={loading}
                                         >
                                             <p>版本号：{v.version}</p>
-                                            <p>更新内容：{v.comment}</p>
                                             <p>更新时间：{v.modified.split('.')[0]}</p>
+                                            <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, <br />) }}></p>
                                         </Card>
                                     )
                                 })
