@@ -88,7 +88,7 @@ class GatesList extends Component {
     }
     getData (sn){
         http.get('/api/gateways_dev_list?gateway=' + sn).then(res=>{
-          let data = [];
+            let data = [];
           if (res.message && res.message.length > 0){
             res.message.map((item=>{
               item.meta.ioc = '' + (item.inputs ? item.inputs.length : '0') + '/' + (item.outputs ? Object.keys(item.outputs).length : '0') + '/' + (item.commands ? item.commands.length : '0');

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import http from '../../utils/Server';
 import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input, Icon, Menu, Dropdown, Select, Tag } from 'antd';
 import './style.scss';
@@ -34,7 +34,7 @@ function getDevicesList (status){
 
 @inject('store')
 @observer
-class MyGates extends PureComponent {
+class MyGates extends Component {
     constructor (props){
         super(props)
         this.getDevicesList = getDevicesList.bind(this);

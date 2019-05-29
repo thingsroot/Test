@@ -45,6 +45,7 @@ class LinkStatus extends Component {
         barData: []
     }
     componentDidMount (){
+        console.log(this.props.store.appStore.status)
       this.getData(this.props.match.params.sn);
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -132,8 +133,10 @@ class LinkStatus extends Component {
                 window.addEventListener('resize', this.resize, 20);
                 }
         })
-        const res = this.props.store.appStore.status;
-        axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
+        http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
+            console.log(res)
+            this.props.store.appStore.setStatus(res)
+            axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
                 let config = res;
                 if (location.data.regeocode){
                     config.address = location.data.regeocode.formatted_address;
@@ -195,6 +198,7 @@ class LinkStatus extends Component {
                     })
                 })
             })
+        })
     }
     setConfig (record, config){
         if (!config) {
