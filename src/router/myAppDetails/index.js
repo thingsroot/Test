@@ -29,8 +29,7 @@ class MyAppDetails extends Component {
         app: '',
         desc: '',
         templateList: [],
-        groupName: '',
-        onLine: []
+        groupName: ''
     };
 
     componentDidMount (){
@@ -47,12 +46,6 @@ class MyAppDetails extends Component {
     }
 
     getDetails = (app)=>{
-        http.get('/api/gateway_list?status=online')
-            .then(res=>{
-                this.setState({
-                    onLine: res.message[0].name
-                })
-            });
         http.get('/api/applications_read?app=' + app).then(res=>{
             this.setState({
                 message: res.data.data.data,
@@ -123,7 +116,7 @@ class MyAppDetails extends Component {
                         </Link>
                         <Link
                             className="button"
-                            to={`/AppsInstall/${this.state.onLine}/${message.name}/2`}
+                            to={`/AppsInstall/${this.props.store.codeStore.firstGateway}/${message.name}/2`}
                         >
                             <Icon type="download" />
                             安装此应用

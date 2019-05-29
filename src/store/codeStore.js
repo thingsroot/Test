@@ -126,6 +126,12 @@ class CodeStore {
 
     @observable suffixName = 'java';
 
+    @observable firstGateway = '';
+
+    @action setFirstGateway (values) {
+        this.firstGateway = values
+    }
+
     @action setUserBeta (values) {
         this.userBeta = values
     }
