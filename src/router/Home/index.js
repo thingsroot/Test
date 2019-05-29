@@ -216,32 +216,47 @@ class Home extends PureComponent {
                         }
                     },
                     legend: {
-                        data: ['系统', '设备', '通讯', '数据']
+                        data: ['系统', '设备', '通讯', '数据', '应用']
                     },
-                    xAxis: {
-                        data: ['Mon Fed 11', 'Mon Fed 13', 'Mon Fed 15', 'Mon Fed 17']
-                    },
+                    xAxis: [{
+                        type: 'category'
+                    }],
                     yAxis: {},
                     series: [{
                         name: '系统',
                         type: 'bar',
                         color: '#37A2DA',
-                        data: data1
+                        data: this.state.barData.map(function (item) {
+                            return [new Date(item.time).toDateString(), item['系统']];
+                        })
                     }, {
                         name: '设备',
                         type: 'bar',
                         color: '#67E0E3',
-                        data: data2
+                        data: this.state.barData.map(function (item) {
+                            return [new Date(item.time).toDateString(), item['设备']];
+                        })
                     }, {
                         name: '通讯',
                         type: 'bar',
                         color: '#FFDB5C',
-                        data: data3
+                        data: this.state.barData.map(function (item) {
+                            return [new Date(item.time).toDateString(), item['通讯']];
+                        })
                     }, {
                         name: '数据',
                         type: 'bar',
                         color: '#FF9F7F',
-                        data: data4
+                        data: this.state.barData.map(function (item) {
+                            return [new Date(item.time).toDateString(), item['数据']];
+                        })
+                    }, {
+                        name: '应用',
+                        type: 'bar',
+                        color: '#FF9F7F',
+                        data: this.state.barData.map(function (item) {
+                            return [new Date(item.time).toDateString(), item['应用']];
+                        })
                     }]
                 });
                 window.addEventListener('resize', this.echarts3);
