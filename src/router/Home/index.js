@@ -196,17 +196,6 @@ class Home extends PureComponent {
             });
             let faultTypeMain = this.refs.faultTypeMain;
             if (this.state.barData && faultTypeMain) {
-                let data1 = [];
-                let data2 = [];
-                let data3 = [];
-                let data4 = [];
-                this.state.barData.map((v) =>{
-                    data1.push(v['系统']);
-                    data2.push(v['设备']);
-                    data3.push(v['通讯']);
-                    data4.push(v['数据']);
-                });
-
                 this.myFaultTypeChart = echarts.init(faultTypeMain);
                 this.myFaultTypeChart.setOption({
                     tooltip: {
@@ -219,7 +208,11 @@ class Home extends PureComponent {
                         data: ['系统', '设备', '通讯', '数据', '应用']
                     },
                     xAxis: [{
-                        type: 'category'
+                        type: 'category',
+                        axisLabel: {
+                            rotate: 30,
+                            interval: 0
+                        }
                     }],
                     yAxis: {},
                     series: [{
@@ -227,35 +220,40 @@ class Home extends PureComponent {
                         type: 'bar',
                         color: '#37A2DA',
                         data: this.state.barData.map(function (item) {
-                            return [new Date(item.time).toDateString(), item['系统']];
+                            return [item.time.substr(0, 10), 2];
+                            // return [item.time.substr(0, 10), item['系统']];
                         })
                     }, {
                         name: '设备',
                         type: 'bar',
                         color: '#67E0E3',
                         data: this.state.barData.map(function (item) {
-                            return [new Date(item.time).toDateString(), item['设备']];
+                            return [item.time.substr(0, 10), 3];
+                            // return [item.time.substr(0, 10), item['设备']];
                         })
                     }, {
                         name: '通讯',
                         type: 'bar',
                         color: '#FFDB5C',
                         data: this.state.barData.map(function (item) {
-                            return [new Date(item.time).toDateString(), item['通讯']];
+                            return [item.time.substr(0, 10), 4];
+                            // return [item.time.substr(0, 10), item['通讯']];
                         })
                     }, {
                         name: '数据',
                         type: 'bar',
                         color: '#FF9F7F',
                         data: this.state.barData.map(function (item) {
-                            return [new Date(item.time).toDateString(), item['数据']];
+                            return [item.time.substr(0, 10), 8];
+                            // return [item.time.substr(0, 10), item['数据']];
                         })
                     }, {
                         name: '应用',
                         type: 'bar',
-                        color: '#FF9F7F',
+                        color: '#07ff31',
                         data: this.state.barData.map(function (item) {
-                            return [new Date(item.time).toDateString(), item['应用']];
+                            return [item.time.substr(0, 10), 1];
+                            // return [item.time.substr(0, 10), item['应用']];
                         })
                     }]
                 });

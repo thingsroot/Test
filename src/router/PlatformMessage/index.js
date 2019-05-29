@@ -669,7 +669,7 @@ class PlatformMessage extends Component {
                     footer={() => {
                         return (
                             <div className="none">
-                                {!isgateway ? '全部消息' + messageCount + '条，列表中为确认消息' + unconfirmed + '条，' : ''}
+                                {!isgateway ? '全部消息' + messageCount + '条，列表中未确认消息' + unconfirmed + '条，' : ''}
                                 <span
                                     onClick={this.toggleMessage}
                                     style={{color: 'blue', cursor: 'pointer'}}

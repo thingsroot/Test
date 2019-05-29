@@ -22,11 +22,11 @@ class MyTree extends Component {
     }
 
     // componentWillReceiveProps (nextProps) {
-        // if (this.props.store.codeStore.showFileName !== nextProps.showFileName) {
-        //     this.setState({
-        //         expandedKeys: [this.props.appName]
-        //     })
-        // }
+    //     if (this.props.store.codeStore.showFileName !== nextProps.showFileName) {
+    //         this.setState({
+    //             expandedKeys: [this.props.appName]
+    //         })
+    //     }
     // }
 
     onExpand = (expandedKeys) => {
@@ -44,7 +44,12 @@ class MyTree extends Component {
 
                 return (
                     <TreeNode
-                        icon={<MyIcon style={{fontSize: 20}} type={'icon-' + item.icon} />}
+                        icon={
+                            <MyIcon
+                                style={{fontSize: 20}}
+                                type={'icon-' + item.icon}
+                            />
+                        }
                         title={item.title}
                         key={item.key}
                         isLeaf={item.isLeaf}
@@ -56,7 +61,12 @@ class MyTree extends Component {
             }
             return (
                 <TreeNode
-                    icon={<MyIcon style={{fontSize: 20}} type={item.icon !== 'file file-' ? 'icon-' + item.icon : 'icon-no'} />}
+                    icon={
+                        <MyIcon
+                            style={{fontSize: 20}}
+                            type={item.icon !== 'file file-' ? 'icon-' + item.icon : 'icon-no'}
+                        />
+                    }
                     title={item.title}
                     key={item.key}
                     isLeaf={item.isLeaf}
@@ -70,15 +80,16 @@ class MyTree extends Component {
         return (
             <div>
                 {
-                    treeData.length > 0 ? <Tree
-                        showIcon
-                        onExpand={this.onExpand}
-                        expandedKeys={this.state.expandedKeys}
-                        onSelect={onSelect}
-                        selectedKeys={selectedKeys}
-                        >
-                        {this.renderTreeNodes(treeData)}
-                    </Tree> : ''
+                    treeData.length > 0
+                        ? <Tree
+                            showIcon
+                            onExpand={this.onExpand}
+                            expandedKeys={this.state.expandedKeys}
+                            onSelect={onSelect}
+                            selectedKeys={selectedKeys}
+                          >
+                            {this.renderTreeNodes(treeData)}
+                          </Tree> : ''
                 }
             </div>
         );

@@ -275,7 +275,6 @@ class TemplateList extends Component {
                         tab="我的"
                         key="1"
                     >
-                        {console.log(myList)}
                         <Table
                             style={myList === undefined || myList.length === 0 ? none : block}
                             columns={columns}

@@ -549,7 +549,7 @@ class DevicemMessage extends Component {
                             <Option value="2">等级：错误</Option>
                             <Option value="3">等级：警告</Option>
                             <Option value="99">等级：致命</Option>
-                        </Select>
+                        </Select>{console.log(this.props.match.params.time)}
                         <Select
                             defaultValue={this.props.match.params.time ? '记录数：1000' : '记录数：100'}
                             style={{ width: 140 }}
