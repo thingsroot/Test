@@ -25,6 +25,7 @@ class MyGatesLogviewer extends Component {
         title: ''
     }
     componentDidMount (){
+        this.props.store.messageStore.cleartime()
         this.t1 = setInterval(()=>this.tick(), 59000);
         this.props.store.messageStore.messageisleave = false;
         this.props.store.messageStore.commnum = 0;
@@ -72,6 +73,7 @@ class MyGatesLogviewer extends Component {
         clearInterval(this.t1)
         this.tick(180)
         this.props.store.messageStore.messageisleave = true;
+        this.props.store.messageStore.countdown();
     }
     tick (time){
             const data = {

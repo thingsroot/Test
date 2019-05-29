@@ -22,6 +22,8 @@ function error (){
 class messageStore {
   @observable commnum = 0;
   @observable data = [];
+  @observable timer = null;
+  @observable timeNum = 0;
   @observable messagedata = [];
   @observable localstor = [];
   @observable  searchflag = true;
@@ -125,6 +127,28 @@ class messageStore {
 
   @action setData (data){
     this.data = data;
+  }
+  cleartime (){
+    if (this.timer){
+      clearInterval(this.timer)
+    }
+    this.timeNum = 0;
+  }
+  countdown (){
+    this.timeNum = 0;
+    this.timer = setInterval(() => {
+      this.timeNum++;
+      if (this.timeNum >= 300){
+        clearInterval(this.timer)
+        this.messageflag = true;
+        this.timer = null;
+        if (this.client){
+          this.client.end()
+          this.client = null;
+          this.connected = false;
+        }
+      }
+    }, 1000);
   }
   connect (sn, type){
     this.mqttSN = sn;

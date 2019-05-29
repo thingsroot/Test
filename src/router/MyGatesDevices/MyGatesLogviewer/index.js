@@ -25,14 +25,10 @@ class MyGatesLogviewer extends Component {
         title: ''
     }
     componentDidMount (){
+        this.props.store.appStore.cleartime()
         this.t1 = setInterval(()=>this.tick(), 59000);
-        // this.refs.content.scrollAround(this.props.store.appStore.data.length)
         this.props.store.appStore.isleave = false;
         this.props.store.appStore.lognum = 0;
-        console.log(this.props.store.appStore.lognum)
-        // this.props.store.appStore.tire = this.props.store.appStore.data;
-        // this.props.store.appStore.data = [];
-        // this.props.store.appStore.data = this.props.store.appStore.tire.concat(this.props.store.appStore.data)
         const pathname = this.props.location.pathname.toLowerCase();
         if (pathname.indexOf('message') !== -1){
             this.setState({
@@ -76,6 +72,7 @@ class MyGatesLogviewer extends Component {
         clearInterval(this.t1)
         this.tick(180)
         this.props.store.appStore.isleave = true;
+        this.props.store.appStore.countdown();
     }
     tick (time){
             const data = {
