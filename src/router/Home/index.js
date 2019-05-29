@@ -112,7 +112,7 @@ class Home extends PureComponent {
     componentDidMount () {
         // http.get()
         //饼状图数据
-        http.get('/apis/api/method/iot_ui.iot_api.device_type_statistics').then(res=>{
+        http.get('/apis/api/method/iot.user_api.device_type_statistics').then(res=>{
             this.setState({
                 pieData: res.message
             });
@@ -142,7 +142,7 @@ class Home extends PureComponent {
             }
         });
         // 在线数据
-        http.get('/apis/api/method/iot_ui.iot_api.device_status_statistics').then(res=>{
+        http.get('/apis/api/method/iot.user_api.device_status_statistics').then(res=>{
             this.setState({
                 timeData: res.message
             });
@@ -190,7 +190,7 @@ class Home extends PureComponent {
             }
         });
         //柱状图数据
-        http.get('/apis/api/method/iot_ui.iot_api.device_event_type_statistics').then(res=>{
+        http.get('/apis/api/method/iot.user_api.device_event_type_statistics').then(res=>{
             this.setState({
                 barData: res.message
             });
@@ -229,35 +229,30 @@ class Home extends PureComponent {
                     series: [{
                         name: '系统',
                         type: 'bar',
-                        color: '#37A2DA',
                         data: this.state.barData.map(function (item) {
                             return [item.time.substr(0, 10), item['系统']];
                         })
                     }, {
                         name: '设备',
                         type: 'bar',
-                        color: '#67E0E3',
                         data: this.state.barData.map(function (item) {
                             return [item.time.substr(0, 10), item['设备']];
                         })
                     }, {
                         name: '通讯',
                         type: 'bar',
-                        color: '#FFDB5C',
                         data: this.state.barData.map(function (item) {
                             return [item.time.substr(0, 10), item['通讯']];
                         })
                     }, {
                         name: '数据',
                         type: 'bar',
-                        color: '#FF9F7F',
                         data: this.state.barData.map(function (item) {
                             return [item.time.substr(0, 10), item['数据']];
                         })
                     }, {
                         name: '应用',
                         type: 'bar',
-                        color: '#FF9F7F',
                         data: this.state.barData.map(function (item) {
                             return [item.time.substr(0, 10), item['应用']];
                         })
@@ -278,7 +273,7 @@ class Home extends PureComponent {
             return s ;
         }
         // 前10网关
-        http.get('/apis/api/method/iot_ui.iot_api.device_event_count_statistics').then(res=>{
+        http.get('/apis/api/method/iot.user_api.device_event_count_statistics').then(res=>{
             if (res.message) {
                 let data = [];
                 let t = getBeforeDate(0);
