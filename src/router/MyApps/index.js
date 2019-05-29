@@ -55,7 +55,11 @@ class MyApps extends Component {
                     backups: res.data
                 })
             }
-        })
+        });
+        http.get('/api/gateway_list?status=online')
+            .then(res=>{
+                this.props.store.codeStore.setFirstGateway(res.message[0].name)
+            });
     }
     tick = (text)=>{
         if (this.timer){
