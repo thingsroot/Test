@@ -70,7 +70,7 @@ class upgrade extends Component {
                                         >
                                             <p>版本号：{v.version}</p>
                                             <p>更新时间：{v.modified.split('.')[0]}</p>
-                                            <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, <br />) }}></p>
+                                            <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, '<br />') }}></p>
                                         </Card>
                                     )
                                 })
