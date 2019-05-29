@@ -291,7 +291,7 @@ class Home extends PureComponent {
 
         });
         //一周内故障最多的网关
-        http.get('/apis/api/method/iot_ui.iot_api.device_event_count_statistics').then(res=>{
+        http.get('/apis/api/method/iot.user_api.device_event_count_statistics').then(res=>{
             if (res.message) {
                 let data = [];
                 let t = getBeforeDate(0);
