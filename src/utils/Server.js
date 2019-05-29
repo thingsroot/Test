@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-import { _getCookie } from './Session';
+import { _getCookie, _setCookie } from './Session';
 // import { _getCookie } from './Session';
 // 创建axios默认请求
 // axios.defaults.baseURL = 'http://iot.symgrid.com';
@@ -20,19 +20,17 @@ axios.interceptors.request.use((config) => {
 // 添加响应拦截器
 axios.interceptors.response.use(
   function (response) {
-    // const cookie  = response.headers.cookie;
-    // console.log(response)
-    // const arr = cookie.split(';');
-    // let obj = {};
-    // console.log(obj)
-    // arr.map(item=>{
-    //   obj[item.split('=')[0].trim()] = item.split('=')[1];
-    // })
-    // if (obj.sid === 'Guest' || obj.sid === ''){
-    //   console.log('sssssss')
-    //   document.cookie = ''
-    //   _setCookie('T&R_auth_token', '')
-    // }
+    const cookie  = response.headers.cookie;
+    console.log(response)
+    const arr = cookie && cookie.length > 0 ? cookie.split(';') : [];
+    let obj = {};
+    arr && arr.length > 0 && arr.map(item=>{
+      obj[item.split('=')[0].trim()] = item.split('=')[1];
+    })
+    if (obj.sid && obj.sid === 'Guest' || response.data.error && response.data.error === 'auth_code_missing'){
+      _setCookie('T&R_auth_token', '')
+      window.location.href = '/'
+    }
     return response;
   },
   function (error) {

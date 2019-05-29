@@ -71,26 +71,29 @@ class TemplateList extends Component {
                                 to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}
                             >查看</Link>
                             <Divider type="vertical" />
-                            <a
+                            <span
+                                style={{color: 'blue', cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={() => {
                                         this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 2)
                                     }}
-                            >编辑</a>
+                            >编辑</span>
                             <Divider type="vertical" />
-                            <a
+                            <span
+                                style={{color: 'blue', cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={(record) => {
                                         this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 1)
                                     }}
-                            >复制</a>
+                            >复制</span>
                             <Divider type="vertical" />
-                            <a
+                            <span
+                                style={{color: 'blue', cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={(record)=>{
                                     this.getName(record.name)
                                 }}
-                            >删除</a>
+                            >删除</span>
                         </span>
                     )
                 }
@@ -142,12 +145,13 @@ class TemplateList extends Component {
                                 to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}
                             >查看</Link>
                             <Divider type="vertical" />
-                            <a
+                            <span
+                                style={{color: 'blue', cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={(record) => {
                                         this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 1)
                                     }}
-                            >复制</a>
+                            >复制</span>
                         </span>
                     )
                 }

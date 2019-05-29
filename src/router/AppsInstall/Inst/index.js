@@ -1,11 +1,28 @@
 import React from 'react';
 import {inject, observer} from 'mobx-react';
 import {Input} from 'antd';
+import {withRouter} from 'react-router-dom'
 import http from '../../../utils/Server';
-
+@withRouter
 @inject('store')
 @observer
 class Inst extends React.Component {
+    componentDidMount (){
+        const pathname = this.props.location.pathname.toLowerCase();
+        if (pathname.indexOf('/appsinstall') === -1){
+          this.props.store.codeStore.instflag = true;
+        } else {
+            this.props.store.codeStore.instflag = false;
+        }
+    }
+    UNSAFE_componentWillReceiveProps (nextProps){
+        const pathname = nextProps.location.pathname.toLowerCase();
+        if (pathname.indexOf('/appsinstall') === -1){
+          this.props.store.codeStore.instflag = true;
+        } else {
+            this.props.store.codeStore.instflag = false;
+        }
+    }
     instBlur = ()=>{
         if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
             this.props.store.codeStore.setErrorMessage('实例名不能为空')
@@ -49,7 +66,7 @@ class Inst extends React.Component {
                 <p style={{lineHeight: '50px'}}>
                     <span className="spanStyle">实例名：</span>
                     <Input
-                        disabled={!this.props.store.codeStore.instflag}
+                        disabled={this.props.store.codeStore.instflag}
                         type="text"
                         style={{width: '300px'}}
                         value={this.props.store.codeStore.instNames}

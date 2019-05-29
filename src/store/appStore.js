@@ -45,6 +45,8 @@ class AppStore {
   @observable tire = [];
   @observable instflag = true;
   @observable toggle = true;
+  @observable timer = null;
+  @observable timeNum = 0;
   @observable arr = [];
   @action setLogFlag (values) {
     this.logflag = values;
@@ -83,6 +85,28 @@ class AppStore {
   }
   @action setData (data){
     this.data = data;
+  }
+  cleartime (){
+    if (this.timer){
+      clearInterval(this.timer)
+    }
+    this.timeNum = 0;
+  }
+  countdown (){
+    this.timeNum = 0;
+    this.timer = setInterval(() => {
+      this.timeNum++;
+      if (this.timeNum >= 300){
+        clearInterval(this.timer)
+        this.flag = true;
+        this.timer = null;
+        if (this.client){
+          this.client.end()
+          this.client = null;
+          this.connected = false;
+        }
+      }
+    }, 1000);
   }
   connect (sn){
     this.mqttSN = sn;

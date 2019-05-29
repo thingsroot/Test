@@ -81,15 +81,15 @@ class MyTree extends Component {
             <div>
                 {
                     treeData.length > 0
-                        ? <Tree
-                            showIcon
-                            onExpand={this.onExpand}
-                            expandedKeys={this.state.expandedKeys}
-                            onSelect={onSelect}
-                            selectedKeys={selectedKeys}
-                          >
-                            {this.renderTreeNodes(treeData)}
-                          </Tree> : ''
+                    ? <Tree
+                        showIcon
+                        onExpand={this.onExpand}
+                        expandedKeys={this.state.expandedKeys}
+                        onSelect={onSelect}
+                        selectedKeys={selectedKeys}
+                      >
+                        {this.renderTreeNodes(treeData)}
+                    </Tree> : ''
                 }
             </div>
         );

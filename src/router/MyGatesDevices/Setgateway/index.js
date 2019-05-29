@@ -45,6 +45,7 @@ class LinkStatus extends Component {
         barData: []
     }
     componentDidMount (){
+        console.log(this.props.store.appStore.status)
       this.getData(this.props.match.params.sn);
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -64,11 +65,11 @@ class LinkStatus extends Component {
         clearInterval(this.timer1)
     }
     resize () {
-            this.myFaultTypeChart1.resize();
+        this.myFaultTypeChart1 && this.myFaultTypeChart1.resize();
+        this.myFaultTypeChart2 && this.myFaultTypeChart2.resize();
     }
-    getData (sn){
-
-        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+    getData (){
+        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
             let data = [];
             const date = new Date() * 1;
             for (var i = 0;i < 10;i++){
@@ -100,7 +101,7 @@ class LinkStatus extends Component {
                 window.addEventListener('resize', this.resize, 20);
                 }
         })
-        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
             let data = [];
             const date = new Date() * 1;
             for (var i = 0;i < 10;i++){
@@ -132,8 +133,10 @@ class LinkStatus extends Component {
                 window.addEventListener('resize', this.resize, 20);
                 }
         })
-        const res = this.props.store.appStore.status;
-        axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
+        http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
+            console.log(res)
+            this.props.store.appStore.setStatus(res)
+            axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
                 let config = res;
                 if (location.data.regeocode){
                     config.address = location.data.regeocode.formatted_address;
@@ -143,11 +146,11 @@ class LinkStatus extends Component {
                 this.setState({
                     config,
                     loading: false,
-                    DATA_UPLOAD_PERIOD_VALUE: config.data_upload_period,
-                    COV_TTL_VALUE: config.data_upload_cov_ttl,
-                    UOLOAD_VALUE: config.event_upload
+                    DATA_UPLOAD_PERIOD_VALUE: this.props.store.appStore.status.data_upload_period,
+                    COV_TTL_VALUE: this.props.store.appStore.status.data_upload_cov_ttl,
+                    UOLOAD_VALUE: this.props.store.appStore.status.event_upload
                 }, ()=>{
-                    http.get('/api/applications_versions_list?app=FreeIOE').then(res=>{
+                    http.get('/api/applications_versions_list?app=FreeIOE&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                         const arr = [];
                         res.data && res.data.length > 0 && res.data.map(item=>{
                             if (item.version > this.state.config.version){
@@ -164,7 +167,7 @@ class LinkStatus extends Component {
                             newdata: arr
                         })
                     })
-                    http.get('/api/applications_versions_list?app=openwrt%2Fx86_64_skynet').then(res=>{
+                    http.get('/api/applications_versions_list?app=' + this.state.config.platform + '_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                         const arr = [];
                         res.data && res.data.length > 0 && res.data.map(item=>{
                             if (item.version > this.state.config.skynet_version){
@@ -183,14 +186,13 @@ class LinkStatus extends Component {
                     })
                 })
             })
-        http.get('/api/gateways_beta_read?gateway=' + sn).then(res=>{
-            this.setState({use_beta: res.data.use_beta === 1}, ()=>{
+            this.setState({use_beta: this.state.config.enable_beta}, ()=>{
                 http.get('/api/applications_versions_latest?app=freeioe&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
                         iot_beta: res.data
                     })
                 })
-                http.get('/api/applications_versions_latest?app=openwrt%2Fx86_64_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
+                http.get('/api/applications_versions_latest?app=' + this.props.store.appStore.status.platform + '_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
                         skynet_version: res.data
                     })
@@ -368,20 +370,20 @@ class LinkStatus extends Component {
                             >
                             <p><b>序列号：</b>{status.sn}</p>
                             <p><b>位置：</b> {config.address} </p>
-                            <p><b>名称：</b>{config.dev_name}</p>
-                            <p><b>描述：</b>{config.description}</p>
-                            <p><b>型号：</b>{config.model ? config.model : 'Q102'}</p>
+                            <p><b>名称：</b>{status.dev_name}</p>
+                            <p><b>描述：</b>{status.description}</p>
+                            <p><b>型号：</b>{status.model ? status.model : 'Q102'}</p>
                             </Card>
                             <Card title="| 配置信息"
                                 bordered={false}
                                 style={{ width: '100%' }}
                                 loading={loading}
                             >
-                            <p><b>CPU:</b>{config.cpu}</p>
-                            <p><b>内存:</b>{config.ram}</p>
-                            <p><b>存储:</b>{config.rom}</p>
-                            <p><b>操作系统:</b>{config.os}</p>
-                            <p><b>核心软件:</b>{config.skynet_version}{this.state.skynet_version > config.skynet_version
+                            <p><b>CPU:</b>{status.cpu}</p>
+                            <p><b>内存:</b>{status.ram}</p>
+                            <p><b>存储:</b>{status.rom}</p>
+                            <p><b>操作系统:</b>{status.os}</p>
+                            <p><b>核心软件:</b>{status.skynet_version}{this.state.skynet_version > status.skynet_version
                             ? <Link
                                 to="#"
                                 style={{marginLeft: 200}}
@@ -389,7 +391,7 @@ class LinkStatus extends Component {
                                     this.setState({update: false, flag: false, title: 'openwrt x86_64_skynet'})
                                 }}
                               >发现新版本></Link> : ''}</p>
-                            <p><b>业务软件:</b>{config.version}{this.state.iot_beta > config.version
+                            <p><b>业务软件:</b>{status.version}{this.state.iot_beta > status.version
                             ? <Link
                                 to="#"
                                 style={{marginLeft: 200}}
@@ -398,10 +400,10 @@ class LinkStatus extends Component {
                                 }}
                               >发现新版本></Link> : ''}</p>
                             {/* <p><b>公网IP:</b>{config.public_ip}</p> */}
-                            <p><b>调试模式:</b>{config.enable_beta === 1 ? '开启' : '关闭'}</p>
-                            <p><b>数据上传:</b>{config.data_upload ? '开启' : '关闭'}</p>
-                            <p><b>统计上传:</b>{config.stat_upload ? '开启' : '关闭'}</p>
-                            <p><b>日志上传:</b>{config.event_upload}</p>
+                            <p><b>调试模式:</b>{status.enable_beta === 1 ? '开启' : '关闭'}</p>
+                            <p><b>数据上传:</b>{status.data_upload ? '开启' : '关闭'}</p>
+                            <p><b>统计上传:</b>{status.stat_upload ? '开启' : '关闭'}</p>
+                            <p><b>日志上传:</b>{status.event_upload}</p>
                             </Card>
                         </div>
                     </div>
@@ -441,11 +443,12 @@ class LinkStatus extends Component {
                                 调试模式 [*开启后可安装测试版本软件]
                             </span>
                             <Switch
-                                checkedChildren="ON"
+                                checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
                                 checked={status.enable_beta === 1}
                                 onChange={()=>{
-                                    this.setAutoDisabled('beta', status.enable_beta)
+                                    this.setAutoDisabled('beta', status.enable_beta === 1)
+                                    status.enable_beta = status.enable_beta === 1 ? 0 : 1
                                 }}
                             />
                         </div>
@@ -454,7 +457,7 @@ class LinkStatus extends Component {
                                 数据上传 [*开启后设备数据会传到当前平台]
                             </span>
                             <Switch
-                                checkedChildren="ON"
+                                checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
                                 checked={config.data_upload}
                                 onChange={()=>{
@@ -534,7 +537,7 @@ class LinkStatus extends Component {
                                 统计上传 [*开启后统计数据传到当前平台]
                             </span>
                             <Switch
-                                checkedChildren="ON"
+                                checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
                                 checked={status.stat_upload}
                                 onChange={()=>{
@@ -548,7 +551,7 @@ class LinkStatus extends Component {
                                 网络配置
                             </span>
                             <Switch
-                                checkedChildren="ON"
+                                checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
                                 checked={status.Net_Manager}
                                 onChange={()=>{
@@ -562,7 +565,7 @@ class LinkStatus extends Component {
                                 虚拟网络 [*开启后可建立点对点VPN]
                             </span>
                             <Switch
-                                checkedChildren="ON"
+                                checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
                                 checked={status.p2p_vpn}
                                 onChange={()=>{
@@ -647,26 +650,39 @@ class LinkStatus extends Component {
                                                 : <span>{this.state.iot_beta}</span>
                                             }</p>
                                         </div>
-                                        <div className="Icon"
-                                            style={{marginLeft: 100}}
-                                        >
-                                            <Icon type="setting" />
-                                        </div>
-                                        <div>
-                                            <h3>openwrt x86_64_skynet</h3>
-                                            <p>
-                                                {config.skynet_version < this.state.skynet_version ? <span>{config.skynet_version} -> {this.state.skynet_version}</span> : <span>{this.state.skynet_version}</span>}</p>
-                                            <span>{title === 'FreeIOE' ? config.version === this.state.iot_beta ? '已经是最新版' : '可升级到最新版' : config.skynet_version === this.state.skynet_version ? '已经是最新版' : '可升级到最新版'}</span>
-                                        </div>
+                                        {
+                                            config.skynet_version >= this.state.skynet_version
+                                            ? ''
+                                            : <div style={{display: 'flex'}}>
+                                                    <div className="Icon"
+                                                        style={{marginLeft: 100}}
+                                                    >
+                                                    <Icon type="setting" />
+                                                </div>
+                                                <div>
+                                                    <h3>openwrt x86_64_skynet</h3>
+                                                    <p>
+                                                        {config.skynet_version < this.state.skynet_version ? <span>{config.skynet_version} -> {this.state.skynet_version}</span> : <span>{this.state.skynet_version}</span>}</p>
+                                                    <span>{title === 'FreeIOE' ? config.version === this.state.iot_beta ? '已经是最新版' : '可升级到最新版' : config.skynet_version === this.state.skynet_version ? '已经是最新版' : '可升级到最新版'}</span>
+                                                </div>
+                                              </div>
+                                        }
                                     </div>
                                     {
                                         config.version < this.state.iot_beta || config.skynet_version < this.state.skynet_version
                                         ? <Button
                                             disabled={actionSwi}
                                             onClick={()=>{
-                                                const data = {
+                                                const data = config.skynet_version < this.state.skynet_version
+                                                ? {
                                                     name: this.props.match.params.sn,
                                                     skynet_version: this.state.skynet_version,
+                                                    version: this.state.iot_beta,
+                                                    no_ack: 1,
+                                                    id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
+                                                }
+                                                : {
+                                                    name: this.props.match.params.sn,
                                                     version: this.state.iot_beta,
                                                     no_ack: 1,
                                                     id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
@@ -708,7 +724,11 @@ class LinkStatus extends Component {
                                 }
                             </div>
                             <div style={{width: '50%', padding: 10}}>
-                            <h1>openwrt x86_64_skynet</h1>
+                            {
+                                config.skynet_version < this.state.skynet_version
+                                ? <h1>{this.state.config.platform}_skynet</h1>
+                                : ''
+                            }
                                 {
                                     opendata && opendata.length > 0 && opendata.map((v, i)=>{
                                         return (

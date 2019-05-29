@@ -63,15 +63,9 @@ class AppsList extends Component {
             }
           }, {
             title: '实例名',
-            dataIndex: 'device_name',
-            sorter: true,
-            //render: name => `${name} ${name}`,
-            width: '20%',
-            action: (record)=>{
-              return (
-                <Button>{record}</Button>
-              )
-            }
+            dataIndex: 'inst_name',
+            sorter: (a, b) => a.inst_name.length - b.inst_name.length,
+            width: '20%'
           }, {
             title: '版本',
             dataIndex: 'version',
@@ -140,29 +134,37 @@ class AppsList extends Component {
       componentWillUnmount (){
         clearInterval(timer)
       }
-      handleTableChange = (pagination, filters, sorter) => {
-        const pager = { ...this.state.pagination };
-        pager.current = pagination.current;
-        this.setState({
-          pagination: pager
-        });
-        this.fetch({
-          results: pagination.pageSize,
-          page: pagination.current,
-          sortField: sorter.field,
-          sortOrder: sorter.order,
-          ...filters
-        });
-      }
+      // handleTableChange = (pagination, filters) => {
+      //   const pager = { ...this.state.pagination };
+      //   pager.current = pagination.current;
+      //   this.setState({
+      //     pagination: pager
+      //   });
+      //   this.fetch({
+      //     results: pagination.pageSize,
+      //     page: pagination.current,
+      //     // sortField: sorter.field,
+      //     // sortOrder: sorter.order,
+      //     ...filters
+      //   });
+      // }
       fetch = (sn) => {
         const pagination = { ...this.state.pagination };
         http.get('/api/gateways_app_list?gateway=' + sn + '&beta=' + this.props.store.appStore.status.enable_beta).then(res=>{
           this.props.store.appStore.setApplen(res.message && res.message.length)
-          this.setState({
-            data: res.message,
-            loading: false,
-            pagination
-          })
+          if (res.ok){
+            this.setState({
+              data: res.message,
+              loading: false,
+              pagination
+            })
+          } else {
+            this.setState({
+              data: [],
+              loading: false,
+              pagination
+            })
+          }
         })
       }
       getConfig = (val)=>{
@@ -305,7 +307,7 @@ class AppsList extends Component {
                   <Table
                       rowKey="sn"
                       columns={this.state.columns}
-                      dataSource={this.state.data && this.state.data.length > 1 ? this.state.data : []}
+                      dataSource={this.state.data && this.state.data.length > 0 ? this.state.data : []}
                       pagination={this.state.pagination}
                       loading={loading}
                       onChange={this.handleTableChange}

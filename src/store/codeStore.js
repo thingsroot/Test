@@ -10,6 +10,7 @@ class CodeStore {
     @observable fileName = 'version';
     @observable addFileName = '';
     @observable addFolderName = '';
+    @observable instflag = false; // 配置面板实例名禁用
 
     @observable readOnly = true;
     @observable editorValue = {};
