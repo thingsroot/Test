@@ -34,7 +34,6 @@ class MyVirtualGates extends React.Component {
                 title: '操作',
                 dataIndex: 'action',
                 render: (props, record)=>{
-                    console.log(props, record)
                     if (record.device_status !== 'ONLINE') {
                         return (
                             <span>--/--</span>

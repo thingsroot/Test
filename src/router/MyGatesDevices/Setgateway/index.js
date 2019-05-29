@@ -45,7 +45,6 @@ class LinkStatus extends Component {
         barData: []
     }
     componentDidMount (){
-        console.log(this.props.store.appStore.status)
       this.getData(this.props.match.params.sn);
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -134,7 +133,6 @@ class LinkStatus extends Component {
                 }
         })
         http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
-            console.log(res)
             this.props.store.appStore.setStatus(res)
             axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
                 let config = res;
@@ -153,6 +151,7 @@ class LinkStatus extends Component {
                     http.get('/api/applications_versions_list?app=FreeIOE&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                         const arr = [];
                         res.data && res.data.length > 0 && res.data.map(item=>{
+                            item.comment = item.comment.replace(/\n/g, '<br />')
                             if (item.version > this.state.config.version){
                                 if (config.use_beta){
                                     arr.push(item)
@@ -713,11 +712,11 @@ class LinkStatus extends Component {
                                             <Card
                                                 title={`应用名称：${v.app_name}`}
                                                 key={i}
-                                                style={{marginTop: 10}}
+                                                style={{marginTop: 10, lineHeight: '30px'}}
                                             >
                                                 <p>版本号：{v.version}</p>
-                                                <p>更新内容：{v.comment}</p>
                                                 <p>更新时间：{v.modified.split('.')[0]}</p>
+                                                <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, <br />) }}></p>
                                             </Card>
                                         )
                                     })
@@ -735,11 +734,11 @@ class LinkStatus extends Component {
                                             <Card
                                                 title={`应用名称：${v.app_name}`}
                                                 key={i}
-                                                style={{marginTop: 10}}
+                                                style={{marginTop: 10, lineHeight: '30px'}}
                                             >
                                                 <p>版本号：{v.version}</p>
-                                                <p>更新内容：{v.comment}</p>
                                                 <p>更新时间：{v.modified.split('.')[0]}</p>
+                                                <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, <br />) }}></p>
                                             </Card>
                                         )
                                     })
