@@ -29,6 +29,7 @@ class MyGatesLogviewer extends Component {
         // this.refs.content.scrollAround(this.props.store.appStore.data.length)
         this.props.store.appStore.isleave = false;
         this.props.store.appStore.lognum = 0;
+        console.log(this.props.store.appStore.lognum)
         // this.props.store.appStore.tire = this.props.store.appStore.data;
         // this.props.store.appStore.data = [];
         // this.props.store.appStore.data = this.props.store.appStore.tire.concat(this.props.store.appStore.data)

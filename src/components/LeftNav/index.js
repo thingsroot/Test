@@ -83,16 +83,10 @@ class LeftNav extends Component {
         })
     }
     getNum (){
-        if (this.props.store.messageStore.commnum !== 0){
             this.setState({
-                comnum: this.props.store.messageStore.commnum
-            })
-        }
-        if (this.props.store.appStore.lognum !== 0 && this.props.store.appStore.lognum !== this.state.lognum) {
-            this.setState({
+                comnum: this.props.store.messageStore.commnum,
                 lognum: this.props.store.appStore.lognum
             })
-        }
     }
     render () {
         const { list, index } = this.state;
