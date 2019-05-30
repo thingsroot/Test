@@ -178,6 +178,7 @@ class MyTemplateDetails extends PureComponent {
                     </div>
                     <div>
                         <Button
+                            style={this.props.match.params.type === '0' ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showModal}
                         >上传新版本</Button>
                         <span style={{padding: '10px'}}></span>

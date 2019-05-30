@@ -43,6 +43,9 @@ class MyAppDetails extends Component {
         http.get('/api/user_groups_list').then(res=>{
             this.props.store.codeStore.setGroupName(res.data[0].name)
         });
+        if (this.props.match.params.active === '3') {
+            this.props.store.codeStore.setTemplateVisible(true)
+        }
     }
 
     getDetails = (app)=>{
@@ -142,6 +145,7 @@ class MyAppDetails extends Component {
                 <Tabs
                     onChange={this.callback}
                     type="card"
+                    defaultActiveKey={this.props.match.params.active}
                 >
                     <TabPane
                         tab="描述"

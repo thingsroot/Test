@@ -23,9 +23,11 @@
     width: 240px;
     position: absolute;
     left: -24px;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
   }
   .code{
-
     position: absolute;
     top: 0;
     right: -24px;

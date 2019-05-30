@@ -23,7 +23,9 @@ class Nav extends Component {
     }
       sendAjax = () => {
         http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
-          this.props.store.appStore.setStatus(res)
+            this.props.store.appStore.setStatus(res)
+            this.props.store.codeStore.setUserBeta(res.enable_beta);
+            console.log(this.props.store.codeStore.userBeta)
         })
         http.get('/api/gateway_list?status=online').then(res=>{
           const online = res.message;
@@ -39,12 +41,13 @@ class Nav extends Component {
         return arr.join('/')
       };
 
-    setBeta = (sn)=>{
-        http.get('/api/gateways_read?name=' + sn)
-            .then(res=>{
-                this.props.store.codeStore.setUserBeta(res.enable_beta);
-            })
-    };
+    // setBeta = (sn)=>{
+    //     http.get('/api/gateways_read?name=' + sn)
+    //         .then(res=>{
+    //             this.props.store.codeStore.setUserBeta(res.enable_beta);
+    //             console.log(this.props.store.codeStore.userBeta)
+    //         })
+    // };
 
     render () {
         const { gateList } = this.props.store.appStore;
@@ -57,9 +60,9 @@ class Nav extends Component {
                         return (
                         <Link
                             key={i}
-                            onClick={()=>{
-                              this.setBeta(v.sn)
-                            }}
+                            // onClick={()=>{
+                            //   this.setBeta(v.sn)
+                            // }}
                             to={
                               this.setUrl(v.sn)
                             }

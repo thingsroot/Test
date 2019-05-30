@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { Input, Rate, Icon, Button, message, notification  } from 'antd';
 import { inject, observer} from 'mobx-react';
 import Status from '../../common/status';
@@ -100,28 +100,26 @@ class MyGatesAppsInstall extends Component {
     onChange = (newValue)=>{
         this.props.store.codeStore.setInstallConfiguration(newValue)
     };
-    //添加模板
-    templateShow = ()=>{
-        this.setState({
-            isTemplateShow: true
-        });
+    setUrl = (name) => {
+        let arr = location.pathname.split('/');
+        arr[3] = name;
+        return arr.join('/')
     };
-
-    handleCancelAddTempList = ()=>{
-        this.setState({
-            isTemplateShow: false
-        })
-    };
-
     getConfig = (val)=>{
-        this.props.store.codeStore.setActiveKey('1');
         this.props.store.codeStore.setErrorCode(false);
         this.props.store.codeStore.setInstallConfiguration('{}');
         this.props.store.codeStore.setInstNames('');
         this.props.store.codeStore.setReadOnly(false);
+        this.setState({app: val.name});
         let config = [];
+        console.log(val.conf_template)
         if (val.conf_template && val.conf_template[0] === '[') {
+            console.log('-----')
+            console.log(JSON.parse(val.conf_template));
             config = JSON.parse(val.conf_template);
+        } else if (val.conf_template === null) {
+            this.props.store.codeStore.setInstallConfiguration('{}');
+            console.log(this.props.store.codeStore.installConfiguration)
         }
         let deviceColumns = [];
         let tableName = [];  //存放表名
@@ -137,10 +135,12 @@ class MyGatesAppsInstall extends Component {
                 v.type === 'section' ||
                 v.type === 'table'
             ) {
-                console.log(v.type)
+                console.log(v)
+                this.props.store.codeStore.setActiveKey('1');
             } else {
                 this.props.store.codeStore.setReadOnly(false);
-                this.props.store.codeStore.setErrorCode(true)
+                this.props.store.codeStore.setErrorCode(true);
+                this.props.store.codeStore.setActiveKey('2');
             }
             if (v.name === 'device_section') {
                 let tableNameData = {};
@@ -190,12 +190,6 @@ class MyGatesAppsInstall extends Component {
         columnsArr.map((item)=>{
             obj[Object.keys(item)] = Object.values(item)
         });
-        http.get('/api/application_configurations_list?app=' + val.name + '&conf_type=Template').then(res=>{
-            this.setState({
-                addTempList: res.data
-            });
-        });
-
         this.setState({
             flag: false,
             item: val,
@@ -229,12 +223,13 @@ class MyGatesAppsInstall extends Component {
         }
         if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
             message.error('实例名不能为空！');
-            return false;
         }
         http.get(url + app).then(res=>{
             version = res.data;
             if (version > 0) {
-                message.success('应用没有正式版本，安装当前最新beta版本!');
+                if (url.indexOf('beta') !== -1) {
+                    message.success('网关安装当前应用最新beta版本!');
+                }
                 let params = {
                     gateway: sn,
                     inst: this.props.store.codeStore.instNames,
@@ -285,7 +280,7 @@ class MyGatesAppsInstall extends Component {
     };
 
     render () {
-        const { data, flag, item, detail, config, deviceColumns, keys } = this.state;
+        const { data, flag, item, detail, config, deviceColumns, keys, app } = this.state;
         return (<div>
             <Status />
                 <div className="AppInstall">
@@ -311,7 +306,7 @@ class MyGatesAppsInstall extends Component {
                             onClick={()=>{
                                 this.props.store.codeStore.setActiveKey('1');
                                 this.props.store.codeStore.setInstallConfiguration('{}');
-                                console.log(this.props.store.codeStore.installConfiguration)
+                                console.log(this.props.store.codeStore.installConfiguration);
                                 this.setState({
                                     flag: true
                                 })
@@ -352,6 +347,7 @@ class MyGatesAppsInstall extends Component {
                         </div>
                         <div className={detail ? 'installapp hide' : 'installapp show'}>
                             <AppConfig
+                                app={app}
                                 config={config}
                                 deviceColumns={deviceColumns}
                                 keys={keys}
@@ -386,12 +382,19 @@ class MyGatesAppsInstall extends Component {
                                        <div key={ind}
                                            className="item"
                                        >
-                                           <img src={`http://ioe.thingsroot.com/${val.icon_image}`}
-                                               alt="logo"
-                                               onClick={()=>{
-                                                   this.getConfig(val);
-                                               }}
-                                           />
+                                           <Link
+                                               to={
+                                                   this.setUrl(val.name)
+                                               }
+                                           >
+                                               <img
+                                                   src={`http://ioe.thingsroot.com/${val.icon_image}`}
+                                                   alt="logo"
+                                                   onClick={()=>{
+                                                       this.getConfig(val);
+                                                   }}
+                                               />
+                                           </Link>
                                            <div className="apptitle">
                                                <p>{val.app_name}</p>
                                                <div>

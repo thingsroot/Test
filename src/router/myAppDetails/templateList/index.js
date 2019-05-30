@@ -68,32 +68,32 @@ class TemplateList extends Component {
                         <span>
                             <Link
                                 className="mybutton"
-                                to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}
+                                to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}/0`}
                             >查看</Link>
                             <Divider type="vertical" />
-                            <span
-                                style={{color: 'blue', cursor: 'pointer'}}
+                            <a
+                                style={{cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={() => {
                                         this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 2)
                                     }}
-                            >编辑</span>
+                            >编辑</a>
                             <Divider type="vertical" />
-                            <span
-                                style={{color: 'blue', cursor: 'pointer'}}
+                            <a
+                                style={{cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={(record) => {
                                         this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 1)
                                     }}
-                            >复制</span>
+                            >复制</a>
                             <Divider type="vertical" />
-                            <span
-                                style={{color: 'blue', cursor: 'pointer'}}
+                            <a
+                                style={{cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={(record)=>{
                                     this.getName(record.name)
                                 }}
-                            >删除</span>
+                            >删除</a>
                         </span>
                     )
                 }
@@ -142,16 +142,16 @@ class TemplateList extends Component {
                         <span>
                             <Link
                                 className="mybutton"
-                                to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}
+                                to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}/1`}
                             >查看</Link>
                             <Divider type="vertical" />
-                            <span
-                                style={{color: 'blue', cursor: 'pointer'}}
+                            <a
+                                style={{cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={(record) => {
                                         this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 1)
                                     }}
-                            >复制</span>
+                            >复制</a>
                         </span>
                     )
                 }
@@ -242,7 +242,7 @@ class TemplateList extends Component {
                     onClick={this.showModal}
                     style={key === '2' ? none : block}
                 >
-                    上传新模板
+                    新建模板
                 </Button>
                 <MyTemplateForm
                     type={type}

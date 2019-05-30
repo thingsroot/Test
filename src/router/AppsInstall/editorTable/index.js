@@ -242,9 +242,8 @@ class EditableTable extends React.Component {
                 }}
                     type="primary"
                     style={{ marginBottom: 16 }}
-                    disabled={this.props.store.codeStore.template.length === 0 ? true : false}
                 >
-                    添加行
+                    添加设备
                 </Button>
                 <Table
                     components={components}

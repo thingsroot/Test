@@ -39,7 +39,7 @@ class ContentMain extends PureComponent {
                     title={'我的应用'}
                 />
                 <PrivateRoute
-                    path="/myappdetails/:name"
+                    path="/myappdetails/:name/:active"
                     component={MyAppDetails}
                     title={'我的应用 · 详情'}
                 />
@@ -110,7 +110,7 @@ class ContentMain extends PureComponent {
                     title={'安装应用'}
                 />
                 <PrivateRoute
-                    path="/mytemplatedetails/:app/:name/:version"
+                    path="/mytemplatedetails/:app/:name/:version/:type"
                     component={MyTemplateDetails}
                     title={'Dashboard'}
                 />

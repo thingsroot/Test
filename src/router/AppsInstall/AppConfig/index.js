@@ -7,6 +7,7 @@ import 'brace/mode/json';
 import 'brace/theme/github';
 import {Link, withRouter} from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
+import http from '../../../utils/Server';
 
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
@@ -56,7 +57,7 @@ class AppConfig extends Component {
                             onClick={()=>{
                                 this.addSingleTemp(record.conf_name, record.description, record.name, record.latest_version)
                             }}
-                        >添加</Button>
+                        >选择</Button>
                     </div>
                 )
             }
@@ -94,11 +95,19 @@ class AppConfig extends Component {
             }
         ],
         showTempList: [],
-        selectSection: 'socket'
+        selectSection: 'socket',
+        isTemplateShow: false
     };
-    componentDidMount (){
-        // console.log(this.props)
+
+    componentDidMount () {
+        http.get('/api/application_configurations_list?app=' + this.props.match.params.app + '&conf_type=Template')
+            .then(res=>{
+                this.setState({
+                    addTempList: res.data
+                });
+            });
     }
+
     //添加模板
     addSingleTemp = (conf, desc, name, version)=>{
         let single = {
@@ -234,10 +243,28 @@ class AppConfig extends Component {
         }
     };
 
+    templateShow = ()=>{
+        this.setState({
+            isTemplateShow: true
+        })
+    };
+
+    handleCancelAddTempList = ()=>{
+        this.setState({
+            isTemplateShow: false
+        })
+    };
+
+    addNew = (app)=>{
+        console.log(app);
+        const w = window.open('about: blank');
+        w.location.href = '/myappdetails/' + app + '3'
+    };
+
     render () {
         const { addTempLists, showTempLists, showTempList, selectSection, addTempList } = this.state;
         const { errorCode, installConfiguration, serial, tcp, activeKey } = this.props.store.codeStore;
-        let { config, deviceColumns } = this.props;
+        let { config, deviceColumns, app } = this.props;
 
         return (
             <Tabs
@@ -255,6 +282,7 @@ class AppConfig extends Component {
                     />
 
                     <div
+                        ref="content"
                         style={errorCode === false ? block : none}
                     >
                         {
@@ -419,12 +447,11 @@ class AppConfig extends Component {
                                             <Button
                                                 onClick={this.templateShow}
                                                 style={{margin: '10px 0'}}
-                                                disabled={addTempList && addTempList.length > 0 ? false : true}
                                             >
-                                                {addTempList && addTempList.length > 0 ? '添加模板' : '此应用下暂时没有模板'}
+                                                选择模板
                                             </Button>
                                             <Modal
-                                                title="添加模板"
+                                                title="选择模板"
                                                 visible={this.state.isTemplateShow}
                                                 onOk={this.handleCancelAddTempList}
                                                 onCancel={this.handleCancelAddTempList}
@@ -438,6 +465,15 @@ class AppConfig extends Component {
                                                     columns={addTempLists}
                                                     pagination={false}
                                                 />
+                                                <Button
+                                                    type="primary"
+                                                    style={{float: 'right', marginTop: '20px'}}
+                                                    onClick={()=>{
+                                                        this.addNew(app)
+                                                    }}
+                                                >
+                                                    添加模板
+                                                </Button>
                                             </Modal>
                                         </div>
                                     )

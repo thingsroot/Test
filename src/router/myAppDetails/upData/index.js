@@ -55,6 +55,12 @@ const CollectionCreateForm = Form.create()(
                 form.resetFields();
             });
         };
+
+        checkChange = (e)=>{
+            console.log(e.target.checked);
+            console.log(this)
+        };
+
         render () {
             const {
                 visible, onCancel, form
@@ -128,7 +134,10 @@ const CollectionCreateForm = Form.create()(
                             {getFieldDecorator('agreement', {
                                 rules: [{ validator: isChecked}]
                             })(
-                                <Checkbox defaultChecked={false}>我同意使用条款</Checkbox>
+                                <Checkbox
+                                    wrappedComponentRef={(btn) => this.form = btn}
+                                    onChange={this.checkChange}
+                                >我同意使用条款</Checkbox>
                             )}
                         </Form.Item>
                     </Form>
