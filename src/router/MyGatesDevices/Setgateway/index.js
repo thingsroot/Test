@@ -151,7 +151,6 @@ class LinkStatus extends Component {
                     http.get('/api/applications_versions_list?app=FreeIOE&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                         const arr = [];
                         res.data && res.data.length > 0 && res.data.map(item=>{
-                            item.comment = item.comment.replace(/\n/g, '<br />')
                             if (item.version > this.state.config.version){
                                 if (config.use_beta){
                                     arr.push(item)
@@ -186,12 +185,12 @@ class LinkStatus extends Component {
                 })
             })
             this.setState({use_beta: this.state.config.enable_beta}, ()=>{
-                http.get('/api/applications_versions_latest?app=freeioe&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
+                http.get('/api/applications_versions_latest?app=freeioe&beta=' + (this.props.store.appStore.status.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
                         iot_beta: res.data
                     })
                 })
-                http.get('/api/applications_versions_latest?app=' + this.props.store.appStore.status.platform + '_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
+                http.get('/api/applications_versions_latest?app=' + this.props.store.appStore.status.platform + '_skynet&beta=' + (this.props.store.appStore.status.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
                         skynet_version: res.data
                     })
@@ -716,7 +715,7 @@ class LinkStatus extends Component {
                                             >
                                                 <p>版本号：{v.version}</p>
                                                 <p>更新时间：{v.modified.split('.')[0]}</p>
-                                                <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, <br />) }}></p>
+                                                <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, '<br />') }}></p>
                                             </Card>
                                         )
                                     })
@@ -738,7 +737,7 @@ class LinkStatus extends Component {
                                             >
                                                 <p>版本号：{v.version}</p>
                                                 <p>更新时间：{v.modified.split('.')[0]}</p>
-                                                <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, <br />) }}></p>
+                                                <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, '<br />') }}></p>
                                             </Card>
                                         )
                                     })
