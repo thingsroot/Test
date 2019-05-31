@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter, Switch, Redirect, Link } from 'react-router-dom';
+import { withRouter, Switch, Redirect } from 'react-router-dom';
 import Status from '../../common/status';
 import LeftNav from '../../components/LeftNav';
 import LoadableComponent from '../../utils/LoadableComponent';
@@ -19,6 +19,7 @@ const Comm = LoadableComponent(()=>import('./MyGatesComm'));
 const Appconfig = LoadableComponent(()=>import('../AppsInstall/AppConfig'));
 const Platformevent = LoadableComponent(()=>import('../PlatformMessage'));
 const Devicesevent = LoadableComponent(()=>import('../DeviceMessage'));
+const Nav = LoadableComponent(()=>import('../AppsInstall/Nav'));
 @withRouter
 @inject('store')
 @observer
@@ -76,15 +77,15 @@ class MyGatesDevices extends Component {
       visible: false
     })
   }
-  setUrl = (sn) => {
-    let arr = location.pathname.split('/');
-    arr[2] = sn;
-    return arr.join('/')
-  }
+  // setUrl = (sn) => {
+  //   let arr = location.pathname.split('/');
+  //   arr[2] = sn;
+  //   return arr.join('/')
+  // }
     render () {
       const { flag } = this.state;
       const { path } = this.props.match;
-      const { gateList, status } = this.props.store.appStore;
+      // const { gateList, status } = this.props.store.appStore;
         return (
             <div >
                 <Status flag={this.visible}/>
@@ -111,26 +112,29 @@ class MyGatesDevices extends Component {
                       visible={this.state.visible}
                       width="400"
                   >
-                  <ul>
-                    {
-                      gateList && gateList.length > 0 && gateList.map((v, i)=>{
-                        return (
-                        <Link key={i}
-                            to={
-                          this.setUrl(v.sn)
-                        }
-                        >
-                            <li onClick={this.onClose}
-                                className={status.sn === v.sn ? 'gateslist gateslistactive' : 'gateslist'}
-                            >
-                              <span></span>
-                              <p>{v.dev_name}(&nbsp;<i>{v.description}</i>&nbsp;)</p>
-                            </li>
-                        </Link>
-                        )
-                      })
-                    }
-                    </ul>
+                    <Nav>
+
+                    </Nav>
+                  {/*<ul>*/}
+                  {/*  {*/}
+                  {/*    gateList && gateList.length > 0 && gateList.map((v, i)=>{*/}
+                  {/*      return (*/}
+                  {/*      <Link key={i}*/}
+                  {/*          to={*/}
+                  {/*        this.setUrl(v.sn)*/}
+                  {/*      }*/}
+                  {/*      >*/}
+                  {/*          <li onClick={this.onClose}*/}
+                  {/*              className={status.sn === v.sn ? 'gateslist gateslistactive' : 'gateslist'}*/}
+                  {/*          >*/}
+                  {/*            <span></span>*/}
+                  {/*            <p>{v.dev_name}(&nbsp;<i>{v.description}</i>&nbsp;)</p>*/}
+                  {/*          </li>*/}
+                  {/*      </Link>*/}
+                  {/*      )*/}
+                  {/*    })*/}
+                  {/*  }*/}
+                  {/*  </ul>*/}
                   </Drawer>
                   <div className="mygateslist">
                     <Switch>

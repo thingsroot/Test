@@ -1,9 +1,25 @@
 .AppInstall{
+    .listbutton{
+        position:fixed;
+        left:80px;
+        top:350px;
+        z-index: 999;
+        height:40px;
+        width: 40px;
+        text-align: center;
+        padding:0;
+        .anticon{
+            color:#fff;
+            font-size: 16px;
+        }
+    }
     .searchlist{
         width: 100%;
         position: relative;
+        text-align: right;
     }
         display: flex;
+        justify-content: right;
         width: 100%;
         margin-top: 20px;
         .show{
@@ -25,9 +41,9 @@ pre{
     background:#eee;
 }
 .installheader{
+    position: relative;
+    top: -10px;
     display: flex;
-    justify-content: space-between;
-    padding:10px;
     .selectlist{
         display: flex;
     }
@@ -42,6 +58,7 @@ pre{
 }
 .installcontent{
     display: flex;
+    justify-content: center;
     flex-wrap: wrap;
     .item{
         width: 222px;

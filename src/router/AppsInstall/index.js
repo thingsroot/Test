@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { withRouter, Link } from 'react-router-dom';
-import { Input, Rate, Icon, Button, message, notification  } from 'antd';
+import { withRouter, Link } from 'react-router-dom';     //
+import {Input, Icon, Button, message, notification, Rate, Drawer } from 'antd';  //
 import { inject, observer} from 'mobx-react';
 import Status from '../../common/status';
 import http from '../../utils/Server';
@@ -10,6 +10,7 @@ import 'highlight.js/styles/github.css';
 import './style.scss';
 import Nav from './Nav';
 import AppConfig from './AppConfig'
+import LazyLoad from 'react-lazy-load';
 const Search = Input.Search;
 const openNotification = (title, message) => {
     notification.open({
@@ -50,7 +51,8 @@ class MyGatesAppsInstall extends Component {
         SourceCode: [],
         dataSourceCode: [],
         errorMessage: '',
-        keys: []
+        keys: [],
+        visible: false
     };
 
     componentDidMount (){
@@ -114,12 +116,9 @@ class MyGatesAppsInstall extends Component {
         let config = [];
         console.log(val.conf_template)
         if (val.conf_template && val.conf_template[0] === '[') {
-            console.log('-----')
-            console.log(JSON.parse(val.conf_template));
             config = JSON.parse(val.conf_template);
         } else if (val.conf_template === null) {
             this.props.store.codeStore.setInstallConfiguration('{}');
-            console.log(this.props.store.codeStore.installConfiguration)
         }
         let deviceColumns = [];
         let tableName = [];  //存放表名
@@ -135,7 +134,6 @@ class MyGatesAppsInstall extends Component {
                 v.type === 'section' ||
                 v.type === 'table'
             ) {
-                console.log(v)
                 this.props.store.codeStore.setActiveKey('1');
             } else {
                 this.props.store.codeStore.setReadOnly(false);
@@ -279,12 +277,40 @@ class MyGatesAppsInstall extends Component {
         });
     };
 
+    onClose = () => {
+        this.setState({
+            visible: false
+        })
+    }
+
+    showDrawer = () => {
+        this.setState({
+            visible: true
+        })
+    }
+
     render () {
         const { data, flag, item, detail, config, deviceColumns, keys, app } = this.state;
         return (<div>
             <Status />
                 <div className="AppInstall">
-                    <Nav />
+                    <Button
+                        type="primary"
+                        onClick={this.showDrawer}
+                        className="listbutton"
+                    >
+                        <Icon type="swap"/><br />
+                    </Button>
+                    <Drawer
+                        title="网关列表"
+                        placement="left"
+                        closable={false}
+                        onClose={this.onClose}
+                        visible={this.state.visible}
+                        width="400"
+                    >
+                        <Nav> </Nav>
+                    </Drawer>
                     <div className={flag ? 'hide appsdetail' : 'show appsdetail'}>
                     <Button
                         className="installbtn"
@@ -364,7 +390,7 @@ class MyGatesAppsInstall extends Component {
                                    onSearch={(value)=>{
                                        this.searchApp(value)
                                    }}
-                                   style={{ width: 200 }}
+                                   style={{ width: 200, marginRight: 80}}
                                />
                                <Icon
                                    className="rollback"
@@ -375,59 +401,67 @@ class MyGatesAppsInstall extends Component {
                                />
                            </div>
                        </div>
-                       <div className="installcontent">
-                           {
-                               data && data.length > 0 && data.map((val, ind)=>{
-                                   return (
-                                       <div key={ind}
-                                           className="item"
-                                       >
-                                           <Link
-                                               to={
-                                                   this.setUrl(val.name)
-                                               }
-                                           >
-                                               <img
-                                                   src={`http://ioe.thingsroot.com/${val.icon_image}`}
-                                                   alt="logo"
-                                                   onClick={()=>{
-                                                       this.getConfig(val);
-                                                   }}
-                                               />
-                                           </Link>
-                                           <div className="apptitle">
-                                               <p>{val.app_name}</p>
-                                               <div>
-                                                   <Rate disabled
-                                                       defaultValue={val.star}
-                                                       size="small"
-                                                   />
-                                                   <span onClick={()=>{
-                                                       this.setState({
-                                                           flag: false,
-                                                           detail: false,
-                                                           item: val
-                                                       })
-                                                   }}
-                                                   ><Icon
-                                                       type="cloud-download"
-                                                       onClick={()=>{
-                                                           this.getConfig(val);
-                                                           if (val.conf_template === null) {
-                                                               this.props.store.codeStore.setActiveKey('2')
-                                                           }
-                                                           if (val.pre_configuration === null) {
-                                                               this.props.store.codeStore.setInstallConfiguration('{}')
-                                                           } else {
-                                                               this.props.store.codeStore.setInstallConfiguration(val.pre_configuration)
-                                                           }
-                                                       }}
-                                                    /></span>
-                                               </div>
-                                           </div>
-                                        </div>)
-                               })
-                           }
+                        <div className="installcontent">
+                            {
+                                data && data.length > 0 && data.map((val, ind)=>{
+                                    return (
+                                        <LazyLoad
+                                            key={ind}
+                                            offsetTop={100}
+                                        >
+                                            <div
+
+                                                className="item"
+                                            >
+                                                <Link
+                                                    to={
+                                                        this.setUrl(val.name)
+                                                    }
+                                                >
+                                                    <img
+                                                        src={`http://ioe.thingsroot.com/${val.icon_image}`}
+                                                        alt="logo"
+                                                        onClick={()=>{
+                                                            this.getConfig(val);
+                                                        }}
+                                                    />
+                                                </Link>
+                                                <div className="apptitle">
+                                                    <p>{val.app_name}</p>
+                                                    <div>
+                                                        <Rate
+                                                            disabled
+                                                            defaultValue={val.star}
+                                                            size="small"
+                                                        />
+                                                        <span onClick={()=>{
+                                                            this.setState({
+                                                                flag: false,
+                                                                detail: false,
+                                                                item: val
+                                                            })
+                                                        }}
+                                                        ><Icon
+                                                            type="cloud-download"
+                                                            onClick={()=>{
+                                                                this.getConfig(val);
+                                                                if (val.conf_template === null) {
+                                                                    this.props.store.codeStore.setActiveKey('2')
+                                                                }
+                                                                if (val.pre_configuration === null) {
+                                                                    this.props.store.codeStore.setInstallConfiguration('{}')
+                                                                } else {
+                                                                    this.props.store.codeStore.setInstallConfiguration(val.pre_configuration)
+                                                                }
+                                                            }}
+                                                        /></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </LazyLoad>
+                                    )
+                                })
+                            }
                         </div>
                     </div>
                 </div>
