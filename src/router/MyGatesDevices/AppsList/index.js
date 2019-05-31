@@ -167,15 +167,15 @@ class AppsList extends Component {
           }
         })
       }
-      getConfig = (val)=>{
+      getConfig = (name, conf)=>{
         this.props.store.codeStore.setActiveKey('1');
         this.props.store.codeStore.setErrorCode(false);
         this.props.store.codeStore.setInstallConfiguration('{}');
         this.props.store.codeStore.setInstNames('');
         this.props.store.codeStore.setReadOnly(false);
         let config = [];
-        if (val.conf_template) {
-            config = JSON.parse(val.conf_template);
+        if (conf && conf[0] === '[') {
+            config = JSON.parse(conf);
         }
         let deviceColumns = [];
         let tableName = [];  //存放表名
@@ -244,22 +244,20 @@ class AppsList extends Component {
         columnsArr.map((item)=>{
             obj[Object.keys(item)] = Object.values(item)
         });
-        http.get('/api/application_configurations_list?app=' + val.name + '&conf_type=Template').then(res=>{
+        http.get('/api/application_configurations_list?app=' + name + '&conf_type=Template').then(res=>{
             this.setState({
                 addTempList: res.data
             });
         });
-
         this.setState({
             flag: false,
-            item: val,
+            // item: val,
             detail: true,
             config: config,
             deviceColumns: obj,
             keys: keys,
-            app: val.name
+            app: name
         });
-
         if (this.props.match.params.type === '2') {
             this.setState({
                 flag: false,
@@ -267,7 +265,8 @@ class AppsList extends Component {
             });
             this.props.store.codeStore.setActiveKey('2')
         }
-        this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
+        this.props.store.codeStore.setInstallConfiguration(conf === null ? '{}' : conf);
+        this.props.store.codeStore.setActiveKey(conf === null ? '2' : '1');
     };
 
     submitData = ()=>{
@@ -281,7 +280,7 @@ class AppsList extends Component {
           inst: this.props.store.codeStore.instNames,
           conf: this.props.store.codeStore.installConfiguration,
           id: `/gateways/${sn}/config/${this.props.store.codeStore.instNames}/${new Date() * 1}`
-        }
+        };
         http.post('/api/gateways_applications_conf', data).then(res=>{
           this.timer = setInterval(() => {
             http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
@@ -304,6 +303,7 @@ class AppsList extends Component {
         return (
             <div>
                 <div className={toggle ? 'show' : 'hide'}>
+                    {console.log(this.state.data)}
                   <Table
                       rowKey="sn"
                       columns={this.state.columns}

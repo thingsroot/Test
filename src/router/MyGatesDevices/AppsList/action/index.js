@@ -220,7 +220,7 @@ class Action extends Component {
                       onClick={()=>{
                           if (this.props.record.data){
                             this.props.store.appStore.apppage = this.props.record.data.data
-                            this.props.getconfig(this.props.record.data.data)
+                            this.props.getconfig(this.props.record.name, this.props.record.conf)
                             this.props.store.codeStore.instNames = this.props.record.inst_name
                             this.props.store.codeStore.instflag = false;
                           }

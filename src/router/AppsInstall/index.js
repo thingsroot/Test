@@ -206,7 +206,6 @@ class MyGatesAppsInstall extends Component {
             this.props.store.codeStore.setActiveKey('2')
         }
         this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
-        console.log(this.props.store.codeStore.installConfiguration)
     };
 
     submitData = ()=>{
@@ -332,7 +331,6 @@ class MyGatesAppsInstall extends Component {
                             onClick={()=>{
                                 this.props.store.codeStore.setActiveKey('1');
                                 this.props.store.codeStore.setInstallConfiguration('{}');
-                                console.log(this.props.store.codeStore.installConfiguration);
                                 this.setState({
                                     flag: true
                                 })
