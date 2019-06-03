@@ -209,7 +209,7 @@ class MyGatesAppsInstall extends Component {
     };
 
     submitData = ()=>{
-        let { app } = this.state;
+        let app = this.props.match.params.app;
         let sn = this.props.match.params.sn;
         let url = '';
         let version = 0;

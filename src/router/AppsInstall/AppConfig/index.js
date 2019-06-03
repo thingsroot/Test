@@ -29,25 +29,30 @@ class AppConfig extends Component {
         addTempLists: [
             {
                 title: '名称',
+                width: '20%',
                 dataIndex: 'conf_name',
                 key: 'conf_name',
                 render: text => <span>{text}</span>
             }, {
                 title: '描述',
+                width: '20%',
                 dataIndex: 'description',
                 key: 'description'
             }, {
                 title: '模板ID',
+                width: '20%',
                 dataIndex: 'name',
                 key: 'name'
             }, {
                 title: '版本',
+                width: '20%',
                 key: 'latest_version',
                 dataIndex: 'latest_version'
             }, {
                 title: '操作',
+                width: '20%',
                 render: (record) => (
-                    <div>
+                    <span>
                         <Button>
                             <Link to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}>查看</Link>
                         </Button>
@@ -58,7 +63,7 @@ class AppConfig extends Component {
                                 this.addSingleTemp(record.conf_name, record.description, record.name, record.latest_version)
                             }}
                         >选择</Button>
-                    </div>
+                    </span>
                 )
             }
         ],
@@ -106,6 +111,16 @@ class AppConfig extends Component {
                     addTempList: res.data
                 });
             });
+        http.get('/api/user_configuration_list?app=' + this.props.match.params.app)
+            .then(res=>{
+                let list = this.state.addTempList;
+                res.message && res.message.length > 0 && res.message.map((item)=>{
+                    list.push(item)
+                });
+                this.setState({
+                    addTempList: list
+                });
+            });
     }
 
     //添加模板
@@ -140,6 +155,11 @@ class AppConfig extends Component {
         this.setState({
             showTempList: dataSource
         });
+        let a = [];
+        dataSource && dataSource.length > 0 && dataSource.map((item)=>{
+            a.push(item.conf_name)
+        });
+        this.props.store.codeStore.setTemplate(a);
         let addTempList = this.state.addTempList;
         addTempList && addTempList.length > 0 && addTempList.map((v)=>{
             if (v.name === name) {
@@ -256,9 +276,8 @@ class AppConfig extends Component {
     };
 
     addNew = (app)=>{
-        console.log(app);
         const w = window.open('about: blank');
-        w.location.href = '/myappdetails/' + app + '3'
+        w.location.href = '/myappdetails/' + app + '/3'
     };
 
     render () {
@@ -464,6 +483,7 @@ class AppConfig extends Component {
                                                     dataSource={addTempList ? addTempList : []}
                                                     columns={addTempLists}
                                                     pagination={false}
+                                                    scroll={{ y: 240 }}
                                                 />
                                                 <Button
                                                     type="primary"
