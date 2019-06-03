@@ -3,6 +3,7 @@ import http from '../../../utils/Server';
 import { withRouter, Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import './style.scss';
+// import {Drawer} from "antd";
 @withRouter
 @inject('store')
 @observer
@@ -24,7 +25,6 @@ class Nav extends Component {
       sendAjax = () => {
         http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
             this.props.store.appStore.setStatus(res);
-            this.props.store.codeStore.setUserBeta(res.enable_beta);
         });
         http.get('/api/gateway_list?status=online').then(res=>{
           const online = res.message;
@@ -41,30 +41,30 @@ class Nav extends Component {
       };
 
     render () {
-        const { gateList } = this.props.store.appStore;
+        // const { gateList } = this.props.store.appStore;
+        const { gateList, status } = this.props.store.appStore;
         return (
-            <ul>
-                <p>网关列表</p>
-                {
-                    gateList && gateList.length > 0 && gateList.map((v, i)=>{
-                        return (
-                            <Link
-                                key={i}
-                                to={
-                                    this.setUrl(v.sn)
-                                }
+        <ul>
+            {
+                gateList && gateList.length > 0 && gateList.map((v, i)=>{
+                    return (
+                        <Link
+                            key={i}
+                            to={
+                                this.setUrl(v.sn)
+                            }
+                        >
+                            <li onClick={this.onClose}
+                                className={status.sn === v.sn ? 'gateslist gateslistactive' : 'gateslist'}
                             >
-                                <li onClick={this.onClose}
-                                    className={this.props.match.params.sn === v.sn ? 'gateslist gateslistactive' : 'gateslist'}
-                                >
-                                    <span></span>
-                                    <p>{v.dev_name}(&nbsp;<i>{v.description}</i>&nbsp;)</p>
-                                </li>
-                            </Link>
-                        )
-                    })
-                }
-            </ul>
+                                <span></span>
+                                <p>{v.dev_name}(&nbsp;<i>{v.description}</i>&nbsp;)</p>
+                            </li>
+                        </Link>
+                    )
+                })
+            }
+        </ul>
         );
     }
 }

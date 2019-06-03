@@ -140,7 +140,7 @@ class AppEditorCode extends Component {
     format = (list, a)=>{
         let arr = [];
         list && list.length > 0 && list.map((v, key)=>{
-            console.log(v.icon.substr(v.icon.indexOf('.') + 1, v.icon.length))
+            console.log(v.icon.substr(v.icon.indexOf('.') + 1, v.icon.length));
             key;
             if (v.children === true){
                 this.getTree(v.id).then(data=>{

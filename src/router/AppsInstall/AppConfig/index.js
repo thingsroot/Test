@@ -232,7 +232,9 @@ class AppConfig extends Component {
     };
 
     submitData = ()=>{
-        this.getData();
+        if (this.props.store.codeStore.readOnly) {
+            this.getData()
+        }
         this.props.submitData();
     };
 
@@ -278,6 +280,10 @@ class AppConfig extends Component {
     addNew = (app)=>{
         const w = window.open('about: blank');
         w.location.href = '/myappdetails/' + app + '/3'
+    };
+
+    onChange = (value)=>{
+        this.props.store.codeStore.setInstallConfiguration(value[0])
     };
 
     render () {
@@ -587,6 +593,7 @@ class AppConfig extends Component {
                         type="primary"
                         style={errorCode === true || config.length <= 0 ? none : block}
                         onClick={this.submitData}
+                        disabled={this.props.disabled}
                     >提交</Button>
                 </TabPane>
                 <TabPane
@@ -622,6 +629,7 @@ class AppConfig extends Component {
                     <br/>
                     <Button
                         type="primary"
+                        disabled={this.props.disabled}
                         onClick={this.submitData}
                     >提交</Button>
                 </TabPane>
