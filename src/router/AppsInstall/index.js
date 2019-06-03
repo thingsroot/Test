@@ -220,34 +220,34 @@ class MyGatesAppsInstall extends Component {
         }
         if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
             message.error('实例名不能为空！');
-        }
-        http.get(url + app).then(res=>{
-            version = res.data;
-            if (version > 0) {
-                if (url.indexOf('beta') !== -1) {
-                    message.success('网关安装当前应用最新beta版本!');
-                }
-                let params = {
-                    gateway: sn,
-                    inst: this.props.store.codeStore.instNames,
-                    app: app,
-                    version: version,
-                    conf: this.props.store.codeStore.installConfiguration,
-                    id: 'app_install/' + sn + '/' + this.props.store.codeStore.instNames + '/' + app
-                };
-                http.post('/api/gateways_applications_install', params).then(res=>{
-                    openNotification('提交任务成功', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.');
-                    setTimeout(()=>{
-                        this.setState({
-                            details: true
-                        })
-                    }, 1000);
-                    let max = 18000;
-                    let min = 0;
-                    if (res.ok === true) {
-                        if (min > max) {
-                            openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '错误：' + res.data.message)
-                        } else {
+        } else {
+            http.get(url + app).then(res=>{
+                version = res.data;
+                if (version > 0) {
+                    if (url.indexOf('beta') !== -1) {
+                        message.success('网关安装当前应用最新beta版本!');
+                    }
+                    let params = {
+                        gateway: sn,
+                        inst: this.props.store.codeStore.instNames,
+                        app: app,
+                        version: version,
+                        conf: this.props.store.codeStore.installConfiguration,
+                        id: 'app_install/' + sn + '/' + this.props.store.codeStore.instNames + '/' + app
+                    };
+                    http.post('/api/gateways_applications_install', params).then(res=>{
+                        openNotification('提交任务成功', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.');
+                        setTimeout(()=>{
+                            this.setState({
+                                details: true
+                            })
+                        }, 1000);
+                        let max = 18000;
+                        let min = 0;
+                        if (res.ok === true) {
+                            if (min > max) {
+                                openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '错误：' + res.data.message)
+                            } else {
                                 let timer = setInterval(()=>{
                                     min += 5000;
                                     setTimeout(()=>{
@@ -266,14 +266,16 @@ class MyGatesAppsInstall extends Component {
                                     }, 1000)
                                 }, 5000)
                             }
-                    } else {
-                        openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
-                    }
-                })
-            } else {
-                message.error('应用暂时没有版本，无法安装！')
-            }
-        });
+                        } else {
+                            openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
+                        }
+                    })
+                } else {
+                    message.error('应用暂时没有版本，无法安装！')
+                }
+            });
+        }
+
     };
 
     onClose = () => {
