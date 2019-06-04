@@ -540,14 +540,15 @@ class MyGates extends Component {
                         <Tabs
                             type="card"
                             onChange={(value)=>{
-                                this.setState({loading: true}, ()=>{
-                                    if (value === '1') {
-                                        this.getDevicesList('online')
-                                    } else if (value === '2') {
-                                        this.getDevicesList('offline')
-                                    } else {
-                                        this.getDevicesList('all')
-                                    }
+                                let status = 'all'
+                                if (value === '1') {
+                                    status = 'online'
+                                }
+                                if (value === '2') {
+                                    status = 'offline'
+                                }
+                                this.setState({loading: true, status: status}, ()=>{
+                                    this.getDevicesList(status)
                                 })
                             }}
                         >
