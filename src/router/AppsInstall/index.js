@@ -219,26 +219,26 @@ class MyGatesAppsInstall extends Component {
         let sn = this.props.match.params.sn;
         let url = '';
         let version = 0;
-        // http.post('/api/gateways_applications_refresh', {
-        //     gateway: sn,
-        //     id: 'refresh' + sn
-        // }).then(res=>{
-        //     if (res.ok === true) {
-        //         http.get('/api/gateways_applications_list?gateway=' + sn).then(res=>{
-        //             if (res.ok === true) {
-        //                 let names = Object.keys(res.data);
-        //                 names && names.length > 0 && names.map(item=>{
-        //                     if (item === this.props.store.codeStore.instNames) {
-        //                         this.props.store.codeStore.setErrorMessage('实例名已存在')
-        //                     } else {
-        //                         this.props.store.codeStore.setErrorMessage('')
-        //                     }
-        //                 })
-        //
-        //             }
-        //         })
-        //     }
-        // })
+        http.post('/api/gateways_applications_refresh', {
+            gateway: sn,
+            id: 'refresh' + sn
+        }).then(res=>{
+            // if (res.ok === true) {
+            //     http.get('/api/gateways_applications_list?gateway=' + sn).then(res=>{
+            //         if (res.ok === true) {
+            //             let names = Object.keys(res.data);
+            //             names && names.length > 0 && names.map(item=>{
+            //                 if (item === this.props.store.codeStore.instNames) {
+            //                     this.props.store.codeStore.setErrorMessage('实例名已存在')
+            //                 } else {
+            //                     this.props.store.codeStore.setErrorMessage('')
+            //                 }
+            //             })
+            //
+            //         }
+            //     })
+            // }
+        })
         http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
             console.log(res);
             if (res.enable_beta === 1) {
