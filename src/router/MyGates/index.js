@@ -163,7 +163,7 @@ class MyGates extends Component {
                                     >
                                         <span key="1"
                                             disabled={record.disabled}
-                                        >网关在线记录</span>
+                                        >在线记录</span>
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="1">
