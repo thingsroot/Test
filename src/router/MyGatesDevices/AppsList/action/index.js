@@ -15,8 +15,9 @@ function cancel () {
 class Action extends Component {
     state = {
         visible: false,
-        loading: false,
+        upgradeLoading: false,
         setName: false,
+        setNameConfirmLoading: false,
         appdebug: false
     }
     componentWillUnmount (){
@@ -39,6 +40,7 @@ class Action extends Component {
                     if (result.data.result) {
                       message.success('应用卸载成功,请稍后...')
                       clearInterval(timer)
+                      this.props.update_app_list()
                     } else if (result.data.result === false) {
                       message.error('应用卸载失败，请重试')
                       clearInterval(timer)
@@ -106,6 +108,7 @@ class Action extends Component {
                   if (res.ok){
                       message.success('应用升级成功')
                       clearInterval(timer)
+                      this.props.update_app_list()
                   } else if (res.ok === false){
                       message.error('应用升级操作失败，请重试');
                       clearInterval(timer)
@@ -114,7 +117,7 @@ class Action extends Component {
           }, 3000);
       })
         setTimeout(() => {
-          this.setState({ loading: false, visible: false });
+          this.setState({ upgradeLoading: false, visible: false });
         }, 3000);
       }
       appSwitch = (type) =>{
@@ -149,6 +152,7 @@ class Action extends Component {
                       message.error(result.data.message)
                     }
                   }
+                  this.props.update_app_list()
                 })
               }, 3000);
             }
@@ -195,7 +199,7 @@ class Action extends Component {
     render () {
         const { actionSwi } = this.props.store.appStore;
         const { record } = this.props;
-        const { loading, visible, setName, nameValue, appdebug } = this.state;
+        const { upgradeLoading, visible, setName, setNameConfirmLoading, nameValue, appdebug } = this.state;
         return (
             <div style={{position: 'relative', paddingBottom: 50}}>
               <div style={{lineHeight: '30px', paddingLeft: 20}}>
@@ -310,7 +314,7 @@ class Action extends Component {
                         <Button
                             key="submit"
                             type="primary"
-                            loading={loading}
+                            loading={upgradeLoading}
                             onClick={this.handleOk}
                         >
                             升级
@@ -340,19 +344,45 @@ class Action extends Component {
                     </Modal>
                     <Modal
                         visible={setName}
+                        confirmLoading={setNameConfirmLoading}
                         title="更改实例名"
                         onOk={()=>{
-                            // this.setState({setName: false})
-                            http.post('/api/gateways_applications_rename', {
-                                gateway: this.props.match.params.sn,
-                                inst: record.inst_name,
-                                new_name: nameValue,
-                                id: `gateway/rename/${nameValue}/${new Date() * 1}`
-                            })
+                          this.setState({setNameConfirmLoading: true})
+                          http.post('/api/gateways_applications_rename', {
+                              gateway: this.props.match.params.sn,
+                              inst: record.inst_name,
+                              new_name: nameValue,
+                              id: `gateway/rename/${nameValue}/${new Date() * 1}`
+                          }).then(result=>{
+                            if (result.ok) {
+                              timer = setInterval(() => {
+                                message.success('更改实例名成功请求发送成功，请稍后...')
+                                this.setState({setName: false})
+                                http.get('/api/gateways_exec_result?id=' + result.data).then(result=>{
+                                  if (result.ok) {
+                                    if (result.data.result){
+                                      message.success('更改实例名成功!!!')
+                                      clearInterval(timer)
+                                    } else {
+                                      clearInterval(timer)
+                                      message.error(result.data.message)
+                                    }
+                                    this.props.update_app_list();
+                                  }
+                                })
+                              }, 3000);
+                            } else {
+                              message.error(result.error)
+                              this.setState({setNameConfirmLoading: false})
+                            }
+                          })
                         }}
                         destroyOnClose
                         onCancel={()=>{
-                            this.setState({setName: false})
+                          this.setState({setName: false})
+                        }}
+                        afterClose={()=>{
+                          this.setState({setNameConfirmLoading: false})
                         }}
                     >
                         <span>实例名: </span>

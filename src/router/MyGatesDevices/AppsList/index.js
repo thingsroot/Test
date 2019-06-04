@@ -318,6 +318,7 @@ class AppsList extends Component {
                           <Action
                               record={record}
                               getconfig={this.getConfig}
+                              update_app_list={this.fetch.bind(this, this.props.match.params.sn)}
                           />
                         )
                       }}
