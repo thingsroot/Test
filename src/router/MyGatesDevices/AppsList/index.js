@@ -244,7 +244,7 @@ class AppsList extends Component {
         columnsArr.map((item)=>{
             obj[Object.keys(item)] = Object.values(item)
         });
-        http.get('/api/application_configurations_list?app=' + name + '&conf_type=Template').then(res=>{
+        http.get('/api/store_configurations_list?app=' + name + '&conf_type=Template').then(res=>{
             this.setState({
                 addTempList: res.data
             });

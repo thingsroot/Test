@@ -112,7 +112,7 @@ class ContentMain extends PureComponent {
                 <PrivateRoute
                     path="/mytemplatedetails/:app/:name/:version/:type"
                     component={MyTemplateDetails}
-                    title={'Dashboard'}
+                    title={'模板详情'}
                 />
                 <Redirect
                     from="/"

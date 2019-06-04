@@ -20,7 +20,7 @@ const MyTemplateForm = Form.create({ name: 'template_form' })(
                     app: this.props.app,
                     conf_name: values.conf_name,
                     description: values.description,
-                    type: 'Configuration',
+                    type: 'Template',
                     public: values.public,
                     owner_type: values.owner_type
                 };

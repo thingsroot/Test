@@ -28,7 +28,6 @@ class MyAppDetails extends Component {
         time: '',
         app: '',
         desc: '',
-        templateList: [],
         groupName: ''
     };
 
@@ -51,25 +50,24 @@ class MyAppDetails extends Component {
     getDetails = (app)=>{
         http.get('/api/applications_read?app=' + app).then(res=>{
             this.setState({
-                message: res.data.data.data,
-                desc: res.data.data.data.description,
-                time: res.data.data.data.modified.substr(0, 11),
-                templateList: res.data.tempList
+                message: res.data.data,
+                desc: res.data.data.description,
+                time: res.data.data.modified.substr(0, 11)
             });
-            sessionStorage.setItem('app_name', res.data.data.data.app_name);
+            sessionStorage.setItem('app_name', res.data.data.app_name);
             this.props.store.codeStore.setVersionList(res.data.versionList.data);
             this.props.store.codeStore.setVersionLatest(res.data.versionLatest.data)
         });
         http.get('/api/user_configuration_list?app=' + app)
             .then(res=>{
-                this.props.store.codeStore.setTemplateList(res.message)
+                this.props.store.codeStore.setTemplateList(res.data)
             });
     };
     callback = (key)=>{
         console.log(key);
     };
     render () {
-        let { app, message, time, user, templateList } = this.state;
+        let { app, message, time, user } = this.state;
         return (
             <div className="myAppDetails">
                 <div className="header">
@@ -167,7 +165,6 @@ class MyAppDetails extends Component {
                         key="3"
                     >
                         <TemplateList
-                            templateList={templateList}
                             app={app}
                         />
                     </TabPane>

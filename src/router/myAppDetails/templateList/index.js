@@ -24,6 +24,7 @@ class TemplateList extends Component {
             type: '',
             conf: '',
             key: '1',
+            templateList: [],
             columns: [
                 {
                     title: '模板名称',
@@ -36,12 +37,22 @@ class TemplateList extends Component {
                     key: 'description'
                 },
                 {
+                    title: '所有者类型',
+                    dataIndex: 'owner_type',
+                    key: 'owner_type',
+                    render: (val) => {
+                        return (
+                            <span>{val === 'User' ? '个人' : '公司'}</span>
+                        )
+                    }
+                },
+                {
                     title: '访问权限',
                     dataIndex: 'public',
                     key: 'public',
-                    render: (record) => {
+                    render: (val) => {
                         return (
-                            <span>{record.public === 0 ? '个人' : '公开'}</span>
+                            <span>{val === 0 ? '个人' : '公开'}</span>
                         )
                     }
                 },
@@ -75,15 +86,15 @@ class TemplateList extends Component {
                                 style={{cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={() => {
-                                        this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 2)
+                                        this.editContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 'edit')
                                     }}
                             >编辑</a>
                             <Divider type="vertical" />
                             <a
                                 style={{cursor: 'pointer'}}
                                 className="mybutton"
-                                onClick={(record) => {
-                                        this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 1)
+                                onClick={() => {
+                                        this.editContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 'copy')
                                     }}
                             >复制</a>
                             <Divider type="vertical" />
@@ -110,14 +121,9 @@ class TemplateList extends Component {
                     key: 'description'
                 },
                 {
-                    title: '访问权限',
-                    dataIndex: 'public',
-                    key: 'public',
-                    render: (record) => {
-                        return (
-                            <span>{record.public === 0 ? '个人' : '公开'}</span>
-                        )
-                    }
+                    title: '所有者',
+                    dataIndex: 'owner_id',
+                    key: 'owner_id'
                 },
                 {
                     title: '版本',
@@ -148,8 +154,8 @@ class TemplateList extends Component {
                             <a
                                 style={{cursor: 'pointer'}}
                                 className="mybutton"
-                                onClick={(record) => {
-                                        this.copyContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 1)
+                                onClick={() => {
+                                        this.editContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 'copy')
                                     }}
                             >复制</a>
                         </span>
@@ -159,23 +165,43 @@ class TemplateList extends Component {
         }
     }
 
-    copyContent = (conf, name, desc, version, publics, owner_type, type)=>{
+    componentDidMount (){
+        const { app } = this.props;
+        http.get('/api/store_configurations_list?app=' + app + '&conf_type=Template')
+            .then(res=>{
+                if (res.ok) {
+                    this.setState({
+                        templateList: res.data
+                    });
+                }
+            });
+    }
+
+    editContent = (conf, name, desc, version, publics, owner_type, type)=>{
+        let new_name = name
+        if (type === 'copy') {
+            new_name = name + '-copy'
+        }
         let data = {
-            conf_name: name + '-copy',
+            conf_name: new_name,
             description: desc,
             public: publics,
             owner_type: owner_type,
             version: version
         };
         this.setState({
-            type: type === 1 ? '复制' : '编辑',
+            type: type === 'copy' ? '复制' : '编辑',
             conf: conf
         });
         if (version !== 0) {
             http.get('/api/configurations_version_read?conf=' + conf + '&version=' + version)
                 .then(res=>{
-                    data['data'] = res.message[0].data;
-                    this.props.store.codeStore.setCopyData(data);
+                    if (res.ok) {
+                        data.data = res.data;
+                        this.props.store.codeStore.setCopyData(data);
+                    } else {
+                        message.error(res.error);
+                    }
                 })
         } else {
             this.props.store.codeStore.setCopyData(data);
@@ -232,9 +258,9 @@ class TemplateList extends Component {
     };
 
     render () {
-        const { templateList, app } = this.props;
+        const { app } = this.props;
         let myList = this.props.store.codeStore.templateList;
-        const { type, conf, key, columns, columns2 } = this.state;
+        const { type, conf, key, templateList, columns, columns2 } = this.state;
         return (
             <div className="templateList">
                 <Button
@@ -250,8 +276,6 @@ class TemplateList extends Component {
                     visible={this.props.store.codeStore.templateVisible}
                     onCancel={this.handleCancel}
                     app={app}
-                    templateList={templateList}
-                    myList={myList}
                 />
                 <CopyForm
                     type={type}
