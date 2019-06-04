@@ -79,7 +79,7 @@ class Action extends Component {
               http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
                 if (result.ok) {
                   if (result.data.result){
-                    message.success('设置设备自动' + (type === '1' ? '启动' : '停止') + '成功，请稍后...')
+                    message.success((type === '1' ? '开启应用开机自启' : '禁止应用开机自启') + '成功，请稍后...')
                     clearInterval(timer)
                   } else {
                     clearInterval(timer)
