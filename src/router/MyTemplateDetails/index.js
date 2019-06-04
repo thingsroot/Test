@@ -79,8 +79,9 @@ class MyTemplateDetails extends PureComponent {
     fileChang = (info)=>{
         this.setState({
             file: info.file.originFileObj
+        }, ()=>{
+            this.openFile(info.file.originFileObj)
         });
-        this.openFile(info.file.originFileObj)
     };
 
     openFile = (file)=>{
@@ -288,12 +289,16 @@ class MyTemplateDetails extends PureComponent {
                             </tbody>
                         </table>
                     </div>
-                    <Button
-                        small
-                        type="primary"
+                    <Upload
+                        className="resetCsv"
                         style={previewCsvData.length > 0 ? {display: 'block'} : {display: 'none'}}
-                        onClick={this.deleteCsv}
-                    >清空</Button>
+                        onChange={this.fileChang}
+                        accept=".csv"
+                    >
+                        <Button>
+                            <Icon type="upload" /> 重选文件
+                        </Button>
+                    </Upload>
                 </Modal>
             </div>
         );

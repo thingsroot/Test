@@ -225,85 +225,85 @@ class MyGatesAppsInstall extends Component {
                 names && names.length > 0 && names.map(item=>{
                     if (item === this.props.store.codeStore.instNames) {
                         message.error('实例名已存在');
-                        return;
+                    } else {
+                        http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
+                            if (res.enable_beta === 1) {
+                                url = '/api/applications_versions_latest?beta=1&app='
+                            } else {
+                                url = '/api/applications_versions_latest?app='
+                            }
+                            if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
+                                message.error('实例名不能为空！');
+                            } else {
+                                http.get(url + app).then(res=>{
+                                    version = res.data;
+                                    if (version > 0) {
+                                        if (url.indexOf('beta') !== -1) {
+                                            message.success('网关安装当前应用最新beta版本!');
+                                        }
+                                        let params = {
+                                            gateway: sn,
+                                            inst: this.props.store.codeStore.instNames,
+                                            app: app,
+                                            version: version,
+                                            conf: JSON.parse(this.props.store.codeStore.installConfiguration),
+                                            id: 'app_install/' + sn + '/' + this.props.store.codeStore.instNames + '/' + app + '/' + this.rand(10000, 99999)
+                                        };
+                                        http.post('/api/gateways_applications_install', params).then(res=>{
+                                            openNotification('提交任务成功', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.');
+                                            setTimeout(()=>{
+                                                this.setState({
+                                                    details: true
+                                                })
+                                            }, 1000);
+                                            let max = 18000;
+                                            let min = 0;
+                                            if (res.ok === true) {
+                                                if (min > max) {
+                                                    openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '错误：' + res.data.message)
+                                                } else {
+                                                    let timer = setInterval(()=>{
+                                                        min += 5000;
+                                                        setTimeout(()=>{
+                                                            http.get('/api/gateways_exec_result?id=' + res.data.data)
+                                                                .then(res=>{
+                                                                    if (JSON.stringify(res) !== '{}' && res.data !== null) {
+                                                                        if (res.data.result === true) {
+                                                                            openNotification('安装应用' + this.props.store.codeStore.instNames + '成功', '' + res.data.id);
+                                                                            clearInterval(timer);
+                                                                        } else if (res.data.result === false) {
+                                                                            openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '' + res.data.message);
+                                                                            clearInterval(timer);
+                                                                        }
+                                                                        this.setState({
+                                                                            disabled: false
+                                                                        })
+                                                                    }
+                                                                })
+                                                        }, 1000)
+                                                    }, 5000)
+                                                }
+                                            } else {
+                                                openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
+                                                this.setState({
+                                                    disabled: false
+                                                })
+                                            }
+                                        })
+                                    } else {
+                                        message.error('应用暂时没有版本，无法安装！');
+                                        this.setState({
+                                            disabled: false
+                                        })
+                                    }
+                                });
+                            }
+                        });
                     }
                 })
             }
         });
 
-        http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
-            if (res.enable_beta === 1) {
-                url = '/api/applications_versions_latest?beta=1&app='
-            } else {
-                url = '/api/applications_versions_latest?app='
-            }
-            if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
-                message.error('实例名不能为空！');
-            } else {
-                http.get(url + app).then(res=>{
-                    version = res.data;
-                    if (version > 0) {
-                        if (url.indexOf('beta') !== -1) {
-                            message.success('网关安装当前应用最新beta版本!');
-                        }
-                        let params = {
-                            gateway: sn,
-                            inst: this.props.store.codeStore.instNames,
-                            app: app,
-                            version: version,
-                            conf: JSON.parse(this.props.store.codeStore.installConfiguration),
-                            id: 'app_install/' + sn + '/' + this.props.store.codeStore.instNames + '/' + app + '/' + this.rand(10000, 99999)
-                        };
-                        http.post('/api/gateways_applications_install', params).then(res=>{
-                            openNotification('提交任务成功', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.');
-                            setTimeout(()=>{
-                                this.setState({
-                                    details: true
-                                })
-                            }, 1000);
-                            let max = 18000;
-                            let min = 0;
-                            if (res.ok === true) {
-                                if (min > max) {
-                                    openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '错误：' + res.data.message)
-                                } else {
-                                    let timer = setInterval(()=>{
-                                        min += 5000;
-                                        setTimeout(()=>{
-                                            http.get('/api/gateways_exec_result?id=' + res.data.data)
-                                                .then(res=>{
-                                                    if (JSON.stringify(res) !== '{}' && res.data !== null) {
-                                                        if (res.data.result === true) {
-                                                            openNotification('安装应用' + this.props.store.codeStore.instNames + '成功', '' + res.data.id);
-                                                            clearInterval(timer);
-                                                        } else if (res.data.result === false) {
-                                                            openNotification('安装应用' + this.props.store.codeStore.instNames + '失败', '' + res.data.message);
-                                                            clearInterval(timer);
-                                                        }
-                                                        this.setState({
-                                                            disabled: false
-                                                        })
-                                                    }
-                                                })
-                                        }, 1000)
-                                    }, 5000)
-                                }
-                            } else {
-                                openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
-								this.setState({
-									disabled: false
-								})
-                            }
-                        })
-                    } else {
-                        message.error('应用暂时没有版本，无法安装！')
-						this.setState({
-							disabled: false
-						})
-                    }
-                });
-            }
-        });
     };
 
     onClose = () => {
@@ -311,13 +311,13 @@ class MyGatesAppsInstall extends Component {
             visible: false,
 			disabled: false
         })
-    }
+    };
 
     showDrawer = () => {
         this.setState({
             visible: true
         })
-    }
+    };
 
     render () {
         const { data, disabled, flag, item, detail, config, deviceColumns, keys, app } = this.state;

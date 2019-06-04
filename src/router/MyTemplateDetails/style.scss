@@ -5,7 +5,6 @@
     justify-content: space-between;
     margin-top: -20px;
   }
-
 }
 .empty{
   width: 100%;
@@ -25,6 +24,11 @@
   .ant-modal-body {
     width: 70vw!important;
     height: 57vh!important;
+    .resetCsv{
+      position: absolute;
+      bottom: 10px;
+      left: 20px;
+    }
   }
   .ant-upload-list-item, .ant-upload-list-item-error{
     display: none!important;
