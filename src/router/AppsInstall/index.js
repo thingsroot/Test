@@ -290,10 +290,16 @@ class MyGatesAppsInstall extends Component {
                                 }
                             } else {
                                 openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
+								this.setState({
+									disabled: false
+								})
                             }
                         })
                     } else {
                         message.error('应用暂时没有版本，无法安装！')
+						this.setState({
+							disabled: false
+						})
                     }
                 });
             }
@@ -302,7 +308,8 @@ class MyGatesAppsInstall extends Component {
 
     onClose = () => {
         this.setState({
-            visible: false
+            visible: false,
+			disabled: false
         })
     }
 
