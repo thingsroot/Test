@@ -213,7 +213,7 @@ class Action extends Component {
       }
       isfork (record){
         if (record.data){
-          if (record.data.data.owner !== _getCookie('user_id')){
+          if (record.data.data.owner !== unescape(_getCookie('user_id'))){
             this.setState({appdebug: false})
           } else {
             this.sendForkCreate(record)
