@@ -114,9 +114,16 @@ class AppsList extends Component {
       }
       componentDidMount () {
         this.fetch(this.props.match.params.sn);
-        // timer = setInterval(() => {
-        //   this.fetch(this.props.match.params.sn)
-        // }, 10000);
+        timer = setInterval(() => {
+          this.fetch(this.props.match.params.sn)
+        }, 10000);
+
+        let enable_beta = this.props.store.appStore.status.enable_beta
+        if (enable_beta === undefined) {
+          setTimeout(()=>{
+            this.fetch(this.props.match.params.sn);
+          }, 1000)
+        }
       }
       UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
@@ -150,7 +157,11 @@ class AppsList extends Component {
       // }
       fetch = (sn) => {
         const pagination = { ...this.state.pagination };
-        http.get('/api/gateways_app_list?gateway=' + sn + '&beta=' + this.props.store.appStore.status.enable_beta).then(res=>{
+        let enable_beta = this.props.store.appStore.status.enable_beta
+        if (enable_beta === undefined) {
+          enable_beta = 0
+        }
+        http.get('/api/gateways_app_list?gateway=' + sn + '&beta=' + enable_beta).then(res=>{
           this.props.store.appStore.setApplen(res.message && res.message.length)
           if (res.ok){
             this.setState({

@@ -44,7 +44,7 @@ class Status extends Component {
     gatewayRead (){
         http.get('/api/gateways_read?name=' + this.state.gateway).then(res=>{
             this.props.store.appStore.setStatus(res)
-          })
+        })
     }
     render () {
         const { status } = this.props.store.appStore;

@@ -18,7 +18,8 @@ class Action extends Component {
         upgradeLoading: false,
         setName: false,
         setNameConfirmLoading: false,
-        appdebug: false
+        appdebug: false,
+        running_action: false
     }
     componentWillUnmount (){
       clearInterval(this.t1);
@@ -55,12 +56,14 @@ class Action extends Component {
       }
       handleCancel = () => {
         this.setState({
-          visible: false
+          visible: false,
+          running_action: false
         });
       };
       showModal = (type) => {
         this.setState({
-          [type]: true
+          [type]: true,
+          running_action: true
         });
       }
       setAutoDisabled (record, props){
@@ -93,7 +96,10 @@ class Action extends Component {
       }
       handleOk = () => {
         const {record} = this.props;
-        this.setState({ visible: true });
+        this.setState({
+          visible: true,
+          running_action: true
+        });
         const data = {
           gateway: this.props.match.params.sn,
           app: record.name,
@@ -115,12 +121,18 @@ class Action extends Component {
                   }
               })
           }, 3000);
-      })
+          this.setState({ running_action: false });
+        }).catch(req=>{
+          req;
+          this.setState({ running_action: false });
+          message.error('发送请求失败！')
+        })
         setTimeout(() => {
-          this.setState({ upgradeLoading: false, visible: false });
+          this.setState({ upgradeLoading: false, visible: false});
         }, 3000);
       }
       appSwitch = (type) =>{
+        this.setState({ running_action: true });
         let action = '';
         if (type === 'stop'){
           action = '关闭'
@@ -156,6 +168,11 @@ class Action extends Component {
                 })
               }, 3000);
             }
+            this.setState({ running_action: false });
+        }).catch(req=>{
+          req;
+          this.setState({ running_action: false });
+          message.error('发送请求失败！')
         })
       }
       sendForkCreate (record){
@@ -211,8 +228,21 @@ class Action extends Component {
                 </div>
               </div>
               <div style={{display: 'flex', justifyContent: 'space-around', marginTop: 20, minWidth: 840, position: 'absolute', right: 20, bottom: 15}}>
+                <div style={{paddingTop: 5}}>
+                    <span>开机自启:</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <Switch checkedChildren="ON"
+                        unCheckedChildren="OFF"
+                        defaultChecked={Number(record.auto) === 0 ? false : true}
+                        disabled={this.state.running_action || actionSwi}
+                        onChange={()=>{
+                            this.setAutoDisabled(record, record.auto)
+                        }}
+                    />
+                </div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                 <Button
-                    disabled={actionSwi}
+                    disabled={this.state.running_action || actionSwi}
                     onClick={()=>{
                         this.showModal('setName')
                     }}
@@ -241,7 +271,7 @@ class Action extends Component {
                     应用调试
                 </Button>
                 <Button
-                    disabled={record.latestVersion <= record.version || actionSwi}
+                    disabled={record.latestVersion === undefined || record.latestVersion <= record.version || this.state.running_action || actionSwi}
                     onClick={()=>{
                         this.showModal('visible')
                     }}
@@ -252,12 +282,12 @@ class Action extends Component {
                         onClick={()=>{
                           this.appSwitch('start')
                         }}
-                        disabled={actionSwi}
+                        disabled={this.state.running_action || actionSwi}
                     >
                         启动应用
                       </Button>
                     <Button
-                        disabled={actionSwi}
+                        disabled={this.state.running_action || actionSwi}
                         onClick={()=>{
                           this.appSwitch('stop')
                         }}
@@ -265,26 +295,15 @@ class Action extends Component {
                         关闭应用
                       </Button>
                       <Button
+                          disabled={this.state.running_action || actionSwi}
                           onClick={()=>{
                             this.appSwitch('restart')
                           }}
                       >
                         重启应用
                       </Button>
-                <div style={{paddingTop: 5}}>
-                    <span>开机自启:</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <Switch checkedChildren="ON"
-                        unCheckedChildren="OFF"
-                        defaultChecked={Number(record.auto) === 0 ? false : true}
-                        disabled={actionSwi}
-                        onChange={()=>{
-                            this.setAutoDisabled(record, record.auto)
-                        }}
-                    />
-                </div>
                 <Popconfirm
-                    disabled={actionSwi}
+                    disabled={this.state.running_action || actionSwi}
                     title="Are you sure update this app?"
                     onConfirm={()=>{
                         this.confirm(record, this.props.match.params.sn, this)
@@ -294,7 +313,7 @@ class Action extends Component {
                     cancelText="No"
                 >
                     <Button
-                        disabled={actionSwi}
+                        disabled={this.state.running_action || actionSwi}
                         type="danger"
                     >应用卸载</Button>
                   </Popconfirm>
@@ -375,11 +394,14 @@ class Action extends Component {
                               message.error(result.error)
                               this.setState({setNameConfirmLoading: false})
                             }
+                            this.setState({running_action: false})
+                          }).catch(()=>{
+                            this.setState({running_action: false})
                           })
                         }}
                         destroyOnClose
                         onCancel={()=>{
-                          this.setState({setName: false})
+                          this.setState({setName: false, running_action: false})
                         }}
                         afterClose={()=>{
                           this.setState({setNameConfirmLoading: false})
