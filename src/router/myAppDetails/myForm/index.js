@@ -25,7 +25,7 @@ const MyTemplateForm = Form.create({ name: 'template_form' })(
                     owner_type: values.owner_type
                 };
                 if (params.owner_type === 'User') {
-                    params['owner_id'] = _getCookie('user_id')
+                    params['owner_id'] = unescape(_getCookie('user_id'))
                 } else {
                     params['owner_id'] = this.props.store.codeStore.groupName
                 }

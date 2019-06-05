@@ -45,7 +45,8 @@ class CodeStore {
         licenseType: '免费',
         description: '',
         confTemplate: '',
-        preConfiguration: ''
+        preConfiguration: '',
+        published: 0
     };
 
     @observable instNames = '';
