@@ -36,8 +36,8 @@ class LinkStatus extends Component {
         DATA_UPLOAD_PERIOD_VALUE: 0,
         COV_TTL: false,
         COV_TTL_VALUE: 0,
-        UOLOAD: false,
-        UOLOAD_VALUE: 0,
+        EVENT_UPLOAD: false,
+        EVENT_UPLOAD_VALUE: 0,
         iot_beta: 0,
         use_beta: 0,
         skynet_version: 0,
@@ -146,7 +146,7 @@ class LinkStatus extends Component {
                     loading: false,
                     DATA_UPLOAD_PERIOD_VALUE: this.props.store.appStore.status.data_upload_period,
                     COV_TTL_VALUE: this.props.store.appStore.status.data_upload_cov_ttl,
-                    UOLOAD_VALUE: this.props.store.appStore.status.event_upload
+                    EVENT_UPLOAD_VALUE: this.props.store.appStore.status.event_upload
                 }, ()=>{
                     http.get('/api/applications_versions_list?app=FreeIOE&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
                         const arr = [];
@@ -306,7 +306,7 @@ class LinkStatus extends Component {
             this.setState({[type]: value})
       }
       buttonOnclick (value, type){
-          if (type === 'UOLOAD'){
+          if (type === 'EVENT_UPLOAD'){
               http.post('/api/gateways_enable_event', {
                   name: this.props.match.params.sn,
                   min_level: this.state[value],
@@ -316,9 +316,9 @@ class LinkStatus extends Component {
                     http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
                         if (result.data){
                             if (result.data.result) {
-                                message.success('开启成功')
+                                message.success('更改事件上送等级成功')
                             } else {
-                                message.error('开启失败')
+                                message.error('更改事件上送等级失败')
                             }
                             clearInterval(this.timer)
                         }
@@ -327,7 +327,7 @@ class LinkStatus extends Component {
 
               })
           } else {
-            http.post('/api/gatewyas_cloud_conf', {
+            http.post('/api/gateways_cloud_conf', {
                 name: this.props.match.params.sn,
                 data: {
                     [type]: this.state[value]
@@ -338,9 +338,9 @@ class LinkStatus extends Component {
                     http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
                         if (result.data){
                             if (result.data.result) {
-                                message.success('开启成功')
+                                message.success('更改设置成功')
                             } else {
-                                message.error('开启失败')
+                                message.error('更改设置失败')
                             }
                             clearInterval(this.timer)
                         }
@@ -351,7 +351,7 @@ class LinkStatus extends Component {
       }
     render () {
         const { status, actionSwi } = this.props.store.appStore;
-        const {  flag, title, update, config, newdata, opendata, loading, DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, UOLOAD, UOLOAD_VALUE } = this.state;
+        const {  flag, title, update, config, newdata, opendata, loading, DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, EVENT_UPLOAD, EVENT_UPLOAD_VALUE } = this.state;
         return (
             <div className="setgateway">
                 <div className={flag && !update ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
@@ -497,6 +497,7 @@ class LinkStatus extends Component {
                                         }}
                                         onClick={()=>{
                                             this.buttonOnclick('DATA_UPLOAD_PERIOD_VALUE', 'DATA_UPLOAD_PERIOD')
+                                            this.setState({DATA_UPLOAD_PERIOD: false})
                                         }}
                                       >保存</Button>
                                     : ''
@@ -530,6 +531,7 @@ class LinkStatus extends Component {
                                         }}
                                         onClick={()=>{
                                             this.buttonOnclick('COV_TTL_VALUE', 'COV_TTL')
+                                            this.setState({COV_TTL: false})
                                         }}
                                       >保存</Button>
                                     : ''
@@ -584,18 +586,18 @@ class LinkStatus extends Component {
                             </span>
                             <div style={{position: 'relative'}}>
                                 <InputNumber
-                                    value={UOLOAD_VALUE}
+                                    value={EVENT_UPLOAD_VALUE}
                                     min={0}
                                     style={{width: 100}}
                                     onChange={(value)=>{
-                                        this.onChange(value, 'UOLOAD_VALUE')
+                                        this.onChange(value, 'EVENT_UPLOAD_VALUE')
                                     }}
                                     onFocus={()=>{
-                                        this.setState({UOLOAD: true})
+                                        this.setState({EVENT_UPLOAD: true})
                                     }}
                                 />
                                 {
-                                    UOLOAD
+                                    EVENT_UPLOAD
                                     ? <Button
                                         style={{
                                             position: 'absolute',
@@ -604,7 +606,8 @@ class LinkStatus extends Component {
                                             top: 9
                                         }}
                                         onClick={()=>{
-                                            this.buttonOnclick('UOLOAD_VALUE', 'UOLOAD')
+                                            this.buttonOnclick('EVENT_UPLOAD_VALUE', 'EVENT_UPLOAD')
+                                            this.setState({EVENT_UPLOAD: false})
                                         }}
                                       >保存</Button>
                                     : ''
