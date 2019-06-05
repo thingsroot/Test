@@ -278,7 +278,7 @@ class AppsList extends Component {
         const data = {
           gateway: sn,
           inst: this.props.store.codeStore.instNames,
-          conf: this.props.store.codeStore.installConfiguration,
+          conf: JSON.parse(this.props.store.codeStore.installConfiguration),
           id: `/gateways/${sn}/config/${this.props.store.codeStore.instNames}/${new Date() * 1}`
         };
         http.post('/api/gateways_applications_conf', data).then(res=>{
