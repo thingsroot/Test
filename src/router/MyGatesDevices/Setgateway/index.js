@@ -312,19 +312,26 @@ class LinkStatus extends Component {
                   min_level: this.state[value],
                   id: `enable_event/${this.props.match.params.sn}/min${value}/${new Date() * 1}`
               }).then(res=>{
-                this.timer = setTimeout(() => {
-                    http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                        if (result.data){
-                            if (result.data.result) {
-                                message.success('更改事件上送等级成功')
-                            } else {
-                                message.error('更改事件上送等级失败')
-                            }
-                            clearInterval(this.timer)
-                        }
-                    })
-                }, 1000);
-
+                message.success('发送更改事件上送等级请求成功')
+                // this.timer = setTimeout(() => {
+                //     http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                //         if (result.data){
+                //             if (result.data.result) {
+                //                 message.success('更改事件上送等级成功')
+                //             } else {
+                //                 message.error('更改事件上送等级失败')
+                //             }
+                //             clearInterval(this.timer)
+                //         }
+                //     })
+                // }, 1000);
+                let info = {
+                    gateway: this.props.match.params.sn,
+                    min_level: this.state[value]
+                }
+                this.props.store.action.pushAction(res.data, '更改事件上送等级', '', info, 5000)
+              }).catch(err=>{
+                message.success('发送更改事件上送等级请求失败：' + err)
               })
           } else {
             http.post('/api/gateways_cloud_conf', {
