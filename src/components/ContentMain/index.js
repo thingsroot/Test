@@ -7,6 +7,7 @@ const AppSettings = LoadableComponent(()=>import('../../router/AppSettings'));
 const Home = LoadableComponent(()=>import('../../router/Home'));
 const MyGates = LoadableComponent(()=>import('../../router/MyGates'));
 const MyApps = LoadableComponent(()=>import('../../router/MyApps'));
+const AppStore = LoadableComponent(()=>import('../../router/AppStore'));
 const UserSettings = LoadableComponent(()=>import('../../router/UserSettings'));
 const MyAccessKey = LoadableComponent(()=>import('../../router/MyAccessKey'));
 const MyVirtualGates = LoadableComponent(()=>import('../../router/MyVirtualGates'));
@@ -16,6 +17,7 @@ const PlatformMessage = LoadableComponent(()=>import('../../router/PlatformMessa
 const DeviceMessage = LoadableComponent(()=>import('../../router/DeviceMessage'));
 const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHistory'));
 const MyGatesDevicesOutputs = LoadableComponent(()=>import('../../router/MyGatesDevicesOutputs'));
+const MyGatesDevicesCommands = LoadableComponent(()=>import('../../router/MyGatesDevicesCommands'));
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
 const MyTemplateDetails = LoadableComponent(()=>import('../../router/MyTemplateDetails'));
@@ -37,6 +39,11 @@ class ContentMain extends PureComponent {
                     path="/myapps"
                     component={MyApps}
                     title={'我的应用'}
+                />
+                <PrivateRoute
+                    path="/appstore"
+                    component={AppStore}
+                    title={'应用商店'}
                 />
                 <PrivateRoute
                     path="/myappdetails/:name/:active"
@@ -103,6 +110,11 @@ class ContentMain extends PureComponent {
                     path="/mygatesdevicesoutputs/:sn/:vsn"
                     component={MyGatesDevicesOutputs}
                     title={'数据下置'}
+                />
+                <PrivateRoute
+                    path="/mygatesdevicescommands/:sn/:vsn"
+                    component={MyGatesDevicesCommands}
+                    title={'设备指令'}
                 />
                 <PrivateRoute
                     path="/appsinstall/:sn/:app/:type"
