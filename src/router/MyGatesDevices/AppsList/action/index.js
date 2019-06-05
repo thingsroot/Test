@@ -153,20 +153,27 @@ class Action extends Component {
         }
         http.post('/api/gateways_applications_' + type, data).then(res=>{
             if (res.ok) {
-              this.t1 = setInterval(() => {
-                http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                  if (result.ok) {
-                    if (result.data.result){
-                      message.success(action + '应用成功，请稍后...')
-                      clearInterval(this.t1)
-                    } else {
-                      clearInterval(this.t1)
-                      message.error(result.data.message)
-                    }
-                  }
-                  this.props.update_app_list()
-                })
-              }, 3000);
+              // this.t1 = setInterval(() => {
+              //   http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+              //     if (result.ok) {
+              //       if (result.data.result){
+              //         message.success(action + '应用成功，请稍后...')
+              //         clearInterval(this.t1)
+              //       } else {
+              //         clearInterval(this.t1)
+              //         message.error(result.data.message)
+              //       }
+              //     }
+              //     this.props.update_app_list()
+              //   })
+              // }, 3000);
+              let info = {
+                gateway: this.props.match.params.sn,
+                inst: this.props.record.inst_name
+              }
+              this.props.store.action.pushAction(res.data, action + '应用', '', info, 10000,  ()=> {
+                this.props.update_app_list();
+              })
             }
             this.setState({ running_action: false });
         }).catch(req=>{
@@ -374,22 +381,34 @@ class Action extends Component {
                               id: `gateway/rename/${nameValue}/${new Date() * 1}`
                           }).then(result=>{
                             if (result.ok) {
-                              timer = setInterval(() => {
-                                message.success('更改实例名成功请求发送成功，请稍后...')
+                              message.success('更改实例名成功请求发送成功，请稍后...')
+
+                              // timer = setInterval(() => {
+                              //   http.get('/api/gateways_exec_result?id=' + result.data).then(result=>{
+                              //     if (result.ok) {
+                              //       if (result.data.result){
+                              //         message.success('更改实例名成功!!!')
+                              //         clearInterval(timer)
+                              //       } else {
+                              //         clearInterval(timer)
+                              //         message.error(result.data.message)
+                              //       }
+                              //       this.props.update_app_list();
+                              //     }
+                              //   })
+                              // }, 3000);
+
+                              let info = {
+                                gateway: this.props.match.params.sn,
+                                inst: this.props.record.inst_name,
+                                new_inst: nameValue
+                              }
+                              this.props.store.action.pushAction(result.data, '应用改名', '', info, 10000, ()=> {
                                 this.setState({setName: false})
-                                http.get('/api/gateways_exec_result?id=' + result.data).then(result=>{
-                                  if (result.ok) {
-                                    if (result.data.result){
-                                      message.success('更改实例名成功!!!')
-                                      clearInterval(timer)
-                                    } else {
-                                      clearInterval(timer)
-                                      message.error(result.data.message)
-                                    }
-                                    this.props.update_app_list();
-                                  }
-                                })
-                              }, 3000);
+                                setTimeout(()=>{
+                                  this.props.update_app_list();
+                                }, 1000)
+                              })
                             } else {
                               message.error(result.error)
                               this.setState({setNameConfirmLoading: false})

@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react';
+import { observer, inject } from 'mobx-react';
+import {notification } from 'antd';  //
 import { Switch, Redirect, withRouter} from 'react-router-dom';
 import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
@@ -21,7 +23,45 @@ const MyGatesDevicesCommands = LoadableComponent(()=>import('../../router/MyGate
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
 const MyTemplateDetails = LoadableComponent(()=>import('../../router/MyTemplateDetails'));
+
+import { doUpdate } from '../../utils/Action';
+
+let timer;
+const openNotification = (title, message) => {
+    notification.open({
+        message: title,
+        description: message,
+        placement: 'buttonRight'
+    });
+};
+
+@inject('store')
+@observer
 class ContentMain extends PureComponent {
+    componentDidMount (){
+        this.startTimer()
+    }
+    componentWillUnmount (){
+        clearInterval(timer);
+    }
+    startTimer (){
+       timer = setInterval(() => {
+            let action_store = this.props.store.action;
+            const { actions } = this.props.store.action;
+            doUpdate(actions, function (action, status, message){
+                action_store.setActionStatus(action.id, status, message)
+                if (status === 'done') {
+                    openNotification(action.title + '成功', message)
+                }
+                if (status === 'failed') {
+                    openNotification(action.title + '失败', message)
+                }
+                if (status === 'timeout') {
+                    openNotification(action.title + '超时', message)
+                }
+            })
+        }, 1000);
+    }
     render (){
         return (
             <Switch>
