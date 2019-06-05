@@ -8,28 +8,41 @@ let timer;
 @inject('store')
 @observer
 class Status extends Component {
+    constructor (props){
+        super(props);
+        this.state = {
+            gateway: ''
+        }
+    }
     componentDidMount (){
-        this.gatewayRead(this.props.match.params.sn)
-        // timer = setInterval(() => {
-        //     this.gatewayRead(this.props.match.params.sn)
-        // }, 5000);
+        this.setState({gateway: this.props.match.params.sn})
+        this.gatewayRead()
+        this.startTimer()
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
         if (nextProps.location.pathname !== this.props.location.pathname) {
-            this.gatewayRead(nextProps.match.params.sn)
-            clearInterval(timer)
-            timer = setInterval(() => {
-                http.get('/api/gateways_read?name=' + nextProps.match.params.sn).then(res=>{
-                    this.props.store.appStore.setStatus(res)
-                  })
-            }, 5000);
+            this.setState({gateway: nextProps.match.params.sn})
+            this.gatewayRead()
         }
     }
     componentWillUnmount (){
         clearInterval(timer);
     }
-    gatewayRead = (sn)=>{
-        http.get('/api/gateways_read?name=' + sn).then(res=>{
+    startTimer (){
+        timer = setInterval(() => {
+            const {gateStatusLast, gateStatusGap, gateStatusNoGapTime} = this.props.store.timer;
+            let now = new Date().getTime()
+            if (now < gateStatusNoGapTime) {
+                this.props.store.timer.setGateStatusLast(now)
+                this.gatewayRead()
+            } else if (now > gateStatusGap + gateStatusLast) {
+                this.props.store.timer.setGateStatusLast(now)
+                this.gatewayRead()
+            }
+        }, 1000);
+    }
+    gatewayRead (){
+        http.get('/api/gateways_read?name=' + this.state.gateway).then(res=>{
             this.props.store.appStore.setStatus(res)
           })
     }
@@ -56,7 +69,7 @@ class Status extends Component {
                     {
                         this.props.location.pathname.indexOf('/AppsInstall') === -1
                         ? <div>
-                            <Link to={`/AppsInstall/${this.props.match.params.sn}/app/1`}>
+                            <Link to={`/AppsInstall/${this.state.gateway}/app/1`}>
                                 安装新应用
                             </Link>
                         </div>

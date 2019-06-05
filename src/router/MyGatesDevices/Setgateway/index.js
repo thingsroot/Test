@@ -276,17 +276,23 @@ class LinkStatus extends Component {
         })
       }
       restart (url){
-          const data = {
-              id: `gateways/${url}/${this.props.match.params.sn}/${new Date() * 1}`,
-              name: this.props.match.params.sn
-          }
-          http.postToken('/api/gateways_' + url, data).then(res=>{
-              if (res.ok){
-                  message.success('重启成功，请稍等...')
-              } else {
-                  message.error('重启失败，请重试...')
-              }
-          })
+        const data = {
+            id: `gateways/${url}/${this.props.match.params.sn}/${new Date() * 1}`,
+            name: this.props.match.params.sn
+        }
+        http.postToken('/api/gateways_' + url, data).then(res=>{
+            if (res.ok){
+                message.success('重启成功，请稍等...')
+                if (url === 'restart') {
+                    let no_gap_time = 10000; // 10 seconds
+                    setTimeout(()=>{
+                        this.props.store.timer.setGateStatusNoGapTime(no_gap_time)
+                    }, 5000)
+                }
+            } else {
+                message.error('重启失败，请重试...')
+            }
+        })
       }
       changeState  = (name)=> {
           // const data = Object.assign(this.state.config, {[name]: !this.state.config[name]});
