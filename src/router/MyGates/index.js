@@ -173,6 +173,7 @@ class MyGates extends Component {
                                         this.setState({
                                             record
                                         }, ()=>{
+                                            this.setState({index: record.owner_type === 'User' ? 2 : 1})
                                             this.showModal('setName')
                                         })
                                     }}
