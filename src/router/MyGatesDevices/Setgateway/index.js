@@ -31,6 +31,7 @@ class LinkStatus extends Component {
         newdata: [],
         loading: true,
         sn: this.props.match.params.sn,
+        upgrading: false,
         flag: true,
         DATA_UPLOAD_PERIOD: false,
         DATA_UPLOAD_PERIOD_VALUE: 0,
@@ -358,7 +359,7 @@ class LinkStatus extends Component {
       }
     render () {
         const { status, actionSwi } = this.props.store.appStore;
-        const {  flag, title, update, config, newdata, opendata, loading, DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, EVENT_UPLOAD, EVENT_UPLOAD_VALUE } = this.state;
+        const {  upgrading, flag, title, update, config, newdata, opendata, loading, DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, EVENT_UPLOAD, EVENT_UPLOAD_VALUE } = this.state;
         return (
             <div className="setgateway">
                 <div className={flag && !update ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
@@ -646,7 +647,7 @@ class LinkStatus extends Component {
                 <div className={!flag && !update ? 'update show' : 'update hide'}>
                                 <Button
                                     onClick={()=>{
-                                        this.setState({update: false, flag: true})
+                                        this.setState({update: false, flag: true, upgrading: true})
                                     }}
                                 >X</Button>
                     <div>
@@ -685,7 +686,7 @@ class LinkStatus extends Component {
                                     {
                                         config.version < this.state.iot_beta || config.skynet_version < this.state.skynet_version
                                         ? <Button
-                                            disabled={actionSwi}
+                                            disabled={upgrading || actionSwi}
                                             onClick={()=>{
                                                 const data = config.skynet_version < this.state.skynet_version
                                                 ? {
@@ -701,18 +702,29 @@ class LinkStatus extends Component {
                                                     no_ack: 1,
                                                     id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
                                                 }
+                                                this.setState({upgrading: true})
                                                 http.postToken('/api/gateways_upgrade', data).then(res=>{
-                                                    this.timer = setInterval(() => {
-                                                        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                                                            if (result.ok){
-                                                                message.success('网关固件升级成功')
-                                                                clearInterval(this.timer)
-                                                            } else {
-                                                                message.error('网关固件升级失败，请重试')
-                                                                clearInterval(this.timer)
-                                                            }
-                                                        })
-                                                    }, 3000);
+                                                    if (res.ok) {
+                                                        this.timer = setInterval(() => {
+                                                            http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+                                                                if (result.ok){
+                                                                    message.success('网关固件升级成功')
+                                                                    this.setState({update: false, flag: true})
+                                                                    clearInterval(this.timer)
+                                                                } else {
+                                                                    message.error('网关固件升级失败，请重试')
+                                                                    clearInterval(this.timer)
+                                                                    this.setState({upgrading: false})
+                                                                }
+                                                            }).catch(()=>{
+                                                                this.setState({upgrading: false})
+                                                            })
+                                                        }, 3000);
+                                                    } else {
+                                                        this.setState({upgrading: false})
+                                                    }
+                                                }).catch(()=>{
+                                                    this.setState({upgrading: false})
                                                 })
                                             }}
                                           >升级更新</Button> : <Button>检查更新</Button>
