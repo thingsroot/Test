@@ -4,7 +4,6 @@ import http from '../../../../utils/Server';
 import { withRouter } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import MyGatesAppsUpgrade from '../../../Upgrade';
-import { _getCookie } from '../../../../utils/Session';
 let timer;
 function cancel () {
     message.error('You have canceled the update');
@@ -15,9 +14,11 @@ function cancel () {
 class Action extends Component {
     state = {
         visible: false,
-        loading: false,
+        upgradeLoading: false,
         setName: false,
-        appdebug: false
+        setNameConfirmLoading: false,
+        appdebug: false,
+        running_action: false
     }
     componentWillUnmount (){
       clearInterval(this.t1);
@@ -39,6 +40,7 @@ class Action extends Component {
                     if (result.data.result) {
                       message.success('应用卸载成功,请稍后...')
                       clearInterval(timer)
+                      this.props.update_app_list()
                     } else if (result.data.result === false) {
                       message.error('应用卸载失败，请重试')
                       clearInterval(timer)
@@ -53,12 +55,14 @@ class Action extends Component {
       }
       handleCancel = () => {
         this.setState({
-          visible: false
+          visible: false,
+          running_action: false
         });
       };
       showModal = (type) => {
         this.setState({
-          [type]: true
+          [type]: true,
+          running_action: true
         });
       }
       setAutoDisabled (record, props){
@@ -77,7 +81,7 @@ class Action extends Component {
               http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
                 if (result.ok) {
                   if (result.data.result){
-                    message.success('设置设备自动' + (type === '1' ? '启动' : '停止') + '成功，请稍后...')
+                    message.success((type === '1' ? '开启应用开机自启' : '禁止应用开机自启') + '成功，请稍后...')
                     clearInterval(timer)
                   } else {
                     clearInterval(timer)
@@ -91,7 +95,10 @@ class Action extends Component {
       }
       handleOk = () => {
         const {record} = this.props;
-        this.setState({ visible: true });
+        this.setState({
+          visible: true,
+          running_action: true
+        });
         const data = {
           gateway: this.props.match.params.sn,
           app: record.name,
@@ -106,18 +113,25 @@ class Action extends Component {
                   if (res.ok){
                       message.success('应用升级成功')
                       clearInterval(timer)
+                      this.props.update_app_list()
                   } else if (res.ok === false){
                       message.error('应用升级操作失败，请重试');
                       clearInterval(timer)
                   }
               })
           }, 3000);
-      })
+          this.setState({ running_action: false });
+        }).catch(req=>{
+          req;
+          this.setState({ running_action: false });
+          message.error('发送请求失败！')
+        })
         setTimeout(() => {
-          this.setState({ loading: false, visible: false });
+          this.setState({ upgradeLoading: false, visible: false});
         }, 3000);
       }
       appSwitch = (type) =>{
+        this.setState({ running_action: true });
         let action = '';
         if (type === 'stop'){
           action = '关闭'
@@ -138,20 +152,33 @@ class Action extends Component {
         }
         http.post('/api/gateways_applications_' + type, data).then(res=>{
             if (res.ok) {
-              this.t1 = setInterval(() => {
-                http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                  if (result.ok) {
-                    if (result.data.result){
-                      message.success(action + '应用成功，请稍后...')
-                      clearInterval(this.t1)
-                    } else {
-                      clearInterval(this.t1)
-                      message.error(result.data.message)
-                    }
-                  }
-                })
-              }, 3000);
+              // this.t1 = setInterval(() => {
+              //   http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
+              //     if (result.ok) {
+              //       if (result.data.result){
+              //         message.success(action + '应用成功，请稍后...')
+              //         clearInterval(this.t1)
+              //       } else {
+              //         clearInterval(this.t1)
+              //         message.error(result.data.message)
+              //       }
+              //     }
+              //     this.props.update_app_list()
+              //   })
+              // }, 3000);
+              let info = {
+                gateway: this.props.match.params.sn,
+                inst: this.props.record.inst_name
+              }
+              this.props.store.action.pushAction(res.data, action + '应用', '', info, 10000,  ()=> {
+                this.props.update_app_list();
+              })
             }
+            this.setState({ running_action: false });
+        }).catch(req=>{
+          req;
+          this.setState({ running_action: false });
+          message.error('发送请求失败！')
         })
       }
       sendForkCreate (record){
@@ -185,7 +212,7 @@ class Action extends Component {
       }
       isfork (record){
         if (record.data){
-          if (record.data.data.owner !== _getCookie('user_id')){
+          if (record.data.data.owner !== this.props.store.session.user_id){
             this.setState({appdebug: false})
           } else {
             this.sendForkCreate(record)
@@ -195,7 +222,7 @@ class Action extends Component {
     render () {
         const { actionSwi } = this.props.store.appStore;
         const { record } = this.props;
-        const { loading, visible, setName, nameValue, appdebug } = this.state;
+        const { upgradeLoading, visible, setName, setNameConfirmLoading, nameValue, appdebug } = this.state;
         return (
             <div style={{position: 'relative', paddingBottom: 50}}>
               <div style={{lineHeight: '30px', paddingLeft: 20}}>
@@ -203,12 +230,25 @@ class Action extends Component {
                   应用名称:{record.data && record.data.data.name || '本地应用'}
                 </div>
                 <div>
-                  应用开发者：{record.data && record.data.data.owner || _getCookie('companies')}
+                  应用开发者：{record.data && record.data.data.owner || this.props.store.session.companies}
                 </div>
               </div>
               <div style={{display: 'flex', justifyContent: 'space-around', marginTop: 20, minWidth: 840, position: 'absolute', right: 20, bottom: 15}}>
+                <div style={{paddingTop: 5}}>
+                    <span>开机自启:</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <Switch checkedChildren="ON"
+                        unCheckedChildren="OFF"
+                        defaultChecked={Number(record.auto) === 0 ? false : true}
+                        disabled={this.state.running_action || actionSwi}
+                        onChange={()=>{
+                            this.setAutoDisabled(record, record.auto)
+                        }}
+                    />
+                </div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                 <Button
-                    disabled={actionSwi}
+                    disabled={this.state.running_action || actionSwi}
                     onClick={()=>{
                         this.showModal('setName')
                     }}
@@ -237,7 +277,7 @@ class Action extends Component {
                     应用调试
                 </Button>
                 <Button
-                    disabled={record.latestVersion <= record.version || actionSwi}
+                    disabled={record.latestVersion === undefined || record.latestVersion <= record.version || this.state.running_action || actionSwi}
                     onClick={()=>{
                         this.showModal('visible')
                     }}
@@ -248,12 +288,12 @@ class Action extends Component {
                         onClick={()=>{
                           this.appSwitch('start')
                         }}
-                        disabled={actionSwi}
+                        disabled={this.state.running_action || actionSwi}
                     >
                         启动应用
                       </Button>
                     <Button
-                        disabled={actionSwi}
+                        disabled={this.state.running_action || actionSwi}
                         onClick={()=>{
                           this.appSwitch('stop')
                         }}
@@ -261,26 +301,15 @@ class Action extends Component {
                         关闭应用
                       </Button>
                       <Button
+                          disabled={this.state.running_action || actionSwi}
                           onClick={()=>{
                             this.appSwitch('restart')
                           }}
                       >
                         重启应用
                       </Button>
-                <div style={{paddingTop: 5}}>
-                    <span>开机自启:</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <Switch checkedChildren="ON"
-                        unCheckedChildren="OFF"
-                        defaultChecked={Number(record.auto) === 0 ? false : true}
-                        disabled={actionSwi}
-                        onChange={()=>{
-                            this.setAutoDisabled(record, record.auto)
-                        }}
-                    />
-                </div>
                 <Popconfirm
-                    disabled={actionSwi}
+                    disabled={this.state.running_action || actionSwi}
                     title="Are you sure update this app?"
                     onConfirm={()=>{
                         this.confirm(record, this.props.match.params.sn, this)
@@ -290,7 +319,7 @@ class Action extends Component {
                     cancelText="No"
                 >
                     <Button
-                        disabled={actionSwi}
+                        disabled={this.state.running_action || actionSwi}
                         type="danger"
                     >应用卸载</Button>
                   </Popconfirm>
@@ -310,7 +339,7 @@ class Action extends Component {
                         <Button
                             key="submit"
                             type="primary"
-                            loading={loading}
+                            loading={upgradeLoading}
                             onClick={this.handleOk}
                         >
                             升级
@@ -340,19 +369,60 @@ class Action extends Component {
                     </Modal>
                     <Modal
                         visible={setName}
+                        confirmLoading={setNameConfirmLoading}
                         title="更改实例名"
                         onOk={()=>{
-                            // this.setState({setName: false})
-                            http.post('/api/gateways_applications_rename', {
+                          this.setState({setNameConfirmLoading: true})
+                          http.post('/api/gateways_applications_rename', {
+                              gateway: this.props.match.params.sn,
+                              inst: record.inst_name,
+                              new_name: nameValue,
+                              id: `gateway/rename/${nameValue}/${new Date() * 1}`
+                          }).then(result=>{
+                            if (result.ok) {
+                              message.success('更改实例名成功请求发送成功，请稍后...')
+
+                              // timer = setInterval(() => {
+                              //   http.get('/api/gateways_exec_result?id=' + result.data).then(result=>{
+                              //     if (result.ok) {
+                              //       if (result.data.result){
+                              //         message.success('更改实例名成功!!!')
+                              //         clearInterval(timer)
+                              //       } else {
+                              //         clearInterval(timer)
+                              //         message.error(result.data.message)
+                              //       }
+                              //       this.props.update_app_list();
+                              //     }
+                              //   })
+                              // }, 3000);
+
+                              let info = {
                                 gateway: this.props.match.params.sn,
-                                inst: record.inst_name,
-                                new_name: nameValue,
-                                id: `gateway/rename/${nameValue}/${new Date() * 1}`
-                            })
+                                inst: this.props.record.inst_name,
+                                new_inst: nameValue
+                              }
+                              this.props.store.action.pushAction(result.data, '应用改名', '', info, 10000, ()=> {
+                                this.setState({setName: false})
+                                setTimeout(()=>{
+                                  this.props.update_app_list();
+                                }, 1000)
+                              })
+                            } else {
+                              message.error(result.error)
+                              this.setState({setNameConfirmLoading: false})
+                            }
+                            this.setState({running_action: false})
+                          }).catch(()=>{
+                            this.setState({running_action: false})
+                          })
                         }}
                         destroyOnClose
                         onCancel={()=>{
-                            this.setState({setName: false})
+                          this.setState({setName: false, running_action: false})
+                        }}
+                        afterClose={()=>{
+                          this.setState({setNameConfirmLoading: false})
                         }}
                     >
                         <span>实例名: </span>

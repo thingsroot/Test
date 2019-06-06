@@ -3,7 +3,6 @@ import {
     Modal, Form, Input, Radio, message
 } from 'antd';
 import http from '../../../utils/Server';
-import {_getCookie} from '../../../utils/Session';
 import {inject, observer} from 'mobx-react';
 
 const CapyForm = Form.create({ name: 'copy_form' })(
@@ -18,15 +17,16 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                     return;
                 }
                 let params = {
+                    name: this.props.conf,
                     app: this.props.app,
                     conf_name: values.conf_name,
                     description: values.description,
-                    type: 'Configuration',
+                    type: values.type,
                     public: values.public,
                     owner_type: values.owner_type
                 };
                 if (params.owner_type === 'User') {
-                    params['owner_id'] = _getCookie('user_id')
+                    params['owner_id'] = this.props.store.session.user_id
                 } else if (params.owner_type === 'Cloud Company Group') {
                     params['owner_id'] = this.props.store.codeStore.groupName
                 }
@@ -34,7 +34,7 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                     http.post('/api/configurations_create', params).then(res=>{
                         conf_name = res.data.name;
                         if (res.ok === false) {
-                            message.error('新版本上传失败！');
+                            message.error('复制模板信息失败！');
                         } else {
                             let list = this.props.store.codeStore.templateList;
                             list.unshift(res.data);
@@ -49,9 +49,9 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                                 http.post('/api/configurations_versions_create', params)
                                     .then(res=>{
                                         if (res.ok === true) {
-                                            message.success('上传新版本成功！');
+                                            message.success('复制模板内容成功！');
                                         } else {
-                                            message.error('上传新版本失败！');
+                                            message.error('复制模板内容失败！');
                                         }
                                     })
                             }
@@ -62,12 +62,15 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                     params['name'] = this.props.conf;
                     http.post('/api/configurations_update', params)
                         .then(res=>{
-                            res;
-                            http.get('/api/user_configuration_list?app=' + params.app)
-                                .then(res=>{
-                                    this.props.store.codeStore.setTemplateList(res.message)
-                                });
-                            message.success('更新模板信息成功！');
+                            if (res.ok) {
+                                message.success('更新模板信息成功！');
+                                http.get('/api/user_configuration_list?app=' + params.app)
+                                    .then(res=>{
+                                        this.props.store.codeStore.setTemplateList(res.message)
+                                    });
+                            } else {
+                                message.error('更新模板信息失败！');
+                            }
                         });
                 }
                 setTimeout(()=>{

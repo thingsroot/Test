@@ -1,5 +1,7 @@
 import {observable, action} from 'mobx'
-import {isAuthenticated, _getCookie} from '../utils/Session';
+import Cookie from 'mobx-cookie'
+import {isAuthenticated} from '../utils/Session';
+
 import mqtt from 'mqtt';
 function getLocalTime (nS) {
     return new Date(parseInt(nS) * 1000).toLocaleString();
@@ -20,6 +22,8 @@ function error (){
     console.log('error')
 }
 class AppStore {
+  _sid = new Cookie('sid');
+  _user_id = new Cookie('user_id');
   @observable isLogin = !!isAuthenticated()  //利用cookie来判断用户是否登录，避免刷新页面后登录状态丢失
   @observable users = []  //模拟用户数据库
   @observable loginUser = {}  //当前登录用户信息
@@ -114,8 +118,8 @@ class AppStore {
     connectTimeout: 4000, // 超时时间
     // 认证信息
     clientId: 'webclient-' + makeid(),
-    username: unescape(_getCookie('user_id')),
-    password: unescape(_getCookie('sid')),
+    username: this._user_id.value,
+    password: this._sid.value,
     keepAlive: 6000,
     timeout: 3,
     topic: sn + '/log',

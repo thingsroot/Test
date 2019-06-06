@@ -1,6 +1,5 @@
 import React from 'react';
 import http from '../../../utils/Server';
-import { _getCookie } from '../../../utils/Session';
 import {inject, observer} from 'mobx-react';
 
 @inject('store')
@@ -42,7 +41,7 @@ class SonTables extends React.Component {
                     <li><span>事件等级：</span>{data.event_level}</li>
                     <li><span>事件类型：</span>{data.event_type}</li>
                     <li><span>详情信息：</span>{data.data}</li>
-                    <li><span>确认消息用户：</span>{data.disposed_by ? data.disposed_by : unescape(_getCookie('user_id'))}</li>
+                    <li><span>确认消息用户：</span>{data.disposed_by ? data.disposed_by : this.props.store.session.user_id}</li>
                 </ul>
             </div>
         )

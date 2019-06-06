@@ -4,7 +4,8 @@ import {
     Form, Icon, Input, Button, Checkbox, message
 } from 'antd';
 import http  from '../../../utils/Server';
-import { _getCookie, _setCookie } from '../../../utils/Session';
+import { _getCookie, _setCookie, authenticateSuccess } from '../../../utils/Session';
+
 @withRouter
 class Sign extends PureComponent {
     handleSubmit = (e) => {
@@ -15,32 +16,27 @@ class Sign extends PureComponent {
                     username: values.userName,
                     password: values.password
                 }).then(res=>{
-                    if (res.statusText === 'OK') {
-                        const Cookie = res.headers['set-cookie'];
-                        Cookie.map(item=>{
-                            const name = item.slice(0, item.indexOf('='))
-                            const content = item.slice(item.indexOf('=') + 1)
-                            _setCookie(name, content, 24)
-                        });
-                        _setCookie('companies', res.data.data.companies[0])
+                    if (res.ok) {
+                        _setCookie('companies', res.data.companies[0])
                         http.get('/api/developers_read?name=' + _getCookie('user_id'))
                             .then(res=>{
                                 if (!res.error) {
                                     if (res.data.enabled === 1) {
                                         _setCookie('is_developer', '1')
                                     } else {
-                                        _setCookie('is_ddeveloper', '0')
+                                        _setCookie('is_developer', '0')
                                     }
                                 } else {
-                                    _setCookie('is_ddeveloper', '0')
+                                    _setCookie('is_developer', '0')
                                 }
                             });
-                        _setCookie('T&R_auth_token', res.data.data.csrf_token)
+                        authenticateSuccess(res.data.csrf_token)
                         message.success('登录成功，正在跳转', 1).then(()=>{
-                            if (_getCookie('T&R_auth_token') !== null ){
-                                this.props.history.push('/')
-                            }
+                            console.log(_getCookie('user_id'))
+                            location.href = '/';
                         })
+                    } else {
+                        message.info('账号密码错误，请重新输入')
                     }
                 }).catch(function (error){
                     if (error){

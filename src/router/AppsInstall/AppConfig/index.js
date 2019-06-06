@@ -111,7 +111,7 @@ class AppConfig extends Component {
     }
 
     componentDidMount () {
-        http.get('/api/application_configurations_list?app=' + this.props.match.params.app + '&conf_type=Template')
+        http.get('/api/store_configurations_list?app=' + this.props.match.params.app + '&conf_type=Template')
             .then(res=>{
                 this.setState({
                     addTempList: res.data

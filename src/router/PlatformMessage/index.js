@@ -4,7 +4,6 @@ import SonTable from './SonTable';
 import './style.scss'
 import http from '../../utils/Server';
 import axios from 'axios';
-import { _getCookie } from '../../utils/Session';
 import {inject, observer} from 'mobx-react';
 const InputGroup = Input.Group;
 const Option = Select.Option;
@@ -80,7 +79,7 @@ class PlatformMessage extends Component {
         let time = this.timestampToTime(hours);
         let params = {
             category: 'user',
-            name: unescape(_getCookie('user_id')),
+            name: this.props.store.session.user_id,
             start: 0,
             limit: 100,
             filters: {
@@ -557,7 +556,7 @@ class PlatformMessage extends Component {
         });
         let params = {
             category: 'user',
-            name: unescape(_getCookie('user_id')),
+            name: this.props.store.session.user_id,
             start: 0,
             limit: this.state.length,
             filters: this.state.filters

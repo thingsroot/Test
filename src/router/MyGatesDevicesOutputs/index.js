@@ -89,17 +89,17 @@ class MyGatesDevicesOutputs extends Component {
                     http.get('/api/gateways_exec_result?id=' + id).then(result=>{
                       if (result.ok && result.data){
                         if (result.data.result){
-                          message.success('应用配置成功')
+                          message.success('数据下置成功')
                           clearInterval(this.timer)
                         } else {
-                          message.error('应用配置失败')
+                          message.error('数据下置失败')
                           clearInterval(this.timer)
                         }
                       }
                     })
                   }, 3000);
             } else {
-                message.error('提交错误')
+                message.error(res.error)
             }
         })
         this.setState({

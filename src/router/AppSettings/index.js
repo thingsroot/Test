@@ -5,7 +5,6 @@ import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
 import {inject, observer} from 'mobx-react';
-import {_getCookie} from '../../utils/Session';
 import reqwest from 'reqwest';
 
 const Option = Select.Option;
@@ -47,7 +46,8 @@ class AppSettings extends Component {
                 licenseType: '免费',
                 description: res.data.description,
                 confTemplate: res.data.pre_configuration,
-                preConfiguration: res.data.conf_template
+                preConfiguration: res.data.conf_template,
+                published: res.data.published
             };
             this.props.store.codeStore.setDescription(res.data.description);
             this.props.store.codeStore.setSettingData(settingData);
@@ -59,7 +59,7 @@ class AppSettings extends Component {
     handleSubmit = (e) => {
         const { description, configuration, predefined } = this.props.store.codeStore;
         e.preventDefault();
-        if (_getCookie('is_developer') === '1') {
+        if (this.props.store.session.is_developer === '1') {
             this.props.form.validateFields((err, values) => {
                 if (err) {
                     return;
@@ -231,7 +231,7 @@ class AppSettings extends Component {
                                 <Form.Item label="授权类型">
                                     {getFieldDecorator('license_type', {
                                         rules: [{ required: true, message: '不能为空！' }],
-                                        initialValue: settingData.licenseType ? settingData.licenseType : ''
+                                        initialValue: settingData.licenseType !== undefined ? settingData.licenseType : ''
                                     })(
                                         <Select
                                             style={{ width: 240 }}
@@ -244,12 +244,12 @@ class AppSettings extends Component {
                             <Col span={3}>
                                 <Form.Item label="发布到应用市场">
                                     {getFieldDecorator('published', {
-                                        initialValue: settingData.published ? settingData.published : 0
+                                        valuePropName: 'checked',
+                                        initialValue: settingData.published === 1 ?  true : false
                                     })(
                                         <Checkbox
                                             onChange={this.checkChange}
                                         >
-
                                         </Checkbox>
                                     )}
                                 </Form.Item>

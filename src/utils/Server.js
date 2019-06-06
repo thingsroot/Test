@@ -1,7 +1,7 @@
 
 import axios from 'axios';
-import { _getCookie, _setCookie } from './Session';
-// import { _getCookie } from './Session';
+import { _getCookie, isAuthenticated } from './Session';
+
 // 创建axios默认请求
 // axios.defaults.baseURL = 'http://iot.symgrid.com';
 // 配置超时时间
@@ -20,16 +20,9 @@ axios.interceptors.request.use((config) => {
 // 添加响应拦截器
 axios.interceptors.response.use(
   function (response) {
-    const cookie  = response.headers.cookie;
-    console.log(response)
-    const arr = cookie && cookie.length > 0 ? cookie.split(';') : [];
-    let obj = {};
-    arr && arr.length > 0 && arr.map(item=>{
-      obj[item.split('=')[0].trim()] = item.split('=')[1];
-    })
-    if (obj.sid && obj.sid === 'Guest' || response.data.error && response.data.error === 'auth_code_missing'){
-      _setCookie('T&R_auth_token', '')
-      window.location.href = '/'
+
+    if (!isAuthenticated() || response.data.error && response.data.error === 'auth_code_missing'){
+      window.location.href = '/login'
     }
     return response;
   },

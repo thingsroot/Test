@@ -1,0 +1,55 @@
+.AppStore{
+.installcontent{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    .item{
+        width: 222px;
+        height: 215px;
+        padding: 10px;
+        margin:10px;
+        line-height: 1.5;
+        background-color: #fff;
+        border:1px solid #eee;
+        cursor: pointer;
+        &:hover{
+            box-shadow: 0 1px 3px rgba(34, 25, 25, .4);
+        }
+        img{
+            display: block;
+            height: 96px;
+            width:96px;
+            margin: 0 auto;
+        }
+        .apptitle{
+            margin-top: 25px;
+            padding:10px;
+            background:#f6f6f6;
+            font-size: 12px;
+            font-weight: 600;
+            p:hover{
+                color:#3c8dbc;
+            }
+            div{
+                display: flex;
+                justify-content: space-between;
+                box-sizing: border-box;
+                span{
+                    display: block;
+                    border:1px solid #ccc;
+                    font-size: 14px;
+                    padding: 3px 7px;
+                    border-radius: 5px;
+                    &:hover{
+                        background: #ddd;
+                        border:1px solid #ccc;
+                    }
+                }
+            }
+            .ant-rate li{
+                margin-right: 0px;
+            }
+        }
+    }
+}
+}

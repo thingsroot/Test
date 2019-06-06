@@ -1,5 +1,5 @@
 import {observable, action} from 'mobx'
-import {_getCookie} from '../utils/Session';
+import Cookie from 'mobx-cookie'
 import mqtt from 'mqtt';
 function getLocalTime (nS) {
     return new Date(parseInt(nS) * 1000).toLocaleString();
@@ -20,6 +20,8 @@ function error (){
     console.log('error')
 }
 class messageStore {
+  _sid = new Cookie('sid');
+  _user_id = new Cookie('user_id');
   @observable commnum = 0;
   @observable data = [];
   @observable timer = null;
@@ -156,8 +158,8 @@ class messageStore {
     connectTimeout: 4000, // 超时时间
     // 认证信息
     clientId: 'webclient-' + makeid(),
-    username: unescape(_getCookie('user_id')),
-    password: unescape(_getCookie('sid')),
+    username: this._user_id.value,
+    password: this._sid.value,
     keepAlive: 6000,
     timeout: 3,
     topic: sn + type,

@@ -4,6 +4,8 @@ import {
 } from 'antd';
 import { getParam, _getCookie, _setCookie, isAdmin } from '../../../utils/Session';
 import http from '../../../utils/Server';
+
+
 class Password extends PureComponent {
     componentDidMount (){
         let update_key  = getParam('key');
@@ -27,14 +29,13 @@ class Password extends PureComponent {
                             message.success(res.full_name + '重置密码成功' + '2秒后返回控制台', 2).then(()=>{
                                 this.props.history.push('/');
                             })
-                            let value = _getCookie('user_id');
-                            _setCookie('usr', value);
                             _setCookie('full_name', res.full_name);
                             // 检测是否为管理员
                             isAdmin();
 
                         } else {
                             message.error(res.message + '5秒后返回登录页', 5).then(()=>{
+                                console.log(_getCookie('user_id'))
                                 this.props.history.push('/login');
                             })
                         }

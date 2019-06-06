@@ -3,6 +3,7 @@ import { Collapse } from 'antd';
 import { withRouter } from 'react-router-dom';
 import ExpandedRowRender from '../../table';
 import MyGatesDevicesOutputs from '../../../MyGatesDevicesOutputs';
+import MyGatesDevicesCommands from '../../../MyGatesDevicesCommands';
 const Panel = Collapse.Panel;
 // function callback (key) {
 //     console.log(key);
@@ -33,6 +34,16 @@ class Collapses extends Component {
                     >
                         <MyGatesDevicesOutputs
                             outputs={this.props.outputs}
+                            vsn={this.props.meta.sn}
+                        />
+                    </Panel>
+                    <Panel
+                        disabled={this.props.commands && Object.keys(this.props.commands).length > 0 ? false : true}
+                        header="控制指令"
+                        key="3"
+                    >
+                        <MyGatesDevicesCommands
+                            commands={this.props.commands}
                             vsn={this.props.meta.sn}
                         />
                     </Panel>

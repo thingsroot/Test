@@ -3,7 +3,6 @@ import {
     Modal, Form, Input, Radio, message
 } from 'antd';
 import http from '../../../utils/Server';
-import {_getCookie} from '../../../utils/Session';
 import {inject, observer} from 'mobx-react';
 
 const MyTemplateForm = Form.create({ name: 'template_form' })(
@@ -20,12 +19,12 @@ const MyTemplateForm = Form.create({ name: 'template_form' })(
                     app: this.props.app,
                     conf_name: values.conf_name,
                     description: values.description,
-                    type: 'Configuration',
+                    type: 'Template',
                     public: values.public,
                     owner_type: values.owner_type
                 };
                 if (params.owner_type === 'User') {
-                    params['owner_id'] = _getCookie('user_id')
+                    params['owner_id'] = this.props.store.session.user_id
                 } else {
                     params['owner_id'] = this.props.store.codeStore.groupName
                 }

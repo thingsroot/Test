@@ -114,9 +114,16 @@ class AppsList extends Component {
       }
       componentDidMount () {
         this.fetch(this.props.match.params.sn);
-        // timer = setInterval(() => {
-        //   this.fetch(this.props.match.params.sn)
-        // }, 10000);
+        timer = setInterval(() => {
+          this.fetch(this.props.match.params.sn)
+        }, 10000);
+
+        let enable_beta = this.props.store.appStore.status.enable_beta
+        if (enable_beta === undefined) {
+          setTimeout(()=>{
+            this.fetch(this.props.match.params.sn);
+          }, 1000)
+        }
       }
       UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
@@ -150,7 +157,11 @@ class AppsList extends Component {
       // }
       fetch = (sn) => {
         const pagination = { ...this.state.pagination };
-        http.get('/api/gateways_app_list?gateway=' + sn + '&beta=' + this.props.store.appStore.status.enable_beta).then(res=>{
+        let enable_beta = this.props.store.appStore.status.enable_beta
+        if (enable_beta === undefined) {
+          enable_beta = 0
+        }
+        http.get('/api/gateways_app_list?gateway=' + sn + '&beta=' + enable_beta).then(res=>{
           this.props.store.appStore.setApplen(res.message && res.message.length)
           if (res.ok){
             this.setState({
@@ -244,7 +255,7 @@ class AppsList extends Component {
         columnsArr.map((item)=>{
             obj[Object.keys(item)] = Object.values(item)
         });
-        http.get('/api/application_configurations_list?app=' + name + '&conf_type=Template').then(res=>{
+        http.get('/api/store_configurations_list?app=' + name + '&conf_type=Template').then(res=>{
             this.setState({
                 addTempList: res.data
             });
@@ -278,7 +289,7 @@ class AppsList extends Component {
         const data = {
           gateway: sn,
           inst: this.props.store.codeStore.instNames,
-          conf: this.props.store.codeStore.installConfiguration,
+          conf: JSON.parse(this.props.store.codeStore.installConfiguration),
           id: `/gateways/${sn}/config/${this.props.store.codeStore.instNames}/${new Date() * 1}`
         };
         http.post('/api/gateways_applications_conf', data).then(res=>{
@@ -318,6 +329,7 @@ class AppsList extends Component {
                           <Action
                               record={record}
                               getconfig={this.getConfig}
+                              update_app_list={this.fetch.bind(this, this.props.match.params.sn)}
                           />
                         )
                       }}
