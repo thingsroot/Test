@@ -6,7 +6,6 @@ import http from '../../utils/Server';
 import VersionList from './versionList';
 import TemplateList from './templateList';
 import AppDesc from './appDesc';
-import {_getCookie} from '../../utils/Session';
 import {inject, observer} from 'mobx-react';
 
 const TabPane = Tabs.TabPane;
@@ -32,7 +31,7 @@ class MyAppDetails extends Component {
     };
 
     componentDidMount (){
-        let user = unescape(_getCookie('user_id'));
+        let user = this.props.store.session.user_id;
         let app = this.props.match.params.name;
         this.setState({
             user: user,

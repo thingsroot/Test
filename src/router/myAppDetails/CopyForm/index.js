@@ -3,7 +3,6 @@ import {
     Modal, Form, Input, Radio, message
 } from 'antd';
 import http from '../../../utils/Server';
-import {_getCookie} from '../../../utils/Session';
 import {inject, observer} from 'mobx-react';
 
 const CapyForm = Form.create({ name: 'copy_form' })(
@@ -27,7 +26,7 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                     owner_type: values.owner_type
                 };
                 if (params.owner_type === 'User') {
-                    params['owner_id'] = unescape(_getCookie('user_id'))
+                    params['owner_id'] = this.props.store.session.user_id
                 } else if (params.owner_type === 'Cloud Company Group') {
                     params['owner_id'] = this.props.store.codeStore.groupName
                 }

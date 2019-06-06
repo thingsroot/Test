@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {Table, Input, Select, Button, message, Icon} from 'antd'
 import './style.scss'
 import http from '../../utils/Server';
-import {_getCookie} from '../../utils/Session';
 import axios from 'axios/index';
 import {inject, observer} from 'mobx-react';
 import SonTables from './SonTables';
@@ -87,7 +86,7 @@ class DevicemMessage extends Component {
         let time = this.timestampToTime(hours);
         let params = {
             category: 'user',
-            name: unescape(_getCookie('user_id')),
+            name: this.props.store.session.user_id,
             start: 0,
             limit: this.state.length,
             filters: {
@@ -487,7 +486,7 @@ class DevicemMessage extends Component {
         let filters = this.state.filters;
         let params = {
             category: 'user',
-            name: unescape(_getCookie('user_id')),
+            name: this.props.store.session.user_id,
             start: 0,
             limit: this.state.length
         };

@@ -1,7 +1,8 @@
 import {observable, action} from 'mobx'
-import {_getCookie} from '../utils/Session';
+import Cookie from 'mobx-cookie'
 
 class Action {
+  _user_id = new Cookie('user_id')
   @observable actions = []
   @action pushAction (id, title, content, info, timeout, finish_action) {
     let now = new Date().getTime()
@@ -17,12 +18,12 @@ class Action {
       last: now,
       timeout: timeout === undefined ? 30000 : timeout
     })
-    let key = _getCookie('user_id') + '_actions'
+    let key = this._user_id.value + '_actions'
     localStorage.getItem(key, JSON.stringify(this.actions))
   }
   @action popAction (id) {
     this.actions.splice(this.actions.findIndex(item => item.id === id), 1)
-    let key = _getCookie('user_id') + '_actions'
+    let key = this._user_id.value + '_actions'
     localStorage.getItem(key, JSON.stringify(this.actions))
   }
   @action setActionStatus (id, status, message) {
@@ -35,7 +36,7 @@ class Action {
     action.message = message
     action.last = new Date().getTime()
 
-    let key = _getCookie('user_id') + '_actions'
+    let key = this._user_id.value + '_actions'
     localStorage.getItem(key, JSON.stringify(this.actions))
   }
 }

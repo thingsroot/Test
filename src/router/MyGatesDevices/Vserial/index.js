@@ -1,7 +1,7 @@
 import { Button, Select, Table } from 'antd';
 import mqtt from 'mqtt';
 import React, { Component } from 'react';
-import { _getCookie } from '../../../utils/Session';
+import {inject, observer} from 'mobx-react';
 import Logviewer from '../MyGatesLogviewer';
 import './style.scss';
 const Option = Select.Option;
@@ -54,6 +54,9 @@ function makeid () {
 //     return new Date(parseInt(nS) * 1000).toLocaleString();
 //  }
 let client;
+
+@inject('store')
+@observer
 class Vserial extends Component {
     state = {
         SerialPort: 'com1',
@@ -131,8 +134,8 @@ class Vserial extends Component {
         connectTimeout: 4000, // 超时时间
         // 认证信息
         clientId: 'webclient-' + makeid(),
-        username: _getCookie('user_id'),
-        password: _getCookie('sid'),
+        username: this.props.store.session.user_id,
+        password: this.props.store.session.sid,
         keepAlive: 6000,
         timeout: 3,
         topic: sn + '/log',

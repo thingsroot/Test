@@ -4,7 +4,6 @@ import http from '../../../../utils/Server';
 import { withRouter } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import MyGatesAppsUpgrade from '../../../Upgrade';
-import { _getCookie } from '../../../../utils/Session';
 let timer;
 function cancel () {
     message.error('You have canceled the update');
@@ -213,7 +212,7 @@ class Action extends Component {
       }
       isfork (record){
         if (record.data){
-          if (record.data.data.owner !== unescape(_getCookie('user_id'))){
+          if (record.data.data.owner !== this.props.store.session.user_id){
             this.setState({appdebug: false})
           } else {
             this.sendForkCreate(record)
@@ -231,7 +230,7 @@ class Action extends Component {
                   应用名称:{record.data && record.data.data.name || '本地应用'}
                 </div>
                 <div>
-                  应用开发者：{record.data && record.data.data.owner || _getCookie('companies')}
+                  应用开发者：{record.data && record.data.data.owner || this.props.store.session.companies}
                 </div>
               </div>
               <div style={{display: 'flex', justifyContent: 'space-around', marginTop: 20, minWidth: 840, position: 'absolute', right: 20, bottom: 15}}>

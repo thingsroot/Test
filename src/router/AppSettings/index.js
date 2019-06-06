@@ -5,7 +5,6 @@ import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
 import {inject, observer} from 'mobx-react';
-import {_getCookie} from '../../utils/Session';
 import reqwest from 'reqwest';
 
 const Option = Select.Option;
@@ -60,7 +59,7 @@ class AppSettings extends Component {
     handleSubmit = (e) => {
         const { description, configuration, predefined } = this.props.store.codeStore;
         e.preventDefault();
-        if (_getCookie('is_developer') === '1') {
+        if (this.props.store.session.is_developer === '1') {
             this.props.form.validateFields((err, values) => {
                 if (err) {
                     return;

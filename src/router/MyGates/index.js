@@ -4,7 +4,6 @@ import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input, Icon, 
 import './style.scss';
 import { inject, observer } from 'mobx-react';
 import { Link } from 'react-router-dom';
-import { _getCookie } from '../../utils/Session';
 const Search = Input.Search;
 const TabPane = Tabs.TabPane;
 let timer;
@@ -245,7 +244,7 @@ class MyGates extends Component {
       }
       handleOk = (type) => {
           const { sn, name, desc, index} = this.state;
-          const owner_id = index === 1 ? this.state.role.name : unescape(_getCookie('user_id'));
+          const owner_id = index === 1 ? this.state.role.name : this.props.store.session.user_id;
           const owner_type = index === 1 ? 'Cloud Company Group' : 'User';
           const data = {
             'name': sn,

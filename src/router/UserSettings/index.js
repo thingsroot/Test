@@ -1,9 +1,13 @@
 import React, { PureComponent } from 'react';
+import { inject, observer } from 'mobx-react';
 import { Button, message } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
-import {_getCookie, _setCookie} from '../../utils/Session';
 import ResetPasswordCreateForm from './resetPassword';
+
+
+@inject('store')
+@observer
 class UserSettings extends PureComponent {
     state = {
         info: {},
@@ -12,12 +16,11 @@ class UserSettings extends PureComponent {
         visible: false
     };
     componentDidMount () {
-        let isAdmin = _getCookie('isAdmin');
-        let user = _getCookie('user_id');
+        const {is_admin, user_id} = this.props.store.session
         this.setState({
-            isAdmin: isAdmin
+            isAdmin: is_admin
         });
-        http.get('/api/user_read?name=' + user).then(res=>{
+        http.get('/api/user_read?name=' + user_id).then(res=>{
             let role = '';
             let groups = res.data.groups;
             groups && groups.length > 0 && groups.map((v, key)=>{
@@ -51,10 +54,14 @@ class UserSettings extends PureComponent {
             };
             http.post('/api/user_update_password', data).then(res=>{
                 res;
+                // TODO: Post Logout ?????
+                this.props.store.session.setUserId('Guest')
+                this.props.store.session.setSid('Guest')
+                this.props.store.session.setCSRFToken('')
                 message.success('修改密码成功，请重新登陆！', 1.5).then(()=>{
+                    console.log('Logout')
                     location.href = '/';
                 })
-                _setCookie('T&R_auth_token', '');
             }).catch(err=>{
                 err;
                 message.success('修改密码失败！')

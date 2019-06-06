@@ -3,7 +3,6 @@ import { Input, Button, Spin } from 'antd';
 import {Link, withRouter} from 'react-router-dom';
 import './style.scss';
 import http from '../../utils/Server';
-import {_getCookie} from '../../utils/Session';
 import {inject, observer} from 'mobx-react';
 
 const Search = Input.Search;
@@ -33,7 +32,7 @@ class MyApps extends Component {
     };
 
     componentDidMount (){
-        let user = unescape(_getCookie('user_id'));
+        let user = this.props.store.session.user_id
         http.get('/api/applications_list').then(res=>{
             let formData = [];
             let myData = [];

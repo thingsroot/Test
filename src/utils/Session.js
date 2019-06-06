@@ -1,6 +1,9 @@
 import http from './Server';
 import { message } from 'antd';
-const LOGIN_COOKIE_NAME = 'T&R_auth_token';
+import Cookie from 'mobx-cookie'
+
+
+const LOGIN_COOKIE_NAME = 'csrf_auth_token';
 // export function exec_result (id) {
 //   let num = 0;
 //   let timer;
@@ -25,34 +28,31 @@ const LOGIN_COOKIE_NAME = 'T&R_auth_token';
 //   }, 1000);
 // }
 export function _getCookie (name) {
-  let start, end
-  if (document.cookie.length > 0) {
-    start = document.cookie.indexOf(name + '=')
-    if (start !== -1) {
-      start = start + name.length + 1
-      end = document.cookie.indexOf(';', start)
-      if (end === -1) {
-        end = document.cookie.length
-      }
-      return (document.cookie.substring(start, end))
-    }
-  }
-  return ''
+  let cookie = new Cookie(name)
+  return cookie.value
 }
 
 export function _setCookie (name, value, expire) {
-  let date = new Date();
-  date.setDate(date.getDate() + expire)
-  document.cookie =  name + '=' + value + '; path=/' +
-    (expire ? ';expires=' + date.toGMTString() : '')
+  let cookie = new Cookie(name)
+  return cookie.set(value, { expires: expire })
 }
 export function isAuthenticated () {
-  if (_getCookie(LOGIN_COOKIE_NAME) && _getCookie('sid') !== 'Guest'){
-    return true
-  } else {
-    return false;
+  let sid = _getCookie('sid')
+  let user_id = _getCookie('user_id')
+  console.log(sid)
+  console.log(user_id)
+  if (sid === undefined || sid === 'Guest') {
+    return false
   }
-  // return _getCookie(LOGIN_COOKIE_NAME)
+  if (user_id === undefined || user_id === 'Guest'){
+    return false
+  }
+  return true
+}
+
+export function authenticateClear () {
+  let cookie = new Cookie(LOGIN_COOKIE_NAME)
+  cookie.remove()
 }
 
 export function authenticateSuccess (token) {

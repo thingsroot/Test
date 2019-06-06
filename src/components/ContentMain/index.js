@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {notification } from 'antd';  //
 import { Switch, Redirect, withRouter} from 'react-router-dom';
@@ -37,7 +37,7 @@ const openNotification = (title, message) => {
 
 @inject('store')
 @observer
-class ContentMain extends PureComponent {
+class ContentMain extends Component {
     componentDidMount (){
         this.startTimer()
     }
