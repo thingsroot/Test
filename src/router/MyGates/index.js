@@ -306,20 +306,43 @@ class MyGates extends Component {
           [name]: false
         });
       }
-    filter = (vale)=>{
-        const value = vale.toLowerCase();
-        const name = this.state.status + 'data';
-        const names = this.state.status + 'datas';
-        const data = this.state[name];
-        const arr = [];
-        data.map(item=>{
-            if (item.dev_name.toLowerCase().indexOf(value) !== -1 || item.sn.indexOf(value) !== -1 || item.description && item.description.toLowerCase().indexOf(value) !== -1){
-                arr.push(item)
-            }
-        })
+    filter = (text)=>{
         this.setState({
-            [names]: arr
-        })
+            loading: true
+        });
+        if (this.timer){
+            clearTimeout(this.timer)
+        }
+        this.timer = setTimeout(() => {
+            const name = this.state.status + 'data';
+            const names = this.state.status + 'datas';
+            const data = this.state[name];
+            const arr = [];
+            if (text) {
+                data.map(item=>{
+                    if (item.dev_name.toLowerCase().indexOf(text.toLowerCase()) !== -1 ||
+                        item.sn.indexOf(text.toLowerCase()) !== -1 ||
+                        item.description && item.description.toLowerCase().indexOf(text.toLowerCase()) !== -1){
+                        arr.push(item)
+                    }
+                });
+                this.setState({
+                    [names]: arr,
+                    loading: false
+                })
+            } else {
+                this.setState({
+                    [names]: data,
+                    loading: false
+                })
+            }
+        }, 1000);
+
+
+    }
+    search = (e)=>{
+          let text = e.target.value;
+          this.filter(text)
     }
     render (){
         let { alldatas, onlinedatas, offlinedatas, confirmLoading } = this.state;
@@ -366,9 +389,7 @@ class MyGates extends Component {
                     <span>搜索：</span>
                     <Search
                         placeholder="网关名称、描述、序列号"
-                        onSearch={(value) => {
-                            this.filter(value)
-                        }}
+                        onChange={this.search}
                         style={{ width: 200 }}
                     />
                 </div>
