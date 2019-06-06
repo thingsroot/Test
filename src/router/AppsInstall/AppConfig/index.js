@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Inst from '../Inst';
-import {Button, Checkbox, Input, Modal, Select, Table, Tabs} from 'antd';
+import {Button, Checkbox, Input, Modal, Select, Table, Tabs, message} from 'antd';
 import EditableTable from '../editorTable';
 import {split as SplitEditor} from 'react-ace';
 import 'brace/mode/json';
@@ -111,22 +111,7 @@ class AppConfig extends Component {
     }
 
     componentDidMount () {
-        http.get('/api/store_configurations_list?app=' + this.props.match.params.app + '&conf_type=Template')
-            .then(res=>{
-                this.setState({
-                    addTempList: res.data
-                });
-            });
-        http.get('/api/user_configuration_list?app=' + this.props.match.params.app)
-            .then(res=>{
-                let list = this.state.addTempList;
-                res.message && res.message.length > 0 && res.message.map((item)=>{
-                    list.push(item)
-                });
-                this.setState({
-                    addTempList: list
-                });
-            });
+        //this.refreshTemplateList()
     }
 
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -134,107 +119,156 @@ class AppConfig extends Component {
             item: nextProps.item
         });
         if (nextProps.item !== undefined) {
-            this.getConfig(nextProps.item)
+            if (nextProps.item.name !== undefined) {
+                this.getConfig(nextProps.item)
+            }
         }
     }
+    prettyJson (str) {
+        let data = JSON.parse(str)
+        if (!data) {
+            message.error('JSON解析错误')
+            return str
+        }
+        return JSON.stringify(data, null, 4)
+    }
 
-    getConfig = (val)=>{
-        this.props.store.codeStore.setErrorCode(false);
-        this.props.store.codeStore.setInstallConfiguration('');
-        this.props.store.codeStore.setInstNames('');
+
+    addNewTemplate (){
+        const w = window.open('about: blank');
+        const { app } = this.props
+        w.location.href = '/myappdetails/' + app + '/3'
+    }
+
+    refreshTemplateList () {
+        this.setState({addTempList: []})
+        const { app } = this.props
+        http.get('/api/store_configurations_list?conf_type=Template&app=' + app)
+        .then(res=>{
+            let list = this.state.addTempList;
+            res.data && res.data.length > 0 && res.data.map((item)=>{
+                list.push(item)
+            });
+            this.setState({
+                addTempList: list
+            });
+        });
+        http.get('/api/user_configuration_list?conf_type=Template&app=' + app)
+            .then(res=>{
+                if (res.ok) {
+                    let list = this.state.addTempList;
+                    res.data && res.data.length > 0 && res.data.map((item)=>{
+                        list.push(item)
+                    });
+                    this.setState({
+                        addTempList: list
+                    });
+                }
+            });
+    }
+
+    getConfig = (app)=>{
         let config = [];
-        if (JSON.stringify(val) !== '{}' && val !== 'undefined') {
-            if (val.conf_template && val.conf_template[0] === '[') {
-                config = JSON.parse(val.conf_template);
-                this.setState({
-                    config: config
-                });
-                let deviceColumns = [];
-                let tableName = [];  //存放表名
-                let dataSource = {};
-                let keys = [];
-                config && config.length > 0 && config.map((v, key)=>{
-                    keys.push(v);
-                    key;
-                    if (v.type === 'templates' ||
-                        v.type === 'text' ||
-                        v.type === 'number' ||
-                        v.type === 'dropdown' ||
-                        v.type === 'section' &&
-                        v.child === undefined
-                    ) {
-                        this.props.store.codeStore.setActiveKey('1');
-                    } else if (v.type === 'table' && v.child !== undefined) {
-                        this.props.store.codeStore.setActiveKey('1');
-                    } else {
-                        this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
-                        this.props.store.codeStore.setReadOnly(false);
-                        this.props.store.codeStore.setErrorCode(true);
-                        this.props.store.codeStore.setActiveKey('2');
-                        console.log(this.props.store.codeStore.installConfiguration)
-                    }
-                    if (v.name === 'device_section') {
-                        let tableNameData = {};
-                        v.child && v.child.length && v.child.map((w, key1)=>{
-                            tableNameData[w.name] = [];
-                            key1;
-                            let arr = [];
-                            w.cols.map((i, key2)=>{
-                                key2;
-                                arr.push({
-                                    key: key2,
-                                    name: i.name,
-                                    desc: i.desc,
-                                    type: i.type
-                                });
+        let conf_template = app.conf_template;
+        let pre_configuration = app.pre_configuration && app.pre_configuration.length > 0 ? app.pre_configuration : '{}';
+
+        this.props.store.codeStore.setErrorCode(false);
+        this.props.store.codeStore.setReadOnly(false);
+        this.props.store.codeStore.setInstNames('');
+        this.props.store.codeStore.setActiveKey('2');
+        this.props.store.codeStore.setInstallConfiguration(this.prettyJson(pre_configuration));
+        this.props.store.codeStore.setAllTableData({});
+        this.props.store.codeStore.setDataSource({});
+        this.setState({config: config, app: app.name})
+
+        this.refreshTemplateList()
+
+        if (app.has_conf_template && conf_template && conf_template[0] === '[') {
+            config = JSON.parse(conf_template);
+            this.setState({
+                config: config
+            });
+            let deviceColumns = [];
+            let tableName = [];  //存放表名
+            let dataSource = {};
+            let keys = [];
+            config && config.length > 0 && config.map((v, key)=>{
+                keys.push(v);
+                key;
+                if (v.type === 'templates' ||
+                    v.type === 'text' ||
+                    v.type === 'number' ||
+                    v.type === 'dropdown' ||
+                    v.type === 'section' &&
+                    v.child === undefined
+                ) {
+                    this.props.store.codeStore.setActiveKey('1');
+                    this.props.store.codeStore.setReadOnly(true);
+                } else if (v.type === 'table' && v.child !== undefined) {
+                    this.props.store.codeStore.setActiveKey('1');
+                    this.props.store.codeStore.setReadOnly(true);
+                } else {
+                    this.props.store.codeStore.setErrorCode(true);
+                }
+                if (v.name === 'device_section') {
+                    let tableNameData = {};
+                    v.child && v.child.length && v.child.map((w, key1)=>{
+                        tableNameData[w.name] = [];
+                        key1;
+                        let arr = [];
+                        w.cols.map((i, key2)=>{
+                            key2;
+                            arr.push({
+                                key: key2,
+                                name: i.name,
+                                desc: i.desc,
+                                type: i.type
                             });
-                            tableName.push(w.name);
-                            deviceColumns.push({
-                                [w.name]: arr
+                        });
+                        tableName.push(w.name);
+                        deviceColumns.push({
+                            [w.name]: arr
+                        });
+                    });
+                    let columnsArr = [];
+                    deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
+                        key;
+                        let data = [];
+                        let name = tableName[key];
+                        v[name].map((w, indexW)=>{
+                            data.push({
+                                key: indexW,
+                                id: w.type,
+                                title: w.desc,
+                                dataIndex: w.name,
+                                editable: true
                             });
                         });
-                        let columnsArr = [];
-                        deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
-                            key;
-                            let data = [];
-                            let name = tableName[key];
-                            v[name].map((w, indexW)=>{
-                                data.push({
-                                    key: indexW,
-                                    id: w.type,
-                                    title: w.desc,
-                                    dataIndex: w.name,
-                                    editable: true
-                                });
-                            });
-                            columnsArr.push({[tableName[key]]: data})
-                        });
-                        let obj = {};
-                        columnsArr.map((item)=>{
-                            obj[Object.keys(item)] = Object.values(item)
-                        });
-                        console.log(obj)
-                        this.setState({
-                            deviceColumns: obj
-                        }, ()=>{
-                            console.log(this.state.deviceColumns)
-                        });
-                        this.props.store.codeStore.setAllTableData(tableNameData);
-                    }
-                });
-                //设置store存储数据
-                tableName && tableName.length > 0 && tableName.map((w)=>{
-                    dataSource[w] = [];
-                });
-                this.props.store.codeStore.setDataSource(dataSource);
-                this.setState({
-                    config: config,
-                    // deviceColumns: obj,
-                    keys: keys
-                });
-            }
-        } else if (val.conf_template === null) {
-            this.props.store.codeStore.setInstallConfiguration('{}');
+                        columnsArr.push({[tableName[key]]: data})
+                    });
+                    let obj = {};
+                    columnsArr.map((item)=>{
+                        obj[Object.keys(item)] = Object.values(item)
+                    });
+                    console.log(obj)
+                    this.setState({
+                        deviceColumns: obj
+                    }, ()=>{
+                        console.log(this.state.deviceColumns)
+                    });
+                    this.props.store.codeStore.setAllTableData(tableNameData);
+                }
+            });
+            //设置store存储数据
+            tableName && tableName.length > 0 && tableName.map((w)=>{
+                dataSource[w] = [];
+            });
+            this.props.store.codeStore.setDataSource(dataSource);
+            this.setState({
+                config: config,
+                // deviceColumns: obj,
+                keys: keys
+            });
         }
 
         if (this.props.match.params.type === '2') {
@@ -242,10 +276,7 @@ class AppConfig extends Component {
                 flag: false,
                 detail: false
             });
-            this.props.store.codeStore.setActiveKey('2');
-            this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
         }
-        this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
     };
 
     //添加模板
@@ -309,6 +340,9 @@ class AppConfig extends Component {
     };
 
     getData = ()=>{
+        if (!this.state.config || this.state.config.length === 0) {
+            return
+        }
         const { tcp, serial } = this.props.store.codeStore;
         const { selectSection, keys } = this.state;
         let sourceCodeData = {};
@@ -351,7 +385,7 @@ class AppConfig extends Component {
         });
 
         if (JSON.stringify(sourceCodeData) !== '{}') {
-            this.props.store.codeStore.setInstallConfiguration(JSON.stringify(sourceCodeData))
+            this.props.store.codeStore.setInstallConfiguration(JSON.stringify(sourceCodeData, null, 4))
         }
     };
 
@@ -371,7 +405,7 @@ class AppConfig extends Component {
         }
         if (errorCode === true) {
             this.props.store.codeStore.setReadOnly(false);
-            this.props.store.codeStore.setInstallConfiguration('{}');
+            this.props.store.codeStore.setInstallConfiguration(JSON.stringify({}, null, 4))
         } else if (this.props.config && this.props.config.length > 0 || errorCode === false) {
             this.props.store.codeStore.setReadOnly(true);
             this.getData();
@@ -402,19 +436,13 @@ class AppConfig extends Component {
         })
     };
 
-    addNew = (app)=>{
-        const w = window.open('about: blank');
-        w.location.href = '/myappdetails/' + app + '/3'
-    };
-
     onChange = (value)=>{
-        this.props.store.codeStore.setInstallConfiguration(value[0])
+        this.props.store.codeStore.setInstallConfiguration(this.prettyJson(value[0]))
     };
 
     render () {
         const { config, deviceColumns, addTempLists, showTempLists, showTempList, selectSection, addTempList } = this.state;
         const { errorCode, installConfiguration, serial, tcp, activeKey } = this.props.store.codeStore;
-        let { app } = this.props;
         console.log(this.props.item)
         return (
             <Tabs
@@ -617,10 +645,18 @@ class AppConfig extends Component {
                                                     scroll={{ y: 240 }}
                                                 />
                                                 <Button
+                                                    style={{marginTop: '20px'}}
+                                                    onClick={()=>{
+                                                        this.refreshTemplateList()
+                                                    }}
+                                                >
+                                                    刷新列表
+                                                </Button>
+                                                <Button
                                                     type="primary"
                                                     style={{float: 'right', marginTop: '20px'}}
                                                     onClick={()=>{
-                                                        this.addNew(app)
+                                                        this.addNewTemplate()
                                                     }}
                                                 >
                                                     添加模板
