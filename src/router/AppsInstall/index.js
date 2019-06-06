@@ -56,6 +56,7 @@ class MyGatesAppsInstall extends Component {
     };
 
     componentDidMount (){
+        this.setState({app: this.props.match.params.app})
         if (this.props.match.params.type === '1') {
             http.get('/api/store_list').then(res=>{
                 this.setState({
@@ -398,7 +399,7 @@ class MyGatesAppsInstall extends Component {
                                                         onClick={()=>{
                                                             this.setState({
                                                                 flag: false,
-                                                                detail: false,
+                                                                detail: true,
                                                                 item: val
                                                             })
                                                         }}
