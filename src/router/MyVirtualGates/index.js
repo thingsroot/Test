@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Table, Button } from 'antd';
+import { Table, Button, Icon } from 'antd';
 import http from '../../utils/Server';
 import './style.scss';
 class MyVirtualGates extends React.Component {
@@ -68,13 +68,13 @@ class MyVirtualGates extends React.Component {
         return (
             <div>
                 <div
-                    style={{position: 'relative', height: 40}}
+                    style={{position: 'relative', height: 40, textAlign: 'right'}}
                 >
                     <Button
                         type="primary"
                         style={{
                             position: 'absolute',
-                            right: 0,
+                            right: 30,
                             top: 0,
                             zIndex: 999
                         }}
@@ -88,6 +88,19 @@ class MyVirtualGates extends React.Component {
                     >
                         申请虚拟网关
                     </Button>
+                    <Icon
+                        style={{
+                            position: 'absolute',
+                            right: 0,
+                            top: 6,
+                            zIndex: 999
+                        }}
+                        className="rollback"
+                        type="rollback"
+                        onClick={()=>{
+                            this.props.history.go(-1)
+                        }}
+                    />
                 </div>
                 <Table
                     rowKey="name"

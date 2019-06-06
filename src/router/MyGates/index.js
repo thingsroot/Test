@@ -15,8 +15,11 @@ class MyGates extends Component {
         super(props)
         this.state = {
             onlinedata: [],
+            onlinedatas: [],
             offlinedata: [],
+            offlinedatas: [],
             alldata: [],
+            alldatas: [],
             status: 'online',
             loading: true,
             visible: false,
@@ -29,7 +32,8 @@ class MyGates extends Component {
             record: {},
             index: 2,
             recordVisible: false,
-            columns: [{
+            columns: [
+                {
                 title: '名称',
                 dataIndex: 'dev_name',
                 key: 'dev_name',
@@ -178,7 +182,8 @@ class MyGates extends Component {
                       </span>
                     )
                 }
-              }]
+              }
+              ]
         }
     }
     componentDidMount (){
@@ -188,24 +193,30 @@ class MyGates extends Component {
                     role: res.data[0]
                 })
             }
-        })
-        this.refreshDevicesList()
+        });
+        this.refreshDevicesList(0);
         timer = setInterval(() => {
-            this.refreshDevicesList()
+            this.refreshDevicesList(1)
         }, 10000);
     }
     componentWillUnmount () {
         clearInterval(timer)
     }
 
-    refreshDevicesList (){
-        let status = this.state.status
+    refreshDevicesList (num){
+        let status = this.state.status;
         http.get('/api/gateway_list?status=' + status).then(res=>{
             const data = status + 'data';
+            const datas = status + 'datas';
             this.setState({
                 loading: false,
                 [data]: res.message
-            })
+            });
+            if (num === 0) {
+                this.setState({
+                    [datas]: res.message
+                })
+            }
         })
     }
     confirm (record) {
@@ -216,7 +227,7 @@ class MyGates extends Component {
                 if (res.ok){
                     message.success('移除网关成功')
                 }
-                this.refreshDevicesList()
+                this.refreshDevicesList(0)
             })
         }
     }
@@ -241,7 +252,7 @@ class MyGates extends Component {
                 })
             }
         });
-      }
+      };
       handleOk = (type) => {
           const { sn, name, desc, index} = this.state;
           const owner_id = index === 1 ? this.state.role.name : this.props.store.session.user_id;
@@ -260,7 +271,7 @@ class MyGates extends Component {
                 http.postToken('/api/gateways_create', data).then(res=>{
                     if (res.ok) {
                       message.success('绑定成功')
-                      this.refreshDevicesList()
+                      this.refreshDevicesList(0)
                     } else {
                       message.error(res.error)
                     }
@@ -295,9 +306,10 @@ class MyGates extends Component {
           [name]: false
         });
       }
-      filter = (vale)=>{
+    filter = (vale)=>{
         const value = vale.toLowerCase();
         const name = this.state.status + 'data';
+        const names = this.state.status + 'datas';
         const data = this.state[name];
         const arr = [];
         data.map(item=>{
@@ -306,11 +318,11 @@ class MyGates extends Component {
             }
         })
         this.setState({
-            [this.state.status]: arr
+            [names]: arr
         })
-      }
+    }
     render (){
-        let { alldata, onlinedata, offlinedata, confirmLoading } = this.state;
+        let { alldatas, onlinedatas, offlinedatas, confirmLoading } = this.state;
         return (
             <div
                 style={{
@@ -363,6 +375,8 @@ class MyGates extends Component {
                 <Modal
                     title="添加网关"
                     visible={this.state.visible}
+                    okText="确定"
+                    cancelText="取消"
                     onOk={()=>{
                         this.handleOk('create')
                     }}
@@ -527,7 +541,7 @@ class MyGates extends Component {
                     <Button
                         style={{position: 'absolute', left: 200, top: 0, zIndex: 999}}
                         onClick={()=>{
-                            this.refreshDevicesList()
+                            this.refreshDevicesList(0)
                         }}
                     >
                         <Icon type="sync"/>
@@ -546,7 +560,7 @@ class MyGates extends Component {
                                 let data = this.state[status + 'data']
                                 let loading = data && data.length > 0 ? false : true
                                 this.setState({loading: loading, status: status}, ()=>{
-                                    this.refreshDevicesList()
+                                    this.refreshDevicesList(0)
                                 })
                             }}
                         >
@@ -557,7 +571,7 @@ class MyGates extends Component {
                                         this.state.columns
                                     }
                                 dataSource={
-                                    onlinedata && onlinedata.length > 0 ? onlinedata : []
+                                    onlinedatas && onlinedatas.length > 0 ? onlinedatas : []
                                 }
                                 bordered
                                 loading={this.state.loading}
@@ -576,7 +590,7 @@ class MyGates extends Component {
                         >
                             <Table columns={this.state.columns}
                                 dataSource={
-                                    offlinedata && offlinedata.length > 0 ? offlinedata : []
+                                    offlinedatas && offlinedatas.length > 0 ? offlinedatas : []
                                 }
                                 rowKey="sn"
                                 rowClassName={(record, index) => {
@@ -596,7 +610,7 @@ class MyGates extends Component {
                         >
                             <Table columns={this.state.columns}
                                 dataSource={
-                                    alldata && alldata.length > 0 ? alldata : []
+                                    alldatas && alldatas.length > 0 ? alldatas : []
                                 }
                                 rowClassName={(record, index) => {
                                     let className = 'light-row';
