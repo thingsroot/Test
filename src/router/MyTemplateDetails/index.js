@@ -186,8 +186,16 @@ class MyTemplateDetails extends PureComponent {
                                 filename={appName + '-' + confName + '-' + maxVersion}
                             >下载到本地</CSVLink>
                         </Button>
-
+                        <span style={{padding: '10px'}}></span>
+                        <Icon
+                            style={{fontSize: 18}}
+                            type="rollback"
+                            onClick={()=>{
+                                this.props.history.go(-1)
+                            }}
+                        />
                     </div>
+
                 </div>
                 <div
                     className="main"
