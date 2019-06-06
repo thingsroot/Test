@@ -8,7 +8,6 @@ import 'brace/theme/github';
 import {Link, withRouter} from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
-
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
@@ -24,35 +23,36 @@ const none = {
 @observer
 
 class AppConfig extends Component {
-    state = {
-        error: false,
-        addTempLists: [
-            {
-                title: '名称',
-                width: '20%',
-                dataIndex: 'conf_name',
-                key: 'conf_name',
-                render: text => <span>{text}</span>
-            }, {
-                title: '描述',
-                width: '20%',
-                dataIndex: 'description',
-                key: 'description'
-            }, {
-                title: '模板ID',
-                width: '20%',
-                dataIndex: 'name',
-                key: 'name'
-            }, {
-                title: '版本',
-                width: '20%',
-                key: 'latest_version',
-                dataIndex: 'latest_version'
-            }, {
-                title: '操作',
-                width: '20%',
-                render: (record) => (
-                    <span>
+    constructor (props) {
+        super(props);
+        this.state = {
+            addTempLists: [
+                {
+                    title: '名称',
+                    width: '20%',
+                    dataIndex: 'conf_name',
+                    key: 'conf_name',
+                    render: text => <span>{text}</span>
+                }, {
+                    title: '描述',
+                    width: '20%',
+                    dataIndex: 'description',
+                    key: 'description'
+                }, {
+                    title: '模板ID',
+                    width: '20%',
+                    dataIndex: 'name',
+                    key: 'name'
+                }, {
+                    title: '版本',
+                    width: '20%',
+                    key: 'latest_version',
+                    dataIndex: 'latest_version'
+                }, {
+                    title: '操作',
+                    width: '20%',
+                    render: (record) => (
+                        <span>
                         <Button>
                             <Link to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}>查看</Link>
                         </Button>
@@ -64,45 +64,51 @@ class AppConfig extends Component {
                             }}
                         >选择</Button>
                     </span>
-                )
-            }
-        ],
-        addTempList: [],
-        showTempLists: [
-            {
-                title: '名称',
-                dataIndex: 'conf_name',
-                key: 'conf_name',
-                render: text => <span>{text}</span>
-            }, {
-                title: '描述',
-                dataIndex: 'description',
-                key: 'description'
-            }, {
-                title: '模板ID',
-                dataIndex: 'name',
-                key: 'name'
-            }, {
-                title: '版本',
-                key: 'latest_version',
-                dataIndex: 'latest_version'
-            }, {
-                title: '操作',
-                key: 'app',
-                render: (record) => (
-                    <Button
-                        onClick={()=>{
-                            this.onDelete(`${record.name}`)
-                        }
-                        }
-                    >删除</Button>
-                )
-            }
-        ],
-        showTempList: [],
-        selectSection: 'socket',
-        isTemplateShow: false
-    };
+                    )
+                }
+            ],
+            addTempList: [],
+            showTempLists: [
+                {
+                    title: '名称',
+                    dataIndex: 'conf_name',
+                    key: 'conf_name',
+                    render: text => <span>{text}</span>
+                }, {
+                    title: '描述',
+                    dataIndex: 'description',
+                    key: 'description'
+                }, {
+                    title: '模板ID',
+                    dataIndex: 'name',
+                    key: 'name'
+                }, {
+                    title: '版本',
+                    key: 'latest_version',
+                    dataIndex: 'latest_version'
+                }, {
+                    title: '操作',
+                    key: 'app',
+                    render: (record) => (
+                        <Button
+                            onClick={()=>{
+                                this.onDelete(`${record.name}`)
+                            }
+                            }
+                        >删除</Button>
+                    )
+                }
+            ],
+            showTempList: [],
+            selectSection: 'socket',
+            isTemplateShow: false,
+            config: [],
+            deviceColumns: [],
+            keys: [],
+            readOnly: false,
+            item: {}
+        };
+    }
 
     componentDidMount () {
         http.get('/api/application_configurations_list?app=' + this.props.match.params.app + '&conf_type=Template')
@@ -122,6 +128,125 @@ class AppConfig extends Component {
                 });
             });
     }
+
+    UNSAFE_componentWillReceiveProps (nextProps){
+        this.setState({
+            item: nextProps.item
+        });
+        if (nextProps.item !== undefined) {
+            this.getConfig(nextProps.item)
+        }
+    }
+
+    getConfig = (val)=>{
+        this.props.store.codeStore.setErrorCode(false);
+        this.props.store.codeStore.setInstallConfiguration('');
+        this.props.store.codeStore.setInstNames('');
+        let config = [];
+        if (JSON.stringify(val) !== '{}' && val !== 'undefined') {
+            if (val.conf_template && val.conf_template[0] === '[') {
+                config = JSON.parse(val.conf_template);
+                this.setState({
+                    config: config
+                });
+                let deviceColumns = [];
+                let tableName = [];  //存放表名
+                let dataSource = {};
+                let keys = [];
+                config && config.length > 0 && config.map((v, key)=>{
+                    keys.push(v);
+                    key;
+                    if (v.type === 'templates' ||
+                        v.type === 'text' ||
+                        v.type === 'number' ||
+                        v.type === 'dropdown' ||
+                        v.type === 'section' &&
+                        v.child === undefined
+                    ) {
+                        this.props.store.codeStore.setActiveKey('1');
+                    } else if (v.type === 'table' && v.child !== undefined) {
+                        this.props.store.codeStore.setActiveKey('1');
+                    } else {
+                        this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
+                        this.props.store.codeStore.setReadOnly(false);
+                        this.props.store.codeStore.setErrorCode(true);
+                        this.props.store.codeStore.setActiveKey('2');
+                        console.log(this.props.store.codeStore.installConfiguration)
+                    }
+                    if (v.name === 'device_section') {
+                        let tableNameData = {};
+                        v.child && v.child.length && v.child.map((w, key1)=>{
+                            tableNameData[w.name] = [];
+                            key1;
+                            let arr = [];
+                            w.cols.map((i, key2)=>{
+                                key2;
+                                arr.push({
+                                    key: key2,
+                                    name: i.name,
+                                    desc: i.desc,
+                                    type: i.type
+                                });
+                            });
+                            tableName.push(w.name);
+                            deviceColumns.push({
+                                [w.name]: arr
+                            });
+                        });
+                        let columnsArr = [];
+                        deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
+                            key;
+                            let data = [];
+                            let name = tableName[key];
+                            v[name].map((w, indexW)=>{
+                                data.push({
+                                    key: indexW,
+                                    id: w.type,
+                                    title: w.desc,
+                                    dataIndex: w.name,
+                                    editable: true
+                                });
+                            });
+                            columnsArr.push({[tableName[key]]: data})
+                        });
+                        let obj = {};
+                        columnsArr.map((item)=>{
+                            obj[Object.keys(item)] = Object.values(item)
+                        });
+                        console.log(obj)
+                        this.setState({
+                            deviceColumns: obj
+                        }, ()=>{
+                            console.log(this.state.deviceColumns)
+                        });
+                        this.props.store.codeStore.setAllTableData(tableNameData);
+                    }
+                });
+                //设置store存储数据
+                tableName && tableName.length > 0 && tableName.map((w)=>{
+                    dataSource[w] = [];
+                });
+                this.props.store.codeStore.setDataSource(dataSource);
+                this.setState({
+                    config: config,
+                    // deviceColumns: obj,
+                    keys: keys
+                });
+            }
+        } else if (val.conf_template === null) {
+            this.props.store.codeStore.setInstallConfiguration('{}');
+        }
+
+        if (this.props.match.params.type === '2') {
+            this.setState({
+                flag: false,
+                detail: false
+            });
+            this.props.store.codeStore.setActiveKey('2');
+            this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
+        }
+        this.props.store.codeStore.setInstallConfiguration(val.pre_configuration === null ? '{}' : val.pre_configuration);
+    };
 
     //添加模板
     addSingleTemp = (conf, desc, name, version)=>{
@@ -184,9 +309,8 @@ class AppConfig extends Component {
     };
 
     getData = ()=>{
-        const { keys } = this.props;
         const { tcp, serial } = this.props.store.codeStore;
-        const { selectSection} = this.state;
+        const { selectSection, keys } = this.state;
         let sourceCodeData = {};
         keys && keys.length > 0 && keys.map((item, key)=>{
             key;
@@ -245,8 +369,9 @@ class AppConfig extends Component {
         } else if (key === '2') {
             this.props.store.codeStore.setActiveKey(key);
         }
-        if (errorCode === true || this.props.config.length === 0) {
+        if (errorCode === true) {
             this.props.store.codeStore.setReadOnly(false);
+            this.props.store.codeStore.setInstallConfiguration('{}');
         } else if (this.props.config && this.props.config.length > 0 || errorCode === false) {
             this.props.store.codeStore.setReadOnly(true);
             this.getData();
@@ -287,10 +412,10 @@ class AppConfig extends Component {
     };
 
     render () {
-        const { addTempLists, showTempLists, showTempList, selectSection, addTempList } = this.state;
+        const { config, deviceColumns, addTempLists, showTempLists, showTempList, selectSection, addTempList } = this.state;
         const { errorCode, installConfiguration, serial, tcp, activeKey } = this.props.store.codeStore;
-        let { config, deviceColumns, app } = this.props;
-
+        let { app } = this.props;
+        console.log(this.props.item)
         return (
             <Tabs
                 activeKey={this.props.store.codeStore.activeKey}
@@ -305,11 +430,11 @@ class AppConfig extends Component {
                         name={name}
                         sn={this.props.match.params.sn}
                     />
-
                     <div
                         ref="content"
                         style={errorCode === false ? block : none}
                     >
+                        {console.log(config)}
                         {
                             config && config.length > 0 && config.map((v, key) => {
                                 if (v.type === 'section') {
@@ -520,10 +645,11 @@ class AppConfig extends Component {
                                                                                 <span
                                                                                     style={{padding: '0 5px'}}
                                                                                 >|</span>{w.desc}</p>
-                                                            <EditableTable
-                                                                tableName={w.name}
-                                                                deviceColumns={deviceColumns[w.name]}
-                                                            />
+                                                                <EditableTable
+                                                                    tableName={w.name}
+                                                                    deviceColumns={deviceColumns[w.name]}
+                                                                />
+
                                                         </div>
                                                     )
                                                 })
@@ -591,7 +717,7 @@ class AppConfig extends Component {
                     <br/>
                     <Button
                         type="primary"
-                        style={errorCode === true || config.length <= 0 ? none : block}
+                        style={errorCode === true || config.length === 0 ? none : block}
                         onClick={this.submitData}
                         disabled={this.props.disabled}
                     >提交</Button>
@@ -611,20 +737,20 @@ class AppConfig extends Component {
                     </div>
                     {
                         activeKey === '2'
-                        ? <SplitEditor
-                            style={{width: '100%'}}
-                            mode="json"
-                            theme="github"
-                            splits={1}
-                            onChange={this.onChange}
-                            value={typeof installConfiguration === 'string' ? [installConfiguration]
-                                : [JSON.stringify(installConfiguration)]}
-                            fontSize={16}
-                            readOnly={this.props.store.codeStore.readOnly}
-                            name="UNIQUE_ID_OF_DIV"
-                            editorProps={{$blockScrolling: true}}
-                          />
-                    : ''
+                            ? <SplitEditor
+                                style={{width: '100%'}}
+                                mode="json"
+                                theme="github"
+                                splits={1}
+                                onChange={this.onChange}
+                                value={typeof installConfiguration === 'string' ? [installConfiguration]
+                                    : [JSON.stringify(installConfiguration)]}
+                                fontSize={16}
+                                readOnly={this.props.store.codeStore.readOnly}
+                                name="UNIQUE_ID_OF_DIV"
+                                editorProps={{$blockScrolling: true}}
+                            />
+                            : ''
                     }
                     <br/>
                     <Button

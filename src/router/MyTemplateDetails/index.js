@@ -78,7 +78,8 @@ class MyTemplateDetails extends PureComponent {
 
     fileChang = (info)=>{
         this.setState({
-            file: info.file.originFileObj
+            file: info.file.originFileObj,
+            previewCsvData: ''
         }, ()=>{
             this.openFile(info.file.originFileObj)
         });
@@ -136,19 +137,12 @@ class MyTemplateDetails extends PureComponent {
             .catch(err=>{
                 console.log(err)
             });
-
     };
 
     handleCancel = () => {
         this.setState({
             visible: false
         });
-    };
-
-    deleteCsv = ()=>{
-        this.setState({
-            previewCsvData: ''
-        })
     };
 
     render () {

@@ -119,7 +119,7 @@ class CodeStore {
     @observable activeKey = '1';  //配置面板/json源码  active
     @observable errorCode = false;  //配置面板代码错误
     @observable config = [];  //配置面板数据
-    @observable installConfiguration = [];  //json源码
+    @observable installConfiguration = '{}';  //json源码
     @observable iDeviceColumns = [];  //配置面板表格
 
     @observable userBeta = 0;   //网关是否开启beta模式
