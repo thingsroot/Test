@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { inject, observer} from 'mobx-react';
 import Papa from 'papaparse';
 import { Select, Button, Upload, Icon, Modal, message } from 'antd';
 import { CSVLink } from 'react-csv';
@@ -15,11 +16,14 @@ const block = {
     overflow: 'auto'
 };
 
+@inject('store')
+@observer
 class MyTemplateDetails extends PureComponent {
     constructor () {
         super();
         this.state = {
             conf: '',
+            conf_info: {},
             content: '',  //数据原型
             csvData: '',  //csv数据
             versionList: [],   //版本号列表
@@ -28,21 +32,34 @@ class MyTemplateDetails extends PureComponent {
             file: '',        //文件流
             previewData: '',  //预览数据原型
             previewCsvData: '', //预览csv数据
-            maxVersion: 0,
-            confName: '',
-            appName: ''
+            maxVersion: 0
         }
     }
     componentDidMount () {
         let conf = this.props.match.params.name;
         this.setState({
             conf: conf
+        }, ()=>{
+            this.fetchInfo();
         });
-        this.getVersionList(conf);
     }
 
-    getVersionList = (conf)=>{
-        http.get('/api/configurations_versions_list?conf=' + conf)
+    fetchInfo (){
+        http.get('/api/configurations_read?name=' + this.state.conf).then( res=> {
+            if (res.ok) {
+                this.setState({conf_info: res.data})
+                this.getVersionList()
+            } else {
+                message.error(res.error)
+            }
+        }).catch((err)=>{
+            err;
+            message.error('读取模板信息失败')
+        })
+    }
+
+    getVersionList (){
+        http.get('/api/configurations_versions_list?conf=' + this.state.conf)
             .then(res=>{
                 let list = [];
                 res.data && res.data.length > 0 && res.data.map((v)=>{
@@ -52,15 +69,12 @@ class MyTemplateDetails extends PureComponent {
                     this.setState({
                         versionList: list,
                         maxVersion: list[0],
-                        dataList: res.data,
-                        csvData: Papa.parse(res.data[0].data).data,
-                        appName: res.data[0].app_name,
-                        confName: res.data[0].app_conf_name
+                        dataList: res.data
                     });
                     this.getDetails(list[0]);
                 }
             });
-    };
+    }
 
     getDetails = (version)=>{
         let { dataList } = this.state;
@@ -146,12 +160,16 @@ class MyTemplateDetails extends PureComponent {
     };
 
     render () {
-        const { confName, appName, content, csvData, versionList, previewCsvData, maxVersion } = this.state;
+        const { conf_info, content, csvData, versionList, previewCsvData, maxVersion } = this.state;
         return (
             <div className="MyTemplateDetails">
                 <div className="title">
                     <div>
-                        <span>版本列表：</span>
+                        <span>名称:</span>
+                        {conf_info.conf_name}
+                        <span style={{paddingLeft: '50px'}}>所有者:</span>
+                        {conf_info.owner}
+                        <span style={{paddingLeft: '50px'}}>版本列表：</span>
                         <Select
                             disabled={versionList.length > 0 ? false : true}
                             value={maxVersion}
@@ -169,11 +187,11 @@ class MyTemplateDetails extends PureComponent {
                                 })
                             }
                         </Select>
-                        <span style={{paddingLeft: '50px'}}>关联应用：{appName}</span>
+                        <span style={{paddingLeft: '50px'}}>关联应用：{conf_info.app}</span>
                     </div>
                     <div>
                         <Button
-                            style={this.props.match.params.type === '0' ? {display: 'inline-block'} : {display: 'none'}}
+                            style={this.state.conf_info.owner === this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showModal}
                         >上传新版本</Button>
                         <span style={{padding: '10px'}}></span>
@@ -183,7 +201,7 @@ class MyTemplateDetails extends PureComponent {
                         >
                             <CSVLink
                                 data={content}
-                                filename={appName + '-' + confName + '-' + maxVersion}
+                                filename={conf_info.app + '-' + conf_info.name + '-' + maxVersion}
                             >下载到本地</CSVLink>
                         </Button>
 

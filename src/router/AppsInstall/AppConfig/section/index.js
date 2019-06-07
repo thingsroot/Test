@@ -266,18 +266,19 @@ class AppConfigSection extends Component {
                 title: '操作',
                 width: '20%',
                 render: (record) => (
+                    record.latest_version !== undefined ? (
                     <span>
-                    <Button>
-                        <Link to={`/myTemplateDetails/${record.app}/${record.name}/${record.latest_version}`}>查看</Link>
-                    </Button>
-                    <span style={{padding: '0 5px'}}> </span>
-                    <Button
-                        disabled={record.disabled}
-                        onClick={()=>{
-                            this.onAddTemplate(record.name, record.conf_name, record.description, record.latest_version)
-                        }}
-                    >选择</Button>
-                </span>
+                        <Button>
+                            <Link to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}`}>查看</Link>
+                        </Button>
+                        <span style={{padding: '0 5px'}}> </span>
+                        <Button
+                            disabled={record.disabled}
+                            onClick={()=>{
+                                this.onAddTemplate(record.name, record.conf_name, record.description, record.latest_version)
+                            }}
+                        >选择</Button>
+                    </span>) : ''
                 )
             }
         ]

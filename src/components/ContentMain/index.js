@@ -162,7 +162,7 @@ class ContentMain extends Component {
                     title={'安装应用'}
                 />
                 <PrivateRoute
-                    path="/mytemplatedetails/:app/:name/:version/:type"
+                    path="/mytemplatedetails/:app/:name/:version?"
                     component={MyTemplateDetails}
                     title={'模板详情'}
                 />
