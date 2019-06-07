@@ -214,7 +214,7 @@ class AppConfigSection extends Component {
                     <EditableTable
                         config={config}
                         tableColumns={tableColumns}
-                        dataSoruce={config.value}
+                        dataSource={config.value}
                         configStore={this.props.configStore}
                         onChange={this.props.onChange}
                     />

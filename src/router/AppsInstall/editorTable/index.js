@@ -124,7 +124,6 @@ class EditableTable extends React.Component {
         this.columns = []
 
         this.state = {
-            dataSource: [],
             count: 0
         };
     }
@@ -132,9 +131,9 @@ class EditableTable extends React.Component {
     componentDidMount () {
         const {dataSource, tableColumns} = this.props
         if (dataSource !== undefined) {
-            this.setState({dataSource: dataSource})
+            this.setState({count: dataSource.length})
         } else {
-            this.setState({dataSource: []})
+            this.props.config.setValue([])
         }
 
         if (tableColumns === undefined) {
@@ -155,7 +154,7 @@ class EditableTable extends React.Component {
             title: '操作',
             dataIndex: '___operation',
             render: (text, record) =>
-            this.state.dataSource.length >= 1 ? (
+            dataSource.length >= 1 ? (
                 <Button
                     type="primary"
                     href="javascript:;"
@@ -169,19 +168,16 @@ class EditableTable extends React.Component {
     }
 
     handleDelete = key => {
-        const dataSource = [...this.state.dataSource];
-        this.setState({
-            dataSource: dataSource.filter(item => item.key !== key)
-        }, ()=>{
-            this.props.config.setValue(this.state.dataSource)
-            this.props.onChange()
-        });
+        let newData = [...this.props.dataSource];
+        newData = newData.filter(item => item.key !== key)
+        this.props.config.setValue(newData)
+        this.props.onChange()
     };
 
 
     handleAdd = () => {
-        const { count, dataSource } = this.state;
-        const { tableColumns } = this.props;
+        const { count } = this.state;
+        const { tableColumns, dataSource } = this.props;
 
         const newData = {key: count};
         if (tableColumns !== undefined && tableColumns.length > 0) {
@@ -190,35 +186,24 @@ class EditableTable extends React.Component {
                 newData[col.dataIndex] = col.default !== undefined ? col.default : ''
             })
         }
-
-        this.setState({
-            dataSource: [...dataSource, newData],
-            count: count + 1
-        }, ()=>{
-           this.props.config.setValue(this.state.dataSource)
-           this.props.onChange()
-        });
+        this.props.config.setValue([...dataSource, newData])
+        this.props.onChange()
     };
 
     handleSave = row => {
-        const newData = [...this.state.dataSource];
+        let newData = [...this.props.dataSource];
         const index = newData.findIndex(item => row.key === item.key);
         const item = newData[index];
         newData.splice(index, 1, {
             ...item,
             ...row
         });
-        this.setState({
-            dataSource: newData
-        }, ()=>{
-            this.props.config.setValue(this.state.dataSource)
-            this.props.onChange()
-        });
+        this.props.config.setValue(newData)
+        this.props.onChange()
     };
 
     render () {
-        const { dataSource } = this.state;
-        const { config, tableColumns, onChange } = this.props;
+        const { config, tableColumns, onChange, dataSource } = this.props;
         config, tableColumns, onChange
 
         const components = {

@@ -197,7 +197,7 @@ class EditorTemplates extends React.Component {
             rowKey="name"
             components={components}
             bordered
-            dataSource={this.props.dataSoruce}
+            dataSource={this.props.dataSource}
             columns={columns}
             rowClassName="editable-row"
             pagination={{
