@@ -24,6 +24,7 @@ class MyTemplateDetails extends PureComponent {
         this.state = {
             conf: '',
             conf_info: {},
+            show_version: 0,
             content: '',  //数据原型
             csvData: '',  //csv数据
             versionList: [],   //版本号列表
@@ -37,8 +38,15 @@ class MyTemplateDetails extends PureComponent {
     }
     componentDidMount () {
         let conf = this.props.match.params.name;
+        let version = this.props.match.params.version
+        if (version === undefined) {
+            version = 0
+        } else {
+            version = Number(version) ? Number(version) : 0
+        }
         this.setState({
-            conf: conf
+            conf: conf,
+            show_version: version
         }, ()=>{
             this.fetchInfo();
         });
@@ -66,12 +74,14 @@ class MyTemplateDetails extends PureComponent {
                     list.push(v.version);
                 });
                 if (list.length > 0) {
+                    let show_version = this.state.show_version !== 0 ? this.state.show_version : list[0]
                     this.setState({
                         versionList: list,
                         maxVersion: list[0],
+                        show_version: show_version,
                         dataList: res.data
                     });
-                    this.getDetails(list[0]);
+                    this.getDetails(show_version);
                 }
             });
     }
@@ -116,7 +126,8 @@ class MyTemplateDetails extends PureComponent {
 
     onVersionChange = (value) => {
         this.setState({
-            maxVersion: value
+            maxVersion: value,
+            show_version: value
         });
         this.getDetails(value);
     };
@@ -160,7 +171,7 @@ class MyTemplateDetails extends PureComponent {
     };
 
     render () {
-        const { conf_info, content, csvData, versionList, previewCsvData, maxVersion } = this.state;
+        const { conf_info, content, csvData, versionList, previewCsvData, show_version } = this.state;
         return (
             <div className="MyTemplateDetails">
                 <div className="title">
@@ -172,7 +183,7 @@ class MyTemplateDetails extends PureComponent {
                         <span style={{paddingLeft: '50px'}}>版本列表：</span>
                         <Select
                             disabled={versionList.length > 0 ? false : true}
-                            value={maxVersion}
+                            value={show_version}
                             style={{ width: 220 }}
                             onChange={this.onVersionChange}
                         >
@@ -201,7 +212,7 @@ class MyTemplateDetails extends PureComponent {
                         >
                             <CSVLink
                                 data={content}
-                                filename={conf_info.app + '-' + conf_info.name + '-' + maxVersion}
+                                filename={conf_info.app + '-' + conf_info.name + '-' + show_version}
                             >下载到本地</CSVLink>
                         </Button>
 
