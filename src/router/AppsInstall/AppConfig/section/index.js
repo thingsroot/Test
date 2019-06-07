@@ -174,13 +174,15 @@ class AppConfigSection extends Component {
         )
     }
     render_table (key, config) {
-        let deviceColumns = [];
-        config.child && config.child.length && config.child.map((w, key1)=>{
-            deviceColumns.push({
-                key: key1,
-                id: w.type,
-                title: w.desc,
-                dataIndex: w.name,
+        let tableColumns = [];
+        config.cols && config.cols.length && config.cols.map((col, col_key)=>{
+            tableColumns.push({
+                key: col_key,
+                id: col.name,
+                columnType: col.type,
+                title: col.desc,
+                dataIndex: col.name,
+                default: col.default,
                 editable: true
             });
         });
@@ -196,9 +198,11 @@ class AppConfigSection extends Component {
                         style={{padding: '0 5px'}}
                     >|</span>{config.desc}</p>
                     <EditableTable
-                        tableName={config.name}
-                        deviceColumns={deviceColumns}
+                        config={config}
+                        tableColumns={tableColumns}
                         dataSoruce={config.value}
+                        configStore={this.props.configStore}
+                        onChange={this.props.onChange}
                     />
 
             </div>
