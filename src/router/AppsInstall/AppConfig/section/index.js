@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
 import {Button, Checkbox, Input, Modal, Select, Table, Divider} from 'antd';
 import EditableTable from '../../editorTable';
+import EditableTemplates from '../../editorTemplates';
 const Option = Select.Option;
 
 const block = {
@@ -20,8 +21,16 @@ class AppConfigSection extends Component {
     }
 
     //添加模板
-    onAddTemplate = (name, conf, desc, version)=>{
-        this.props.configStore.addTemplate(name, conf, desc, version)
+    onAddTemplate = (config, name, conf_name, desc, version)=>{
+        this.props.configStore.addTemplate(name, conf_name, desc, version)
+        let val = config.Value
+        val.push({
+            id: name,
+            name: conf_name,
+            description: desc,
+            version: version
+        })
+        config.setValue(val)
         this.props.onChange()
     };
     // 删除模板
@@ -51,6 +60,11 @@ class AppConfigSection extends Component {
             showTemplateSelection: true
         })
     };
+
+    createNewTemplate = () => {
+        const w = window.open('about: blank');
+        w.location.href = '/myappdetails/' + this.props.app_info.name + '/new_template'
+    }
 
     handleCancelAddTempList = ()=>{
         this.setState({
@@ -209,37 +223,6 @@ class AppConfigSection extends Component {
         )
     }
     render_templates (key, config, templates, templateStore) {
-        const showTempLists = [
-            {
-                title: '名称',
-                dataIndex: 'conf_name',
-                key: 'conf_name',
-                render: text => <span>{text}</span>
-            }, {
-                title: '描述',
-                dataIndex: 'description',
-                key: 'description'
-            }, {
-                title: '模板ID',
-                dataIndex: 'name',
-                key: 'name'
-            }, {
-                title: '版本',
-                key: 'latest_version',
-                dataIndex: 'latest_version'
-            }, {
-                title: '操作',
-                key: 'app',
-                render: (record) => (
-                    <Button
-                        onClick={()=>{
-                            this.onDeleteTemplate(`${record.name}`)
-                        }
-                        }
-                    >删除</Button>
-                )
-            }
-        ]
         const addTempLists = [
             {
                 title: '名称',
@@ -275,7 +258,7 @@ class AppConfigSection extends Component {
                         <Button
                             disabled={record.disabled}
                             onClick={()=>{
-                                this.onAddTemplate(record.name, record.conf_name, record.description, record.latest_version)
+                                this.onAddTemplate(config, record.name, record.conf_name, record.description, record.latest_version)
                             }}
                         >选择</Button>
                     </span>) : ''
@@ -288,11 +271,11 @@ class AppConfigSection extends Component {
                 key={key}
                 style={config.hide === true ? none : block}
             >
-                <Table
-                    rowKey="name"
-                    dataSource={config.value}
-                    columns={showTempLists}
-                    pagination={false}
+                <EditableTemplates
+                    config={config}
+                    dataSoruce={config.value}
+                    configStore={this.props.configStore}
+                    onChange={this.props.onChange}
                 />
                 <Button
                     onClick={this.templateShow}
@@ -327,9 +310,7 @@ class AppConfigSection extends Component {
                     <Button
                         type="primary"
                         style={{float: 'right', marginTop: '20px'}}
-                        onClick={()=>{
-                            this.addNewTemplate()
-                        }}
+                        onClick={this.createNewTemplate}
                     >
                         添加模板
                     </Button>
@@ -338,7 +319,8 @@ class AppConfigSection extends Component {
         )
     }
     render () {
-        const { configSection, configStore, templatesSource } = this.props
+        const { configSection, configStore, templatesSource, app_info } = this.props
+        app_info;
         return (
             <div
                 id={configSection.name}

@@ -73,10 +73,10 @@ class EditableCell extends React.Component {
                             {this.props.configStore.templates.map((item)=>{
                                 return (
                                     <Select.Option
-                                        key={item}
+                                        key={item.name}
                                         onClick={this.selectSave}
                                     >
-                                        {item}
+                                        {item.name}
                                     </Select.Option>
                                 )
                             })}
@@ -152,7 +152,7 @@ class EditableTable extends React.Component {
             })
         })
         copy_columns.push({
-            title: 'operation',
+            title: '操作',
             dataIndex: '___operation',
             render: (text, record) =>
             this.state.dataSource.length >= 1 ? (

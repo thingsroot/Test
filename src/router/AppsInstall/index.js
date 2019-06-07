@@ -331,7 +331,6 @@ class MyGatesAppsInstall extends Component {
                                 app_info={app_info}
                                 submitData={this.submitData}
                                 configStore={this.state.configStore}
-                                refreshTemplateList={this.refreshTemplateList}
                             />
                         </div>
                     </div>

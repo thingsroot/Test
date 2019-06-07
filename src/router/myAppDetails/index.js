@@ -41,8 +41,12 @@ class MyAppDetails extends Component {
         http.get('/api/user_groups_list').then(res=>{
             this.props.store.codeStore.setGroupName(res.data[0].name)
         });
-        if (this.props.match.params.active === '3') {
+        let action = this.props.match.params.action ? this.props.match.params.action : ''
+        if (action === 'new_template') {
             this.props.store.codeStore.setTemplateVisible(true)
+            this.setState( {activeKey: 'templates'} )
+        } else {
+            this.setState( {activeKey: action})
         }
     }
 
@@ -63,7 +67,7 @@ class MyAppDetails extends Component {
             });
     };
     callback = (key)=>{
-        console.log(key);
+        this.setState({activeKey: key})
     };
     render () {
         let { app, message, time, user } = this.state;
@@ -142,17 +146,17 @@ class MyAppDetails extends Component {
                 <Tabs
                     onChange={this.callback}
                     type="card"
-                    defaultActiveKey={this.props.match.params.active}
+                    activeKey={this.state.activeKey}
                 >
                     <TabPane
                         tab="描述"
-                        key="1"
+                        key="description"
                     >
                         <AppDesc desc={this.state.desc}/>
                     </TabPane>
                     <TabPane
                         tab="版本列表"
-                        key="2"
+                        key="versions"
                     >
                         <VersionList
                             app={app}
@@ -161,7 +165,7 @@ class MyAppDetails extends Component {
                     </TabPane>
                     <TabPane
                         tab="模板列表"
-                        key="3"
+                        key="templates"
                     >
                         <TemplateList
                             app={app}

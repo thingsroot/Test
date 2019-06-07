@@ -155,32 +155,29 @@ class AppConfig extends Component {
         return JSON.stringify(data, null, 4)
     }
 
-
-    addNewTemplate (){
-        const w = window.open('about: blank');
-        const { app } = this.props
-        w.location.href = '/myappdetails/' + app + '/3'
-    }
-
-    refreshTemplateList () {
+    refreshTemplateList = () => {
         this.setState({appTemplateList: []})
         const { app } = this.props
         http.get('/api/store_configurations_list?conf_type=Template&app=' + app)
         .then(res=>{
             let list = this.state.appTemplateList;
-            res.data && res.data.length > 0 && res.data.map((item)=>{
-                list.push(item)
+            res.data && res.data.length > 0 && res.data.map((tp)=>{
+                if (undefined === list.find(item => item.name === tp.name) ) {
+                    list.push(tp)
+                }
             });
             this.setState({
                 appTemplateList: list
             });
         });
-        http.get('/api/user_configuration_list?conf_type=Template&app=' + app)
+        http.get('/api/user_configurations_list?conf_type=Template&app=' + app)
             .then(res=>{
                 if (res.ok) {
                     let list = this.state.appTemplateList;
-                    res.data && res.data.length > 0 && res.data.map((item)=>{
-                        list.push(item)
+                    res.data && res.data.length > 0 && res.data.map((tp)=>{
+                        if (undefined === list.find(item => item.name === tp.name) ) {
+                            list.push(tp)
+                        }
                     });
                     this.setState({
                         appTemplateList: list
@@ -331,9 +328,11 @@ class AppConfig extends Component {
                                 return (
                                     <AppConfigSection
                                         key={key}
+                                        app_info={this.state.app_info}
                                         configStore={configStore}
                                         configSection={v}
                                         templatesSource={this.state.appTemplateList}
+                                        refreshTemplateList={this.refreshTemplateList}
                                         onChange={()=>{
                                             this.onConfigChange()
                                         }}

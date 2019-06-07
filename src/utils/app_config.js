@@ -237,7 +237,7 @@ export class ConfigStore {
     get Value (){
         let value = {}
         this.sections.map( (section, index) => {
-            if (index === 0) {
+            if (index === 0 || section.type === 'section' || section.type === 'templates') {
                 let val = section.Value
                 for (let [k, v] of Object.entries(val)) {
                     value[k] = v
@@ -253,10 +253,10 @@ export class ConfigStore {
     @action setValue (value){
         let val = value ? value : {}
         this.sections.map( (section, index) => {
-            if (index !== 0 && section.type !== 'section') {
-                section.setValue(val[section.name])
-            } else {
+            if (index === 0 || section.type === 'section' || section.type === 'templates') {
                 section.setValue(val)
+            } else {
+                section.setValue(val[section.name])
             }
         })
     }

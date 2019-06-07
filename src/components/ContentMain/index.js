@@ -86,7 +86,7 @@ class ContentMain extends Component {
                     title={'应用商店'}
                 />
                 <PrivateRoute
-                    path="/myappdetails/:name/:active"
+                    path="/myappdetails/:name/:action?"
                     component={MyAppDetails}
                     title={'我的应用 · 详情'}
                 />
