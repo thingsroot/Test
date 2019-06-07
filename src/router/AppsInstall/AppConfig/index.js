@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import Inst from '../Inst';
 import {Button, Tabs, message} from 'antd';
 import AppConfigSection from './section';
-import {split as SplitEditor} from 'react-ace';
+import AceEditor from 'react-ace';
 import 'brace/mode/json';
-import 'brace/theme/github';
+import 'brace/theme/monokai';
 import {withRouter} from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
@@ -122,7 +122,7 @@ class AppConfig extends Component {
             readOnly: false,
             errorCode: false,
             instanceName: '',
-            activeKey: '2',
+            activeKey: 'json',
             configValue: ''
         };
     }
@@ -200,7 +200,7 @@ class AppConfig extends Component {
         this.props.configStore.cleanSetion()
 
         if (app.has_conf_template && conf_template && conf_template[0] === '[') {
-            this.setState({activeKey: '1'})
+            this.setState({activeKey: 'ui'})
 
             config = JSON.parse(conf_template);
             this.setState({
@@ -255,7 +255,7 @@ class AppConfig extends Component {
             }
             this.props.configStore.setValue(JSON.parse(pre_configuration))
         } else {
-            this.setState({activeKey: '2'})
+            this.setState({activeKey: 'json'})
         }
 
         if (this.props.match.params.type === '2') {
@@ -270,28 +270,34 @@ class AppConfig extends Component {
         this.props.submitData();
     };
 
-    onTabActiveChange = (key)=>{
+    onTabActiveChange (key){
         this.setState({activeKey: key})
-    };
+    }
 
-
-    onChange = (value)=>{
+    onJsonChange (value){
         //this.props.store.codeStore.setInstallConfiguration(this.prettyJson(value[0]))
-        this.props.configStore.setValue(JSON.parse(value))
-    };
+        this.setState({configValue: value})
+        let val = JSON.parse(value)
+        this.props.configStore.setValue(val)
+    }
+    onConfigChange (){
+        this.setState({configValue: JSON.stringify(this.props.configStore.Value, null, 4)})
+    }
 
     render () {
-        const { activeKey, errorCode, readOnly } = this.state;
+        const { activeKey, errorCode } = this.state;
         const { configStore } = this.props;
         return (
             <Tabs
                 activeKey={activeKey}
-                onChange={this.onTabActiveChange}
+                onChange={(key)=> {
+                    this.onTabActiveChange(key)
+                }}
                 type="card"
             >
                 <TabPane
                     tab="配置面板"
-                    key="1"
+                    key="ui"
                 >
                     <Inst
                         name={name}
@@ -309,6 +315,9 @@ class AppConfig extends Component {
                                         configStore={configStore}
                                         configSection={v}
                                         templatesSource={this.state.appTemplateList}
+                                        onChange={()=>{
+                                            this.onConfigChange()
+                                        }}
                                     />
                                 )
                             })
@@ -335,30 +344,33 @@ class AppConfig extends Component {
                 </TabPane>
                 <TabPane
                     tab="JSON源码"
-                    key="2"
+                    key="json"
                 >
                     <Inst
                         sn={this.props.match.params.sn}
                     />
-                    <div className="editorInfo">
-                        <p style={{lineHeight: '40px'}}>
-                            编辑器状态：
-                            <span>{readOnly ? '不可编辑' : '可编辑'}</span>
-                        </p>
-                    </div>
-                        <SplitEditor
-                            style={{width: '100%'}}
+                        <AceEditor
+                            placeholder="Placeholder Text"
                             mode="json"
-                            theme="github"
-                            splits={1}
-                            onChange={this.onChange}
-                            value={[this.state.configValue]}
-                            fontSize={16}
-                            readOnly={readOnly}
-                            name="UNIQUE_ID_OF_DIV"
-                            editorProps={{$blockScrolling: true}}
+                            theme="monokai"
+                            name="config_json_editor"
+                            onChange={(value) => {
+                                this.onJsonChange(value)
+                            }}
+                            fontSize={14}
+                            showPrintMargin
+                            showGutter
+                            highlightActiveLine
+                            value={this.state.configValue}
+                            style={{width: '100%'}}
+                            setOptions={{
+                                enableBasicAutocompletion: false,
+                                enableLiveAutocompletion: false,
+                                enableSnippets: false,
+                                showLineNumbers: true,
+                                tabSize: 2
+                            }}
                         />
-                    }
                     <br/>
                     <Button
                         type="primary"

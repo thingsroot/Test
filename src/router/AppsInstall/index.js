@@ -346,17 +346,16 @@ class MyGatesAppsInstall extends Component {
                             </div>
                         </div>
                         <div className={detail ? 'installapp hide' : 'installapp show'}>
-                                <AppConfig
-                                    app={app}
-                                    item={item}
-                                    deviceColumns={deviceColumns}
-                                    keys={keys}
-                                    disabled={disabled}
-                                    submitData={this.submitData}
-                                    configStore={this.state.configStore}
-                                    refreshTemplateList={this.refreshTemplateList}
-                                />
-                            }
+                            <AppConfig
+                                app={app}
+                                item={item}
+                                deviceColumns={deviceColumns}
+                                keys={keys}
+                                disabled={disabled}
+                                submitData={this.submitData}
+                                configStore={this.state.configStore}
+                                refreshTemplateList={this.refreshTemplateList}
+                            />
                         </div>
                     </div>
                     <div className={flag ? 'show' : 'hide'}>

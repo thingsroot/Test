@@ -24,7 +24,7 @@ html, body {
 }
 
 body {
-    font-family: 'Microsoft YaHei','Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family:  Helvetica,Arial,'Microsoft YaHei','Source Sans Pro','Helvetica Neue',sans-serif;
     font-size:14px;
     color:#333;
 }

@@ -65,7 +65,19 @@ const newConfigItem = (name, desc, type, default_value, depends, values) => {
             this.values = value;
         },
         setValue (value) {
-            this.value = value;
+            console.log(this.name, this.type, value)
+            if (value === undefined) {
+                this.value = createDefaultValue(this.type, this.default, this.values)
+                return
+            }
+
+            if (this.type === 'boolean') {
+                this.value = Boolean(value) ? Boolean(value) : (value === 1 || value === '1')
+            } else if (this.type === 'number') {
+                this.value = Number(value)
+            } else {
+                this.value = value;
+            }
         },
         setHide (value) {
             this.hide = value;
@@ -126,8 +138,9 @@ class ConfigSection {
     }
 
     @action setValue (value) {
+        let val = value ? value : {}
         for (let item of this.child) {
-            item.setValue(value[item.name])
+            item.setValue(val[item.name])
         }
     }
 }
@@ -193,46 +206,25 @@ export class ConfigStore {
 
     get Value (){
         let value = {}
-        this.sections.map( (section, skey) => {
-            skey;
-            let sval = section.Value;
-            for (let [k, v] of Object.entries(sval)) {
-                value[k] = v
+        this.sections.map( (section, index) => {
+            if (index === 0) {
+                let val = section.Value
+                for (let [k, v] of Object.entries(val)) {
+                    value[k] = v
+                }
+            } else {
+                value[section.name] = section.Value
             }
         })
         return value
     }
     @action setValue (value){
-        for (let [k, v] of Object.entries(value)) {
-            this.setKeyValue(k, v)
-        }
-    }
-
-    getKeyValue (key){
-        this.sections.map( (section, skey) => {
-            if (key === skey) {
-                return section.Value
-            }
-            for (let item of section.child) {
-                if (key === item.name) {
-                    return item.Value
-                }
-            }
-        })
-    }
-
-    @action setKeyValue (key, value) {
+        let val = value ? value : {}
         this.sections.map( (section, index) => {
-            index;
-            if (key === section.name) {
-                section.setValue(value)
-                return
-            }
-            for (let item of section.child) {
-                if (key === item.name) {
-                    item.setValue(value)
-                    return
-                }
+            if (index !== 0) {
+                section.setValue(val[section.name])
+            } else {
+                section.setValue(val)
             }
         })
     }

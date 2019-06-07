@@ -19,21 +19,10 @@ class AppConfigSection extends Component {
         }
     }
 
-    inputChange = (refName)=>{
-        this.props.configStore.setKeyValue(refName, event.target.value)
-    };
-
-    checkedChange = (refName)=>{
-        this.props.configStore.setKeyValue(refName, event.target.checked)
-    };
-
-    selectChangeValue = (refName)=>{
-        this.props.configStore.setKeyValue(refName, event.target.innerText)
-    };
-
     //添加模板
     onAddTemplate = (name, conf, desc, version)=>{
         this.props.configStore.addTemplate(name, conf, desc, version)
+        this.props.onChange()
     };
     // 删除模板
     onDeleteTemplate =  (name)=>{
@@ -80,10 +69,11 @@ class AppConfigSection extends Component {
                                 className="spanStyle"
                             >{config.desc}</span>
                 <Checkbox
-                    defaultChecked={config.value}
+                    checked={config.value}
                     onChange={
                         () => {
-                            this.checkedChange(config.name)
+                            config.setValue(event.target.checked)
+                            this.props.onChange()
                         }
                     }
                 >
@@ -108,10 +98,11 @@ class AppConfigSection extends Component {
                     <Input
                         style={{width: '300px'}}
                         type="number"
-                        defaultValue={config.value}
+                        value={config.value}
                         ref={config.name}
                         onChange={()=>{
-                            this.inputChange(config.name)
+                            config.setValue(event.target.value)
+                            this.props.onChange()
                         }}
                     />
                 </div>
@@ -130,10 +121,11 @@ class AppConfigSection extends Component {
                     <Input
                         style={{width: '300px'}}
                         type="text"
-                        defaultValue={config.value}
+                        value={config.value}
                         ref={config.name}
                         onChange={()=>{
-                            this.inputChange(config.name)
+                            config.setValue(event.target.value)
+                            this.props.onChange()
                         }}
                     />
                 </div>
@@ -154,13 +146,14 @@ class AppConfigSection extends Component {
                 <div style={{lineHeight: '50px'}}>
                     <span className="spanStyle">{config.desc}：</span>
                     <Select
-                        defaultValue={config.value}
+                        value={config.value}
                         style={{width: 300}}
                         onChange={()=>{
                             config.depends && config.depends.length > 0 && config.depends.map( (dep, dep_key) => {
                                 this.props.configStore.setHide(dep, dep_key === event.target.innerText)
                             })
-                            this.selectChangeValue(config.name)
+                            config.setValue(event.target.innerText)
+                            this.props.onChange()
                         }}
                     >
                         {config.values && config.values.length > 0 && config.values.map(w => <Option key={w}>{w}</Option>)}
