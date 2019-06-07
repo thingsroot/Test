@@ -133,10 +133,11 @@ class AppConfigSection extends Component {
         )
     }
     render_dropdown (key, config) {
-        config.depends && config.depends.length > 0 && config.depends.map( (dep, dep_key) => {
-            dep_key;
-            this.props.configStore.setHide(dep, true)
-        })
+        if (config.depends !== undefined) {
+            for (let [k, v] of Object.entries(config.depends)) {
+                this.props.configStore.setHide(v, k !== config.value)
+            }
+        }
         return (
             <div
                 id={config.name}
@@ -153,6 +154,11 @@ class AppConfigSection extends Component {
                                 this.props.configStore.setHide(dep, dep_key === event.target.innerText)
                             })
                             config.setValue(event.target.innerText)
+                            if (config.depends !== undefined) {
+                                for (let [k, v] of Object.entries(config.depends)) {
+                                    this.props.configStore.setHide(v, k !== config.value)
+                                }
+                            }
                             this.props.onChange()
                         }}
                     >
@@ -169,7 +175,7 @@ class AppConfigSection extends Component {
     }
     render_table (key, config) {
         let deviceColumns = [];
-        config.cols && config.cols.length && config.cols.map((w, key1)=>{
+        config.child && config.child.length && config.child.map((w, key1)=>{
             deviceColumns.push({
                 key: key1,
                 id: w.type,

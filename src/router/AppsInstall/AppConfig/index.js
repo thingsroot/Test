@@ -33,7 +33,7 @@ const tcp_client_childs = [
     {
         'name': 'host',
         'desc': 'IP地址',
-        'type': 'text',
+        'type': 'string',
         'default': '127.0.0.1'
     },
     {
@@ -103,10 +103,16 @@ const templates_childs = [
     },
     {
         'name': 'version',
-        'desc': '端口',
+        'desc': '版本',
         'type': 'number'
     }
 ];
+const templates_section = {
+    'name': 'templates',
+    'desc': '模板选择',
+    'type': 'templates',
+    'child': templates_childs
+}
 
 @withRouter
 @inject('store')
@@ -117,8 +123,7 @@ class AppConfig extends Component {
         this.state = {
             config: [],
             appTemplateList: [],
-            keys: [],
-            item: {},
+            app_info: {},
             readOnly: false,
             errorCode: false,
             instanceName: '',
@@ -133,11 +138,11 @@ class AppConfig extends Component {
 
     UNSAFE_componentWillReceiveProps (nextProps){
         this.setState({
-            item: nextProps.item
+            app_info: nextProps.app_info
         });
-        if (nextProps.item !== undefined) {
-            if (nextProps.item.name !== undefined) {
-                this.getConfig(nextProps.item)
+        if (nextProps.app_info !== undefined) {
+            if (nextProps.app_info.name !== undefined) {
+                this.getConfig(nextProps.app_info)
             }
         }
     }
@@ -187,14 +192,22 @@ class AppConfig extends Component {
     getConfig = (app)=>{
         let config = [];
         let conf_template = app.conf_template;
-        let pre_configuration = app.pre_configuration && app.pre_configuration.length > 0 ? app.pre_configuration : '{}';
+        let pre_configuration = {}
+
+        try {
+            let str_pre = app.pre_configuration && app.pre_configuration.length > 0 ? app.pre_configuration : '{}';
+            pre_configuration = JSON.parse(str_pre)
+        } catch (e) {
+            //message.error(e.message)
+            console.log(e.message)
+        }
 
         this.setState({
             errorCode: false,
             readOnly: false,
             instanceName: ''
         })
-        this.setState({config: config, app: app.name, configValue: pre_configuration})
+        this.setState({config: config, app: app.name, configValue: JSON.stringify(pre_configuration, null, 4)})
 
         this.refreshTemplateList()
         this.props.configStore.cleanSetion()
@@ -208,7 +221,7 @@ class AppConfig extends Component {
             });
             let sections = [];
             let cur_section = {
-                name: '应用配置',
+                name: '__basic__app_settings',
                 desc: '应用配置信息',
                 type: 'section',
                 child: []
@@ -223,7 +236,7 @@ class AppConfig extends Component {
                 }
                 let is_section = false;
                 if (v.type === 'templates') {
-                    v.child = templates_childs
+                    v.child = [templates_section]
                     is_section = true
                 }
                 if (v.type === 'section') {
@@ -253,7 +266,7 @@ class AppConfig extends Component {
             for (let section of sections) {
                 this.props.configStore.addSection(section)
             }
-            this.props.configStore.setValue(JSON.parse(pre_configuration))
+            this.props.configStore.setValue(pre_configuration)
         } else {
             this.setState({activeKey: 'json'})
         }
@@ -277,8 +290,14 @@ class AppConfig extends Component {
     onJsonChange (value){
         //this.props.store.codeStore.setInstallConfiguration(this.prettyJson(value[0]))
         this.setState({configValue: value})
-        let val = JSON.parse(value)
-        this.props.configStore.setValue(val)
+
+        try {
+            let val = JSON.parse(value)
+            this.props.configStore.setValue(val)
+        } catch (e) {
+            //message.error(e.message)
+            console.log(e.message)
+        }
     }
     onConfigChange (){
         this.setState({configValue: JSON.stringify(this.props.configStore.Value, null, 4)})

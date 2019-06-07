@@ -116,7 +116,7 @@ class MyAppDetails extends Component {
                         </Link>
                         <Link
                             className="button"
-                            to={`/AppsInstall/${this.props.store.codeStore.firstGateway}/${message.name}/2`}
+                            to={`/appsinstall/${this.props.store.codeStore.firstGateway}/${message.name}/install`}
                         >
                             <Icon type="download" />
                             安装此应用

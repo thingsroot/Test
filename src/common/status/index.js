@@ -67,9 +67,9 @@ class Status extends Component {
                     &nbsp;序号: {status.sn}
                 </div>
                     {
-                        this.props.location.pathname.indexOf('/AppsInstall') === -1
+                        this.props.location.pathname.indexOf('/appsinstall') === -1
                         ? <div>
-                            <Link to={`/AppsInstall/${this.state.gateway}/app/1`}>
+                            <Link to={`/appsinstall/${this.state.gateway}`}>
                                 安装新应用
                             </Link>
                         </div>

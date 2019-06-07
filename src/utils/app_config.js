@@ -65,7 +65,7 @@ const newConfigItem = (name, desc, type, default_value, depends, values) => {
             this.values = value;
         },
         setValue (value) {
-            console.log(this.name, this.type, value)
+            //console.log(this.name, this.type, value)
             if (value === undefined) {
                 this.value = createDefaultValue(this.type, this.default, this.values)
                 return
@@ -132,7 +132,9 @@ class ConfigSection {
     get Value () {
         let val = {}
         for (let item of this.child) {
-            val[item.name] = item.Value
+            if (item.hide !== true) {
+                val[item.name] = item.Value
+            }
         }
         return val
     }
@@ -141,6 +143,18 @@ class ConfigSection {
         let val = value ? value : {}
         for (let item of this.child) {
             item.setValue(val[item.name])
+        }
+    }
+
+    @action setHide (value, key) {
+        console.log(value ? 'hide' : 'show', this.name, key)
+        if (key === undefined) {
+            this.hide = value
+            return
+        }
+        let item = this.child.find(item => item.name === key)
+        if (item !== undefined) {
+            item.setHide(value)
         }
     }
 }
@@ -204,6 +218,18 @@ export class ConfigStore {
         this.templates.splice(this.templates.findIndex(item => name === item.name), 1)
     }
 
+    @action setHide (key, value) {
+        let arr = key.split('/');
+        let section = this.sections.find(item => item.name === arr[0])
+        if (section) {
+            section.setHide(value, arr[1])
+        } else {
+            if (arr[1] === undefined) {
+                this.sections[0].setHide(value, arr[0])
+            }
+        }
+    }
+
     get Value (){
         let value = {}
         this.sections.map( (section, index) => {
@@ -213,7 +239,9 @@ export class ConfigStore {
                     value[k] = v
                 }
             } else {
-                value[section.name] = section.Value
+                if (section.hide !== true) {
+                    value[section.name] = section.Value
+                }
             }
         })
         return value
@@ -221,7 +249,7 @@ export class ConfigStore {
     @action setValue (value){
         let val = value ? value : {}
         this.sections.map( (section, index) => {
-            if (index !== 0) {
+            if (index !== 0 && section.type !== 'section') {
                 section.setValue(val[section.name])
             } else {
                 section.setValue(val)

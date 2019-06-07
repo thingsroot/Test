@@ -28,44 +28,47 @@ const openNotification = (title, message) => {
 class MyGatesAppsInstall extends Component {
     state = {
         app: '',
-        vendor: [],
-        agreement: [],
-        type: [],
-        data: [],
-        flag: true,
-        item: {},
-        detail: true,
+        app_list: [],
+        app_show: [],
+        install_step: '', // Install step
+        app_info: {},
         filter: {
             ventor: '',
             agreement: '',
             type: ''
         },
-        instName: null,
         config: [],
-        isTemplateShow: false,
-        addTempList: [],
-        showTempList: [],
-        deviceList: [],
-        object: {},
-        editingKey: '',
-        deviceColumns: [],
-        deviceSource: [],
-        SourceCode: [],
-        dataSourceCode: [],
-        keys: [],
-        visible: false,
-        disabled: false,
+        gateway_list_visible: false,
+        install_btn_disabled: false,
         configStore: new ConfigStore()
     };
 
     componentDidMount (){
-        this.setState({app: this.props.match.params.app})
-        if (this.props.match.params.type === '1') {
+        let app = this.props.match.params.app ? this.props.match.params.app : ''
+        let install_step = this.props.match.params.step ? this.props.match.params.step : ''
+        if (this.props.match.params.app !== undefined && install_step === '') {
+            install_step = 'view'
+        }
+
+        this.setState({app: app, install_step: install_step})
+        if (install_step === 'install') {
+            http.get('/api/applications_details?name=' + this.props.match.params.app).then(res=>{
+                this.setState({app_info: res.data})
+            })
+        } else {
             http.get('/api/store_list').then(res=>{
                 this.setState({
-                    data: res.data,
-                    filterdata: res.data
+                    app_list: res.data,
+                    app_show: res.data
                 })
+                if (this.state.app && this.state.install_step === 'view') {
+                    let item = res.data.find(item => item.name === this.state.app)
+                    if (item) {
+                        this.setState({
+                            app_info: item
+                        })
+                    }
+                }
             });
             marked.setOptions({
                 renderer: new marked.Renderer(),
@@ -79,10 +82,6 @@ class MyGatesAppsInstall extends Component {
                 xhtml: false,
                 highlight: (code) =>  highlight.highlightAuto(code).value // 这段代码
             });
-        } else if (this.props.match.params.type === '2') {
-            http.get('/api/applications_details?name=' + this.props.match.params.app).then(res=>{
-                this.getConfig(res.data)
-            })
         }
     }
 
@@ -94,11 +93,11 @@ class MyGatesAppsInstall extends Component {
     // }
 
     searchApp (value){
-        let { filterdata } = this.state;
+        let { app_list } = this.state;
         let newdata = [];
-        newdata = filterdata.filter((item)=>item.app_name.toLowerCase().indexOf(value.toLowerCase()) !== -1);
+        newdata = app_list.filter((item)=>item.app_name.toLowerCase().indexOf(value.toLowerCase()) !== -1);
         this.setState({
-            data: newdata
+            app_show: newdata
         })
     }
 
@@ -106,9 +105,16 @@ class MyGatesAppsInstall extends Component {
         this.props.store.codeStore.setInstallConfiguration(newValue)
     };
 
-    setUrl = (name) => {
+    setUrl = (name, step) => {
         let arr = location.pathname.split('/');
+        if (name === undefined) {
+            arr.splice(3)
+            return arr.join('/')
+        }
         arr[3] = name;
+        if (step && step.length > 0) {
+            arr[4] = step
+        }
         return arr.join('/')
     };
 
@@ -138,7 +144,7 @@ class MyGatesAppsInstall extends Component {
             } else {
                 message.error('应用暂时没有版本，无法安装！');
                 this.setState({
-                    disabled: false
+                    install_btn_disabled: false
                 })
             }
         })
@@ -147,61 +153,30 @@ class MyGatesAppsInstall extends Component {
     //安装应用
     appInstall = (params, sn)=>{
         http.post('/api/gateways_applications_install', params).then(res=>{
-            notification.info({
-                message: '提交任务成功',
-                description: '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.',
-                placement: 'buttonRight'
+            openNotification('提交任务成功', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.')
+            this.setState({
+                install_btn_disabled: false
             });
-            setTimeout(()=>{
-                this.setState({
-                    details: true
-                })
-            }, 1000);
-            let max = 18000;
-            let min = 0;
             if (res.ok === true) {
-                if (min > max) {
-                    notification.error({
-                        message: '安装应用' + this.props.store.codeStore.instNames + '失败',
-                        description: '错误：' + res.data.message,
-                        placement: 'buttonRight'
-                    });
-                } else {
-                    let timer = setInterval(()=>{
-                        min += 5000;
-                        setTimeout(()=>{
-                            http.get('/api/gateways_exec_result?id=' + res.data.data)
-                                .then(res=>{
-                                    if (JSON.stringify(res) !== '{}' && res.data !== null) {
-                                        if (res.data.result === true) {
-                                            notification.success({
-                                                message: '安装应用' + this.props.store.codeStore.instNames + '成功',
-                                                description: '' + res.data.id + '.',
-                                                placement: 'buttonRight'
-                                            });
-                                            clearInterval(timer);
-                                        } else if (res.data.result === false) {
-                                            notification.error({
-                                                message: '安装应用' + this.props.store.codeStore.instNames + '失败',
-                                                description: '' + res.data.message + '',
-                                                placement: 'buttonRight'
-                                            });
-                                            clearInterval(timer);
-                                        }
-                                        this.setState({
-                                            disabled: false
-                                        })
-                                    }
-                                })
-                        }, 1000)
-                    }, 5000)
+                let info = {
+                    gateway: sn,
+                    inst: this.props.store.codeStore.instNames,
+                    params: params
                 }
+                this.props.store.action.pushAction(res.data, '安装应用' + this.props.store.codeStore.instNames, '', info, 10000,  ()=> {
+                    this.setState({
+                        install_step: ''
+                    })
+                })
             } else {
                 openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
-                this.setState({
-                    disabled: false
-                })
             }
+        }).catch( (err)=> {
+            err;
+            openNotification('提交任务失败', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.')
+            this.setState({
+                install_btn_disabled: false
+            });
         })
     };
 
@@ -225,7 +200,7 @@ class MyGatesAppsInstall extends Component {
         let app = this.props.match.params.app;
         let url = '';
         this.setState({
-            disabled: true
+            install_btn_disabled: true
         });
         if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
             message.error('实例名不能为空！');
@@ -247,27 +222,25 @@ class MyGatesAppsInstall extends Component {
                         }
                     })
                 }
-
-
             });
         }
     };
 
     onClose = () => {
         this.setState({
-            visible: false,
-			disabled: false
+            gateway_list_visible: false,
+			install_btn_disabled: false
         })
     };
 
     showDrawer = () => {
         this.setState({
-            visible: true
+            gateway_list_visible: true
         })
     };
 
     render () {
-        const { data, disabled, flag, item, detail, config, deviceColumns, keys, app } = this.state;
+        const { app_show, install_step, app_info, app } = this.state;
         return (<div>
             <Status />
                 <div className="AppInstall">
@@ -283,41 +256,48 @@ class MyGatesAppsInstall extends Component {
                         placement="left"
                         closable={false}
                         onClose={this.onClose}
-                        visible={this.state.visible}
+                        visible={this.state.gateway_list_visible}
                         width="400"
                     >
                         <Nav> </Nav>
                     </Drawer>
-                    <div className={flag ? 'hide appsdetail' : 'show appsdetail'}>
+                    <div className={install_step === '' ? 'hide appsdetail' : 'show appsdetail'}>
                     <Button
                         className="installbtn"
                         type="primary"
                         onClick={()=>{
-                            this.setState({detail: !detail});
-                            if (config.length === 0) {
-                                this.props.store.codeStore.setActiveKey('2')
+                            if (install_step === 'install') {
+                                this.setState({install_step: 'view'})
+                            } else {
+                                this.setState({install_step: 'install'})
                             }
                         }}
                     >
                         {
-                            detail ? '安装到网关' : '查看应用描述'
+                            install_step === 'install' ? '查看应用描述' : '安装到网关'
                         }
                     </Button>
-                        <Icon
-                            type="rollback"
-                            className="back"
-                            onClick={()=>{
-                                this.setState({
-                                    flag: true
-                                })
-                        }}
-                        />
-                        <h2 style={{borderBottom: '1px solid #ccc', padding: 10}}>{item.app_name}</h2>
-                        <div className={detail ? 'show' : 'hide'}>
+                        <Link
+                            to={
+                                this.setUrl()
+                            }
+                        >
+                            <Icon
+                                type="rollback"
+                                className="back"
+                                onClick={()=>{
+                                    this.setState({
+                                        install_step: ''
+                                    })
+                                }}
+                            />
+                        </Link>
+                        <h2 style={{borderBottom: '1px solid #ccc', padding: 10}}>{app_info.app_name}</h2>
+                        <div className={install_step !== 'install' ? 'show' : 'hide'}>
                             <div style={{display: 'flex' }}>
                                 {
-                                    item.icon_image
-                                    ? <img src={'http://ioe.thingsroot.com/' + item.icon_image}
+                                    app_info.icon_image
+                                    ? <img src={'http://ioe.thingsroot.com/' + app_info.icon_image}
                                         alt=""
                                         style={{width: 128, height: 128}}
                                       />
@@ -327,13 +307,13 @@ class MyGatesAppsInstall extends Component {
                                     <div style={{width: 500}}
                                         className="detail"
                                     >
-                                        <p>发布者： {item.app_name_unique}</p>
-                                        <p>通讯协议: {item.protocol}</p>
-                                        <p>适配型号： {item.device_serial}</p>
+                                        <p>发布者： {app_info.app_name_unique}</p>
+                                        <p>通讯协议: {app_info.protocol}</p>
+                                        <p>适配型号： {app_info.device_serial}</p>
                                     </div>
                                     <div  className="detail">
-                                        <p>应用分类： {item.category}</p>
-                                        <p>设备厂家: {item.device_supplier}</p>
+                                        <p>应用分类： {app_info.category}</p>
+                                        <p>设备厂家: {app_info.device_supplier}</p>
                                         <p>应用价格： 免费</p>
                                     </div>
                                 </div>
@@ -345,20 +325,17 @@ class MyGatesAppsInstall extends Component {
                                 markdown
                             </div>
                         </div>
-                        <div className={detail ? 'installapp hide' : 'installapp show'}>
+                        <div className={install_step !== 'install' ? 'installapp hide' : 'installapp show'}>
                             <AppConfig
                                 app={app}
-                                item={item}
-                                deviceColumns={deviceColumns}
-                                keys={keys}
-                                disabled={disabled}
+                                app_info={app_info}
                                 submitData={this.submitData}
                                 configStore={this.state.configStore}
                                 refreshTemplateList={this.refreshTemplateList}
                             />
                         </div>
                     </div>
-                    <div className={flag ? 'show' : 'hide'}>
+                    <div className={install_step === '' ? 'show' : 'hide'}>
                         <div className="installheader">
                            <div className="searchlist">
                                <Search
@@ -380,7 +357,7 @@ class MyGatesAppsInstall extends Component {
                        </div>
                         <div className="installcontent">
                             {
-                                data && data.length > 0 && data.map((val, ind)=>{
+                                app_show && app_show.length > 0 && app_show.map((val, ind)=>{
                                     return (
                                         <LazyLoad
                                             key={ind}
@@ -399,9 +376,8 @@ class MyGatesAppsInstall extends Component {
                                                         alt="logo"
                                                         onClick={()=>{
                                                             this.setState({
-                                                                flag: false,
-                                                                detail: true,
-                                                                item: val
+                                                                install_step: 'view',
+                                                                app_info: val
                                                             })
                                                         }}
                                                     />
@@ -416,15 +392,14 @@ class MyGatesAppsInstall extends Component {
                                                         />
                                                         <span onClick={()=>{
                                                             this.setState({
-                                                                flag: false,
-                                                                detail: false,
-                                                                item: val
+                                                                install_step: 'install',
+                                                                app_info: val
                                                             })
                                                         }}
                                                         >
                                                             <Link
                                                                 to={
-                                                                    this.setUrl(val.name)
+                                                                    this.setUrl(val.name, 'install')
                                                                 }
                                                             >
                                                                 <Icon

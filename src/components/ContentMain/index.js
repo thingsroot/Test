@@ -157,7 +157,7 @@ class ContentMain extends Component {
                     title={'设备指令'}
                 />
                 <PrivateRoute
-                    path="/appsinstall/:sn/:app/:type"
+                    path="/appsinstall/:sn/:app?/:step?"
                     component={AppsInstall}
                     title={'安装应用'}
                 />
