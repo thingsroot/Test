@@ -39,8 +39,6 @@ export function _setCookie (name, value, expire) {
 export function isAuthenticated () {
   let sid = _getCookie('sid')
   let user_id = _getCookie('user_id')
-  console.log(sid)
-  console.log(user_id)
   if (sid === undefined || sid === 'Guest') {
     return false
   }

@@ -153,7 +153,7 @@ class EditableTable extends React.Component {
 
     handleAdd = (name) => {
         const { count, dataSource } = this.state;
-        let deviceColumns = this.props.deviceColumns[0];
+        let deviceColumns = this.props.deviceColumns;
         const newData = {};
         deviceColumns.map(item => {
             newData[item.dataIndex] = '1';
@@ -193,7 +193,7 @@ class EditableTable extends React.Component {
                 cell: EditableCell
             }
         };
-        let deviceColumns = this.props.deviceColumns[0];
+        let deviceColumns = this.props.deviceColumns;
         let arr = [];
         deviceColumns.map(item => {
             arr.push(item.dataIndex);

@@ -11,6 +11,8 @@ import './style.scss';
 import Nav from './Nav';
 import AppConfig from './AppConfig'
 import LazyLoad from 'react-lazy-load';
+import {ConfigStore} from '../../utils/app_config'
+
 const Search = Input.Search;
 const openNotification = (title, message) => {
     notification.open({
@@ -52,7 +54,8 @@ class MyGatesAppsInstall extends Component {
         dataSourceCode: [],
         keys: [],
         visible: false,
-        disabled: false
+        disabled: false,
+        configStore: new ConfigStore()
     };
 
     componentDidMount (){
@@ -83,12 +86,12 @@ class MyGatesAppsInstall extends Component {
         }
     }
 
-    shouldComponentUpdate (nextProps, nextState){
-        if (nextState.item.description && nextState.item.description !== null){
-            document.getElementById('box').innerHTML = marked(nextState.item.description)
-        }
-        return true;
-    }
+    // shouldComponentUpdate (nextProps, nextState){
+    //     if (nextState.item.description && nextState.item.description !== null){
+    //         document.getElementById('box').innerHTML = marked(nextState.item.description)
+    //     }
+    //     return true;
+    // }
 
     searchApp (value){
         let { filterdata } = this.state;
@@ -343,17 +346,16 @@ class MyGatesAppsInstall extends Component {
                             </div>
                         </div>
                         <div className={detail ? 'installapp hide' : 'installapp show'}>
-                            {
-                                item !== undefined
-                                ? <AppConfig
+                                <AppConfig
                                     app={app}
                                     item={item}
                                     deviceColumns={deviceColumns}
                                     keys={keys}
                                     disabled={disabled}
                                     submitData={this.submitData}
-                                    />
-                                : ''
+                                    configStore={this.state.configStore}
+                                    refreshTemplateList={this.refreshTemplateList}
+                                />
                             }
                         </div>
                     </div>
