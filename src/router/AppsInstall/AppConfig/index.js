@@ -327,7 +327,7 @@ class AppConfig extends Component {
                 type="card"
             >
                 <TabPane
-                    tab="配置面板"
+                    tab="可视化编辑"
                     key="ui"
                 >
                     <Inst
@@ -362,12 +362,12 @@ class AppConfig extends Component {
                         style={errorCode === false ? none : block}
                         className="message"
                     >
-                        数据错误，请使用JSON格式配置！
+                        数据错误，请使用文本编辑修正错误！
                     </div>
                     <div style={configStore.sections && configStore.sections.length > 0 ? none : block}>
                         <p
                             className="message"
-                        >此应用不支持配置界面 请使用JSON格式配置</p>
+                        >此应用不支持可视化编辑 请使用文本编辑</p>
                     </div>
                     <br/>
                     <Button
@@ -378,7 +378,7 @@ class AppConfig extends Component {
                     >提交</Button>
                 </TabPane>
                 <TabPane
-                    tab="JSON源码"
+                    tab="文本编辑(JSON)"
                     key="json"
                 >
                     <Inst

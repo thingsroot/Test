@@ -41,7 +41,7 @@ class EditorCode extends Component {
             >
                 <div style={{paddingBottom: '20px'}}>
                     <p style={{display: 'flex'}}>
-                        <span style={style}>配置面板描述(JSON):</span>
+                        <span style={style}>可视化面板描述(JSON):</span>
                         <span style={style}>应用初始值(JSON):</span>
                     </p>
                     <SplitEditor
