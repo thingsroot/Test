@@ -109,22 +109,29 @@ class EditorTemplates extends React.Component {
                     <Button
                         onClick={() => this.save(form, record.key)}
                     >
-                        Save
+                        保存
                     </Button>
                     )}
                 </EditableContext.Consumer>
                 <Popconfirm title="Sure to cancel?"
                     onConfirm={() => this.cancel(record.key)}
                 >
-                    <Button>Cancel</Button>
+                    <Button>取消</Button>
                 </Popconfirm>
                 </span>
             ) : (
-                <Button disabled={editingKey !== ''}
+              <div disabled={editingKey !== ''}>
+                <Button
                     onClick={() => this.edit(record.key)}
                 >
-                    Edit
+                    编辑
                 </Button>
+                <Popconfirm title="Sure to delete?"
+                    onConfirm={()=> this.delete(record.key)}
+                >
+                  <Button>删除</Button>
+                </Popconfirm>
+              </div>
             );
             }
       }
@@ -166,6 +173,12 @@ class EditorTemplates extends React.Component {
 
   edit (key) {
     this.setState({ editingKey: key });
+  }
+  delete (key) {
+    let newData = [...this.props.dataSource];
+    newData = newData.filter(item => item.key !== key)
+    this.props.config.setValue(newData)
+    this.props.onChange()
   }
 
   render () {

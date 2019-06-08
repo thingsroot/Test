@@ -18,6 +18,61 @@ class EditableCell extends React.Component {
         editing: false
     };
 
+    getInput = () => {
+        const {columnReference, columnType, dataIndex, configStore} = this.props;
+
+        let colRef = columnReference ? configStore.Value[columnReference] : []
+        if (colRef === undefined) {
+            colRef = []
+        }
+
+        if (columnType === 'number') {
+            return (
+            <Input ref={node => (this.input = node)}
+                type="number"
+                onPressEnter={this.save}
+                onBlur={this.save}
+            />)
+        }
+        if (columnType === 'template') {
+            return (
+            <div>
+                <Input ref={node => (this.input = node)}
+                    type="hidden"
+                    onChange={this.save}
+                />
+                <Select
+                    defaultValue="请选择模板"
+                    style={{width: '95%'}}
+                >
+                    {colRef.map((item)=>{
+                        return (
+                            <Select.Option
+                                key={item.name}
+                                onClick={(e) => {
+                                    this.selectSave(e, dataIndex)
+                                }}
+                            >
+                                {item.name}
+                            </Select.Option>
+                        )
+                    })}
+                </Select>
+            </div>)
+        }
+        return (
+        <Input ref={node => (this.input = node)}
+            onPressEnter={this.save}
+            defaultValue=""
+            onBlur={this.save}
+        /> )
+    };
+    selectSave = (e, dataIndex)=>{
+        const { record, handleSave } = this.props;
+        record[dataIndex] = e.key;
+        this.toggleEdit();
+        handleSave({ ...record });
+    }
     toggleEdit = () => {
         const editing = !this.state.editing;
         this.setState({ editing }, () => {
@@ -41,6 +96,7 @@ class EditableCell extends React.Component {
     renderCell = form => {
         this.form = form;
         const { columnType, children, dataIndex, record, title } = this.props;
+        columnType;
         const { editing } = this.state;
         return editing ? (
         <Form.Item style={{ margin: 0 }}>
@@ -52,43 +108,7 @@ class EditableCell extends React.Component {
                 }
             ],
             initialValue: record[dataIndex]
-            })(
-                columnType === 'number' ? (
-                    <Input ref={node => (this.input = node)}
-                        type="number"
-                        onPressEnter={this.save}
-                        onBlur={this.save}
-                    />
-                ) : columnType === 'template' ? (
-                    <div>
-                        <Input
-                            type="hidden"
-                            ref={node => (this.input = node)}
-                            onChange={this.save}
-                        />
-                        <Select
-                            defaultValue="请选择模板"
-                            style={{width: '95%'}}
-                        >
-                            {this.props.configStore.templates.map((item)=>{
-                                return (
-                                    <Select.Option
-                                        key={item.name}
-                                        onClick={this.selectSave}
-                                    >
-                                        {item.name}
-                                    </Select.Option>
-                                )
-                            })}
-                        </Select>
-                    </div>
-                ) : (
-                    <Input ref={node => (this.input = node)}
-                        onPressEnter={this.save}
-                        onBlur={this.save}
-                    />
-                )
-            )}
+            })(this.getInput())}
         </Form.Item>
         ) : (
         <div
@@ -102,8 +122,8 @@ class EditableCell extends React.Component {
     };
 
     render () {
-        const {columnType, editable, dataIndex, title, record, handleSave, children, ...restProps} = this.props;
-        columnType, dataIndex, title, record, handleSave
+        const {configStore, columnReference, columnType, editable, dataIndex, title, record, handleSave, children, ...restProps} = this.props;
+        configStore, columnReference, columnType, dataIndex, title, record, handleSave
 
         return (
         <td {...restProps}>
@@ -147,22 +167,23 @@ class EditableTable extends React.Component {
                 title: col.title,
                 dataIndex: col.dataIndex,
                 editable: col.editable,
-                columnType: col.columnType
+                columnType: col.columnType,
+                columnReference: col.columnReference,
+                configStore: this.props.configStore
             })
         })
         copy_columns.push({
             title: '操作',
             dataIndex: '___operation',
             render: (text, record) =>
-            dataSource.length >= 1 ? (
-                <Button
-                    type="primary"
-                    href="javascript:;"
-                    onClick={()=>{
-                        this.handleDelete(record.key)
-                    }}
-                >删除</Button>
-            ) : null
+                this.props.dataSource.length >= 1 ? (
+                    <Button
+                        type="primary"
+                        onClick={()=>{
+                            this.handleDelete(record.key)
+                        }}
+                    >删除</Button>
+                ) : null
         })
         this.columns = copy_columns
     }
@@ -183,7 +204,17 @@ class EditableTable extends React.Component {
         if (tableColumns !== undefined && tableColumns.length > 0) {
             tableColumns.map( (col, index) => {
                 index;
-                newData[col.dataIndex] = col.default !== undefined ? col.default : ''
+                if (col.default !== undefined) {
+                    newData[col.dataIndex] = col.default
+                } else {
+                    if (col.columnType === 'template') {
+                        newData[col.dataIndex] = '请选择模板'
+                    } else if (col.columnType === 'number') {
+                        newData[col.dataIndex] = 0
+                    } else {
+                        newData[col.dataIndex] = ' '
+                    }
+                }
             })
         }
         this.props.config.setValue([...dataSource, newData])
@@ -221,12 +252,13 @@ class EditableTable extends React.Component {
                 onCell: record => ({
                     record,
                     id: col.id,
-                    columnType: col.columnType,
                     editable: col.editable,
                     dataIndex: col.dataIndex,
                     title: col.title,
-                    handleSave: this.handleSave,
-                    configStore: this.props.configStore
+                    columnType: col.columnType,
+                    columnReference: col.columnReference,
+                    configStore: col.configStore,
+                    handleSave: this.handleSave
                 })
             };
         });

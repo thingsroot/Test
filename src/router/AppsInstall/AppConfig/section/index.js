@@ -46,11 +46,6 @@ class AppConfigSection extends Component {
         });
         this.props.store.codeStore.setTemplate(a);
         let addTempList = this.state.addTempList;
-        addTempList && addTempList.length > 0 && addTempList.map((v)=>{
-            if (v.name === name) {
-                v.disabled = false;
-            }
-        });
         this.setState({
             addTempList: addTempList
         })
@@ -190,10 +185,16 @@ class AppConfigSection extends Component {
     render_table (key, config) {
         let tableColumns = [];
         config.cols && config.cols.length && config.cols.map((col, col_key)=>{
+            let tableReference = col.reference
+            if (tableReference === undefined && col.type === 'template') {
+                tableReference = 'templates'
+            }
+
             tableColumns.push({
                 key: col_key,
                 id: col.name,
                 columnType: col.type,
+                columnReference: tableReference,
                 title: col.desc,
                 dataIndex: col.name,
                 default: col.default,
@@ -226,41 +227,47 @@ class AppConfigSection extends Component {
         const addTempLists = [
             {
                 title: '名称',
-                width: '20%',
+                width: '15%',
                 dataIndex: 'conf_name',
                 key: 'conf_name',
                 render: text => <span>{text}</span>
             }, {
                 title: '描述',
-                width: '20%',
+                width: '25%',
                 dataIndex: 'description',
                 key: 'description'
             }, {
                 title: '模板ID',
-                width: '20%',
+                width: '15%',
                 dataIndex: 'name',
                 key: 'name'
             }, {
                 title: '版本',
-                width: '20%',
+                width: '10%',
                 key: 'latest_version',
                 dataIndex: 'latest_version'
             }, {
                 title: '操作',
-                width: '20%',
+                width: '40%',
                 render: (record) => (
                     record.latest_version !== undefined ? (
                     <span>
                         <Button>
-                            <Link to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}`}>查看</Link>
+                            <Link to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}`}> 查看 </Link>
                         </Button>
-                        <span style={{padding: '0 5px'}}> </span>
+                        <span style={{padding: '0 2px'}}> </span>
+                        <Button>
+                            <Link to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}/clone`}> 克隆 </Link>
+                        </Button>
+                        <span style={{padding: '0 2px'}}> </span>
                         <Button
-                            disabled={record.disabled}
+                            type="primary"
                             onClick={()=>{
                                 this.onAddTemplate(config, record.name, record.conf_name, record.description, record.latest_version)
                             }}
-                        >选择</Button>
+                        >
+                            添加此模板
+                        </Button>
                     </span>) : ''
                 )
             }
@@ -273,7 +280,7 @@ class AppConfigSection extends Component {
             >
                 <EditableTemplates
                     config={config}
-                    dataSoruce={config.value}
+                    dataSource={config.value}
                     configStore={this.props.configStore}
                     onChange={this.props.onChange}
                 />
@@ -292,6 +299,37 @@ class AppConfigSection extends Component {
                     okText="确定"
                     cancelText="取消"
                 >
+                    <div
+                        style={{
+                            display: 'flex',
+                            position: 'absolute',
+                            right: 300,
+                            top: 10,
+                            zIndex: 999,
+                            lineHeight: '30px'
+                        }}
+                    >
+                        <Button
+                            onClick={()=>{
+                                this.props.refreshTemplateList()
+                            }}
+                        >
+                            刷新
+                        </Button>
+                        <span style={{padding: '0 20px'}}> </span>
+                        <Input.Search
+                            placeholder="网关名称、描述、序列号"
+                            onChange={this.search}
+                            style={{ width: 200 }}
+                        />
+                        <span style={{padding: '0 2px'}}> </span>
+                        <Button
+                            type="primary"
+                            onClick={this.createNewTemplate}
+                        >
+                            创建新模板
+                        </Button>
+                    </div>
                     <Table
                         rowKey="name"
                         dataSource={templateStore}
@@ -299,21 +337,6 @@ class AppConfigSection extends Component {
                         pagination={false}
                         scroll={{ y: 240 }}
                     />
-                    <Button
-                        style={{marginTop: '20px'}}
-                        onClick={()=>{
-                            this.props.refreshTemplateList()
-                        }}
-                    >
-                        刷新列表
-                    </Button>
-                    <Button
-                        type="primary"
-                        style={{float: 'right', marginTop: '20px'}}
-                        onClick={this.createNewTemplate}
-                    >
-                        添加模板
-                    </Button>
                 </Modal>
             </div>
         )
