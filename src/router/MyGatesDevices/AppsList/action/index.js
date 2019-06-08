@@ -221,7 +221,7 @@ class Action extends Component {
       }
     render () {
         const { actionSwi } = this.props.store.appStore;
-        const { record } = this.props;
+        const { record, show_app_config } = this.props;
         const { upgradeLoading, visible, setName, setNameConfirmLoading, nameValue, appdebug } = this.state;
         return (
             <div style={{position: 'relative', paddingBottom: 50}}>
@@ -256,15 +256,11 @@ class Action extends Component {
                     更改名称
                 </Button>
                   <Button
-                      disabled={!this.props.record.data}
+                      disabled={!record.data}
                       onClick={()=>{
-                          if (this.props.record.data){
-                            this.props.store.appStore.apppage = this.props.record.data.data
-                            this.props.getconfig(this.props.record.name, this.props.record.conf)
-                            this.props.store.codeStore.instNames = this.props.record.inst_name
-                            this.props.store.codeStore.instflag = false;
+                          if (record.data){
+                            show_app_config(record.inst_name, record.conf, record.data.data)
                           }
-                          this.props.store.appStore.toggle = false;
                       }}
                   >
                       应用配置

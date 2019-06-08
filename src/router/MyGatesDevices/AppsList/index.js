@@ -6,6 +6,7 @@ import { withRouter } from 'react-router-dom';
 import Action from './action';
 import app from '../../../assets/images/app.png'
 import AppConfig from '../../AppsInstall/AppConfig';
+import {ConfigStore} from '../../../utils/app_config';
 import './style.scss';
 // const openNotification = () => {
 //   notification.open({
@@ -28,14 +29,10 @@ class AppsList extends Component {
           data: [],
           pagination: {},
           loading: true,
-          config: [],
-          addTempList: [],
-          deviceColumns: [],
-          keys: [],
-          flag: true,
-          item: {},
-          detail: true,
-          app: '',
+          configStore: new ConfigStore(),
+          edit_app_info: {},
+          edit_app_inst: '',
+          show_app_config: false,
           url: window.location.pathname,
           columns: [{
             title: '',
@@ -178,107 +175,6 @@ class AppsList extends Component {
           }
         })
       }
-      getConfig = (name, conf)=>{
-        this.props.store.codeStore.setActiveKey('1');
-        this.props.store.codeStore.setErrorCode(false);
-        this.props.store.codeStore.setInstallConfiguration('{}');
-        this.props.store.codeStore.setInstNames('');
-        this.props.store.codeStore.setReadOnly(false);
-        let config = [];
-        if (conf && conf[0] === '[') {
-            config = JSON.parse(conf);
-        }
-        let deviceColumns = [];
-        let tableName = [];  //存放表名
-        let dataSource = {};
-        let keys = [];
-        config && config.length > 0 && config.map((v, key)=>{
-            keys.push(v);
-            key;
-            if (v.type === 'templates' ||
-                v.type === 'text' ||
-                v.type === 'number' ||
-                v.type === 'dropdown' ||
-                v.type === 'section' ||
-                v.type === 'table'
-            ) {
-                return false;
-            } else {
-                this.props.store.codeStore.setReadOnly(false);
-                this.props.store.codeStore.setErrorCode(true)
-            }
-            if (v.name === 'device_section') {
-                let tableNameData = {};
-                v.child && v.child.length && v.child.map((w, key1)=>{
-                    tableNameData[w.name] = [];
-                    key1;
-                    let arr = [];
-                    w.cols.map((i, key2)=>{
-                        key2;
-                        arr.push({
-                            key: key2,
-                            name: i.name,
-                            desc: i.desc,
-                            type: i.type
-                        });
-                    });
-                    tableName.push(w.name);
-                    deviceColumns.push({
-                        [w.name]: arr
-                    })
-                });
-                this.props.store.codeStore.setAllTableData(tableNameData);
-            }
-        });
-        //设置store存储数据
-        tableName && tableName.length > 0 && tableName.map((w)=>{
-            dataSource[w] = [];
-        });
-        this.props.store.codeStore.setDataSource(dataSource);
-        let columnsArr = [];
-        deviceColumns && deviceColumns.length > 0 && deviceColumns.map((v, key)=>{
-            key;
-            let data = [];
-            let name = tableName[key];
-            v[name].map((w, indexW)=>{
-                data.push({
-                    key: indexW,
-                    id: w.type,
-                    title: w.desc,
-                    dataIndex: w.name,
-                    editable: true
-                });
-            });
-            columnsArr.push({[tableName[key]]: data})
-        });
-        let obj = {};
-        columnsArr.map((item)=>{
-            obj[Object.keys(item)] = Object.values(item)
-        });
-        http.get('/api/store_configurations_list?app=' + name + '&conf_type=Template').then(res=>{
-            this.setState({
-                addTempList: res.data
-            });
-        });
-        this.setState({
-            flag: false,
-            // item: val,
-            detail: true,
-            config: config,
-            deviceColumns: obj,
-            keys: keys,
-            app: name
-        });
-        if (this.props.match.params.type === '2') {
-            this.setState({
-                flag: false,
-                detail: false
-            });
-            this.props.store.codeStore.setActiveKey('2')
-        }
-        this.props.store.codeStore.setInstallConfiguration(conf === null ? '{}' : conf);
-        this.props.store.codeStore.setActiveKey(conf === null ? '2' : '1');
-    };
 
     submitData = ()=>{
         let sn = this.props.match.params.sn;
@@ -308,12 +204,20 @@ class AppsList extends Component {
           }, 3000);
         })
     };
+    showAppConfig = (app_inst, app_conf, app_info) => {
+      this.setState({
+        edit_app_info: app_info,
+        edit_app_inst: app_inst,
+        edit_app_conf: app_conf,
+        show_app_config: true
+      })
+    }
     render () {
-      const { loading, config, deviceColumns, keys } = this.state;
-      const { toggle } = this.props.store.appStore;
+      let gateway_sn = this.props.match.params.sn;
+      const { loading, show_app_config, edit_app_inst, edit_app_conf, edit_app_info, configStore } = this.state;
         return (
             <div>
-                <div className={toggle ? 'show' : 'hide'}>
+                <div className={show_app_config ? 'hide' : 'show'}>
                     {console.log(this.state.data)}
                   <Table
                       rowKey="sn"
@@ -330,27 +234,30 @@ class AppsList extends Component {
                               record={record}
                               getconfig={this.getConfig}
                               update_app_list={this.fetch.bind(this, this.props.match.params.sn)}
+                              show_app_config={this.showAppConfig}
                           />
                         )
                       }}
                   />
                 </div>
                 <div
-                    className={toggle ? 'hide' : 'show'}
+                    className={show_app_config ? 'show' : 'hide'}
                     style={{position: 'relative'}}
                 >
                   <Button
                       style={{position: 'absolute', right: 10, top: 5, zIndex: 999}}
                       onClick={()=>{
-                        this.props.store.appStore.toggle = true;
+                        this.setState({show_app_config: false})
                       }}
                   >
                     X
                   </Button>
                   <AppConfig
-                      config={config}
-                      deviceColumns={deviceColumns}
-                      keys={keys}
+                      gateway_sn={gateway_sn}
+                      configStore={configStore}
+                      app_info={edit_app_info}
+                      app_inst={edit_app_inst}
+                      pre_configuration={edit_app_conf}
                       submitData={this.submitData}
                   />
                 </div>

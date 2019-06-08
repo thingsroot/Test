@@ -212,7 +212,7 @@ class EditableTable extends React.Component {
                     } else if (col.columnType === 'number') {
                         newData[col.dataIndex] = 0
                     } else {
-                        newData[col.dataIndex] = ' '
+                        newData[col.dataIndex] = ''
                     }
                 }
             })

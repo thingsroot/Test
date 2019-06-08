@@ -7,24 +7,8 @@ import http from '../../../utils/Server';
 @inject('store')
 @observer
 class Inst extends React.Component {
-    componentDidMount (){
-        const pathname = this.props.location.pathname.toLowerCase();
-        if (pathname.indexOf('/appsinstall') === -1){
-          this.props.store.codeStore.instflag = true;
-        } else {
-            this.props.store.codeStore.instflag = false;
-        }
-    }
-    UNSAFE_componentWillReceiveProps (nextProps){
-        const pathname = nextProps.location.pathname.toLowerCase();
-        if (pathname.indexOf('/appsinstall') === -1){
-          this.props.store.codeStore.instflag = true;
-        } else {
-            this.props.store.codeStore.instflag = false;
-        }
-    }
     instBlur = ()=>{
-        if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
+        if (this.props.inst_name === '' || this.props.inst_name === undefined) {
             this.props.store.codeStore.setErrorMessage('实例名不能为空')
         } else {
             this.props.store.codeStore.setErrorMessage('')
@@ -32,22 +16,22 @@ class Inst extends React.Component {
     };
 
     instChange = (e)=>{
-        this.props.store.codeStore.instNames = e.target.value;
+        this.props.inst_name = e.target.value;
         setTimeout(this.inst, 1000)
     };
 
     inst = ()=>{
-        let sn = this.props.sn;
+        let gateway_sn = this.props.gateway_sn;
         http.post('/api/gateways_applications_refresh', {
-            gateway: sn,
-            id: 'refresh' + sn
+            gateway: gateway_sn,
+            id: 'refresh' + gateway_sn
         }).then(res=>{
             if (res.ok === true) {
-                http.get('/api/gateways_applications_list?gateway=' + sn).then(res=>{
+                http.get('/api/gateways_applications_list?gateway=' + gateway_sn).then(res=>{
                     if (res.ok === true) {
                         let names = Object.keys(res.data);
                         names && names.length > 0 && names.map(item=>{
-                            if (item === this.props.store.codeStore.instNames) {
+                            if (item === this.props.inst_name) {
                                 this.props.store.codeStore.setErrorMessage('实例名已存在')
                             } else {
                                 this.props.store.codeStore.setErrorMessage('')
@@ -61,15 +45,17 @@ class Inst extends React.Component {
     };
 
     render () {
+        const { gateway_sn, inst_name, editable } = this.props;
+        gateway_sn, inst_name, editable;
         return (
             <div className="Inst">
                 <p style={{lineHeight: '50px'}}>
                     <span className="spanStyle">实例名：</span>
                     <Input
-                        disabled={this.props.store.codeStore.instflag}
+                        disabled={editable !== true}
                         type="text"
                         style={{width: '300px'}}
-                        value={this.props.store.codeStore.instNames}
+                        value={inst_name}
                         onChange={this.instChange}
                         onBlur={this.instBlur}
                     />

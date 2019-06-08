@@ -124,7 +124,6 @@ class AppConfig extends Component {
             config: [],
             appTemplateList: [],
             app_info: {},
-            readOnly: false,
             errorCode: false,
             instanceName: '',
             activeKey: 'json',
@@ -137,14 +136,22 @@ class AppConfig extends Component {
     }
 
     UNSAFE_componentWillReceiveProps (nextProps){
-        this.setState({
-            app_info: nextProps.app_info
-        });
-        if (nextProps.app_info !== undefined) {
-            if (nextProps.app_info.name !== undefined) {
-                this.getConfig(nextProps.app_info)
-            }
+        let org_app_name = this.state.app_info ? this.state.app_info.name : ''
+        let new_app_name = nextProps.app_info ? nextProps.app_info.name : ''
+        if (org_app_name === new_app_name && this.state.pre_configuration === nextProps.pre_configuration) {
+            return
         }
+        this.setState({
+            app_info: nextProps.app_info,
+            pre_configuration: nextProps.pre_configuration
+        }, () => {
+            const {app_info} = this.state;
+            if (app_info !== undefined && app_info.name !== undefined) {
+                this.getConfig(app_info)
+            } else {
+                this.getNoAppConfig()
+            }
+        });
     }
     prettyJson (str) {
         let data = JSON.parse(str)
@@ -186,30 +193,44 @@ class AppConfig extends Component {
             });
     }
 
+    getNoAppConfig = () => {
+        let pre_configuration = this.state.pre_configuration !== undefined ? this.state.pre_configuration : {};
+        this.setState({
+            errorCode: false,
+            config: [],
+            activeKey: 'json',
+            configValue: JSON.stringify(pre_configuration, null, 4)
+        })
+        this.refreshTemplateList()
+        this.props.configStore.cleanSetion()
+    }
+
     getConfig = (app)=>{
         let config = [];
         let conf_template = app.conf_template;
-        let pre_configuration = {}
+        let pre_configuration = this.state.pre_configuration;
+        let show_json = false;
 
         try {
-            let str_pre = app.pre_configuration && app.pre_configuration.length > 0 ? app.pre_configuration : '{}';
-            pre_configuration = JSON.parse(str_pre)
+            if (pre_configuration === undefined) {
+                let str_pre = app.pre_configuration && app.pre_configuration.length > 0 ? app.pre_configuration : '{}';
+                pre_configuration = JSON.parse(str_pre)
+            }
         } catch (e) {
+            show_json = true
             //message.error(e.message)
             console.log(e.message)
         }
 
         this.setState({
-            errorCode: false,
-            readOnly: false,
-            instanceName: ''
+            errorCode: false
         })
         this.setState({config: config, app: app.name, configValue: JSON.stringify(pre_configuration, null, 4)})
 
         this.refreshTemplateList()
         this.props.configStore.cleanSetion()
 
-        if (app.has_conf_template && conf_template && conf_template[0] === '[') {
+        if ( (!show_json) && app.has_conf_template && conf_template && conf_template[0] === '[') {
             this.setState({activeKey: 'ui'})
 
             config = JSON.parse(conf_template);
@@ -257,7 +278,6 @@ class AppConfig extends Component {
 
             this.setState({
                 errorCode: errorCode,
-                readOnly: !errorCode,
                 config: sections
             });
             for (let section of sections) {
@@ -266,13 +286,6 @@ class AppConfig extends Component {
             this.props.configStore.setValue(pre_configuration)
         } else {
             this.setState({activeKey: 'json'})
-        }
-
-        if (this.props.match.params.type === '2') {
-            this.setState({
-                flag: false,
-                detail: false
-            });
         }
     };
 
@@ -302,7 +315,9 @@ class AppConfig extends Component {
 
     render () {
         const { activeKey, errorCode } = this.state;
-        const { configStore } = this.props;
+        const { configStore, gateway_sn, app_info, app_inst, pre_configuration } = this.props;
+        gateway_sn, app_info, app_inst, pre_configuration;
+        var allow_inst_name_edit = app_inst === undefined ? true : false
         return (
             <Tabs
                 activeKey={activeKey}
@@ -317,7 +332,9 @@ class AppConfig extends Component {
                 >
                     <Inst
                         name={name}
-                        sn={this.props.match.params.sn}
+                        inst_name={app_inst}
+                        editable={allow_inst_name_edit}
+                        gateway_sn={gateway_sn}
                     />
                     <div
                         ref="content"
@@ -365,7 +382,7 @@ class AppConfig extends Component {
                     key="json"
                 >
                     <Inst
-                        sn={this.props.match.params.sn}
+                        sn={this.props.dev_sn}
                     />
                         <AceEditor
                             placeholder="Placeholder Text"

@@ -28,6 +28,7 @@ const openNotification = (title, message) => {
 class MyGatesAppsInstall extends Component {
     state = {
         app: '',
+        app_inst: '',
         app_list: [],
         app_show: [],
         install_step: '', // Install step
@@ -132,13 +133,15 @@ class MyGatesAppsInstall extends Component {
                 if (url.indexOf('beta') !== -1) {
                     message.success('网关安装当前应用最新beta版本!');
                 }
+                const {configStore, app_inst} = this.state
+
                 let params = {
                     gateway: sn,
-                    inst: this.props.store.codeStore.instNames,
+                    inst: app_inst,
                     app: app,
                     version: version,
-                    conf: JSON.parse(this.props.store.codeStore.installConfiguration),
-                    id: 'app_install/' + sn + '/' + this.props.store.codeStore.instNames + '/' + app + '/' + this.rand(10000, 99999)
+                    conf: JSON.parse(configStore.Value),
+                    id: 'app_install/' + sn + '/' + app_inst + '/' + app + '/' + this.rand(10000, 99999)
                 };
                 this.appInstall(params, sn)
             } else {
@@ -153,17 +156,16 @@ class MyGatesAppsInstall extends Component {
     //安装应用
     appInstall = (params, sn)=>{
         http.post('/api/gateways_applications_install', params).then(res=>{
-            openNotification('提交任务成功', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.')
+            openNotification('提交任务成功', '网关' + sn + '安装' + params.inst + '应用.')
             this.setState({
                 install_btn_disabled: false
             });
             if (res.ok === true) {
                 let info = {
                     gateway: sn,
-                    inst: this.props.store.codeStore.instNames,
                     params: params
                 }
-                this.props.store.action.pushAction(res.data, '安装应用' + this.props.store.codeStore.instNames, '', info, 10000,  ()=> {
+                this.props.store.action.pushAction(res.data, '网关' + sn + '安装应用' + params.inst, '', info, 10000,  ()=> {
                     this.setState({
                         install_step: ''
                     })
@@ -173,7 +175,7 @@ class MyGatesAppsInstall extends Component {
             }
         }).catch( (err)=> {
             err;
-            openNotification('提交任务失败', '网关' + sn + '安装' + this.props.store.codeStore.instNames + '应用.')
+            openNotification('提交任务失败', '网关' + sn + '安装' + params.inst + '应用.')
             this.setState({
                 install_btn_disabled: false
             });
@@ -181,12 +183,12 @@ class MyGatesAppsInstall extends Component {
     };
 
     //判断是否已有实例名
-    isInst =  sn => new Promise((resolve => {
+    isInst =  (sn, inst_name) => new Promise((resolve => {
         http.get('/api/gateways_applications_list?gateway=' + sn).then(res=> {
             if (res.ok === true) {
                 let names = Object.keys(res.data);
                 names && names.length > 0 && names.map(item => {
-                    if (item === this.props.store.codeStore.instNames) {
+                    if (item === inst_name) {
                         resolve(true);
                     }
                     resolve(false)
@@ -198,16 +200,18 @@ class MyGatesAppsInstall extends Component {
     submitData = ()=>{
         let sn = this.props.match.params.sn;
         let app = this.props.match.params.app;
+        let inst_name = this.state.app_inst
+
         let url = '';
         this.setState({
             install_btn_disabled: true
         });
-        if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
+        if (inst_name === '' || inst_name === undefined) {
             message.error('实例名不能为空！');
             return;
         } else {
             //判断实例名是否存在
-            this.isInst(sn).then(data=>{
+            this.isInst(sn, inst_name).then(data=>{
                 console.log(data);
                 if (data) {
                     message.error('实例名已存在！');
@@ -240,7 +244,8 @@ class MyGatesAppsInstall extends Component {
     };
 
     render () {
-        const { app_show, install_step, app_info, app } = this.state;
+        const { app_show, install_step, app_inst, app_info } = this.state;
+        let gateway_sn = this.props.match.params.sn;
         return (<div>
             <Status />
                 <div className="AppInstall">
@@ -327,10 +332,11 @@ class MyGatesAppsInstall extends Component {
                         </div>
                         <div className={install_step !== 'install' ? 'installapp hide' : 'installapp show'}>
                             <AppConfig
-                                app={app}
+                                gateway_sn={gateway_sn}
+                                configStore={this.state.configStore}
+                                app_inst={app_inst}
                                 app_info={app_info}
                                 submitData={this.submitData}
-                                configStore={this.state.configStore}
                             />
                         </div>
                     </div>
