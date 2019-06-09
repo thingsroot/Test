@@ -123,6 +123,7 @@ class AppConfig extends Component {
         this.state = {
             config: [],
             appTemplateList: [],
+            app_inst: '',
             app_info: {},
             errorCode: false,
             instanceName: '',
@@ -133,6 +134,7 @@ class AppConfig extends Component {
 
     componentDidMount () {
         //this.refreshTemplateList()
+        this.setState({app_inst: this.props.app_inst})
     }
 
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -142,6 +144,7 @@ class AppConfig extends Component {
             return
         }
         this.setState({
+            app_inst: nextProps.app_inst,
             app_info: nextProps.app_info,
             pre_configuration: nextProps.pre_configuration
         }, () => {
@@ -164,7 +167,7 @@ class AppConfig extends Component {
 
     refreshTemplateList = () => {
         this.setState({appTemplateList: []})
-        const { app } = this.props
+        let app = this.state.app_info.name
         http.get('/api/store_configurations_list?conf_type=Template&app=' + app)
         .then(res=>{
             let list = this.state.appTemplateList;
@@ -289,8 +292,10 @@ class AppConfig extends Component {
         }
     };
 
-    submitData = ()=>{
-        this.props.submitData();
+    onSubmit = ()=>{
+        const {app_inst, app_info} = this.state;
+        const {configStore} = this.props;
+        this.props.onSubmit(app_inst, app_info, configStore.Value);
     };
 
     onTabActiveChange (key){
@@ -314,10 +319,9 @@ class AppConfig extends Component {
     }
 
     render () {
-        const { activeKey, errorCode } = this.state;
-        const { configStore, gateway_sn, app_info, app_inst, pre_configuration } = this.props;
-        gateway_sn, app_info, app_inst, pre_configuration;
-        var allow_inst_name_edit = app_inst === undefined ? true : false
+        const { activeKey, errorCode, app_inst } = this.state;
+        const { configStore, gateway_sn, app_info, inst_editable, disabled, pre_configuration } = this.props;
+        app_info, pre_configuration;
         return (
             <Tabs
                 activeKey={activeKey}
@@ -333,8 +337,11 @@ class AppConfig extends Component {
                     <Inst
                         name={name}
                         inst_name={app_inst}
-                        editable={allow_inst_name_edit}
+                        editable={inst_editable}
                         gateway_sn={gateway_sn}
+                        onChange={(value) =>{
+                            this.setState({ app_inst: value })
+                        }}
                     />
                     <div
                         ref="content"
@@ -373,8 +380,8 @@ class AppConfig extends Component {
                     <Button
                         type="primary"
                         style={errorCode === true || configStore.sections.length === 0 ? none : block}
-                        onClick={this.submitData}
-                        disabled={this.props.disabled}
+                        onClick={this.onSubmit}
+                        disabled={disabled}
                     >提交</Button>
                 </TabPane>
                 <TabPane
@@ -409,8 +416,8 @@ class AppConfig extends Component {
                     <br/>
                     <Button
                         type="primary"
-                        disabled={this.props.disabled}
-                        onClick={this.submitData}
+                        disabled={disabled}
+                        onClick={this.onSubmit}
                     >提交</Button>
                 </TabPane>
             </Tabs>

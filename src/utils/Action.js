@@ -37,7 +37,7 @@ export function doUpdate (actions, cb) {
                     cb(action, 'failed', msg)
                 }
                 if (action.finish_action !== undefined) {
-                    action.finish_action()
+                    action.finish_action(result)
                 }
             }).catch( err=> {
                 console.log(err)

@@ -176,32 +176,31 @@ class AppsList extends Component {
         })
       }
 
-    submitData = ()=>{
-        let sn = this.props.match.params.sn;
-        if (this.props.store.codeStore.instNames === '' || this.props.store.codeStore.instNames === undefined) {
-            message.error('实例名不能为空！');
+    onSubmitAppConfig = (app_inst, app_info, configuration)=>{
+      app_info, configuration;
+      let gateway_sn = this.props.match.params.sn;
+      const { edit_app_inst } = this.state;
+        if (edit_app_inst !== app_inst) {
+            message.error('应用实例不存在！');
             return false;
         }
         const data = {
-          gateway: sn,
-          inst: this.props.store.codeStore.instNames,
-          conf: JSON.parse(this.props.store.codeStore.installConfiguration),
-          id: `/gateways/${sn}/config/${this.props.store.codeStore.instNames}/${new Date() * 1}`
+          gateway: gateway_sn,
+          inst: edit_app_inst,
+          conf: configuration,
+          id: `/gateways/${gateway_sn}/config/${edit_app_inst}/${new Date() * 1}`
         };
         http.post('/api/gateways_applications_conf', data).then(res=>{
-          this.timer = setInterval(() => {
-            http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-              if (result.ok && result.data){
-                if (result.data.result){
-                  message.success('应用配置成功')
-                  clearInterval(this.timer)
-                } else {
-                  message.error('应用配置失败')
-                  clearInterval(this.timer)
-                }
-              }
+          if (res.ok) {
+            message.success('应用配置请求发送成功')
+            this.props.store.action.pushAction(res.data, '更改应用' + edit_app_inst + '配置',  '网关:' + gateway_sn, data, 10000,  ()=> {
+                this.setState({show_app_config: true})
             })
-          }, 3000);
+          } else {
+            message.error('应用配置请求发送失败' + res.error)
+          }
+        }).catch(err => {
+          message.error('应用配置请求发送失败' + err)
         })
     };
     showAppConfig = (app_inst, app_conf, app_info) => {
@@ -257,8 +256,9 @@ class AppsList extends Component {
                       configStore={configStore}
                       app_info={edit_app_info}
                       app_inst={edit_app_inst}
+                      inst_editable={false}
                       pre_configuration={edit_app_conf}
-                      submitData={this.submitData}
+                      onSubmit={this.onSubmitAppConfig}
                   />
                 </div>
             </div>

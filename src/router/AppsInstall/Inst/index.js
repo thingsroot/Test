@@ -3,41 +3,36 @@ import {inject, observer} from 'mobx-react';
 import {Input} from 'antd';
 import {withRouter} from 'react-router-dom'
 import http from '../../../utils/Server';
+
 @withRouter
 @inject('store')
 @observer
 class Inst extends React.Component {
+    state ={
+        errorMessage: ''
+    }
     instBlur = ()=>{
         if (this.props.inst_name === '' || this.props.inst_name === undefined) {
-            this.props.store.codeStore.setErrorMessage('实例名不能为空')
+            this.setState({errorMessage: '实例名不能为空'})
         } else {
-            this.props.store.codeStore.setErrorMessage('')
+            this.setState({errorMessage: ''})
         }
     };
 
     instChange = (e)=>{
-        this.props.inst_name = e.target.value;
-        setTimeout(this.inst, 1000)
+        this.props.onChange(e.target.value)
+        setTimeout(this.checkInstanceName, 1000)
     };
 
-    inst = ()=>{
+    checkInstanceName = ()=>{
         let gateway_sn = this.props.gateway_sn;
-        http.post('/api/gateways_applications_refresh', {
-            gateway: gateway_sn,
-            id: 'refresh' + gateway_sn
-        }).then(res=>{
+        http.get('/api/gateways_applications_list?gateway=' + gateway_sn).then(res=>{
             if (res.ok === true) {
-                http.get('/api/gateways_applications_list?gateway=' + gateway_sn).then(res=>{
-                    if (res.ok === true) {
-                        let names = Object.keys(res.data);
-                        names && names.length > 0 && names.map(item=>{
-                            if (item === this.props.inst_name) {
-                                this.props.store.codeStore.setErrorMessage('实例名已存在')
-                            } else {
-                                this.props.store.codeStore.setErrorMessage('')
-                            }
-                        })
-
+                this.setState({errorMessage: ''})
+                let names = Object.keys(res.data);
+                names && names.length > 0 && names.map(item=>{
+                    if (this.props.inst_name === item) {
+                        this.setState({errorMessage: '实例名' + item + '已经存在!'})
                     }
                 })
             }
@@ -45,8 +40,8 @@ class Inst extends React.Component {
     };
 
     render () {
-        const { gateway_sn, inst_name, editable } = this.props;
-        gateway_sn, inst_name, editable;
+        const { gateway_sn, inst_name, editable, onChange } = this.props;
+        gateway_sn, onChange;
         return (
             <div className="Inst">
                 <p style={{lineHeight: '50px'}}>
@@ -59,7 +54,7 @@ class Inst extends React.Component {
                         onChange={this.instChange}
                         onBlur={this.instBlur}
                     />
-                    <span className="error">{this.props.store.codeStore.errorMessage}</span>
+                    <span className="error">{this.state.errorMessage}</span>
                 </p>
             </div>
         )

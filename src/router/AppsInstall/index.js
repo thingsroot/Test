@@ -28,7 +28,7 @@ const openNotification = (title, message) => {
 class MyGatesAppsInstall extends Component {
     state = {
         app: '',
-        app_inst: '',
+        gateway_sn: '',
         app_list: [],
         app_show: [],
         install_step: '', // Install step
@@ -46,44 +46,50 @@ class MyGatesAppsInstall extends Component {
 
     componentDidMount (){
         let app = this.props.match.params.app ? this.props.match.params.app : ''
+        let gateway_sn = this.props.match.params.sn;
         let install_step = this.props.match.params.step ? this.props.match.params.step : ''
         if (this.props.match.params.app !== undefined && install_step === '') {
             install_step = 'view'
         }
 
-        this.setState({app: app, install_step: install_step})
-        if (install_step === 'install') {
-            http.get('/api/applications_details?name=' + this.props.match.params.app).then(res=>{
-                this.setState({app_info: res.data})
-            })
-        } else {
-            http.get('/api/store_list').then(res=>{
-                this.setState({
-                    app_list: res.data,
-                    app_show: res.data
+        this.setState({
+            app: app,
+            install_step: install_step,
+            gateway_sn: gateway_sn
+        }, () => {
+            if (install_step === 'install') {
+                http.get('/api/applications_details?name=' + this.state.app).then(res=>{
+                    this.setState({app_info: res.data})
                 })
-                if (this.state.app && this.state.install_step === 'view') {
-                    let item = res.data.find(item => item.name === this.state.app)
-                    if (item) {
-                        this.setState({
-                            app_info: item
-                        })
+            } else {
+                http.get('/api/store_list').then(res=>{
+                    this.setState({
+                        app_list: res.data,
+                        app_show: res.data
+                    })
+                    if (this.state.app && this.state.install_step === 'view') {
+                        let item = res.data.find(item => item.name === this.state.app)
+                        if (item) {
+                            this.setState({
+                                app_info: item
+                            })
+                        }
                     }
-                }
-            });
-            marked.setOptions({
-                renderer: new marked.Renderer(),
-                gfm: true,
-                tables: true,
-                breaks: false,
-                pedantic: false,
-                sanitize: false,
-                smartLists: true,
-                smartypants: false,
-                xhtml: false,
-                highlight: (code) =>  highlight.highlightAuto(code).value // 这段代码
-            });
-        }
+                });
+                marked.setOptions({
+                    renderer: new marked.Renderer(),
+                    gfm: true,
+                    tables: true,
+                    breaks: false,
+                    pedantic: false,
+                    sanitize: false,
+                    smartLists: true,
+                    smartypants: false,
+                    xhtml: false,
+                    highlight: (code) =>  highlight.highlightAuto(code).value // 这段代码
+                });
+            }
+        })
     }
 
     // shouldComponentUpdate (nextProps, nextState){
@@ -101,10 +107,6 @@ class MyGatesAppsInstall extends Component {
             app_show: newdata
         })
     }
-
-    onChange = (newValue)=>{
-        this.props.store.codeStore.setInstallConfiguration(newValue)
-    };
 
     setUrl = (name, step) => {
         let arr = location.pathname.split('/');
@@ -125,23 +127,31 @@ class MyGatesAppsInstall extends Component {
     };
 
     //获取版本
-    getLast = (url, app, sn)=>{
+    installLatestVersion = (app, sn, inst_name, configuration)=>{
+        let url = ''
+        let enable_beta = this.props.store.appStore.status.enable_beta
+        if (enable_beta === 1) {
+            url = '/api/applications_versions_latest?beta=1&app=';
+        } else {
+            url = '/api/applications_versions_latest?app=';
+        }
         let version = 0;
         http.get(url + app).then(res=> {
             version = res.data;
             if (version > 0) {
-                if (url.indexOf('beta') !== -1) {
+                if (enable_beta === 1) {
                     message.success('网关安装当前应用最新beta版本!');
+                } else {
+                    message.success('网关安装当前应用最新版本!');
                 }
-                const {configStore, app_inst} = this.state
 
                 let params = {
                     gateway: sn,
-                    inst: app_inst,
+                    inst: inst_name,
                     app: app,
                     version: version,
-                    conf: JSON.parse(configStore.Value),
-                    id: 'app_install/' + sn + '/' + app_inst + '/' + app + '/' + this.rand(10000, 99999)
+                    conf: configuration,
+                    id: 'app_install/' + sn + '/' + inst_name + '/' + app + '/' + this.rand(10000, 99999)
                 };
                 this.appInstall(params, sn)
             } else {
@@ -150,6 +160,9 @@ class MyGatesAppsInstall extends Component {
                     install_btn_disabled: false
                 })
             }
+        }).catch(err=> {
+            err;
+            message.error('安装应用最新版本失败!')
         })
     };
 
@@ -157,20 +170,26 @@ class MyGatesAppsInstall extends Component {
     appInstall = (params, sn)=>{
         http.post('/api/gateways_applications_install', params).then(res=>{
             openNotification('提交任务成功', '网关' + sn + '安装' + params.inst + '应用.')
-            this.setState({
-                install_btn_disabled: false
-            });
             if (res.ok === true) {
                 let info = {
                     gateway: sn,
                     params: params
                 }
-                this.props.store.action.pushAction(res.data, '网关' + sn + '安装应用' + params.inst, '', info, 10000,  ()=> {
-                    this.setState({
-                        install_step: ''
-                    })
+                this.props.store.action.pushAction(res.data, '网关' + sn + '安装应用' + params.inst, '', info, 10000,  (result)=> {
+                    if (result) {
+                        this.setState({
+                            install_step: ''
+                        })
+                    } else {
+                        this.setState({
+                            install_btn_disabled: false
+                        });
+                    }
                 })
             } else {
+                this.setState({
+                    install_btn_disabled: false
+                });
                 openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
             }
         }).catch( (err)=> {
@@ -183,26 +202,28 @@ class MyGatesAppsInstall extends Component {
     };
 
     //判断是否已有实例名
-    isInst =  (sn, inst_name) => new Promise((resolve => {
+    checkInstanceName =  (sn, inst_name) => new Promise((resolve, reject) => {
         http.get('/api/gateways_applications_list?gateway=' + sn).then(res=> {
             if (res.ok === true) {
                 let names = Object.keys(res.data);
+                let fond_dumplicate = false
                 names && names.length > 0 && names.map(item => {
                     if (item === inst_name) {
-                        resolve(true);
+                        fond_dumplicate = true
                     }
-                    resolve(false)
                 })
+                if (!fond_dumplicate) {
+                    resolve()
+                } else {
+                    reject('实例名重复')
+                }
             }
+        }).catch(err=> {
+            reject(err)
         });
-    }));
+    });
 
-    submitData = ()=>{
-        let sn = this.props.match.params.sn;
-        let app = this.props.match.params.app;
-        let inst_name = this.state.app_inst
-
-        let url = '';
+    onInstallSubmit = (inst_name, app_info, configuration)=>{
         this.setState({
             install_btn_disabled: true
         });
@@ -211,21 +232,13 @@ class MyGatesAppsInstall extends Component {
             return;
         } else {
             //判断实例名是否存在
-            this.isInst(sn, inst_name).then(data=>{
-                console.log(data);
-                if (data) {
-                    message.error('实例名已存在！');
-                } else {
-                    http.get('/api/gateways_read?name=' + sn).then(res=>{
-                        if (res.enable_beta === 1) {
-                            url = '/api/applications_versions_latest?beta=1&app=';
-                            this.getLast(url, app, sn)
-                        } else {
-                            url = '/api/applications_versions_latest?app=';
-                            this.getLast(url, app, sn)
-                        }
-                    })
-                }
+            this.checkInstanceName(this.state.gateway_sn, inst_name).then(()=>{
+                this.installLatestVersion(app_info.name, this.state.gateway_sn, inst_name, configuration)
+            }).catch(err=>{
+                message.error(err)
+                this.setState({
+                    install_btn_disabled: false
+                });
             });
         }
     };
@@ -244,8 +257,7 @@ class MyGatesAppsInstall extends Component {
     };
 
     render () {
-        const { app_show, install_step, app_inst, app_info } = this.state;
-        let gateway_sn = this.props.match.params.sn;
+        const { gateway_sn, app_show, install_step, app_inst, app_info } = this.state;
         return (<div>
             <Status />
                 <div className="AppInstall">
@@ -335,8 +347,10 @@ class MyGatesAppsInstall extends Component {
                                 gateway_sn={gateway_sn}
                                 configStore={this.state.configStore}
                                 app_inst={app_inst}
+                                inst_editable
+                                disabled={this.state.install_btn_disabled}
                                 app_info={app_info}
-                                submitData={this.submitData}
+                                onSubmit={this.onInstallSubmit}
                             />
                         </div>
                     </div>

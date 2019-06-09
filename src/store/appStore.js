@@ -37,7 +37,7 @@ class AppStore {
   @observable localstor = [];
   @observable actionSwi = false;
   @observable logflag = false;
-  @observable  searchflag = true;
+  @observable searchflag = true;
   @observable maxNum = false;
   @observable value = '';
   @observable isleave = false;
