@@ -33,9 +33,10 @@ class MyGatesDevices extends Component {
         url: window.location.pathname
     }
     componentDidMount (){
-        this.sendAjax(this.props.match.params.sn)
-        this.setState({gateway: this.props.match.params.sn})
-        this.props.store.timer.setGateStatusLast(0)
+        this.setState({gateway: this.props.match.params.sn}, ()=>{
+            this.sendAjax()
+            this.props.store.timer.setGateStatusLast(0)
+        })
         if (this.props.location.pathname.indexOf('VPN') !== -1){
             this.setState({flag: false})
         } else {
@@ -49,24 +50,26 @@ class MyGatesDevices extends Component {
             this.setState({flag: true})
         }
         if (this.props.match.params.sn !== nextProps.match.params.sn){
-            this.sendAjax(nextProps.match.params.sn)
-            this.setState({gateway: this.props.match.params.sn})
-            this.props.store.timer.setGateStatusLast(0)
+            this.setState({gateway: this.props.match.params.sn}, ()=>{
+                this.sendAjax()
+                this.props.store.timer.setGateStatusLast(0)
+            })
         }
     }
-    sendAjax = (sn) => {
-        // http.get('/api/gateways_read?name=' + sn).then(res=>{
-        //   this.props.store.appStore.setStatus(res)
-        // })
-        http.get('/api/gateways_app_list?gateway=' + sn).then(res=>{
-            if (Object.values(res.data).filter(item=> item.device_name === 'ioe_frpc').length > 0){
+    sendAjax = () => {
+        const {gateway} = this.state;
+        if (gateway === undefined || gateway === '') {
+            return;
+        }
+        http.get('/api/gateways_app_list?gateway=' + gateway).then(res=>{
+            if (Object.values(res.data).filter(item=> item.inst_name === 'ioe_frpc' && item.name === 'frpc').length > 0){
                 this.setState({VPNflag: true})
             } else {
                 this.setState({VPNflag: false})
             }
             this.props.store.appStore.setApplen(Object.keys(res.data).length);
         })
-        http.get('/api/gateways_dev_len?gateway=' + sn).then(res=>{
+        http.get('/api/gateways_dev_len?gateway=' + gateway).then(res=>{
             this.props.store.appStore.setDevlen(res.length);
         })
     }
