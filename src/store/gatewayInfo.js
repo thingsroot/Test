@@ -31,7 +31,7 @@ class GatewayData {
         let self_keys = Object.getOwnPropertyNames(this.__proto__)
         for (let [k, v] of Object.entries(data)) {
             if (self_keys.findIndex(item => item === k) !== -1) {
-                console.log(k, v)
+                //console.log(k, v)
                 this[k] = v
             }
         }

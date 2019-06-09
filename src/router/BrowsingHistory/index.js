@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Input, Table, Select, Button, Icon } from 'antd';
+import { inject, observer } from 'mobx-react';
 import Status from '../../common/status';
 import axios from 'axios';
 import './style.scss';
@@ -39,6 +40,10 @@ const columns = [{
     title: '质量戳',
     dataIndex: 'quality'
   }];
+
+
+@inject('store')
+@observer
 class BrowsingHistory extends Component {
     state = {
         data: [],
@@ -53,11 +58,24 @@ class BrowsingHistory extends Component {
         domain: '5m',
         scope: '1h',
         vt: '',
-        record: {}
+        record: {},
+        gateway: '',
+        device_sn: ''
       };
       componentDidMount () {
-        this.fetch();
+        this.setState({gateway: this.props.match.params.sn, device_sn: this.props.match.params.vsn}, () =>{
+          this.fetch();
+        })
+        this.props.store.timer.setGateStatusLast(0)
         console.log(this)
+      }
+      UNSAFE_componentWillReceiveProps (nextProps){
+          if (this.props.match.params.sn !== nextProps.match.params.sn){
+            this.setState({gateway: this.props.match.params.sn, device_sn: this.props.match.params.vsn}, () =>{
+              this.fetch();
+            })
+            this.props.store.timer.setGateStatusLast(0)
+          }
       }
       handleTableChange = (pagination, filters, sorter) => {
         const pager = { ...this.state.pagination };
@@ -77,26 +95,30 @@ class BrowsingHistory extends Component {
         console.log('params:', params);
         this.setState({ loading: true });
         axios({
-          url: `/api/gateways_dev_data?gateway=${this.props.match.params.sn}&name=${this.props.match.params.vsn}&_=${new Date() * 1}`,
+          url: `/api/gateways_dev_data?gateway=${this.state.gateway}&name=${this.state.device_sn}&_=${new Date() * 1}`,
           method: 'get',
           data: {
             results: 10,
             ...params
           },
           type: 'json'
-        }).then((data) => {
-            console.log(data)
-            data.data.data.map((val, ind)=>{
-                val.id = ind;
-            })
+        }).then((resp) => {
+          let res = resp.data;
+          console.log(res)
+          if (!res.ok) {
+            return
+          }
+          res.data.map((val, ind)=>{
+              val.id = ind;
+          })
           const pagination = { ...this.state.pagination };
           // Read total count from server
-          pagination.total = data.totalCount;
+          pagination.total = res.totalCount;
           // pagination.total = 200;
           this.setState({
             loading: false,
-            data: data.data.data,
-            filterdata: data.data.data,
+            data: res.data,
+            filterdata: res.data,
             pagination
           }, ()=>{
             console.log(this.state)
@@ -124,14 +146,18 @@ class BrowsingHistory extends Component {
               headers: {
                   Accept: 'application/json, text/javascript, */*; q=0.01'
               }
-            }).then(res=>{
-                if (res.data.message !== undefined){
-                  res.data.message.map((val, ind)=>{
+            }).then(resp=>{
+                let res = resp.data
+                if (!res.ok) {
+                  return
+                }
+                if (res.data !== undefined){
+                  res.data.map((val, ind)=>{
                     val.id = ind + 1;
                     val.type = this.state.way;
                   })
                   this.setState({
-                      detail: res.data.message,
+                      detail: res.data,
                       detailloading: false
                   })
                 } else {
@@ -193,7 +219,7 @@ class BrowsingHistory extends Component {
     render () {
         return (
             <div className="historywrap">
-                <Status />
+                <Status gateway={this.state.gateway}/>
                 <div className="history">
                     <div className="historyleft">
                         <div style={{display: 'flex'}}>

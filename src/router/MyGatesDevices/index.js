@@ -20,6 +20,7 @@ const Appconfig = LoadableComponent(()=>import('../AppsInstall/AppConfig'));
 const Platformevent = LoadableComponent(()=>import('../PlatformMessage'));
 const Devicesevent = LoadableComponent(()=>import('../DeviceMessage'));
 const GatewaysDrawer = LoadableComponent(()=>import('../AppsInstall/GatewaysDrawer'));
+
 @withRouter
 @inject('store')
 @observer
