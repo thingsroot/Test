@@ -23,7 +23,6 @@ class TemplateList extends Component {
             deleteName: '',
             type: '',
             conf: '',
-            key: '1',
             templateList: [],
             columns: [
                 {
@@ -79,7 +78,7 @@ class TemplateList extends Component {
                         <span>
                             <Link
                                 className="mybutton"
-                                to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}/0`}
+                                to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}`}
                             >查看</Link>
                             <Divider type="vertical" />
                             <a
@@ -148,7 +147,7 @@ class TemplateList extends Component {
                         <span>
                             <Link
                                 className="mybutton"
-                                to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}/1`}
+                                to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}`}
                             >查看</Link>
                             <Divider type="vertical" />
                             <a
@@ -251,22 +250,15 @@ class TemplateList extends Component {
             });
     };
 
-    callback = (key)=>{
-        this.setState({
-            key: key
-        })
-    };
-
     render () {
         const { app } = this.props;
         let myList = this.props.store.codeStore.templateList;
-        const { type, conf, key, templateList, columns, columns2 } = this.state;
+        const { type, conf, templateList, columns, columns2 } = this.state;
         return (
             <div className="templateList">
                 <Button
                     type="primary"
                     onClick={this.showModal}
-                    style={key === '2' ? none : block}
                 >
                     新建模板
                 </Button>
@@ -296,12 +288,11 @@ class TemplateList extends Component {
                     <p>确认删除此模板？</p>
                 </Modal>
                 <Tabs
-                    defaultActiveKey="1"
-                    onChange={this.callback}
+                    defaultActiveKey="private"
                 >
                     <TabPane
                         tab="我的"
-                        key="1"
+                        key="private"
                     >
                         <Table
                             style={myList === undefined || myList.length === 0 ? none : block}
@@ -319,7 +310,7 @@ class TemplateList extends Component {
                     </TabPane>
                     <TabPane
                         tab="所有"
-                        key="2"
+                        key="store"
                     >
                         <Table
                             style={templateList === undefined || templateList.length === 0 ? none : block}

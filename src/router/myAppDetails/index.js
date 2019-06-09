@@ -61,7 +61,7 @@ class MyAppDetails extends Component {
             this.props.store.codeStore.setVersionList(res.data.versionList.data);
             this.props.store.codeStore.setVersionLatest(res.data.versionLatest.data)
         });
-        http.get('/api/user_configuration_list?app=' + app)
+        http.get('/api/user_configurations_list?app=' + app)
             .then(res=>{
                 this.props.store.codeStore.setTemplateList(res.data)
             });

@@ -64,7 +64,7 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                         .then(res=>{
                             if (res.ok) {
                                 message.success('更新模板信息成功！');
-                                http.get('/api/user_configuration_list?app=' + params.app)
+                                http.get('/api/user_configurations_list?app=' + params.app)
                                     .then(res=>{
                                         this.props.store.codeStore.setTemplateList(res.message)
                                     });
