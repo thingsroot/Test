@@ -6,7 +6,7 @@ import Status from '../../common/status';
 import http from '../../utils/Server';
 import ReactMarkdown from 'react-markdown'
 import './style.scss';
-import GatewaysDrawer from './GatewaysDrawer';
+import GatewaysDrawer from '../../common/GatewaysDrawer';
 import AppConfig from './AppConfig'
 import LazyLoad from 'react-lazy-load';
 import {ConfigStore} from '../../utils/app_config'
@@ -292,7 +292,7 @@ class MyGatesAppsInstall extends Component {
                             shape="round"
                             icon="download"
                         >
-                            <Link to={`/mygatesdevices/${gateway_sn}/appslist`}> 查看应用列表 </Link>
+                            <Link to={`/gateways/${gateway_sn}/appslist`}> 查看应用列表 </Link>
                         </Button>
                     </Modal>
                     <div className={install_step === '' ? 'hide appsdetail' : 'show appsdetail'}>

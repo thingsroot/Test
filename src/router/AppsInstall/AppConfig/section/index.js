@@ -61,7 +61,7 @@ class AppConfigSection extends Component {
 
     createNewTemplate = () => {
         const w = window.open('about: blank');
-        w.location.href = '/myappdetails/' + this.props.app_info.name + '/new_template'
+        w.location.href = '/appdetails/' + this.props.app_info.name + '/new_template'
     }
 
     handleCancelAddTempList = ()=>{
@@ -258,11 +258,11 @@ class AppConfigSection extends Component {
                     record.latest_version !== undefined ? (
                     <span>
                         <Button>
-                            <Link to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}`}> 查看 </Link>
+                            <Link to={`/template/${record.app}/${record.name}/${record.latest_version}`}> 查看 </Link>
                         </Button>
                         <span style={{padding: '0 2px'}}> </span>
                         <Button>
-                            <Link to={`/mytemplatedetails/${record.app}/${record.name}/${record.latest_version}/clone`}> 克隆 </Link>
+                            <Link to={`/template/${record.app}/${record.name}/${record.latest_version}/clone`}> 克隆 </Link>
                         </Button>
                         <span style={{padding: '0 2px'}}> </span>
                         <Button

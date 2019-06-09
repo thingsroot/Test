@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { Icon, Modal, Select, message, Input } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { inject, observer} from 'mobx-react';
-import MyTree from './MyTree';
-import MyCode from './MyCode';
+import FileTree from './FileTree';
+import CodeEditor from './Editor';
 import './style.scss';
 import http from '../../utils/Server';
 const Option = Select.Option;
@@ -674,7 +674,7 @@ class AppEditorCode extends Component {
                 </div>
                 <div className="main">
                     <div className="tree">
-                        <MyTree
+                        <FileTree
                             treeData={arr}
                             getFileName={this.getFileName}
                             app={app}
@@ -684,7 +684,7 @@ class AppEditorCode extends Component {
                         />
                     </div>
                     <div className="code">
-                        <MyCode
+                        <CodeEditor
                             fontSize={fontSize}
                             showFileName={this.props.store.codeStore.showFileName}
                             isChange={this.props.store.codeStore.isChange}

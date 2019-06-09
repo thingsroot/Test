@@ -18,7 +18,7 @@ class LeftNav extends Component {
             {
                 icon: 'profile',
                 text: '设备列表',
-                href: '/gateslist'
+                href: '/devslist'
             }, {
                 icon: 'appstore',
                 text: '应用列表',
@@ -26,7 +26,7 @@ class LeftNav extends Component {
             }, {
                 icon: 'database',
                 text: '网关设置',
-                href: '/setgateway'
+                href: '/settings'
             }
         ],
         index: 0
@@ -36,7 +36,7 @@ class LeftNav extends Component {
             this.getNum()
         }, 500);
         const pathname = this.props.location.pathname.toLowerCase();
-        if (pathname.indexOf('/gateslist') !== -1) {
+        if (pathname.indexOf('/devslist') !== -1) {
             this.setState({
                 index: 0
             })
@@ -44,7 +44,7 @@ class LeftNav extends Component {
             this.setState({
                 index: 1
             });
-        } else if (pathname.indexOf('/setgateway') !== -1){
+        } else if (pathname.indexOf('/settings') !== -1){
             this.setState({
                 index: 2
             });
@@ -52,7 +52,7 @@ class LeftNav extends Component {
             this.setState({
                 index: '4'
             });
-        } else if (pathname.indexOf('/gatewayrecord') !== -1){
+        } else if (pathname.indexOf('/onlinerecords') !== -1){
             this.setState({
                 index: 5
             })
@@ -106,7 +106,7 @@ class LeftNav extends Component {
                                         }}
                                     ><li className={index === i ? 'active' : ''}>
                                     {
-                                        v.href.toLowerCase() === '/gateslist' ? <div className="gatecount count">{this.props.store.appStore.devs_len}</div> : ''
+                                        v.href.toLowerCase() === '/devslist' ? <div className="gatecount count">{this.props.store.appStore.devs_len}</div> : ''
                                     }
                                     {
                                         v.href.toLowerCase() === '/appslist' ? <div className="appcount count">{this.props.store.appStore.apps_len}</div> : ''
@@ -121,7 +121,7 @@ class LeftNav extends Component {
                         <p>高级功能</p>
                         <ul>
                             <Link
-                                to={`${url}/gatewayrecord`}
+                                to={`${url}/onlinerecords`}
                                 onClick={()=>{
                                     this.setState({index: 5})
                                 }}
@@ -177,7 +177,7 @@ class LeftNav extends Component {
                     <ul>
                         {
                             this.vserialflag
-                            ? <Link to={`${url}/Vserial`}
+                            ? <Link to={`${url}/vserial`}
                                 key="4"
                                 onClick={()=>{
                                 this.setIndex('3')

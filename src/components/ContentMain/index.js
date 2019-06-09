@@ -4,25 +4,24 @@ import {notification } from 'antd';  //
 import { Switch, Redirect, withRouter} from 'react-router-dom';
 import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
-const MyAppDetails = LoadableComponent(()=>import('../../router/myAppDetails'));
+
+const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppSettings = LoadableComponent(()=>import('../../router/AppSettings'));
 const Home = LoadableComponent(()=>import('../../router/Home'));
-const MyGates = LoadableComponent(()=>import('../../router/MyGates'));
+const Gateways = LoadableComponent(()=>import('../../router/Gateways'));
 const MyApps = LoadableComponent(()=>import('../../router/MyApps'));
 const AppStore = LoadableComponent(()=>import('../../router/AppStore'));
 const UserSettings = LoadableComponent(()=>import('../../router/UserSettings'));
-const MyAccessKey = LoadableComponent(()=>import('../../router/MyAccessKey'));
-const MyVirtualGates = LoadableComponent(()=>import('../../router/MyVirtualGates'));
-const MyGatesDevices = LoadableComponent(()=>import('../../router/MyGatesDevices'));
-const MyGatesAppsInstall = LoadableComponent(()=>import('../../router/MyGatesAppsInstall'));
+const AccessKeys = LoadableComponent(()=>import('../../router/AccessKeys'));
+const VirtualGateways = LoadableComponent(()=>import('../../router/VirtualGateways'));
+const GatewayDevices = LoadableComponent(()=>import('../../router/GatewayDevices'));
+const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
 const PlatformMessage = LoadableComponent(()=>import('../../router/PlatformMessage'));
 const DeviceMessage = LoadableComponent(()=>import('../../router/DeviceMessage'));
 const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHistory'));
-const MyGatesDevicesOutputs = LoadableComponent(()=>import('../../router/MyGatesDevicesOutputs'));
-const MyGatesDevicesCommands = LoadableComponent(()=>import('../../router/MyGatesDevicesCommands'));
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
-const MyTemplateDetails = LoadableComponent(()=>import('../../router/MyTemplateDetails'));
+const TemplateDetails = LoadableComponent(()=>import('../../router/TemplateDetails'));
 
 import { doUpdate } from '../../utils/Action';
 
@@ -71,8 +70,8 @@ class ContentMain extends Component {
                     title={'Dashboard'}
                 />
                 <PrivateRoute
-                    path="/mygates"
-                    component={MyGates}
+                    path="/gateways"
+                    component={Gateways}
                     title={'我的网关'}
                 />
                 <PrivateRoute
@@ -86,48 +85,53 @@ class ContentMain extends Component {
                     title={'应用商店'}
                 />
                 <PrivateRoute
-                    path="/myappdetails/:name/:action?"
-                    component={MyAppDetails}
-                    title={'我的应用 · 详情'}
+                    path="/appdetails/:name/:action?"
+                    component={AppDetails}
+                    title={'应用详情'}
                 />
                 <PrivateRoute
-                    path="/appsettings/:type/:name"
+                    path="/appsettings/:type/:name？"
                     component={AppSettings}
-                    title={'Dashboard'}
+                    title={'应用设置'}
                 />
                 <PrivateRoute
-                    path="/appsettings/:type"
-                    component={AppSettings}
-                    title={'Dashboard'}
+                    path="/appsinstall/:sn/:app?/:step?"
+                    component={AppsInstall}
+                    title={'安装应用'}
                 />
                 <PrivateRoute
                     path="/appeditorcode/:app/:name"
                     component={AppEditorCode}
-                    title={'Dashboard'}
+                    title={'代码编辑'}
                 />
                 <PrivateRoute
-                    path="/userSettings"
+                    path="/template/:app/:name/:version?/:action?"
+                    component={TemplateDetails}
+                    title={'模板详情'}
+                />
+                <PrivateRoute
+                    path="/account"
                     component={UserSettings}
-                    title={'Dashboard'}
+                    title={'用户信息'}
                 />
                 <PrivateRoute
-                    path="/myaccesskey"
-                    component={MyAccessKey}
-                    title={'MyAccessKey'}
+                    path="/accesskeys"
+                    component={AccessKeys}
+                    title={'访问授权码'}
                 />
                 <PrivateRoute
-                    path="/myvirtualgates"
-                    component={MyVirtualGates}
+                    path="/virtualgateways"
+                    component={VirtualGateways}
                     title={'虚拟网关'}
                 />
                 <PrivateRoute
-                    path="/mygatesdevices/:sn"
-                    component={MyGatesDevices}
+                    path="/gatewaydevices/:sn"
+                    component={GatewayDevices}
                     title={'设备列表'}
                 />
                 <PrivateRoute
-                    path="/mygatesappsinstall/:sn"
-                    component={MyGatesAppsInstall}
+                    path="/gatewayappsinstall/:sn"
+                    component={GatewayAppInstall}
                     title={'安装应用'}
                 />
                 <PrivateRoute
@@ -145,26 +149,6 @@ class ContentMain extends Component {
                     path="/browsinghistory/:sn/:vsn"
                     component={BrowsingHistory}
                     title={'Dashboard'}
-                />
-                <PrivateRoute
-                    path="/mygatesdevicesoutputs/:sn/:vsn"
-                    component={MyGatesDevicesOutputs}
-                    title={'数据下置'}
-                />
-                <PrivateRoute
-                    path="/mygatesdevicescommands/:sn/:vsn"
-                    component={MyGatesDevicesCommands}
-                    title={'设备指令'}
-                />
-                <PrivateRoute
-                    path="/appsinstall/:sn/:app?/:step?"
-                    component={AppsInstall}
-                    title={'安装应用'}
-                />
-                <PrivateRoute
-                    path="/mytemplatedetails/:app/:name/:version?/:action?"
-                    component={MyTemplateDetails}
-                    title={'模板详情'}
                 />
                 <Redirect
                     from="/"

@@ -30,7 +30,7 @@ class Siders extends PureComponent {
             this.setState({
                 key: '1'
             })
-        } else if (pathname.indexOf('/mygates') !== -1 || pathname.indexOf('/appinstall') !== -1) {
+        } else if (pathname.indexOf('/gateways') !== -1 || pathname.indexOf('/appsinstall') !== -1) {
             this.setState({
                 key: '2'
             })
@@ -54,7 +54,7 @@ class Siders extends PureComponent {
             this.setState({
                 key: '3'
             })
-        } else if (pathname.indexOf('/myappdetails') !== -1) {
+        } else if (pathname.indexOf('/appdetails') !== -1) {
             this.setState({
                 key: '3'
             })
@@ -103,7 +103,7 @@ class Siders extends PureComponent {
                     </Link>
                     </Menu.Item>
                     <Menu.Item key="2">
-                    <Link to="/mygates">
+                    <Link to="/gateways">
                         <Icon type="laptop" />
                         <span>我的网关</span>
                     </Link>

@@ -138,7 +138,7 @@ class MyApps extends Component {
                             myList && myList.length > 0 && myList.map((v, key)=>{
                                 return <li key={key}>
                                     <div className="appImg">
-                                        <Link to={`/myappdetails/${v.name}`}>
+                                        <Link to={`/appdetails/${v.name}`}>
                                             <img
                                                 src={`http://cloud.thingsroot.com${v.icon_image}`}
                                                 alt=""
@@ -171,7 +171,7 @@ class MyApps extends Component {
                             forkList && forkList.length > 0 && forkList.map((v, key)=>{
                                 return <li key={key}>
                                     <div className="appImg">
-                                        <Link to={`/myappdetails/${v.name}`}>
+                                        <Link to={`/appdetails/${v.name}`}>
                                             <img
                                                 src={`http://cloud.thingsroot.com${v.icon_image}`}
                                                 alt=""

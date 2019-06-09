@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import { Button, message } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
-import ResetPasswordCreateForm from './resetPassword';
+import ResetPasswordCreateForm from './ResetPassword';
 
 
 @inject('store')

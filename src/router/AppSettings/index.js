@@ -95,7 +95,7 @@ class AppSettings extends Component {
                                 }
                             });
                             setTimeout(()=>{
-                                window.location.href = '/myApps'
+                                window.location.href = '/myapps'
                             }, 1500)
                         } else {
                             message.error('应用创建失败！')
