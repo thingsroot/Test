@@ -134,7 +134,11 @@ class AppConfig extends Component {
 
     componentDidMount () {
         //this.refreshTemplateList()
-        this.setState({app_inst: this.props.app_inst})
+        this.setState({
+            app_inst: this.props.app_inst,
+            app_info: this.props.app_info,
+            pre_configuration: this.props.pre_configuration
+        })
     }
 
     UNSAFE_componentWillReceiveProps (nextProps){

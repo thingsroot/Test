@@ -20,7 +20,7 @@ class Sign extends PureComponent {
                         _setCookie('companies', res.data.companies[0])
                         http.get('/api/developers_read?name=' + _getCookie('user_id'))
                             .then(res=>{
-                                if (!res.error) {
+                                if (res.ok && res.data) {
                                     if (res.data.enabled === 1) {
                                         _setCookie('is_developer', '1')
                                     } else {

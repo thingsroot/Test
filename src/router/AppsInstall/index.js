@@ -4,9 +4,7 @@ import {Input, Icon, Button, message, notification, Rate, Drawer } from 'antd'; 
 import { inject, observer} from 'mobx-react';
 import Status from '../../common/status';
 import http from '../../utils/Server';
-import marked from 'marked';
-import highlight from 'highlight.js';
-import 'highlight.js/styles/github.css';
+import ReactMarkdown from 'react-markdown'
 import './style.scss';
 import Nav from './Nav';
 import AppConfig from './AppConfig'
@@ -76,28 +74,9 @@ class MyGatesAppsInstall extends Component {
                         }
                     }
                 });
-                marked.setOptions({
-                    renderer: new marked.Renderer(),
-                    gfm: true,
-                    tables: true,
-                    breaks: false,
-                    pedantic: false,
-                    sanitize: false,
-                    smartLists: true,
-                    smartypants: false,
-                    xhtml: false,
-                    highlight: (code) =>  highlight.highlightAuto(code).value // 这段代码
-                });
             }
         })
     }
-
-    // shouldComponentUpdate (nextProps, nextState){
-    //     if (nextState.item.description && nextState.item.description !== null){
-    //         document.getElementById('box').innerHTML = marked(nextState.item.description)
-    //     }
-    //     return true;
-    // }
 
     searchApp (value){
         let { app_list } = this.state;
@@ -324,7 +303,7 @@ class MyGatesAppsInstall extends Component {
                                     <div style={{width: 500}}
                                         className="detail"
                                     >
-                                        <p>发布者： {app_info.app_name_unique}</p>
+                                        <p>发布者： {app_info.owner}</p>
                                         <p>通讯协议: {app_info.protocol}</p>
                                         <p>适配型号： {app_info.device_serial}</p>
                                     </div>
@@ -339,7 +318,9 @@ class MyGatesAppsInstall extends Component {
                                 id="box"
                                 style={{marginTop: 20}}
                             >
-                                markdown
+                                <ReactMarkdown
+                                    source={app_info && app_info.description && app_info.description}
+                                />
                             </div>
                         </div>
                         <div className={install_step !== 'install' ? 'installapp hide' : 'installapp show'}>
