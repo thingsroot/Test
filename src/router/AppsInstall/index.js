@@ -245,6 +245,7 @@ class MyGatesAppsInstall extends Component {
                         <Icon type="swap"/><br />
                     </Button>
                     <GatewaysDrawer
+                        gateway={this.state.gateway_sn}
                         onClose={this.onClose}
                         onChange={this.onChangeGateway}
                         visible={this.state.gateway_list_visible}

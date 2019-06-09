@@ -3,21 +3,22 @@ import { inject, observer } from 'mobx-react';
 import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
-let timer;
 @withRouter
 @inject('store')
 @observer
 class Status extends Component {
     constructor (props){
         super(props);
+        this.timer = undefined
         this.state = {
             gateway: ''
         }
     }
     componentDidMount (){
-        this.setState({gateway: this.props.gateway})
-        this.gatewayRead()
-        this.startTimer()
+        this.setState({gateway: this.props.gateway}, () => {
+            this.gatewayRead()
+            this.startTimer()
+        })
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
         if (nextProps.gateway !== this.state.gateway) {
@@ -26,10 +27,10 @@ class Status extends Component {
         }
     }
     componentWillUnmount (){
-        clearInterval(timer);
+        clearInterval(this.timer);
     }
     startTimer (){
-        timer = setInterval(() => {
+        this.timer = setInterval(() => {
             const {gateStatusLast, gateStatusGap, gateStatusNoGapTime} = this.props.store.timer;
             let now = new Date().getTime()
             if (now < gateStatusNoGapTime) {
@@ -42,6 +43,9 @@ class Status extends Component {
         }, 1000);
     }
     gatewayRead (){
+        if (this.state.gateway === undefined || this.state.gateway === '') {
+            return
+        }
         http.get('/api/gateways_read?name=' + this.state.gateway).then(res=>{
             if (res.ok) {
                 if (res.data.sn !== this.state.gateway) {

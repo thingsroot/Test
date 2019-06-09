@@ -5,6 +5,7 @@ import { inject, observer } from 'mobx-react';
 import { Drawer } from 'antd';  //
 import './style.scss';
 // import {Drawer} from "antd";
+
 @withRouter
 @inject('store')
 @observer
@@ -15,7 +16,17 @@ class GatewaysDrawer extends Component {
     };
     componentDidMount (){
         this.updateGatewayList()
+        this.startTimer()
     }
+    componentWillUnmount (){
+        clearInterval(this.timer);
+    }
+    startTimer (){
+        this.timer = setInterval(() => {
+            this.updateGatewayList()
+        }, 10000);
+    }
+
     updateGatewayList = () => {
         // FIXME: Save localStorage about user accessed gateways..
         http.get('/api/gateways_list?status=online').then(res=>{
@@ -40,12 +51,13 @@ class GatewaysDrawer extends Component {
 
     render () {
         // const { gateList } = this.props.store.appStore;
-        const { gateList, status, gateway_sn } = this.state;
+        const { gateways, status, gateway_sn } = this.state;
         status, gateway_sn;
         const { onClose, onChange, visible, gateway } = this.props;
         onClose, onChange;
         return (
             <Drawer
+                className="gateways_drawer"
                 title="网关列表"
                 placement="left"
                 closable={false}
@@ -55,7 +67,7 @@ class GatewaysDrawer extends Component {
             >
                 <ul>
                     {
-                        gateList && gateList.length > 0 && gateList.map((v, i)=>{
+                        gateways && gateways.length > 0 && gateways.map((v, i)=>{
                             return (
                                 <Link
                                     key={i}
