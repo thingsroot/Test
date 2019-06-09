@@ -271,6 +271,7 @@ class EditableTable extends React.Component {
                 Add
             </Button>
             <Table
+                rowKey="key"
                 components={components}
                 rowClassName={() => 'editable-row'}
                 bordered

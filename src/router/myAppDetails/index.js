@@ -41,7 +41,7 @@ class MyAppDetails extends Component {
         http.get('/api/user_groups_list').then(res=>{
             this.props.store.codeStore.setGroupName(res.data[0].name)
         });
-        let action = this.props.match.params.action ? this.props.match.params.action : ''
+        let action = this.props.match.params.action ? this.props.match.params.action : 'description'
         if (action === 'new_template') {
             this.props.store.codeStore.setTemplateVisible(true)
             this.setState( {activeKey: 'templates'} )
@@ -152,7 +152,7 @@ class MyAppDetails extends Component {
                         tab="描述"
                         key="description"
                     >
-                        <AppDesc desc={this.state.desc}/>
+                        <AppDesc source={this.state.desc}/>
                     </TabPane>
                     <TabPane
                         tab="版本列表"

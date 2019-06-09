@@ -201,6 +201,7 @@ class AppConfigSection extends Component {
                 editable: true
             });
         });
+        let rowKey = config.key !== undefined ? config.key : 'index'
 
         return (
             <div
@@ -214,6 +215,7 @@ class AppConfigSection extends Component {
                     >|</span>{config.desc}</p>
                     <EditableTable
                         config={config}
+                        rowKey={rowKey}
                         tableColumns={tableColumns}
                         dataSource={config.value}
                         configStore={this.props.configStore}
