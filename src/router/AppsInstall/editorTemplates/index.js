@@ -33,7 +33,7 @@ class EditableCell extends React.Component {
     return <Input />;
   };
 
-  renderCell = (form) => {
+  renderCell = form => {
     const {
         configStore,
         editing,
@@ -74,7 +74,7 @@ class EditableCell extends React.Component {
 class EditorTemplates extends React.Component {
   constructor (props) {
     super(props);
-    this.state = { editingKey: '' };
+    this.state = { editingKey: '', count: 0 };
     this.columns = [
         {
             title: '名称',
@@ -138,6 +138,13 @@ class EditorTemplates extends React.Component {
     ];
   }
 
+
+  componentDidMount () {
+    const {dataSource} = this.props
+    if (dataSource !== undefined) {
+        this.setState({count: dataSource.length})
+    }
+  }
   isEditing = record => record.key === this.state.editingKey;
 
   cancel = () => {
@@ -207,7 +214,7 @@ class EditorTemplates extends React.Component {
     return (
       <EditableContext.Provider value={this.props.form}>
         <Table
-            rowKey="name"
+            rowKey="key"
             components={components}
             bordered
             dataSource={this.props.dataSource}

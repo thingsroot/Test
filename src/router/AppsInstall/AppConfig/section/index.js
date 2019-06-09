@@ -24,7 +24,10 @@ class AppConfigSection extends Component {
     onAddTemplate = (config, name, conf_name, desc, version)=>{
         this.props.configStore.addTemplate(name, conf_name, desc, version)
         let val = config.Value
+        let max_key = 0
+        val.map(item => max_key < item.key ? max_key = item.key : max_key)
         val.push({
+            key: max_key + 1,
             id: name,
             name: conf_name,
             description: desc,

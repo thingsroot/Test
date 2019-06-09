@@ -151,7 +151,9 @@ class EditableTable extends React.Component {
     componentDidMount () {
         const {dataSource, tableColumns} = this.props
         if (dataSource !== undefined) {
-            this.setState({count: dataSource.length})
+            let max_key = 0
+            dataSource.map(item => max_key < item.key ? max_key = item.key : max_key)
+            this.setState({count: max_key + 1})
         } else {
             this.props.config.setValue([])
         }
@@ -217,6 +219,7 @@ class EditableTable extends React.Component {
                 }
             })
         }
+        this.setState({count: count + 1})
         this.props.config.setValue([...dataSource, newData])
         this.props.onChange()
     };
