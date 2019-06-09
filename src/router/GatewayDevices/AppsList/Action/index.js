@@ -288,13 +288,13 @@ class Action extends Component {
                   </Button>
                   <Popconfirm
                       disabled={this.state.running_action || actionSwi}
-                      title="Are you sure update this app?"
+                      title="确定要卸载此应用吗?"
                       onConfirm={()=>{
                           this.confirm(record, this.props.match.params.sn, this)
                       }}
                       onCancel={cancel}
-                      okText="Yes"
-                      cancelText="No"
+                      okText="是"
+                      cancelText="否"
                   >
                       <Button
                           disabled={this.state.running_action || actionSwi}
