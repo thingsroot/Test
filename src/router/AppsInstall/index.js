@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';     //
-import {Input, Icon, Button, message, notification, Rate, Drawer } from 'antd';  //
+import {Input, Icon, Button, message, notification, Rate, Modal } from 'antd';  //
 import { inject, observer} from 'mobx-react';
 import Status from '../../common/status';
 import http from '../../utils/Server';
 import ReactMarkdown from 'react-markdown'
 import './style.scss';
-import Nav from './Nav';
+import GatewaysDrawer from './GatewaysDrawer';
 import AppConfig from './AppConfig'
 import LazyLoad from 'react-lazy-load';
 import {ConfigStore} from '../../utils/app_config'
@@ -39,7 +39,8 @@ class MyGatesAppsInstall extends Component {
         config: [],
         gateway_list_visible: false,
         install_btn_disabled: false,
-        configStore: new ConfigStore()
+        configStore: new ConfigStore(),
+        showLinkSelection: false
     };
 
     componentDidMount (){
@@ -60,22 +61,25 @@ class MyGatesAppsInstall extends Component {
                     this.setState({app_info: res.data})
                 })
             } else {
-                http.get('/api/store_list').then(res=>{
-                    this.setState({
-                        app_list: res.data,
-                        app_show: res.data
-                    })
-                    if (this.state.app && this.state.install_step === 'view') {
-                        let item = res.data.find(item => item.name === this.state.app)
-                        if (item) {
-                            this.setState({
-                                app_info: item
-                            })
-                        }
-                    }
-                });
+               this.fetchStoreApps()
             }
         })
+    }
+    fetchStoreApps () {
+        http.get('/api/store_list').then(res=>{
+            this.setState({
+                app_list: res.data,
+                app_show: res.data
+            })
+            if (this.state.app && this.state.install_step === 'view') {
+                let item = res.data.find(item => item.name === this.state.app)
+                if (item) {
+                    this.setState({
+                        app_info: item
+                    })
+                }
+            }
+        });
     }
 
     searchApp (value){
@@ -135,9 +139,7 @@ class MyGatesAppsInstall extends Component {
                 this.appInstall(params, sn)
             } else {
                 message.error('应用暂时没有版本，无法安装！');
-                this.setState({
-                    install_btn_disabled: false
-                })
+                this.setState({ install_btn_disabled: false })
             }
         }).catch(err=> {
             err;
@@ -156,27 +158,19 @@ class MyGatesAppsInstall extends Component {
                 }
                 this.props.store.action.pushAction(res.data, '网关' + sn + '安装应用' + params.inst, '', info, 10000,  (result)=> {
                     if (result) {
-                        this.setState({
-                            install_step: ''
-                        })
+                        this.setState({ showLinkSelection: true })
                     } else {
-                        this.setState({
-                            install_btn_disabled: false
-                        });
+                        this.setState({ install_btn_disabled: false });
                     }
                 })
             } else {
-                this.setState({
-                    install_btn_disabled: false
-                });
+                this.setState({ install_btn_disabled: false });
                 openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
             }
         }).catch( (err)=> {
             err;
             openNotification('提交任务失败', '网关' + sn + '安装' + params.inst + '应用.')
-            this.setState({
-                install_btn_disabled: false
-            });
+            this.setState({ install_btn_disabled: false });
         })
     };
 
@@ -234,11 +228,14 @@ class MyGatesAppsInstall extends Component {
             gateway_list_visible: true
         })
     };
+    onChangeGateway = () => {
+        this.componentDidMount()
+    }
 
     render () {
-        const { gateway_sn, app_show, install_step, app_inst, app_info } = this.state;
+        const { gateway_sn, app_show, install_step, app_inst, app_info, showLinkSelection } = this.state;
         return (<div>
-            <Status />
+            <Status gateway={this.state.gateway_sn}/>
                 <div className="AppInstall">
                     <Button
                         type="primary"
@@ -247,16 +244,56 @@ class MyGatesAppsInstall extends Component {
                     >
                         <Icon type="swap"/><br />
                     </Button>
-                    <Drawer
-                        title="网关列表"
-                        placement="left"
-                        closable={false}
+                    <GatewaysDrawer
                         onClose={this.onClose}
+                        onChange={this.onChangeGateway}
                         visible={this.state.gateway_list_visible}
-                        width="400"
+                    ></GatewaysDrawer>
+                    <Modal
+                        visible={showLinkSelection}
+                        title="快捷选择"
+                        closable={false}
+                        keyboard
+                        onCancel={()=>{
+                            this.setState({install_step: 'view', showLinkSelection: false})
+                        }}
+                        footer={[
+                            // <Button key="back" onClick={this.handleCancel}>
+                            // Return
+                            // </Button>,
+                            // <Button key="submit" type="primary" loading={loading} onClick={this.handleOk}>
+                            // Submit
+                            // </Button>,
+                        ]}
                     >
-                        <Nav> </Nav>
-                    </Drawer>
+                        <Button
+                            shape="round"
+                            icon="download"
+                            onClick={()=>{
+                                this.setState({gateway_list_visible: true, showLinkSelection: false})
+                            }}
+                        >
+                            安装到其他网管
+                        </Button>
+                        <Button
+                            shape="round"
+                            icon="download"
+                            onClick={()=>{
+                                this.setState({install_step: '', showLinkSelection: false})
+                                if (this.state.app_list === undefined || this.state.app_list.length === 0) {
+                                    this.fetchStoreApps()
+                                }
+                            }}
+                        >
+                            继续安装其他应用
+                        </Button>
+                        <Button type="primary"
+                            shape="round"
+                            icon="download"
+                        >
+                            <Link to={`/mygatesdevices/${gateway_sn}/appslist`}> 查看应用列表 </Link>
+                        </Button>
+                    </Modal>
                     <div className={install_step === '' ? 'hide appsdetail' : 'show appsdetail'}>
                     <Button
                         className="installbtn"
@@ -285,10 +322,13 @@ class MyGatesAppsInstall extends Component {
                                     this.setState({
                                         install_step: ''
                                     })
+                                    if (this.state.app_list === undefined || this.state.app_list.length === 0) {
+                                        this.fetchStoreApps()
+                                    }
                                 }}
                             />
                         </Link>
-                        <h2 style={{borderBottom: '1px solid #ccc', padding: 10}}>{app_info.app_name}</h2>
+                        <h2 style={{borderBottom: '1px solid #ccc', padding: 10}}>安装 {app_info.app_name} 到 {this.state.gateway_sn}</h2>
                         <div className={install_step !== 'install' ? 'show' : 'hide'}>
                             <div style={{display: 'flex' }}>
                                 {
@@ -354,7 +394,7 @@ class MyGatesAppsInstall extends Component {
                                    }}
                                />
                            </div>
-                       </div>
+                        </div>
                         <div className="installcontent">
                             {
                                 app_show && app_show.length > 0 && app_show.map((val, ind)=>{

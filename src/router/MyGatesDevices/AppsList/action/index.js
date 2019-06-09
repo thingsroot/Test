@@ -166,8 +166,8 @@ class Action extends Component {
               version: Number(record.version)
           }).then(res=>{
               if (res.ok){
-                  if (res.message){
-                      this.props.history.push('/AppEditorCode/' + res.message.name + '/' + res.message.app_name);
+                  if (res.data){
+                      this.props.history.push('/AppEditorCode/' + res.data.name + '/' + res.data.app_name);
                       this.setState({appdebug: false})
                   }
               } else {

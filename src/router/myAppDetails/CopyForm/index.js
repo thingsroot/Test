@@ -66,7 +66,7 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                                 message.success('更新模板信息成功！');
                                 http.get('/api/user_configurations_list?app=' + params.app)
                                     .then(res=>{
-                                        this.props.store.codeStore.setTemplateList(res.message)
+                                        this.props.store.codeStore.setTemplateList(res.data)
                                     });
                             } else {
                                 message.error('更新模板信息失败！');

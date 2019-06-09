@@ -205,17 +205,19 @@ class MyGates extends Component {
 
     refreshDevicesList (num){
         let status = this.state.status;
-        http.get('/api/gateway_list?status=' + status).then(res=>{
-            const data = status + 'data';
-            const datas = status + 'datas';
-            this.setState({
-                loading: false,
-                [data]: res.message
-            });
-            if (num === 0) {
+        http.get('/api/gateways_list?status=' + status).then(res=>{
+            if (res.ok) {
+                const data = status + 'data';
+                const datas = status + 'datas';
                 this.setState({
-                    [datas]: res.message
-                })
+                    loading: false,
+                    [data]: res.data
+                });
+                if (num === 0) {
+                    this.setState({
+                        [datas]: res.data
+                    })
+                }
             }
         })
     }

@@ -94,7 +94,7 @@ class LinkStatus extends Component {
                         name: '数值',
                         type: 'line',
                         color: '#37A2DA',
-                        data: res.message
+                        data: res.data
                     }
                     ]
                 });
@@ -126,7 +126,7 @@ class LinkStatus extends Component {
                         name: '数值',
                         type: 'line',
                         color: '#37A2DA',
-                        data: res.message
+                        data: res.data
                     }
                     ]
                 });

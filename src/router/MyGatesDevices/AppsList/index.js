@@ -159,12 +159,12 @@ class AppsList extends Component {
           enable_beta = 0
         }
         http.get('/api/gateways_app_list?gateway=' + sn + '&beta=' + enable_beta).then(res=>{
-          this.props.store.appStore.setApplen(res.message && res.message.length)
           if (res.ok){
+            this.props.store.appStore.setApplen(res.data && res.data.length)
             this.setState({
-              data: res.message,
-              loading: false,
-              pagination
+                data: res.data,
+                loading: false,
+                pagination
             })
           } else {
             this.setState({

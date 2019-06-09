@@ -20,31 +20,31 @@ let myFaultTypeChart;
       visible: false,
       barData: [],
       columns: [
-                { title: '类型', dataIndex: 'vt', key: 'vt' },
-                { title: '名称', dataIndex: 'name', key: 'name' },
-                { title: '描述', dataIndex: 'desc', key: 'desc'},
-                { title: '单位', dataIndex: 'upgradeNum', key: 'upgradeNum' },
-                { title: '数值', dataIndex: 'pv', key: 'pv', render (text) {
-                  return (<span title={text}>{text}</span>)
-                }},
-                { title: '时间', dataIndex: 'tm', key: 'tm' },
-                { title: '质量戳', dataIndex: 'q', key: 'q' },
-                {
-                  title: '操作',
-                  dataIndex: 'operation',
-                  key: 'operation',
-                  render: (record, props) => {
-                    return (
-                      <span className="table-operation">
-                        <Button onClick={()=>{
-                          this.showModal(props)
-                        }}
-                        >浏览数据</Button>
-                      </span>
-                    )
-                  }
-                }
-              ]
+        { title: '类型', dataIndex: 'vt', key: 'vt' },
+        { title: '名称', dataIndex: 'name', key: 'name' },
+        { title: '描述', dataIndex: 'desc', key: 'desc'},
+        { title: '单位', dataIndex: 'upgradeNum', key: 'upgradeNum' },
+        { title: '数值', dataIndex: 'pv', key: 'pv', render (text) {
+          return (<span title={text}>{text}</span>)
+        }},
+        { title: '时间', dataIndex: 'tm', key: 'tm' },
+        { title: '质量戳', dataIndex: 'q', key: 'q' },
+        {
+          title: '操作',
+          dataIndex: 'operation',
+          key: 'operation',
+          render: (record, props) => {
+            return (
+              <span className="table-operation">
+                <Button onClick={()=>{
+                  this.showModal(props)
+                }}
+                >浏览数据</Button>
+              </span>
+            )
+          }
+        }
+      ]
     }
     componentDidMount (){
       myFaultTypeChart = null;
@@ -101,17 +101,20 @@ let myFaultTypeChart;
         _: new Date() * 1
       }
       http.get(`/api/gateways_historical_data?sn=${data.sn}&vsn=${data.vsn}&tag=${data.name}&vt=${data.vt}&time_condition=time > now() - 10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+        if (!res.ok) {
+          return
+        }
         const { myCharts } = this.refs;
         let data = [];
         const date = new Date() * 1;
-        const length = res.message.length > 120 ? 120 : res.message.length
+        const length = res.data.length > 120 ? 120 : res.data.length
         for (var i = 0;i < length;i++){
           const hours = new Date(date - (i * 5000)).getHours()
           const min = new Date(date - (i * 5000)).getMinutes()
           const seconds = new Date(date - (i * 5000)).getSeconds();
           data.unshift(hours + ':' + (min < 10 ? '0' + min : min) + ':' + (seconds < 10 ? '0' + seconds : seconds));
         }
-        if (res.message && res.message.length > 0 && this.state.record.vt !== 'string') {
+        if (res.data && res.data.length > 0 && this.state.record.vt !== 'string') {
           myFaultTypeChart = echarts.init(myCharts);
           myFaultTypeChart.setOption({
               tooltip: {
@@ -129,7 +132,7 @@ let myFaultTypeChart;
                   name: '数值',
                   type: 'line',
                   color: '#37A2DA',
-                  data: res.message
+                  data: res.data
                 }
               ]
           });

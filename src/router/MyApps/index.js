@@ -55,9 +55,11 @@ class MyApps extends Component {
                 })
             }
         });
-        http.get('/api/gateway_list?status=online')
+        http.get('/api/gateways_list?status=online')
             .then(res=>{
-                this.props.store.codeStore.setFirstGateway(res.message[0].name)
+                if (res.ok) {
+                    this.props.store.codeStore.setFirstGateway(res.data[0].name)
+                }
             });
     }
     tick = (text)=>{

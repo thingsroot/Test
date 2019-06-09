@@ -15,13 +15,13 @@ class Status extends Component {
         }
     }
     componentDidMount (){
-        this.setState({gateway: this.props.match.params.sn})
+        this.setState({gateway: this.props.gateway})
         this.gatewayRead()
         this.startTimer()
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
-        if (nextProps.location.pathname !== this.props.location.pathname) {
-            this.setState({gateway: nextProps.match.params.sn})
+        if (nextProps.gateway !== this.state.gateway) {
+            this.setState({gateway: nextProps.gateway})
             this.gatewayRead()
         }
     }
@@ -43,28 +43,34 @@ class Status extends Component {
     }
     gatewayRead (){
         http.get('/api/gateways_read?name=' + this.state.gateway).then(res=>{
-            this.props.store.appStore.setStatus(res)
-        })
+            if (res.ok) {
+                if (res.data.sn !== this.state.gateway) {
+                    console.log('Delayed data arrived!!', res.data)
+                    return
+                }
+                this.props.store.gatewayInfo.updateStatus(res.data);
+            }
+        });
     }
     render () {
-        const { status } = this.props.store.appStore;
+        const { device_status, dev_name, description } = this.props.store.gatewayInfo;
         return (
             <div className="statusWrap">
                 <div>
                     <div className="status"></div>
-                    &nbsp; <span className={status.device_status === 'ONLINE' ? 'online' : 'offline'}>{status.device_status}</span>
+                    &nbsp; <span className={device_status === 'ONLINE' ? 'online' : 'offline'}>{device_status ? device_status : 'OFFLINE'}</span>
                 </div>
                 <div>
                     <div className="positon"><span></span></div>
-                    &nbsp;名称: {status.name}
+                    &nbsp;名称: {dev_name ? dev_name : ''}
                 </div>
                 <div>
                     <div className="positon"><span></span></div>
-                    &nbsp;描述: {status.description}
+                    &nbsp;描述: {description ? description : ''}
                 </div>
                 <div>
                     <div className="positon"><span></span></div>
-                    &nbsp;序号: {status.sn}
+                    &nbsp;序号: {this.state.gateway}
                 </div>
                     {
                         this.props.location.pathname.indexOf('/appsinstall') === -1

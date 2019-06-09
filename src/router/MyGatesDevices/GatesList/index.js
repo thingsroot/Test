@@ -87,10 +87,11 @@ class GatesList extends Component {
       clearInterval(this.timer)
     }
     getData (sn){
-        http.get('/api/gateways_dev_list?gateway=' + sn).then(res=>{
-            let data = [];
-          if (res.message && res.message.length > 0){
-            res.message.map((item=>{
+      http.get('/api/gateways_dev_list?gateway=' + sn).then(res=>{
+        if (res.ok) {
+          let data = [];
+          if (res.data && res.data.length > 0){
+            res.data.map((item=>{
               item.meta.ioc = '' + (item.inputs ? item.inputs.length : '0') + '/' + (item.outputs ? Object.keys(item.outputs).length : '0') + '/' + (item.commands ? item.commands.length : '0');
               if (item.meta.outputs > 0){
                 item.meta.Gate_Sn = this.props.match.params.sn;
@@ -101,11 +102,12 @@ class GatesList extends Component {
           }
           this.setState({
             data,
-            devList: res.message,
+            devList: res.data,
             loading: false
           })
           this.props.store.appStore.dev_list = data;
-        })
+        }
+      })
     }
     render () {
         let { data, loading } = this.state;
