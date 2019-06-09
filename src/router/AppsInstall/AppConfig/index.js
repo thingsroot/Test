@@ -351,23 +351,23 @@ class AppConfig extends Component {
                         ref="content"
                         style={errorCode === false ? block : none}
                     >
-                        {
-                            configStore.sections && configStore.sections.length > 0 && configStore.sections.map((v, key) => {
-                                return (
-                                    <AppConfigSection
-                                        key={key}
-                                        app_info={this.state.app_info}
-                                        configStore={configStore}
-                                        configSection={v}
-                                        templatesSource={this.state.appTemplateList}
-                                        refreshTemplateList={this.refreshTemplateList}
-                                        onChange={()=>{
-                                            this.onConfigChange()
-                                        }}
-                                    />
-                                )
-                            })
-                        }
+                    {
+                        configStore.sections && configStore.sections.length > 0 && configStore.sections.map((v, key) => {
+                            return (
+                                <AppConfigSection
+                                    key={key}
+                                    app_info={this.state.app_info}
+                                    configStore={configStore}
+                                    configSection={v}
+                                    templatesSource={this.state.appTemplateList}
+                                    refreshTemplateList={this.refreshTemplateList}
+                                    onChange={()=>{
+                                        this.onConfigChange()
+                                    }}
+                                />
+                            )
+                        })
+                    }
                     </div>
                     <div
                         style={errorCode === false ? none : block}
@@ -393,30 +393,36 @@ class AppConfig extends Component {
                     key="json"
                 >
                     <Inst
-                        sn={this.props.dev_sn}
+                        name={name}
+                        inst_name={app_inst}
+                        editable={inst_editable}
+                        gateway_sn={gateway_sn}
+                        onChange={(value) =>{
+                            this.setState({ app_inst: value })
+                        }}
                     />
-                        <AceEditor
-                            placeholder="Placeholder Text"
-                            mode="json"
-                            theme="monokai"
-                            name="config_json_editor"
-                            onChange={(value) => {
-                                this.onJsonChange(value)
-                            }}
-                            fontSize={14}
-                            showPrintMargin
-                            showGutter
-                            highlightActiveLine
-                            value={this.state.configValue}
-                            style={{width: '100%'}}
-                            setOptions={{
-                                enableBasicAutocompletion: false,
-                                enableLiveAutocompletion: false,
-                                enableSnippets: false,
-                                showLineNumbers: true,
-                                tabSize: 2
-                            }}
-                        />
+                    <AceEditor
+                        placeholder="Placeholder Text"
+                        mode="json"
+                        theme="monokai"
+                        name="config_json_editor"
+                        onChange={(value) => {
+                            this.onJsonChange(value)
+                        }}
+                        fontSize={14}
+                        showPrintMargin
+                        showGutter
+                        highlightActiveLine
+                        value={this.state.configValue}
+                        style={{width: '100%'}}
+                        setOptions={{
+                            enableBasicAutocompletion: false,
+                            enableLiveAutocompletion: false,
+                            enableSnippets: false,
+                            showLineNumbers: true,
+                            tabSize: 2
+                        }}
+                    />
                     <br/>
                     <Button
                         type="primary"
