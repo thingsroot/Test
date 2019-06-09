@@ -49,7 +49,7 @@ const columns = [{
   @withRouter
   @inject('store')
   @observer
-class OutputList extends Component {
+class DevicesList extends Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
@@ -64,22 +64,19 @@ class OutputList extends Component {
         devList: []
     }
     componentDidMount (){
-      this.timer = setInterval(() => {
+      this.setState({sn: this.props.match.params.sn}, ()=>{
         this.getData(this.state.sn);
-      }, 3000);
+      })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
       if (nextProps.location.pathname !== this.props.location.pathname){
         clearInterval(this.timer)
-        this.timer = setInterval(() => {
-          this.getData(this.state.sn);
-        }, 3000);
         const sn = nextProps.match.params.sn;
         this.setState({
             sn,
             loading: true
         }, ()=>{
-            this.getData(sn);
+            this.getData(this.state.sn);
         });
       }
     }
@@ -128,4 +125,4 @@ class OutputList extends Component {
     }
 }
 
-export default OutputList;
+export default DevicesList;

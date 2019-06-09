@@ -18,13 +18,13 @@ import './style.scss';
 //     }
 //   });
 // };
-let timer;
 @withRouter
 @inject('store')
 @observer
 class AppsList extends Component {
       constructor (props){
         super(props)
+        this.timer = undefined
         this.state = {
           data: [],
           pagination: {},
@@ -33,6 +33,7 @@ class AppsList extends Component {
           edit_app_info: {},
           edit_app_inst: '',
           show_app_config: false,
+          gateway_sn: '',
           url: window.location.pathname,
           columns: [{
             title: '',
@@ -110,33 +111,25 @@ class AppsList extends Component {
       }
       }
       componentDidMount () {
-        this.fetch(this.props.match.params.sn);
-        timer = setInterval(() => {
-          this.fetch(this.props.match.params.sn)
-        }, 10000);
-
-        let enable_beta = this.props.store.appStore.status.enable_beta
-        if (enable_beta === undefined) {
-          setTimeout(()=>{
-            this.fetch(this.props.match.params.sn);
-          }, 1000)
-        }
+        this.setState({gateway_sn: this.props.match.params.sn}, () =>{
+          this.fetch();
+          this.timer = setInterval(() => {
+            this.fetch()
+          }, 10000);
+        })
       }
       UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
-        clearInterval(timer);
-        timer = setInterval(() => {
-          this.fetch(nextProps.match.params.sn)
-        }, 10000);
-        this.setState({
-          loading: true
-        }, ()=>{
-          this.fetch(nextProps.match.params.sn);
-        })
+          this.setState({
+            loading: true,
+            gateway_sn: this.props.match.params.sn
+          }, ()=>{
+            this.fetch();
+          })
         }
       }
       componentWillUnmount (){
-        clearInterval(timer)
+        clearInterval(this.timer)
       }
       // handleTableChange = (pagination, filters) => {
       //   const pager = { ...this.state.pagination };
@@ -152,13 +145,13 @@ class AppsList extends Component {
       //     ...filters
       //   });
       // }
-      fetch = (sn) => {
+      fetch = () => {
         const pagination = { ...this.state.pagination };
         let enable_beta = this.props.store.appStore.status.enable_beta
         if (enable_beta === undefined) {
           enable_beta = 0
         }
-        http.get('/api/gateways_app_list?gateway=' + sn + '&beta=' + enable_beta).then(res=>{
+        http.get('/api/gateways_app_list?gateway=' + this.state.gateway_sn + '&beta=' + enable_beta).then(res=>{
           if (res.ok){
             this.props.store.appStore.setApplen(res.data && res.data.length)
             this.setState({
@@ -178,7 +171,7 @@ class AppsList extends Component {
 
     onSubmitAppConfig = (app_inst, app_info, configuration)=>{
       app_info, configuration;
-      let gateway_sn = this.props.match.params.sn;
+      let gateway_sn = this.state.gateway_sn
       const { edit_app_inst } = this.state;
         if (edit_app_inst !== app_inst) {
             message.error('应用实例不存在！');
@@ -212,17 +205,17 @@ class AppsList extends Component {
       })
     }
     render () {
-      let gateway_sn = this.props.match.params.sn;
-      const { loading, show_app_config, edit_app_inst, edit_app_conf, edit_app_info, configStore } = this.state;
+      const { loading, gateway_sn, data, pagination } = this.state
+      const { show_app_config, edit_app_inst, edit_app_conf, edit_app_info, configStore } = this.state;
         return (
             <div>
                 <div className={show_app_config ? 'hide' : 'show'}>
-                    {console.log(this.state.data)}
+                    {console.log(data)}
                   <Table
                       rowKey="sn"
                       columns={this.state.columns}
-                      dataSource={this.state.data && this.state.data.length > 0 ? this.state.data : []}
-                      pagination={this.state.pagination}
+                      dataSource={data && data.length > 0 ? data : []}
+                      pagination={pagination}
                       loading={loading}
                       onChange={this.handleTableChange}
                       bordered
@@ -232,7 +225,7 @@ class AppsList extends Component {
                           <Action
                               record={record}
                               getconfig={this.getConfig}
-                              update_app_list={this.fetch.bind(this, this.props.match.params.sn)}
+                              update_app_list={this.fetch.bind(this)}
                               show_app_config={this.showAppConfig}
                           />
                         )

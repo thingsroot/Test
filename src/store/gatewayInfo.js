@@ -52,15 +52,17 @@ const dumpInstallApps = (data) => {
 }
 
 class GatewayInfo {
-    @observable install_apps = [] // Instance name list
-    @observable Net_Manager = false
-    @observable p2p_vpn = false
     @observable last_updated = ''
     @observable dev_name = ''
     @observable device_status = ''
     @observable sn = ''
     @observable description = ''
     @observable enabled = 0
+
+    @observable install_apps = [] // Instance name list
+    @observable Net_Manager = false
+    @observable p2p_vpn = false
+    @observable cpu = ''
     @observable data = new GatewayData()
 
     @action updateStatus (data) {

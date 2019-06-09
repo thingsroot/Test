@@ -22,15 +22,15 @@ function getMin (i, date) {
 @withRouter
 @inject('store')
 @observer
-class LinkStatus extends Component {
+class GatewaySettings extends Component {
     state = {
         title: '',
         config: {},
-        data: [],
+        address: '',
         opendata: [],
         newdata: [],
         loading: true,
-        sn: this.props.match.params.sn,
+        sn: '',
         upgrading: false,
         flag: true,
         DATA_UPLOAD_PERIOD: false,
@@ -39,25 +39,28 @@ class LinkStatus extends Component {
         COV_TTL_VALUE: 0,
         EVENT_UPLOAD: false,
         EVENT_UPLOAD_VALUE: 0,
-        iot_beta: 0,
-        use_beta: 0,
+        version: 0,
         skynet_version: 0,
         update: false,
         barData: []
     }
     componentDidMount (){
-      this.getData(this.props.match.params.sn);
+        this.setState({
+            sn: this.props.match.params.sn,
+            loading: true
+        }, ()=> {
+            this.getData();
+        })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-      if (nextProps.location.pathname !== this.props.location.pathname){
-        this.setState({
-            loading: true
-        })
-        setTimeout(() => {
-        const sn = nextProps.match.params.sn;
-            this.getData(sn);
-        }, 1000);
-      }
+        if (nextProps.location.pathname !== this.props.location.pathname){
+            this.setState({
+                sn: this.props.match.params.sn,
+                loading: true
+            }, ()=> {
+                this.getData();
+            })
+        }
     }
     componentWillUnmount () {
         window.removeEventListener('resize', this.resize, 20)
@@ -69,7 +72,8 @@ class LinkStatus extends Component {
         this.myFaultTypeChart2 && this.myFaultTypeChart2.resize();
     }
     getData (){
-        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+        const { sn } = this.state;
+        http.get(`/api/gateways_historical_data?sn=${sn}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
             let data = [];
             const date = new Date() * 1;
             for (var i = 0;i < 10;i++){
@@ -101,7 +105,7 @@ class LinkStatus extends Component {
                 window.addEventListener('resize', this.resize, 20);
                 }
         })
-        http.get(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+        http.get(`/api/gateways_historical_data?sn=${sn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
             let data = [];
             const date = new Date() * 1;
             for (var i = 0;i < 10;i++){
@@ -133,76 +137,80 @@ class LinkStatus extends Component {
                 window.addEventListener('resize', this.resize, 20);
                 }
         })
-        http.get('/api/gateways_read?name=' + this.props.match.params.sn).then(res=>{
-            this.props.store.appStore.setStatus(res)
-            axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
-                let config = res;
-                if (location.data.regeocode){
-                    config.address = location.data.regeocode.formatted_address;
-                } else {
-                    config.address = '- -';
-                }
-                this.setState({
-                    config,
-                    loading: false,
-                    DATA_UPLOAD_PERIOD_VALUE: this.props.store.appStore.status.data_upload_period,
-                    COV_TTL_VALUE: this.props.store.appStore.status.data_upload_cov_ttl,
-                    EVENT_UPLOAD_VALUE: this.props.store.appStore.status.event_upload
-                }, ()=>{
-                    http.get('/api/applications_versions_list?app=FreeIOE&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
-                        const arr = [];
-                        res.data && res.data.length > 0 && res.data.map(item=>{
-                            if (item.version > this.state.config.version){
-                                if (config.use_beta){
+        http.get('/api/gateways_read?name=' + sn).then(res=>{
+            if (!res.ok) {
+                message.error(res.error)
+                return
+            }
+            let config = res.data;
+
+            this.setState({
+                config: config,
+                loading: false,
+                DATA_UPLOAD_PERIOD_VALUE: config.data.data_upload_period,
+                COV_TTL_VALUE: config.data.data_upload_cov_ttl,
+                EVENT_UPLOAD_VALUE: config.data.event_upload
+            }, ()=>{
+                const {data} = this.state.config
+                http.get('/api/applications_versions_list?app=FreeIOE&beta=' + (data.enable_beta ? 1 : 0)).then(res=>{
+                    const arr = [];
+                    res.data && res.data.length > 0 && res.data.map(item=>{
+                        if (item.version > data.version){
+                            if (data.enable_beta){
+                                arr.push(item)
+                            } else {
+                                if (item.beta === 0){
                                     arr.push(item)
-                                } else {
-                                    if (item.beta === 0){
-                                        arr.push(item)
-                                    }
                                 }
                             }
-                        })
-                        this.setState({
-                            newdata: arr
-                        })
+                        }
                     })
-                    http.get('/api/applications_versions_list?app=' + this.state.config.platform + '_skynet&beta=' + (this.state.config.enable_beta ? 1 : 0)).then(res=>{
-                        const arr = [];
-                        res.data && res.data.length > 0 && res.data.map(item=>{
-                            if (item.version > this.state.config.skynet_version){
-                                if (config.enable_beta){
-                                    arr.push(item)
-                                } else {
-                                    if (item.beta === 0){
-                                        arr.push(item)
-                                    }
-                                }
-                            }
-                        })
-                        this.setState({
-                            opendata: arr
-                        })
-                    })
-                })
-            })
-            this.setState({use_beta: this.state.config.enable_beta}, ()=>{
-                http.get('/api/applications_versions_latest?app=freeioe&beta=' + (this.props.store.appStore.status.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
-                        iot_beta: res.data
+                        newdata: arr
                     })
                 })
-                http.get('/api/applications_versions_latest?app=' + this.props.store.appStore.status.platform + '_skynet&beta=' + (this.props.store.appStore.status.enable_beta ? 1 : 0)).then(res=>{
+                http.get('/api/applications_versions_list?app=' + data.platform + '_skynet&beta=' + (data.enable_beta ? 1 : 0)).then(res=>{
+                    const arr = [];
+                    res.data && res.data.length > 0 && res.data.map(item=>{
+                        if (item.version > data.skynet_version){
+                            if (data.enable_beta){
+                                arr.push(item)
+                            } else {
+                                if (item.beta === 0){
+                                    arr.push(item)
+                                }
+                            }
+                        }
+                    })
+                    this.setState({
+                        opendata: arr
+                    })
+                })
+                http.get('/api/applications_versions_latest?app=freeioe&beta=' + (data.enable_beta ? 1 : 0)).then(res=>{
+                    this.setState({
+                        version: res.data
+                    })
+                })
+                http.get('/api/applications_versions_latest?app=' + data.platform + '_skynet&beta=' + (data.enable_beta ? 1 : 0)).then(res=>{
                     this.setState({
                         skynet_version: res.data
                     })
                 })
             })
+            axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + res.longitude + ',' + res.latitude).then(location=>{
+                if (location.data.regeocode){
+                    this.setState({address: location.data.regeocode.formatted_address});
+                } else {
+                    this.setState({address: '- -'});
+                }
+            })
         })
     }
     setConfig (record, config){
         if (!config) {
-            http.post('/api/gateways_applications_install', {
-                gateway: this.props.match.params.sn,
+            const { sn } = this.state;
+            let params = {
+                gateway: sn,
                 inst: record,
                 app: record ===  'Network' ? 'network_uci' : 'frpc',
                 version: 'latest',
@@ -210,42 +218,32 @@ class LinkStatus extends Component {
                     auto_start: true,
                     enable_web: true
                 },
-                id: `installapp/${this.props.match.params.sn}/${record}/${new Date() * 1}`
-            }).then(res=>{
-                if (res.data){
-                    this.timer = setTimeout(() => {
-                        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                            if (result.data){
-                                if (result.data.result) {
-                                    message.success('开启成功')
-                                } else {
-                                    message.error('开启失败')
-                                }
-                                clearInterval(this.timer)
-                            }
-                        })
-                    }, 1000);
+                id: `installapp/${sn}/${record}/${new Date() * 1}`
+            }
+            http.post('/api/gateways_applications_install', params).then(res=>{
+                if (res.ok) {
+                    message.info('功能开启请求成功. 等待网关响应!')
+                    this.props.store.action.pushAction(res.data, '功能开启', '', params, 10000,  ()=> {
+                      this.getData();
+                    })
+                } else {
+                    message.error(res.error)
                 }
             })
         } else {
-            http.post('/api/gateways_applications_remove', {
+            let params = {
                 gateway: this.props.match.params.sn,
                 inst: record,
                 id: `removeapp/${this.props.match.params.sn}/${record}/${new Date() * 1}`
-            }).then(res=>{
-                if (res.data) {
-                    this.timer1 = setTimeout(() => {
-                        http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                            if (result.data){
-                                if (result.data.result) {
-                                    message.success('关闭成功')
-                                } else {
-                                    message.error('关闭失败')
-                                }
-                                clearInterval(this.timer1)
-                            }
-                        })
-                    }, 1000);
+            }
+            http.post('/api/gateways_applications_remove', params).then(res=>{
+                if (res.ok) {
+                    message.info('功能关闭请求成功. 等待网关响应!')
+                    this.props.store.action.pushAction(res.data, '功能关闭', '', params, 10000,  ()=> {
+                      this.getData();
+                    })
+                } else {
+                    message.error(res.error)
                 }
             })
         }
@@ -275,91 +273,78 @@ class LinkStatus extends Component {
                 }, 1000);
             }
         })
-      }
-      restart (url){
-        const data = {
-            id: `gateways/${url}/${this.props.match.params.sn}/${new Date() * 1}`,
-            name: this.props.match.params.sn
-        }
-        http.postToken('/api/gateways_' + url, data).then(res=>{
-            if (res.ok){
-                message.success('重启成功，请稍等...')
-                if (url === 'restart') {
-                    let no_gap_time = 10000; // 10 seconds
-                    setTimeout(()=>{
-                        this.props.store.timer.setGateStatusNoGapTime(no_gap_time)
-                    }, 5000)
-                }
-            } else {
-                message.error('重启失败，请重试...')
+    }
+    restart (url){
+    const data = {
+        id: `gateways/${url}/${this.state.sn}/${new Date() * 1}`,
+        name: this.state.sn
+    }
+    http.postToken('/api/gateways_' + url, data).then(res=>{
+        if (res.ok){
+            message.success('重启成功，请稍等...')
+            if (url === 'restart') {
+                let no_gap_time = 10000; // 10 seconds
+                setTimeout(()=>{
+                    this.props.store.timer.setGateStatusNoGapTime(no_gap_time)
+                }, 5000)
             }
-        })
-      }
-      changeState  = (name)=> {
-          // const data = Object.assign(this.state.config, {[name]: !this.state.config[name]});
-          const { config } = this.state;
-          const data = Object.assign({}, config, {[name]: !config[name]});
+        } else {
+            message.error('重启失败，请重试...')
+        }
+    })
+    }
+    changeState  = (name)=> {
+        // const data = Object.assign(this.state.config, {[name]: !this.state.config[name]});
+        const { config } = this.state;
+        const data = Object.assign({}, config, {[name]: !config[name]});
         this.setState({
             config: data
         })
-      }
-        onChange (value, type) {
-            this.setState({[type]: value})
-      }
-      buttonOnclick (value, type){
-          if (type === 'EVENT_UPLOAD'){
-              http.post('/api/gateways_enable_event', {
-                  name: this.props.match.params.sn,
-                  min_level: this.state[value],
-                  id: `enable_event/${this.props.match.params.sn}/min${value}/${new Date() * 1}`
-              }).then(res=>{
+    }
+    onChange (value, type) {
+        this.setState({[type]: value})
+    }
+    buttonOnclick (value, type){
+        if (type === 'EVENT_UPLOAD'){
+            let params = {
+                name: this.state.sn,
+                min_level: this.state[value],
+                id: `enable_event/${this.state.sn}/min${value}/${new Date() * 1}`
+            }
+            http.post('/api/gateways_enable_event', params).then(res=>{
                 message.success('发送更改事件上送等级请求成功')
-                // this.timer = setTimeout(() => {
-                //     http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                //         if (result.data){
-                //             if (result.data.result) {
-                //                 message.success('更改事件上送等级成功')
-                //             } else {
-                //                 message.error('更改事件上送等级失败')
-                //             }
-                //             clearInterval(this.timer)
-                //         }
-                //     })
-                // }, 1000);
-                let info = {
-                    gateway: this.props.match.params.sn,
-                    min_level: this.state[value]
+                if (res.ok) {
+                    this.props.store.action.pushAction(res.data, '更改事件上送等级', '', params, 5000)
+                } else {
+                    message.success('发送更改事件上送等级请求失败：' + res.error)
                 }
-                this.props.store.action.pushAction(res.data, '更改事件上送等级', '', info, 5000)
-              }).catch(err=>{
+            }).catch(err=>{
                 message.success('发送更改事件上送等级请求失败：' + err)
-              })
-          } else {
-            http.post('/api/gateways_cloud_conf', {
-                name: this.props.match.params.sn,
+            })
+        } else {
+            let params = {
+                name: this.state.sn,
                 data: {
                     [type]: this.state[value]
                 },
-                id: `set${type}/${this.props.match.params.sn}/min${value}/${new Date() * 1}`
-            }).then(res=>{
-                this.timer = setTimeout(() => {
-                    http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                        if (result.data){
-                            if (result.data.result) {
-                                message.success('更改设置成功')
-                            } else {
-                                message.error('更改设置失败')
-                            }
-                            clearInterval(this.timer)
-                        }
-                    })
-                }, 1000);
+                id: `set${type}/${this.state.sn}/min${value}/${new Date() * 1}`
+            }
+            http.post('/api/gateways_cloud_conf', params).then(res=>{
+                message.success('更改设置成功请求成功')
+                if (res.ok) {
+                    this.props.store.action.pushAction(res.data, '更改设置', '', params, 5000)
+                } else {
+                    message.success('更改设置失败:' + res.error)
+                }
+            }).catch(err=>{
+                message.success('更改设置成功请求失败：' + err)
             })
-          }
-      }
+        }
+    }
     render () {
-        const { status, actionSwi } = this.props.store.appStore;
-        const {  upgrading, flag, title, update, config, newdata, opendata, loading, DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, EVENT_UPLOAD, EVENT_UPLOAD_VALUE } = this.state;
+        const { actionSwi } = this.props.store.appStore;
+        const {  upgrading, flag, title, update, config, newdata, opendata, loading
+            , DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, EVENT_UPLOAD, EVENT_UPLOAD_VALUE } = this.state;
         return (
             <div className="settings">
                 <div className={flag && !update ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
@@ -380,22 +365,22 @@ class LinkStatus extends Component {
                                 style={{ width: '100%' }}
                                 loading={loading}
                             >
-                            <p><b>序列号：</b>{status.sn}</p>
+                            <p><b>序列号：</b>{config.sn}</p>
                             <p><b>位置：</b> {config.address} </p>
-                            <p><b>名称：</b>{status.dev_name}</p>
-                            <p><b>描述：</b>{status.description}</p>
-                            <p><b>型号：</b>{status.model ? status.model : 'Q102'}</p>
+                            <p><b>名称：</b>{config.dev_name}</p>
+                            <p><b>描述：</b>{config.description}</p>
+                            <p><b>型号：</b>{config.model ? config.model : 'Q102'}</p>
                             </Card>
                             <Card title="| 配置信息"
                                 bordered={false}
                                 style={{ width: '100%' }}
                                 loading={loading}
                             >
-                            <p><b>CPU:</b>{status.cpu}</p>
-                            <p><b>内存:</b>{status.ram}</p>
-                            <p><b>存储:</b>{status.rom}</p>
-                            <p><b>操作系统:</b>{status.os}</p>
-                            <p><b>核心软件:</b>{status.skynet_version}{this.state.skynet_version > status.skynet_version
+                            <p><b>CPU:</b>{config.cpu}</p>
+                            <p><b>内存:</b>{config.ram}</p>
+                            <p><b>存储:</b>{config.rom}</p>
+                            <p><b>操作系统:</b>{config.os}</p>
+                            <p><b>核心软件:</b>{config.data && config.data.skynet_version}{this.state.skynet_version > (config.data ? config.data.skynet_version : 0)
                             ? <Link
                                 to="#"
                                 style={{marginLeft: 200}}
@@ -403,7 +388,7 @@ class LinkStatus extends Component {
                                     this.setState({update: false, flag: false, title: 'openwrt x86_64_skynet'})
                                 }}
                               >发现新版本></Link> : ''}</p>
-                            <p><b>业务软件:</b>{status.version}{this.state.iot_beta > status.version
+                            <p><b>业务软件:</b>{config.data && config.data.version}{this.state.version >  (config.data ? config.data.version : 0)
                             ? <Link
                                 to="#"
                                 style={{marginLeft: 200}}
@@ -412,10 +397,10 @@ class LinkStatus extends Component {
                                 }}
                               >发现新版本></Link> : ''}</p>
                             {/* <p><b>公网IP:</b>{config.public_ip}</p> */}
-                            <p><b>调试模式:</b>{status.enable_beta === 1 ? '开启' : '关闭'}</p>
-                            <p><b>数据上传:</b>{status.data_upload ? '开启' : '关闭'}</p>
-                            <p><b>统计上传:</b>{status.stat_upload ? '开启' : '关闭'}</p>
-                            <p><b>日志上传:</b>{status.event_upload}</p>
+                            <p><b>调试模式:</b>{config.data && config.data.enable_beta === 1 ? '开启' : '关闭'}</p>
+                            <p><b>数据上传:</b>{config.data && config.data.data_upload ? '开启' : '关闭'}</p>
+                            <p><b>统计上传:</b>{config.data && config.data.stat_upload ? '开启' : '关闭'}</p>
+                            <p><b>日志上传:</b>{config.data && config.data.event_upload}</p>
                             </Card>
                         </div>
                     </div>
@@ -457,10 +442,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
-                                checked={status.enable_beta === 1}
+                                checked={config.data && config.data.enable_beta === 1}
                                 onChange={()=>{
-                                    this.setAutoDisabled('beta', status.enable_beta === 1)
-                                    status.enable_beta = status.enable_beta === 1 ? 0 : 1
+                                    this.setAutoDisabled('beta', config.data.enable_beta === 1)
+                                    config.data.enable_beta = config.data.enable_beta === 1 ? 0 : 1
                                 }}
                             />
                         </div>
@@ -471,10 +456,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
-                                checked={config.data_upload}
+                                checked={config.data && config.data.data_upload}
                                 onChange={()=>{
                                     this.changeState('data_upload')
-                                    this.setAutoDisabled('data', status.data_upload)
+                                    this.setAutoDisabled('data', config.data.data_upload)
                                 }}
                             />
                         </div>
@@ -553,10 +538,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
-                                checked={status.stat_upload}
+                                checked={config.data && config.data.stat_upload}
                                 onChange={()=>{
                                     this.changeState('stat_upload');
-                                    this.setAutoDisabled('stat', status.stat_upload)
+                                    this.setAutoDisabled('stat', config.data.stat_upload)
                                 }}
                             />
                         </div>
@@ -567,10 +552,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
-                                checked={status.Net_Manager}
+                                checked={config.Net_Manager}
                                 onChange={()=>{
                                     this.changeState('Net_Manager');
-                                    this.setConfig('Network', status.Net_Manager)
+                                    this.setConfig('Network', config.Net_Manager)
                                 }}
                             />
                         </div>
@@ -581,10 +566,10 @@ class LinkStatus extends Component {
                             <Switch
                                 checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
-                                checked={status.p2p_vpn}
+                                checked={config.p2p_vpn}
                                 onChange={()=>{
                                     this.changeState('p2p_vpn');
-                                    this.setConfig('ioe_frpc', status.p2p_vpn)
+                                    this.setConfig('ioe_frpc', config.p2p_vpn)
                                 }}
                             />
                         </div>
@@ -660,9 +645,9 @@ class LinkStatus extends Component {
                                         <div>
                                             <h3>FreeIOE</h3>
                                             <p>
-                                                {config.version < this.state.iot_beta
-                                                ? <span>{config.version} -> {this.state.iot_beta}</span>
-                                                : <span>{this.state.iot_beta}</span>
+                                                {config.version < this.state.version
+                                                ? <span>{config.version} -> {this.state.version}</span>
+                                                : <span>{this.state.version}</span>
                                             }</p>
                                         </div>
                                         {
@@ -678,13 +663,13 @@ class LinkStatus extends Component {
                                                     <h3>openwrt x86_64_skynet</h3>
                                                     <p>
                                                         {config.skynet_version < this.state.skynet_version ? <span>{config.skynet_version} -> {this.state.skynet_version}</span> : <span>{this.state.skynet_version}</span>}</p>
-                                                    <span>{title === 'FreeIOE' ? config.version === this.state.iot_beta ? '已经是最新版' : '可升级到最新版' : config.skynet_version === this.state.skynet_version ? '已经是最新版' : '可升级到最新版'}</span>
+                                                    <span>{title === 'FreeIOE' ? config.version === this.state.version ? '已经是最新版' : '可升级到最新版' : config.skynet_version === this.state.skynet_version ? '已经是最新版' : '可升级到最新版'}</span>
                                                 </div>
                                               </div>
                                         }
                                     </div>
                                     {
-                                        config.version < this.state.iot_beta || config.skynet_version < this.state.skynet_version
+                                        config.version < this.state.version || config.skynet_version < this.state.skynet_version
                                         ? <Button
                                             disabled={upgrading || actionSwi}
                                             onClick={()=>{
@@ -692,13 +677,13 @@ class LinkStatus extends Component {
                                                 ? {
                                                     name: this.props.match.params.sn,
                                                     skynet_version: this.state.skynet_version,
-                                                    version: this.state.iot_beta,
+                                                    version: this.state.version,
                                                     no_ack: 1,
                                                     id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
                                                 }
                                                 : {
                                                     name: this.props.match.params.sn,
-                                                    version: this.state.iot_beta,
+                                                    version: this.state.version,
                                                     no_ack: 1,
                                                     id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
                                                 }
@@ -779,4 +764,4 @@ class LinkStatus extends Component {
     }
 }
 
-export default LinkStatus;
+export default GatewaySettings;
