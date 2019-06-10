@@ -46,12 +46,11 @@ class CommandList extends Component {
         }]
     }
     componentDidMount (){
-        const data = this.props.commands;
-        this.setState({data})
+        this.setState({data: this.props.commands})
     }
     showModal = (record) => {
         this.setState({
-            record,
+            record: record,
             visible: true
         });
     }
@@ -60,11 +59,9 @@ class CommandList extends Component {
         this.setState({value})
     }
     handleOk = () => {
-        console.log(this.props.match.params)
-        const { sn } = this.props.match.params;
-        const { vsn } = this.props;
+        const { sn, vsn } = this.props;
         const { record, value } = this.state;
-        const id = `send_command/${sn}/${vsn}/${this.state.record.name}/${new Date() * 1}`
+        const id = `send_command/${sn}/${vsn}/${record.name}/${new Date() * 1}`
         let params = {
             gateway: sn,
             name: vsn,
@@ -98,25 +95,32 @@ class CommandList extends Component {
         });
     }
     render () {
-        const { data } = this.state;
+        const { data, record, columns, visible } = this.state;
         return (
             <div>
                 <Table
                     bordered
                     rowKey="name"
-                    columns={this.state.columns}
+                    rowClassName={(record, index) => {
+                        let className = 'light-row';
+                        if (index % 2 === 0) {
+                            className = 'dark-row';
+                        }
+                        return className;
+                    }}
+                    columns={columns}
                     dataSource={data ? data : []}
                 />
                 <Modal
                     title="设备指令"
-                    visible={this.state.visible}
+                    visible={visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                 >
                     <p className="flex">指令名：
                         <Input
-                            disabled
-                            value={this.state.record.name}
+                            readOnly
+                            value={record.name}
                         />
                     </p>
                     <p className="flex">参数：

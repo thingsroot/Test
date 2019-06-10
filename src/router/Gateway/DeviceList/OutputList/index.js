@@ -4,6 +4,7 @@ import { inject, observer} from 'mobx-react';
 import http from '../../../../utils/Server';
 import { Table, Button, Modal, Input, message } from 'antd';
 import './style.scss';
+
 @withRouter
 @inject('store')
 @observer
@@ -25,11 +26,7 @@ class OutputList extends Component {
             dataIndex: 'desc'
         }, {
             title: '单位',
-            render: ()=>{
-                return (
-                    <span>--</span>
-                )
-            }
+            dataIndex: 'unit'
         }, {
             title: '数值',
             dataIndex: 'pv'
@@ -52,17 +49,11 @@ class OutputList extends Component {
         }]
     }
     componentDidMount (){
-        const data = this.props.outputs;
-        data.map((item)=>{
-            if (!item.vt){
-                item.vt = 'float'
-            }
-        })
-        this.setState({data})
+        this.setState({data: this.props.outputs})
     }
     showModal = (record) => {
         this.setState({
-            record,
+            record: record,
             visible: true
         });
     }
@@ -71,11 +62,9 @@ class OutputList extends Component {
         this.setState({value})
     }
     handleOk = () => {
-        console.log(this.props.match.params)
-        const { sn } = this.props.match.params;
-        const { vsn } = this.props;
+        const { sn, vsn } = this.props;
         const { record, value } = this.state;
-        const id = `send_output/${sn}/${vsn}/${this.state.record.name}/${this.state.value}/${new Date() * 1}`
+        const id = `send_output/${sn}/${vsn}/${record.name}/${value}/${new Date() * 1}`
         let params = {
             gateway: sn,
             name: vsn,
@@ -101,25 +90,32 @@ class OutputList extends Component {
         });
     }
     render () {
-        const { data } = this.state;
+        const { data, record, columns, visible } = this.state;
         return (
             <div>
                 <Table
                     bordered
                     rowKey="name"
-                    columns={this.state.columns}
+                    rowClassName={(record, index) => {
+                        let className = 'light-row';
+                        if (index % 2 === 0) {
+                            className = 'dark-row';
+                        }
+                        return className;
+                    }}
+                    columns={columns}
                     dataSource={data ? data : []}
                 />
                 <Modal
                     title="数据下置"
-                    visible={this.state.visible}
+                    visible={visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                 >
                     <p className="flex">点名：
                         <Input
                             disabled
-                            value={this.state.record.name}
+                            value={record.name}
                         />
                     </p>
                     <p className="flex">数值：

@@ -49,7 +49,7 @@ class MyGates extends Component {
                                     color="cyan"
                                   >公司</Tag>
                             }
-                            <b>{record.dev_name}</b>
+                            {record.dev_name}
                         </div>
                     )
                 }
