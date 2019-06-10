@@ -147,7 +147,8 @@ class AppsList extends Component {
       // }
       fetch = () => {
         const pagination = { ...this.state.pagination };
-        let enable_beta = this.props.store.appStore.status.enable_beta
+        const {gatewayInfo} = this.props.store
+        let enable_beta = gatewayInfo.data.enable_beta
         if (enable_beta === undefined) {
           enable_beta = 0
         }

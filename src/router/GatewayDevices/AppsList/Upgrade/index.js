@@ -15,7 +15,9 @@ class AppUpgrade extends Component {
         loading: true
     }
     componentDidMount (){
-        http.get('/api/applications_versions_list?app=' + this.props.app + '&beta=' + this.props.store.appStore.status.enable_beta).then(res=>{
+        const {gatewayInfo} = this.props.store
+        let enable_beta = gatewayInfo.data.enable_beta
+        http.get('/api/applications_versions_list?app=' + this.props.app + '&beta=' + enable_beta).then(res=>{
             const data = []
             if (res.data[0].version >= this.props.version){
                 res.data.map(item=>{

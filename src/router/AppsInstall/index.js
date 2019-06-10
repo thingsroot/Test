@@ -112,7 +112,8 @@ class MyGatesAppsInstall extends Component {
     //获取版本
     installLatestVersion = (app, sn, inst_name, configuration)=>{
         let url = ''
-        let enable_beta = this.props.store.appStore.status.enable_beta
+        const {gatewayInfo} = this.props.store
+        let enable_beta = gatewayInfo.data.enable_beta
         if (enable_beta === 1) {
             url = '/api/applications_versions_latest?beta=1&app=';
         } else {
@@ -123,9 +124,9 @@ class MyGatesAppsInstall extends Component {
             version = res.data;
             if (version > 0) {
                 if (enable_beta === 1) {
-                    message.success('网关安装当前应用最新beta版本!');
+                    message.success(`网关安装当前应用最新beta版本[${version}]!`);
                 } else {
-                    message.success('网关安装当前应用最新版本!');
+                    message.success(`网关安装当前应用最新版本[${version}]!`);
                 }
 
                 let params = {
@@ -272,7 +273,7 @@ class MyGatesAppsInstall extends Component {
                                 this.setState({gateway_list_visible: true, showLinkSelection: false})
                             }}
                         >
-                            安装到其他网管
+                            安装到其他网关
                         </Button>
                         <Button
                             shape="round"

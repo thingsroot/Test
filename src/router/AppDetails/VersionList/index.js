@@ -56,7 +56,7 @@ class VersionList extends PureComponent {
                                 return <li key={key}>
                                     <div><p>版本号：<span className="fontColor">{v.version}</span>
                                         {
-                                            v.meta === 0 ? <span>(正式版)</span> : <span>(测试版)</span>
+                                            v.beta === 0 ? <span>(正式版)</span> : <span>(测试版)</span>
                                         }
                                     </p></div>
                                     <div><p>更新时间：<span className="fontColor">{v.modified.substr(0, 19)}</span></p>
