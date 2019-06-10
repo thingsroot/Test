@@ -149,7 +149,7 @@ class MyGatesDevices extends Component {
                             component={Logviewer}
                             title="我的网关·日志"
                         />
-                        <PrivateRoute path={`${path}/message`}
+                        <PrivateRoute path={`${path}/commviewer`}
                             component={Comm}
                             title="我的网关·报文"
                         />

@@ -1,8 +1,11 @@
 .messagewrap{
+    .opwrap{
+        top:10px;
+    }
     .searwrap{
         position: absolute;
         right:0;
-        top:10px;
+        top:0px;
         display: flex;
         width: 300px;
     }

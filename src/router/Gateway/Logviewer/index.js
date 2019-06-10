@@ -110,16 +110,17 @@ class Logviewer extends Component {
         const { data } = this.props.store.appStore;
         return (
             <div style={{position: 'relative'}}>
+                <div className="opwrap">
                     {
                         this.props.store.appStore.flag
-                        ? <Button
+                        ? <Button type="primary"
                             onClick={()=>{
                                 this.tick()
                                 this.t1;
                                 this.props.store.appStore.connect(this.props.match.params.sn, this.state.type)
                             }}
                           >订阅{this.state.title}</Button>
-                    : <Button
+                    : <Button type="danger"
                         onClick={()=>{
                                 this.closeEnableLog()
                                 clearInterval(this.t1)
@@ -130,31 +131,34 @@ class Logviewer extends Component {
                         }}
                       >取消订阅</Button>
                     }
-                    <Button
+                    <span style={{padding: '0 5px'}} />
+                    <Button type="danger"
                         onClick={()=>{
                             this.props.store.appStore.newdata = [];
                             this.props.store.appStore.arr = [];
                             this.props.store.appStore.data = [];
                         }}
                     >清除</Button>
-                    <div className="searwrap">
-                        <Select
-                            labelInValue
-                            defaultValue={{ key: 'content' }}
-                            style={{ width: 120 }}
-                            onChange={this.handleChange}
-                        >
-                            <Option value="content">内容</Option>
-                            <Option value="id">ID</Option>
-                            <Option value="type">类型</Option>
-                        </Select>
-                        <Search
-                            placeholder="input search text"
-                            onSearch={this.filter}
-                            enterButton
-                        />
-                    </div>
-                    <div>当前日志数量：{data.length}</div>
+                    <span style={{padding: '0 10px'}} >当前报文数量：{data.length}</span>
+                </div>
+                <div className="searwrap">
+                    <Select
+                        labelInValue
+                        defaultValue={{ key: 'content' }}
+                        style={{ width: 120 }}
+                        onChange={this.handleChange}
+                    >
+                        <Option value="content">内容</Option>
+                        <Option value="id">ID</Option>
+                        <Option value="type">类型</Option>
+                    </Select>
+                    <span style={{padding: '0 5px'}} />
+                    <Search
+                        placeholder="input search text"
+                        onSearch={this.filter}
+                        enterButton
+                    />
+                </div>
                 {
                     this.state.maxNum
                     ? <Alert

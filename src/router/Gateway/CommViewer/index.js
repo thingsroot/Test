@@ -30,7 +30,7 @@ class MyGatesLogviewer extends Component {
         this.props.store.messageStore.messageisleave = false;
         this.props.store.messageStore.commnum = 0;
         const pathname = this.props.location.pathname.toLowerCase();
-        if (pathname.indexOf('message') !== -1){
+        if (pathname.indexOf('commviewer') !== -1){
             this.setState({
                 title: '报文',
                 type: '/comm'
@@ -114,16 +114,17 @@ class MyGatesLogviewer extends Component {
                 style={{position: 'relative'}}
                 className="messagewrap"
             >
+                <div className="opwrap">
                     {
                         this.props.store.messageStore.messageflag
-                        ? <Button
+                        ? <Button type="primary"
                             onClick={()=>{
                                 this.tick()
                                 this.t1;
                                 this.props.store.messageStore.connect(this.props.match.params.sn, this.state.type)
                             }}
                           >订阅{this.state.title}</Button>
-                    : <Button
+                    : <Button type="danger"
                         onClick={()=>{
                                 this.closeEnableLog()
                                 clearInterval(this.t1)
@@ -134,31 +135,34 @@ class MyGatesLogviewer extends Component {
                         }}
                       >取消订阅</Button>
                     }
-                    <Button
+                    <span style={{padding: '0 5px'}} />
+                    <Button type="danger"
                         onClick={()=>{
                             this.props.store.messageStore.messagedata = [];
                             this.props.store.messageStore.arr = [];
                             // this.props.store.messageStore.data = [];
                         }}
                     >清除</Button>
-                    <div className="searwrap">
-                        <Select
-                            labelInValue
-                            defaultValue={{ key: 'content' }}
-                            style={{ width: 120 }}
-                            onChange={this.handleChange}
-                        >
-                            <Option value="content">内容</Option>
-                            <Option value="id">ID</Option>
-                            <Option value="type">类型</Option>
-                        </Select>
-                        <Search
-                            placeholder="input search text"
-                            onSearch={this.filter}
-                            enterButton
-                        />
-                    </div>
-                    <div>当前报文数量：{data.length}</div>
+                    <span style={{padding: '0 10px'}} >当前报文数量：{data.length}</span>
+                </div>
+                <div className="searwrap">
+                    <Select
+                        labelInValue
+                        defaultValue={{ key: 'content' }}
+                        style={{ width: 120 }}
+                        onChange={this.handleChange}
+                    >
+                        <Option value="content">内容</Option>
+                        <Option value="id">ID</Option>
+                        <Option value="type">类型</Option>
+                    </Select>
+                    <span style={{padding: '0 5px'}} />
+                    <Search
+                        placeholder="input search text"
+                        onSearch={this.filter}
+                        enterButton
+                    />
+                </div>
                 {
                     this.state.maxNum
                     ? <Alert

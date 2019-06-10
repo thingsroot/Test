@@ -60,7 +60,7 @@ class LeftNav extends Component {
             this.setState({
                 index: 6
             })
-        } else if (pathname.indexOf('/message') !== -1){
+        } else if (pathname.indexOf('/commviewer') !== -1){
             this.setState({
                 index: 7
             })
@@ -131,7 +131,7 @@ class LeftNav extends Component {
                                 >{this.state.lognum !== 0 ? <div className="logcount count">{this.state.lognum}</div> : ''}<Icon type="ordered-list"/>&nbsp;&nbsp;网关日志</li>
                             </Link>
                             <Link
-                                to={`${url}/message`}
+                                to={`${url}/commviewer`}
                                 onClick={()=>{
                                     this.setState({index: 7})
                                 }}
