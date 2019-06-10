@@ -30,7 +30,7 @@ class GatewaySettings extends Component {
         opendata: [],
         newdata: [],
         loading: true,
-        sn: '',
+        gateway: '',
         upgrading: false,
         flag: true,
         DATA_UPLOAD_PERIOD: false,
@@ -46,16 +46,16 @@ class GatewaySettings extends Component {
     }
     componentDidMount (){
         this.setState({
-            sn: this.props.match.params.sn,
+            gateway: this.props.match.params.sn,
             loading: true
         }, ()=> {
             this.getData();
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (nextProps.location.pathname !== this.props.location.pathname){
+        if (nextProps.match.params.sn !== this.state.gateway){
             this.setState({
-                sn: this.props.match.params.sn,
+                gateway: nextProps.match.params.sn,
                 loading: true
             }, ()=> {
                 this.getData();
@@ -72,8 +72,8 @@ class GatewaySettings extends Component {
         this.myFaultTypeChart2 && this.myFaultTypeChart2.resize();
     }
     getData (){
-        const { sn } = this.state;
-        http.get(`/api/gateways_historical_data?sn=${sn}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+        const { gateway } = this.state;
+        http.get(`/api/gateways_historical_data?sn=${gateway}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
             let data = [];
             const date = new Date() * 1;
             for (var i = 0;i < 10;i++){
@@ -105,7 +105,7 @@ class GatewaySettings extends Component {
                 window.addEventListener('resize', this.resize, 20);
                 }
         })
-        http.get(`/api/gateways_historical_data?sn=${sn}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
+        http.get(`/api/gateways_historical_data?sn=${gateway}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
             let data = [];
             const date = new Date() * 1;
             for (var i = 0;i < 10;i++){
@@ -137,7 +137,7 @@ class GatewaySettings extends Component {
                 window.addEventListener('resize', this.resize, 20);
                 }
         })
-        http.get('/api/gateways_read?name=' + sn).then(res=>{
+        http.get('/api/gateways_read?name=' + gateway).then(res=>{
             if (!res.ok) {
                 message.error(res.error)
                 return
@@ -207,10 +207,10 @@ class GatewaySettings extends Component {
         })
     }
     setConfig (record, config){
+        const { gateway } = this.state;
         if (!config) {
-            const { sn } = this.state;
             let params = {
-                gateway: sn,
+                gateway: gateway,
                 inst: record,
                 app: record ===  'Network' ? 'network_uci' : 'frpc',
                 version: 'latest',
@@ -218,7 +218,7 @@ class GatewaySettings extends Component {
                     auto_start: true,
                     enable_web: true
                 },
-                id: `installapp/${sn}/${record}/${new Date() * 1}`
+                id: `installapp/${gateway}/${record}/${new Date() * 1}`
             }
             http.post('/api/gateways_applications_install', params).then(res=>{
                 if (res.ok) {
@@ -232,9 +232,9 @@ class GatewaySettings extends Component {
             })
         } else {
             let params = {
-                gateway: this.props.match.params.sn,
+                gateway: gateway,
                 inst: record,
-                id: `removeapp/${this.props.match.params.sn}/${record}/${new Date() * 1}`
+                id: `removeapp/${gateway}/${record}/${new Date() * 1}`
             }
             http.post('/api/gateways_applications_remove', params).then(res=>{
                 if (res.ok) {
@@ -253,7 +253,7 @@ class GatewaySettings extends Component {
         const inst = record === 'beta' ? 'beta' : 'enable';
         const name = record === 'beta' ? 'gateway' : 'name';
         let params = {
-            [name]: this.state.sn,
+            [name]: this.state.gateway,
             [inst]: type
         }
         let title = `开启${record === 'beta' ? '测试模式' : '开机自启'}`
@@ -268,9 +268,10 @@ class GatewaySettings extends Component {
         })
     }
     restart (url){
+        const { gateway } = this.state;
         const data = {
-            id: `gateways/${url}/${this.state.sn}/${new Date() * 1}`,
-            name: this.state.sn
+            id: `gateways/${url}/${gateway}/${new Date() * 1}`,
+            name: gateway
         }
         http.post('/api/gateways_' + url, data).then(res=>{
             if (res.ok){
@@ -298,11 +299,12 @@ class GatewaySettings extends Component {
         this.setState({[type]: value})
     }
     buttonOnclick (value, type){
+        const { gateway } = this.state;
         if (type === 'EVENT_UPLOAD'){
             let params = {
-                name: this.state.sn,
+                name: gateway,
                 min_level: this.state[value],
-                id: `enable_event/${this.state.sn}/min${value}/${new Date() * 1}`
+                id: `enable_event/${this.state.gateway}/min${value}/${new Date() * 1}`
             }
             http.post('/api/gateways_enable_event', params).then(res=>{
                 message.success('发送更改事件上送等级请求成功')
@@ -316,11 +318,11 @@ class GatewaySettings extends Component {
             })
         } else {
             let params = {
-                name: this.state.sn,
+                name: gateway,
                 data: {
                     [type]: this.state[value]
                 },
-                id: `set${type}/${this.state.sn}/min${value}/${new Date() * 1}`
+                id: `set${type}/${gateway}/min${value}/${new Date() * 1}`
             }
             http.post('/api/gateways_cloud_conf', params).then(res=>{
                 message.success('更改设置成功请求成功')
@@ -668,17 +670,17 @@ class GatewaySettings extends Component {
                                             onClick={()=>{
                                                 const data = config.skynet_version < this.state.skynet_version
                                                 ? {
-                                                    name: this.props.match.params.sn,
+                                                    name: config.sn,
                                                     skynet_version: this.state.skynet_version,
                                                     version: this.state.version,
                                                     no_ack: 1,
-                                                    id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
+                                                    id: `sys_upgrade/${config.sn}/${new Date() * 1}`
                                                 }
                                                 : {
                                                     name: this.props.match.params.sn,
                                                     version: this.state.version,
                                                     no_ack: 1,
-                                                    id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
+                                                    id: `sys_upgrade/${config.sn}/${new Date() * 1}`
                                                 }
                                                 this.setState({upgrading: true})
                                                 http.post('/api/gateways_upgrade', data).then(res=>{

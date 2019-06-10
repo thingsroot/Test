@@ -119,10 +119,10 @@ class AppsList extends Component {
         })
       }
       UNSAFE_componentWillReceiveProps (nextProps){
-        if (nextProps.location.pathname !== this.props.location.pathname){
+        if (nextProps.match.params.sn !== this.state.gateway_sn){
           this.setState({
             loading: true,
-            gateway_sn: this.props.match.params.sn
+            gateway_sn: nextProps.match.params.sn
           }, ()=>{
             this.fetch();
           })

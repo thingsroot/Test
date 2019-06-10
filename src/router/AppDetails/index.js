@@ -80,7 +80,6 @@ class AppDetails extends Component {
                 })
             }
         });
-        //this.props.store.codeStore.setVersionLatest(this.props.store.codeStore.versionLatest 
     }
     callback = (key)=>{
         this.setState({activeKey: key})

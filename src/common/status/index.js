@@ -22,8 +22,9 @@ class Status extends Component {
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
         if (nextProps.gateway !== this.state.gateway) {
-            this.setState({gateway: nextProps.gateway})
-            this.gatewayRead()
+            this.setState({gateway: nextProps.gateway}, () => {
+                this.gatewayRead()
+            })
         }
     }
     componentWillUnmount (){
@@ -49,7 +50,7 @@ class Status extends Component {
         http.get('/api/gateways_read?name=' + this.state.gateway).then(res=>{
             if (res.ok) {
                 if (res.data.sn !== this.state.gateway) {
-                    console.log('Delayed data arrived!!', res.data)
+                    console.log('Delayed data arrived!!', res.data, this.state.gateway)
                     return
                 }
                 this.props.store.gatewayInfo.updateStatus(res.data);

@@ -50,7 +50,7 @@ class MyGatesDevices extends Component {
             this.setState({flag: true})
         }
         if (this.props.match.params.sn !== nextProps.match.params.sn){
-            this.setState({gateway: this.props.match.params.sn}, ()=>{
+            this.setState({gateway: nextProps.match.params.sn}, ()=>{
                 this.sendAjax()
                 this.props.store.timer.setGateStatusLast(0)
             })
@@ -114,7 +114,7 @@ class MyGatesDevices extends Component {
                             : ''
                         }
                     <GatewaysDrawer
-                        gateway={this.state.gateway_sn}
+                        gateway={this.state.gateway}
                         onClose={this.onClose}
                         onChange={this.onChangeGateway}
                         visible={this.state.visible}
