@@ -13,7 +13,7 @@ const MyIcon = Icon.createFromIconfontCN({
 class LeftNav extends Component {
     state = {
         lognum: 0,
-        comnum: 0,
+        commnum: 0,
         list: [
             {
                 icon: 'profile',
@@ -83,10 +83,10 @@ class LeftNav extends Component {
         })
     }
     getNum (){
-            this.setState({
-                comnum: this.props.store.messageStore.commnum,
-                lognum: this.props.store.appStore.lognum
-            })
+        this.setState({
+            commnum: this.props.mqtt.comm_channel.NewArrived,
+            lognum: this.props.mqtt.log_channel.NewArrived
+        })
     }
     render () {
         const { list, index } = this.state;

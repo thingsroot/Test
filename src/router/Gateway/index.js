@@ -3,11 +3,13 @@ import { withRouter, Switch, Redirect } from 'react-router-dom';
 import Status from '../../common/status';
 import LeftNav from '../../components/LeftNav';
 import LoadableComponent from '../../utils/LoadableComponent';
-import PrivateRoute from '../../components/PrivateRoute';
+import GatewayRoute from '../../components/GatewayRoute';
 import './style.scss';
 import http from '../../utils/Server';
 import { inject, observer } from 'mobx-react';
 import { Button, Icon } from 'antd';
+import GatewayMQTT from '../../utils/GatewayMQTT';
+
 const DeviceList = LoadableComponent(()=>import('./DeviceList'));
 const AppsList = LoadableComponent(()=>import('./AppsList'));
 const Settings = LoadableComponent(()=>import('./Settings'));
@@ -25,12 +27,17 @@ const GatewaysDrawer = LoadableComponent(()=>import('../../common/GatewaysDrawer
 @inject('store')
 @observer
 class MyGatesDevices extends Component {
-    state = {
-        gateway: '',
-        visible: false,
-        flag: true,
-        VPNflag: false,
-        url: window.location.pathname
+    constructor (props){
+        super(props);
+        this.data_len = 0
+        this.state = {
+            gateway: '',
+            visible: false,
+            flag: true,
+            VPNflag: false,
+            url: window.location.pathname,
+            mqtt: new GatewayMQTT()
+        }
     }
     componentDidMount (){
         this.setState({gateway: this.props.match.params.sn}, ()=>{
@@ -51,6 +58,7 @@ class MyGatesDevices extends Component {
         }
         if (this.props.match.params.sn !== nextProps.match.params.sn){
             this.setState({gateway: nextProps.match.params.sn}, ()=>{
+                this.state.mqtt.disconnect(true)
                 this.sendAjax()
                 this.props.store.timer.setGateStatusLast(0)
             })
@@ -101,6 +109,8 @@ class MyGatesDevices extends Component {
                     <div className="mygatesdevices">
                         <LeftNav
                             prop={this.props.match.params}
+                            gateway={this.state.gateway}
+                            mqtt={this.state.mqtt}
                             vpnflag={this.state.VPNflag}
                         />
                         {
@@ -121,49 +131,62 @@ class MyGatesDevices extends Component {
                     />
                     <div className="mygateslist">
                       <Switch>
-                        <PrivateRoute path={`${path}/devsList`}
+                        <GatewayRoute path={`${path}/devsList`}
                             component={DeviceList}
                             title="我的网关·设备列表"
+                            gateway={this.state.gateway}
                         />
-                        <PrivateRoute path={`${path}/appslist`}
+                        <GatewayRoute path={`${path}/appslist`}
                             component={AppsList}
                             title="我的网关·应用列表"
+                            gateway={this.state.gateway}
                         />
-                        <PrivateRoute path={`${path}/settings`}
+                        <GatewayRoute path={`${path}/settings`}
                             component={Settings}
                             title="我的网关·网关设置"
+                            gateway={this.state.gateway}
                         />
-                        <PrivateRoute path={`${path}/vpn`}
+                        <GatewayRoute path={`${path}/vpn`}
                             component={VPN}
                             title="我的网关·vpn通道"
+                            gateway={this.state.gateway}
                         />
-                        <PrivateRoute path={`${path}/vserial`}
+                        <GatewayRoute path={`${path}/vserial`}
                             component={Vserial}
                             title="我的网关·虚拟串口"
+                            gateway={this.state.gateway}
                         />
-                        <PrivateRoute path={`${path}/onlinerecords`}
+                        <GatewayRoute path={`${path}/onlinerecords`}
                             component={OnlineRecords}
                             title="我的网关·在线记录"
+                            gateway={this.state.gateway}
                         />
-                        <PrivateRoute path={`${path}/logviewer`}
+                        <GatewayRoute path={`${path}/logviewer`}
                             component={Logviewer}
                             title="我的网关·日志"
+                            mqtt={this.state.mqtt}
+                            gateway={this.state.gateway}
                         />
-                        <PrivateRoute path={`${path}/commviewer`}
+                        <GatewayRoute path={`${path}/commviewer`}
                             component={Comm}
                             title="我的网关·报文"
+                            mqtt={this.state.mqtt}
+                            gateway={this.state.gateway}
                         />
-                        <PrivateRoute path={`${path}/platformevent`}
+                        <GatewayRoute path={`${path}/platformevent`}
                             component={Platformevent}
                             title="我的网关·平台事件"
+                            gateway={this.state.gateway}
                         />
-                        <PrivateRoute path={`${path}/devicesevent`}
+                        <GatewayRoute path={`${path}/devicesevent`}
                             component={Devicesevent}
                             title="我的网关·设备事件"
+                            gateway={this.state.gateway}
                         />
-                        <PrivateRoute path="/gateways/appconfig"
+                        <GatewayRoute path="/gateways/appconfig"
                             component={Appconfig}
                             title="我的网关·应用配置"
+                            gateway={this.state.gateway}
                         />
                         <Redirect from={path}
                             to={`${path}/devslist`}

@@ -1,6 +1,5 @@
 import appStore from './appStore';
 import codeStore from './codeStore';
-import messageStore from './messageStore';
 import timer from './timer'
 import action from './action'
 import session from './session'
@@ -12,7 +11,6 @@ const store = {
     session,
     appStore,
     codeStore,
-    messageStore,
     gatewayInfo
 };
 

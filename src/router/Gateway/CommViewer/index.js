@@ -5,30 +5,24 @@ import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
 import './style.scss';
 import ReactList from 'react-list';
-// import App from './action';
-let data_len = 0;
+
 const Search = Input.Search;
 const Option = Select.Option;
+
 @withRouter
 @inject('store')
 @observer
-class MyGatesLogviewer extends Component {
-    state = {
-        data: [],
-        flag: true,
-        searchflag: true,
-        maxNum: false,
-        value: '',
-        connected: false,
-        searchtype: 'content',
-        type: '',
-        title: ''
+class CommViewer extends Component {
+    constructor (props){
+        super(props);
+        this.mqtt_topic = '/comm'
+        this.state = {
+            type: '',
+            title: '',
+            gateway: ''
+        }
     }
     componentDidMount (){
-        this.props.store.messageStore.cleartime()
-        this.t1 = setInterval(()=>this.tick(), 59000);
-        this.props.store.messageStore.messageisleave = false;
-        this.props.store.messageStore.commnum = 0;
         const pathname = this.props.location.pathname.toLowerCase();
         if (pathname.indexOf('commviewer') !== -1){
             this.setState({
@@ -41,66 +35,69 @@ class MyGatesLogviewer extends Component {
                 type: '/log'
             })
         }
-        if (this.props.match.params.sn !== this.props.store.messageStore.mqttSN && this.props.store.messageStore.mqttSN !== ''){
-            this.props.store.messageStore.client.end();
-            this.props.store.messageStore.flag =  true;
-            this.props.store.messageStore.data =  [];
-            this.props.store.messageStore.connected =  false;
-            this.props.store.messageStore.client = null;
-            clearInterval(this.t1)
-        }
+        this.setState({ gateway: this.props.gateway })
+        const { mqtt } = this.props;
+        mqtt.comm_channel.setShow(true)
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
-        if (nextProps.location.pathname !== this.props.location.pathname){
-            if (this.props.store.messageStore.client) {
-                this.props.store.messageStore.client.end();
-                this.props.store.messageStore.messageflag =  true;
-                this.props.store.messageStore.data =  [];
-                this.props.store.messageStore.messagedata =  [];
-                this.props.store.messageStore.connected =  false;
-                this.props.store.messageStore.client = null;
-                clearInterval(this.t1)
-                this.tick('0')
-            }
-        }
-    }
-    componentDidUpdate () {
-        if (data_len !== this.props.store.messageStore.data.length) {
-            data_len = this.props.store.messageStore.data.length;
+        if (nextProps.gateway !== this.props.gateway){
+            this.stopChannel()
+            this.setState({
+                gateway: nextProps.gateway
+            })
         }
     }
     componentWillUnmount (){
+        const { mqtt } = this.props;
         clearInterval(this.t1)
-        this.tick(180)
-        this.props.store.messageStore.messageisleave = true;
-        this.props.store.messageStore.countdown();
-    }
-    tick (time){
-            const data = {
-                duration: time || 60,
-                name: this.props.match.params.sn,
-                id: `sys_enable_comm/${this.props.match.params.sn}/${new Date() * 1}`
-            }
-            http.post('/api/gateways_enable_comm', data)
-    }
-    handleChange = (value)=> {
-        this.props.store.messageStore.searchtype =  value.key
-      }
-    filter = (valu)=>{
-        const value = valu.toLowerCase();
-        if (value) {
-            this.props.store.messageStore.value = value;
-            this.props.store.messageStore.data = this.props.store.messageStore.newdata.filter(item=>item[this.props.store.messageStore.searchtype].toLowerCase().indexOf(value) !== -1)
-        } else {
-            this.props.store.messageStore.value = '';
-            this.props.store.messageStore.data = this.props.store.messageStore.newdata;
+        if (mqtt.comm_channel.Active) {
+            this.tick(180)
+            mqtt.comm_channel.setShow(false)
         }
     }
-    closeEnableLog =()=>{
+    tick (time){
+        const { mqtt } = this.props;
+        mqtt.tick(time)
+
+        const data = {
+            duration: time || 60,
+            name: this.state.gateway,
+            id: `sys_enable_comm/${this.state.gateway}/${new Date() * 1}`
+        }
+        http.post('/api/gateways_enable_comm', data)
+    }
+    handleChange = (value)=> {
+        const { mqtt } = this.props;
+        if (value !== undefined && value !== '') {
+            mqtt.comm_channel.setSearchType(value)
+        }
+    }
+    filter = (value)=>{
+        const lvalue = value.toLowerCase();
+
+        const { mqtt } = this.props;
+        if (lvalue !== undefined && lvalue !== '') {
+            mqtt.comm_channel.setFilter(lvalue)
+
+        } else {
+            mqtt.comm_channel.clearFilter()
+        }
+    }
+    startChannel =()=>{
+        const { mqtt } = this.props;
+        this.tick(60)
+        this.t1 = setInterval(()=>this.tick(60), 59000);
+        mqtt.connect(this.state.gateway, this.mqtt_topic)
+    }
+    stopChannel =()=>{
+        const { mqtt } = this.props;
+        mqtt.unsubscribe(this.mqtt_topic)
+        clearInterval(this.t1)
+
         const data = {
             duration: 0,
-            name: this.props.match.params.sn,
-            id: `sys_enable_comm/${this.props.match.params.sn}/${new Date() * 1}`
+            name: this.state.gateway,
+            id: `sys_enable_comm/${this.state.gateway}/${new Date() * 1}`
         }
         http.post('/api/gateways_enable_comm', data)
     }
@@ -108,42 +105,31 @@ class MyGatesLogviewer extends Component {
         this.setState({maxNum: false})
     }
     render () {
-        const  data  = this.props.store.messageStore.messagedata;
+        const { mqtt } = this.props;
+        const { gateway } = this.state;
+        gateway;
         return (
             <div
                 style={{position: 'relative'}}
-                className="messagewrap"
+                className="commView"
             >
                 <div className="opwrap">
                     {
-                        this.props.store.messageStore.messageflag
-                        ? <Button type="primary"
-                            onClick={()=>{
-                                this.tick()
-                                this.t1;
-                                this.props.store.messageStore.connect(this.props.match.params.sn, this.state.type)
-                            }}
+                        mqtt.comm_channel.Active
+                        ? <Button type="danger"
+                            onClick={this.stopChannel}
+                          >取消订阅</Button>
+                        : <Button type="primary"
+                            onClick={this.startChannel}
                           >订阅{this.state.title}</Button>
-                    : <Button type="danger"
-                        onClick={()=>{
-                                this.closeEnableLog()
-                                clearInterval(this.t1)
-                                this.props.store.messageStore.messageflag = true;
-                                this.props.store.messageStore.client.end()
-                                this.props.store.messageStore.connected = false;
-                                // this.refs.content.innerHTML = '';
-                        }}
-                      >取消订阅</Button>
                     }
                     <span style={{padding: '0 5px'}} />
                     <Button type="danger"
                         onClick={()=>{
-                            this.props.store.messageStore.messagedata = [];
-                            this.props.store.messageStore.arr = [];
-                            // this.props.store.messageStore.data = [];
+                            mqtt.comm_channel.clearData()
                         }}
                     >清除</Button>
-                    <span style={{padding: '0 10px'}} >当前报文数量：{data.length}</span>
+                    <span style={{padding: '0 10px'}} >当前报文数量：{mqtt.comm_channel.Data.length} / {mqtt.comm_channel.AllData.length}</span>
                 </div>
                 <div className="searwrap">
                     <Select
@@ -196,14 +182,14 @@ class MyGatesLogviewer extends Component {
                                         ref="content"
                                         axis="y"
                                         type="simple"
-                                        length={data.length}
+                                        length={mqtt.comm_channel.Data.length}
                                         itemRenderer={(key)=>{
                                             return (<div key={key}>
                                                 <div className="tableHeaders">
-                                                    <div>{data[key].time}</div>
-                                                    <div>{data[key].id}</div>
-                                                    <div>{data[key].direction}</div>
-                                                    <div>{data[key].content}</div>
+                                                    <div>{mqtt.comm_channel.Data[key].time}</div>
+                                                    <div>{mqtt.comm_channel.Data[key].id}</div>
+                                                    <div>{mqtt.comm_channel.Data[key].direction}</div>
+                                                    <div>{mqtt.comm_channel.Data[key].content}</div>
                                                 </div>
                                             </div>)
                                         }}
@@ -217,4 +203,4 @@ class MyGatesLogviewer extends Component {
     }
 }
 
-export default MyGatesLogviewer;
+export default CommViewer;
