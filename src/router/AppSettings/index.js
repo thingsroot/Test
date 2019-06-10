@@ -4,7 +4,6 @@ import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
-import {inject, observer} from 'mobx-react';
 import reqwest from 'reqwest';
 
 const Option = Select.Option;
@@ -15,8 +14,6 @@ function callback (key) {
 }
 
 @withRouter
-@inject('store')
-@observer
 class AppSettings extends Component {
     state = {
         expand: false,
@@ -25,39 +22,40 @@ class AppSettings extends Component {
         previewImage: '',
         previewVisible: false,
         imageUrl: '',
-        checkValue: 0
+        checkValue: 0,
+        app: '',
+        app_info: {},
+        description: '',
+        conf_template: '',
+        pre_configuration: ''
     };
     componentDidMount (){
-        let app = this.props.match.params.name;
-        if (app) {
-            this.getDetails(app);
-        } else {
-            this.setState({
-                imgSrc: 'http://cloud.thingsroot.com/assets/app_center/img/logo.png'
-            })
-        }
+        this.setState({
+            app: this.props.match.params.app,
+            imgSrc: 'http://cloud.thingsroot.com/assets/app_center/img/logo.png'
+        }, () => {
+            this.getDetails(this.state.app);
+        })
     }
 
-    getDetails = (app)=>{
-        http.get('/api/applications_details?name=' + app).then(res=>{
-            let settingData = {
-                appName: res.data.app_name,
-                codeName: res.data.code_name,
-                licenseType: '免费',
-                description: res.data.description,
-                confTemplate: res.data.pre_configuration,
-                preConfiguration: res.data.conf_template,
-                published: res.data.published
-            };
-            this.props.store.codeStore.setDescription(res.data.description);
-            this.props.store.codeStore.setSettingData(settingData);
+    getDetails = ()=>{
+        http.get('/api/applications_details?name=' + this.state.app).then(res=>{
+            if (!res.ok) {
+                message.error('获取应用信息失败:' + res.error)
+                return
+            }
             this.setState({
+                app_info: res.data,
+                description: res.data.description,
+                conf_template: res.data.conf_template,
+                pre_configuration: res.data.pre_configuration,
                 imgSrc: 'http://cloud.thingsroot.com' + res.data.icon_image
             })
         })
     };
     handleSubmit = (e) => {
-        const { description, configuration, predefined } = this.props.store.codeStore;
+        const { app_info, description, conf_template, pre_configuration } = this.state;
+        app_info;
         e.preventDefault();
         if (this.props.store.session.is_developer === '1') {
             this.props.form.validateFields((err, values) => {
@@ -70,15 +68,15 @@ class AppSettings extends Component {
                     published: values.published === true ? 1 : 0,
                     license_type: 'Open',
                     description: description,
-                    conf_template: configuration,
-                    pre_configuration: predefined
+                    conf_template: conf_template,
+                    pre_configuration: pre_configuration
                 };
-                if (configuration) {
+                if (conf_template && conf_template !== '') {
                     params['has_conf_template'] = 1
                 } else {
                     params['has_conf_template'] = 0
                 }
-                if (this.props.match.params.type === '1') {
+                if (this.props.match.params.action === 'new') {
                     http.post('/api/applications_create', params).then(res=>{
                         if (res.ok === true) {
                             let formData = new FormData();
@@ -102,7 +100,7 @@ class AppSettings extends Component {
                         }
                     })
                 } else {
-                    params['name'] = this.props.match.params.name;
+                    params['name'] = this.props.match.params.app;
                     http.post('/api/applications_update', params)
                         .then(res=>{
                             if (res.ok === true) {
@@ -161,7 +159,7 @@ class AppSettings extends Component {
 
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { settingData } = this.props.store.codeStore;
+        const { app_info} = this.state;
         return (
             <div>
                 <Icon
@@ -203,7 +201,7 @@ class AppSettings extends Component {
                                 <Form.Item label="应用名称">
                                     {getFieldDecorator('app_name', {
                                         rules: [{ required: true, message: '不能为空！' }],
-                                        initialValue: settingData.appName ? settingData.appName : ''
+                                        initialValue: app_info.app_name ? app_info.app_name : ''
                                     })(
                                         <Input type="text"
                                             style={{width: '240px'}}
@@ -218,7 +216,7 @@ class AppSettings extends Component {
                                             pattern: /^[0-9a-zA-Z_]{1,}$/,
                                             message: '应用ID须包含字母，数字或特殊字符！'
                                         }],
-                                        initialValue: settingData.codeName ? settingData.codeName : ''
+                                        initialValue: app_info.code_name ? app_info.code_name : ''
                                     })(
                                         <Input
                                             type="text"
@@ -231,7 +229,7 @@ class AppSettings extends Component {
                                 <Form.Item label="授权类型">
                                     {getFieldDecorator('license_type', {
                                         rules: [{ required: true, message: '不能为空！' }],
-                                        initialValue: settingData.licenseType !== undefined ? settingData.licenseType : ''
+                                        initialValue: app_info.licenseType !== undefined ? app_info.licenseType : ''
                                     })(
                                         <Select
                                             style={{ width: 240 }}
@@ -245,7 +243,7 @@ class AppSettings extends Component {
                                 <Form.Item label="发布到应用市场">
                                     {getFieldDecorator('published', {
                                         valuePropName: 'checked',
-                                        initialValue: settingData.published === 1 ?  true : false
+                                        initialValue: app_info.published === 1 ?  true : false
                                     })(
                                         <Checkbox
                                             onChange={this.checkChange}
@@ -270,13 +268,13 @@ class AppSettings extends Component {
                 >
                     <TabPane
                         tab="描述"
-                        key="1"
+                        key="desc"
                     >
                         <EditorDesc />
                     </TabPane>
                     <TabPane
                         tab="默认安装配置"
-                        key="2"
+                        key="conf"
                     >
                         <div style={{minHeight: '400px'}}>
                             <EditorCode />
@@ -290,7 +288,7 @@ class AppSettings extends Component {
                     className="login-form-button"
                     onClick={this.handleSubmit}
                 >
-                    {this.props.match.params.type === '1' ? '创建' : '修改'}
+                    {this.props.match.params.type === 'new' ? '创建' : '修改'}
                 </Button>
                 <Button
                     onClick={()=>{
@@ -303,5 +301,6 @@ class AppSettings extends Component {
         )
     }
 }
+
 const WrappedAdvancedSearchForm = Form.create()(AppSettings);
 export default (WrappedAdvancedSearchForm);

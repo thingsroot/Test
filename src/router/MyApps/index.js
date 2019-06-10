@@ -115,7 +115,7 @@ class MyApps extends Component {
                             this.props.store.codeStore.setSettingData('');
                         }}
                     >
-                        <Link to={'/appSettings/1'}>创建新应用</Link>
+                        <Link to={'/appsettings/new'}>创建新应用</Link>
                     </Button>
 
                     <Search

@@ -27,10 +27,10 @@ class CommandList extends Component {
         columns: [{
             title: '名称',
             dataIndex: 'name'
-          }, {
+        }, {
             title: '描述',
             dataIndex: 'desc'
-          }, {
+        }, {
             title: '操作',
             width: '150px',
             render: (record)=>{
@@ -43,21 +43,21 @@ class CommandList extends Component {
                     >发送</Button>
                 )
             }
-          }]
+        }]
     }
     componentDidMount (){
         const data = this.props.commands;
         this.setState({data})
     }
     showModal = (record) => {
-      this.setState({
-          record,
-          visible: true
-      });
+        this.setState({
+            record,
+            visible: true
+        });
     }
     inputChange = () => {
-      const value = event.target.value
-      this.setState({value})
+        const value = event.target.value
+        this.setState({value})
     }
     handleOk = () => {
         console.log(this.props.match.params)
@@ -65,45 +65,37 @@ class CommandList extends Component {
         const { vsn } = this.props;
         const { record, value } = this.state;
         const id = `send_command/${sn}/${vsn}/${this.state.record.name}/${new Date() * 1}`
-      http.postToken('/api/gateways_dev_commands', {
-        gateway: sn,
-        name: vsn,
-        command: record.name,
-        param: value, //JSON.parse(value),
-        id: id
-      }).then(res=>{
-        if (res.ok && res.data === id){
-          openNotification('提交设备指令成功', '网关:' + sn + '\n设备:' + vsn + '\n参数:' + value);
-          this.timer = setInterval(() => {
-              http.get('/api/gateways_exec_result?id=' + id).then(result=>{
-                if (result.ok && result.data){
-                  if (result.data.result){
-                    openNotification('设备执行指令成功', '网关:' + sn + '\n设备:' + vsn + '\n参数:' + value);
-                    message.success('设备执行指令成功')
-                    clearInterval(this.timer)
-                  } else {
-                    openNotification('设备执行指令失败', '网关:' + sn + '\n设备:' + vsn + '\n参数:' + value);
-                    message.error('设备执行指令失败')
-                    clearInterval(this.timer)
-                  }
-                }
-              })
-            }, 3000);
-        } else {
-          message.error(res.error)
+        let params = {
+            gateway: sn,
+            name: vsn,
+            command: record.name,
+            param: value, //JSON.parse(value),
+            id: id
         }
-      }).catch(req=>{
-          req;
-          message.error('发送请求失败')
-      })
-      this.setState({
-        visible: false
-      });
+        http.postToken('/api/gateways_dev_commands', params).then(res=>{
+            if (res.ok && res.data === id){
+                openNotification('提交设备指令成功', '网关:' + sn + '\n设备:' + vsn + '\n参数:' + value);
+                if (res.ok && res.data === id){
+                    openNotification('提交设备指令成功', '网关:' + sn + '\n设备:' + vsn + '\n参数:' + value);
+                    this.props.store.action.pushAction(res.data, '设备指令执行', '', params, 10000)
+                } else {
+                    message.error(res.error)
+                }
+            } else {
+                message.error(res.error)
+            }
+        }).catch(req=>{
+            req;
+            message.error('发送请求失败')
+        })
+        this.setState({
+            visible: false
+        });
     }
     handleCancel = () => {
-      this.setState({
-        visible: false
-      });
+        this.setState({
+            visible: false
+        });
     }
     render () {
         const { data } = this.state;

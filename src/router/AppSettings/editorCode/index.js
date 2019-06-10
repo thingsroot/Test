@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { split as SplitEditor} from 'react-ace';
 import 'brace/mode/java';
 import 'brace/theme/tomorrow';
-import {inject, observer} from 'mobx-react';
 import { message } from 'antd';
 const style = {
     flexGrow: 1,
@@ -10,18 +9,13 @@ const style = {
     paddingBottom: '10px'
 };
 
-@inject('store')
-@observer
 class EditorCode extends Component {
     state = {
         data: '{name: "alice"}'
     };
 
     onChange = (value)=>{
-        console.log(value);
-        this.props.store.codeStore.setConfiguration(value[0]);
-        console.log(this.props.store.codeStore.configuration);
-        this.props.store.codeStore.setPredefined(value[1])
+        this.props.onChange(value[0], value[1]);
     };
     prettyJson (str) {
         let data = JSON.parse(str)

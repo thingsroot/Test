@@ -356,26 +356,19 @@ class VPN extends Component {
                         <Button
                             disabled={flag}
                             onClick={()=>{
-                                http.post('/api/gateways_applications_start', {
+                                let params = {
                                     gateway: this.props.match.params.sn,
                                     inst: 'ioe_frpc',
                                     id: `start${this.props.match.params.sn}/ioe_frpc/${new Date() * 1}`
-                                }).then(res=>{
+                                }
+                                http.post('/api/gateways_applications_start', params).then(res=>{
                                     if (res.ok && res.data){
-                                        this.timer = setInterval(() => {
-                                            http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                                              if (result.ok && result.data){
-                                                if (result.data.result){
-                                                  message.success('应用配置成功')
-                                                  clearInterval(this.timer)
-                                                } else {
-                                                  message.error('应用配置失败')
-                                                  clearInterval(this.timer)
-                                                }
-                                              }
-                                            })
-                                          }, 3000);
+                                        this.props.store.action.pushAction(res.data, '启动设备VPN', '', params, 10000)
+                                    } else {
+                                        message.error('启动设备VPN失败')
                                     }
+                                }).catch( err => {
+                                    message.error('启动设备VPN失败:' + err)
                                 })
                             }}
                         ><Icon type="sync"/></Button>
