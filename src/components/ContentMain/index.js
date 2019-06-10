@@ -90,7 +90,12 @@ class ContentMain extends Component {
                     title={'应用详情'}
                 />
                 <PrivateRoute
-                    path="/appsettings/:type/:name？"
+                    path="/appsettings/:action?"
+                    component={AppSettings}
+                    title={'应用设置'}
+                />
+                <PrivateRoute
+                    path="/appsettings/:action?/:app？"
                     component={AppSettings}
                     title={'应用设置'}
                 />

@@ -25,33 +25,27 @@ class AppSettings extends Component {
         previewImage: '',
         previewVisible: false,
         imageUrl: '',
-        checkValue: 0
+        checkValue: 0,
+        app: '',
+        app_info: {}
     };
     componentDidMount (){
-        let app = this.props.match.params.name;
-        if (app) {
-            this.getDetails(app);
-        } else {
-            this.setState({
-                imgSrc: 'http://cloud.thingsroot.com/assets/app_center/img/logo.png'
-            })
-        }
+        this.setState({
+            app: this.props.match.params.app,
+            imgSrc: 'http://cloud.thingsroot.com/assets/app_center/img/logo.png'
+        }, () => {
+            this.getDetails(this.state.app);
+        })
     }
 
-    getDetails = (app)=>{
-        http.get('/api/applications_details?name=' + app).then(res=>{
-            let settingData = {
-                appName: res.data.app_name,
-                codeName: res.data.code_name,
-                licenseType: '免费',
-                description: res.data.description,
-                confTemplate: res.data.pre_configuration,
-                preConfiguration: res.data.conf_template,
-                published: res.data.published
-            };
-            this.props.store.codeStore.setDescription(res.data.description);
-            this.props.store.codeStore.setSettingData(settingData);
+    getDetails = ()=>{
+        http.get('/api/applications_details?name=' + this.state.app).then(res=>{
+            if (!res.ok) {
+                message.error('获取应用信息失败:' + res.error)
+                return
+            }
             this.setState({
+                app_info: res.data,
                 imgSrc: 'http://cloud.thingsroot.com' + res.data.icon_image
             })
         })
@@ -78,7 +72,7 @@ class AppSettings extends Component {
                 } else {
                     params['has_conf_template'] = 0
                 }
-                if (this.props.match.params.type === '1') {
+                if (this.props.match.params.action === 'new') {
                     http.post('/api/applications_create', params).then(res=>{
                         if (res.ok === true) {
                             let formData = new FormData();
@@ -102,7 +96,7 @@ class AppSettings extends Component {
                         }
                     })
                 } else {
-                    params['name'] = this.props.match.params.name;
+                    params['name'] = this.props.match.params.app;
                     http.post('/api/applications_update', params)
                         .then(res=>{
                             if (res.ok === true) {
@@ -270,13 +264,13 @@ class AppSettings extends Component {
                 >
                     <TabPane
                         tab="描述"
-                        key="1"
+                        key="desc"
                     >
                         <EditorDesc />
                     </TabPane>
                     <TabPane
                         tab="默认安装配置"
-                        key="2"
+                        key="conf"
                     >
                         <div style={{minHeight: '400px'}}>
                             <EditorCode />
@@ -290,7 +284,7 @@ class AppSettings extends Component {
                     className="login-form-button"
                     onClick={this.handleSubmit}
                 >
-                    {this.props.match.params.type === '1' ? '创建' : '修改'}
+                    {this.props.match.params.type === 'new' ? '创建' : '修改'}
                 </Button>
                 <Button
                     onClick={()=>{
@@ -303,5 +297,6 @@ class AppSettings extends Component {
         )
     }
 }
+
 const WrappedAdvancedSearchForm = Form.create()(AppSettings);
 export default (WrappedAdvancedSearchForm);

@@ -94,12 +94,12 @@ const templates_childs = [
     {
         'name': 'id',
         'desc': '模板ID',
-        'type': 'text'
+        'type': 'string'
     },
     {
         'name': 'name',
         'desc': '名称',
-        'type': 'text'
+        'type': 'string'
     },
     {
         'name': 'version',
@@ -256,6 +256,7 @@ class AppConfig extends Component {
             config && config.length > 0 && config.map((v, key)=>{
                 key;
                 if (!template_json_type.find(item => item === v.type)) {
+                    message.error(`不支持的的可视化类型: ${v.type}`)
                     errorCode = true;
                     return
                 }
@@ -340,7 +341,7 @@ class AppConfig extends Component {
                 >
                     <Inst
                         name={name}
-                        inst_name={app_inst}
+                        inst_name={app_inst ? app_inst : ''}
                         editable={inst_editable}
                         gateway_sn={gateway_sn}
                         onChange={(value) =>{

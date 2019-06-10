@@ -252,46 +252,39 @@ class GatewaySettings extends Component {
         const type = config ? 0 : 1;
         const inst = record === 'beta' ? 'beta' : 'enable';
         const name = record === 'beta' ? 'gateway' : 'name';
-        http.postToken('/api/gateways_' + record + '_enable', {
+        let params = {
             [name]: this.state.sn,
             [inst]: type
-        }).then(res=>{
-            if (res.data){
-                this.timer = setTimeout(() => {
-                    http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                        if (result.data){
-                            if (result.data.result) {
-                                message.success(type === 1 ? '开启成功' : '关闭成功')
-                                // this.changeState()
-                            } else {
-                                message.error(type === 1 ? '开启失败' : '关闭失败')
-                                // this.changeState()
-                            }
-                            clearInterval(this.timer)
-                        }
-                    })
-                }, 1000);
+        }
+        let title = `开启${record === 'beta' ? '测试模式' : '开机自启'}`
+        http.postToken('/api/gateways_' + record + '_enable', params).then(res=>{
+            if (res.ok){
+                this.props.store.action.pushAction(res.data, title, '', params, 10000)
+            } else {
+                message.error(res.error)
             }
+        }).catch(err => {
+            message.error(err)
         })
     }
     restart (url){
-    const data = {
-        id: `gateways/${url}/${this.state.sn}/${new Date() * 1}`,
-        name: this.state.sn
-    }
-    http.postToken('/api/gateways_' + url, data).then(res=>{
-        if (res.ok){
-            message.success('重启成功，请稍等...')
-            if (url === 'restart') {
-                let no_gap_time = 10000; // 10 seconds
-                setTimeout(()=>{
-                    this.props.store.timer.setGateStatusNoGapTime(no_gap_time)
-                }, 5000)
-            }
-        } else {
-            message.error('重启失败，请重试...')
+        const data = {
+            id: `gateways/${url}/${this.state.sn}/${new Date() * 1}`,
+            name: this.state.sn
         }
-    })
+        http.postToken('/api/gateways_' + url, data).then(res=>{
+            if (res.ok){
+                message.success('重启成功，请稍等...')
+                if (url === 'restart') {
+                    let no_gap_time = 10000; // 10 seconds
+                    setTimeout(()=>{
+                        this.props.store.timer.setGateStatusNoGapTime(no_gap_time)
+                    }, 5000)
+                }
+            } else {
+                message.error('重启失败，请重试...')
+            }
+        })
     }
     changeState  = (name)=> {
         // const data = Object.assign(this.state.config, {[name]: !this.state.config[name]});
@@ -690,25 +683,19 @@ class GatewaySettings extends Component {
                                                 this.setState({upgrading: true})
                                                 http.postToken('/api/gateways_upgrade', data).then(res=>{
                                                     if (res.ok) {
-                                                        this.timer = setInterval(() => {
-                                                            http.get('/api/gateways_exec_result?id=' + res.data).then(result=>{
-                                                                if (result.ok){
-                                                                    message.success('网关固件升级成功')
-                                                                    this.setState({update: false, flag: true})
-                                                                    clearInterval(this.timer)
-                                                                } else {
-                                                                    message.error('网关固件升级失败，请重试')
-                                                                    clearInterval(this.timer)
-                                                                    this.setState({upgrading: false})
-                                                                }
-                                                            }).catch(()=>{
+                                                        this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 10000,  (result)=> {
+                                                            if (result.ok){
+                                                                this.setState({update: false, flag: true})
+                                                            } else {
                                                                 this.setState({upgrading: false})
-                                                            })
-                                                        }, 3000);
+                                                            }
+                                                        })
                                                     } else {
+                                                        message.error('网关固件升级失败！ 错误:' + res.error)
                                                         this.setState({upgrading: false})
                                                     }
-                                                }).catch(()=>{
+                                                }).catch((err)=>{
+                                                    message.error('网关固件升级失败！ 错误:' + err)
                                                     this.setState({upgrading: false})
                                                 })
                                             }}
