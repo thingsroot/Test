@@ -6,7 +6,7 @@ import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
 
 const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
-const AppSettings = LoadableComponent(()=>import('../../router/AppSettings'));
+const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
 const Home = LoadableComponent(()=>import('../../router/Home'));
 const Gateways = LoadableComponent(()=>import('../../router/Gateways'));
 const MyApps = LoadableComponent(()=>import('../../router/MyApps'));
@@ -90,9 +90,14 @@ class ContentMain extends Component {
                     title={'应用详情'}
                 />
                 <PrivateRoute
-                    path="/appsettings/:action?/:app？"
-                    component={AppSettings}
+                    path="/appedit/:name/:action?"
+                    component={AppEdit}
                     title={'应用设置'}
+                />
+                <PrivateRoute
+                    path="/appnew"
+                    component={AppEdit}
+                    title={'创建新应用'}
                 />
                 <PrivateRoute
                     path="/appsinstall/:sn/:app?/:step?"

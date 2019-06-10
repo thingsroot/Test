@@ -18,16 +18,21 @@ class EditorCode extends Component {
         this.props.onChange(value[0], value[1]);
     };
     prettyJson (str) {
-        let data = JSON.parse(str)
-        if (!data) {
-            message.error('JSON解析错误')
+        try {
+            let data = JSON.parse(str)
+            if (!data) {
+                message.error('JSON解析错误')
+                return str
+            }
+            return JSON.stringify(data, null, 4)
+        } catch (err) {
+            // message.error('JSON格式错误')
             return str
         }
-        return JSON.stringify(data, null, 4)
     }
 
     render () {
-        const { settingData } = this.props.store.codeStore;
+        const { pre_configuration, conf_template } = this.props;
         return (
             <div
                 className="editorCode"
@@ -46,8 +51,8 @@ class EditorCode extends Component {
                         fontSize={18}
                         orientation="beside"
                         value={[
-                            settingData.preConfiguration ? this.prettyJson(settingData.preConfiguration) : '',
-                            settingData.confTemplate ? this.prettyJson(settingData.confTemplate) : ''
+                            conf_template ? this.prettyJson(conf_template) : '',
+                            pre_configuration ? this.prettyJson(pre_configuration) : ''
                         ]}
                         name="UNIQUE_ID_OF_DIV"
                         onChange={this.onChange}

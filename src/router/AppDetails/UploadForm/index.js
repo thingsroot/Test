@@ -1,18 +1,16 @@
 import React, { Component } from 'react';
 import {Modal, Form, Input, Checkbox, Upload, Icon, Button, message} from 'antd';
 import { withRouter } from 'react-router-dom';
-import http from '../../../utils/Server';
 import reqwest from 'reqwest';
-import {inject, observer} from 'mobx-react';
 const { TextArea } = Input;
+
 const CollectionCreateForm = Form.create()(
-    @inject('store')
-    @observer
     @withRouter
     class extends Component {
         state = {
             fileList: [],
-            uploading: false
+            uploading: false,
+            initialVersion: this.props.initialValue + 1
         };
         handleCreate = () => {
             const { fileList } = this.state;
@@ -34,21 +32,19 @@ const CollectionCreateForm = Form.create()(
                     processData: false,
                     data: formData,
                     success: () => {
-                      this.setState({
-                        fileList: [],
-                        uploading: false
-                      });
-                      message.success('上传成功.');
-                      //this.props.store.codeStore.setVersionVisible(false);
-                      this.props.onClose()
-                      http.get('/api/versions_list?app=' + this.props.match.params.name).then(res=>{
-                          this.props.store.codeStore.setVersionList(res.data);
-                      });
-                      this.props.store.codeStore.setVersionLatest(this.props.store.codeStore.versionLatest + 1);
+                        this.setState({
+                            fileList: [],
+                            uploading: false
+                        });
+                        message.success('上传成功.');
+                        this.setState({
+                            initialVersion: values.version + 1
+                        })
+                        this.props.onSuccess()
                     },
                     error: () => {
                       this.setState({
-                        uploading: false
+                            uploading: false
                       });
                       message.error('上传失败.');
                     }
@@ -63,9 +59,8 @@ const CollectionCreateForm = Form.create()(
         };
 
         render () {
-            const {
-                visible, onCancel, form
-            } = this.props;
+            const { visible, onCancel, form, initialVersion } = this.props;
+            initialVersion;
             const { fileList } = this.state;
             const { getFieldDecorator } = form;
             const isChecked = (rule, value, callback) => {
@@ -105,7 +100,7 @@ const CollectionCreateForm = Form.create()(
                 >
                     <Form layout="vertical">
                         <Form.Item label="版本">
-                            {getFieldDecorator('version', { initialValue: this.props.store.codeStore.versionLatest + 1 }, {
+                            {getFieldDecorator('version', { initialValue: this.state.initialVersion }, {
                                 rules: [{ required: true, message: '新版本号大于旧版本号！' }]
                             })(
                                 <Input type="number"

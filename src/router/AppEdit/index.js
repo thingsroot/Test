@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { observer, inject } from 'mobx-react';
 import {Form, Row, Col, Input, Button, Select, Tabs, message, Checkbox, Icon } from 'antd';
 import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
@@ -14,8 +15,11 @@ function callback (key) {
 }
 
 @withRouter
-class AppSettings extends Component {
+@inject('store')
+@observer
+class AppEdit extends Component {
     state = {
+        is_new: true,
         expand: false,
         message: '',
         imgSrc: '',
@@ -31,10 +35,13 @@ class AppSettings extends Component {
     };
     componentDidMount (){
         this.setState({
-            app: this.props.match.params.app,
+            is_new: this.props.match.params.name !== undefined ? false : true,
+            app: this.props.match.params.name,
             imgSrc: 'http://cloud.thingsroot.com/assets/app_center/img/logo.png'
         }, () => {
-            this.getDetails(this.state.app);
+            if (!this.state.is_new) {
+                this.getDetails();
+            }
         })
     }
 
@@ -76,7 +83,7 @@ class AppSettings extends Component {
                 } else {
                     params['has_conf_template'] = 0
                 }
-                if (this.props.match.params.action === 'new') {
+                if (this.state.is_new) {
                     http.post('/api/applications_create', params).then(res=>{
                         if (res.ok === true) {
                             let formData = new FormData();
@@ -100,7 +107,7 @@ class AppSettings extends Component {
                         }
                     })
                 } else {
-                    params['name'] = this.props.match.params.app;
+                    params['name'] = this.state.app
                     http.post('/api/applications_update', params)
                         .then(res=>{
                             if (res.ok === true) {
@@ -147,6 +154,17 @@ class AppSettings extends Component {
             imgSrc: tmppath
         })
     };
+    onDescriptionChange = (description) => {
+        this.setState({
+            description: description
+        })
+    }
+    onConfTemplateChange = (conf_template, pre_configuration) => {
+        this.setState({
+            pre_configuration: pre_configuration,
+            conf_template: conf_template
+        })
+    }
 
     checkChange = (e)=>{
         console.log(e.target.value);
@@ -159,7 +177,7 @@ class AppSettings extends Component {
 
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { app_info} = this.state;
+        const { app_info, description, conf_template, pre_configuration } = this.state;
         return (
             <div>
                 <Icon
@@ -229,12 +247,12 @@ class AppSettings extends Component {
                                 <Form.Item label="授权类型">
                                     {getFieldDecorator('license_type', {
                                         rules: [{ required: true, message: '不能为空！' }],
-                                        initialValue: app_info.licenseType !== undefined ? app_info.licenseType : ''
+                                        initialValue: app_info.license_type !== undefined ? app_info.license_type : 'Open'
                                     })(
                                         <Select
                                             style={{ width: 240 }}
                                         >
-                                            <Option value="open">免费</Option>
+                                            <Option value="Open">免费</Option>
                                         </Select>
                                     )}
                                 </Form.Item>
@@ -270,14 +288,20 @@ class AppSettings extends Component {
                         tab="描述"
                         key="desc"
                     >
-                        <EditorDesc />
+                        <EditorDesc value={description}
+                            onChange={this.onDescriptionChange}
+                        />
                     </TabPane>
                     <TabPane
                         tab="默认安装配置"
                         key="conf"
                     >
                         <div style={{minHeight: '400px'}}>
-                            <EditorCode />
+                            <EditorCode
+                                pre_configuration={pre_configuration}
+                                conf_template={conf_template}
+                                onChange={this.onConfTemplateChange}
+                            />
                         </div>
                     </TabPane>
                 </Tabs>
@@ -288,7 +312,7 @@ class AppSettings extends Component {
                     className="login-form-button"
                     onClick={this.handleSubmit}
                 >
-                    {this.props.match.params.type === 'new' ? '创建' : '修改'}
+                    {this.state.is_new ? '创建' : '修改'}
                 </Button>
                 <Button
                     onClick={()=>{
@@ -302,5 +326,5 @@ class AppSettings extends Component {
     }
 }
 
-const WrappedAdvancedSearchForm = Form.create()(AppSettings);
+const WrappedAdvancedSearchForm = Form.create()(AppEdit);
 export default (WrappedAdvancedSearchForm);

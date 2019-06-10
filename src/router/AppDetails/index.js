@@ -23,7 +23,9 @@ const none = {
 class AppDetails extends Component {
     state = {
         user: '',
-        message: '',
+        app_info: '',
+        versionList: [],
+        versionLatest: 0,
         time: '',
         app: '',
         desc: '',
@@ -31,16 +33,19 @@ class AppDetails extends Component {
     };
 
     componentDidMount (){
-        let user = this.props.store.session.user_id;
-        let app = this.props.match.params.name;
-        this.setState({
-            user: user,
-            app: app
-        });
-        this.getDetails(app);
+        this.loadApp()
         http.get('/api/user_groups_list').then(res=>{
             this.props.store.codeStore.setGroupName(res.data[0].name)
         });
+    }
+    UNSAFE_componentWillReceiveProps (nextProps){
+        if (nextProps.location.pathname !== this.props.location.pathname){
+            this.loadApp()
+        }
+    }
+    loadApp = () => {
+        let user = this.props.store.session.user_id;
+        let app = this.props.match.params.name;
         let action = this.props.match.params.action ? this.props.match.params.action : 'description'
         if (action === 'new_template') {
             this.props.store.codeStore.setTemplateVisible(true)
@@ -48,12 +53,18 @@ class AppDetails extends Component {
         } else {
             this.setState( {activeKey: action})
         }
+        this.setState({
+            user: user,
+            app: app
+        }, ()=>{
+            this.getDetails();
+        })
     }
-
-    getDetails = (app)=>{
+    getDetails = ()=>{
+        const {app} = this.state;
         http.get('/api/applications_read?app=' + app).then(res=>{
             this.setState({
-                message: res.data.data,
+                app_info: res.data.data,
                 versionList: res.data.versionList.data,
                 versionLatest: res.data.versionLatest.data,
                 desc: res.data.data.description,
@@ -68,15 +79,25 @@ class AppDetails extends Component {
                 this.props.store.codeStore.setTemplateList(res.data)
             });
     };
+    updateVersionList = ()=> {
+        http.get('/api/versions_list?app=' + this.props.match.params.name).then(res=>{
+            if (res.ok) {
+                this.setState({
+                    versionList: res.data
+                })
+            }
+        });
+        //this.props.store.codeStore.setVersionLatest(this.props.store.codeStore.versionLatest 
+    }
     callback = (key)=>{
         this.setState({activeKey: key})
     };
     render () {
-        let { app, message, time, user } = this.state;
+        let { app, app_info, time, user, desc } = this.state;
         return (
             <div className="myAppDetails">
                 <div className="header">
-                    <span><Icon type="appstore" />{message.app_name}</span>
+                    <span><Icon type="appstore" />{app_info.app_name}</span>
                     <span
                         onClick={()=>{
                             this.props.history.go(-1)
@@ -87,58 +108,50 @@ class AppDetails extends Component {
                 <div className="details">
                     <div className="appImg">
                         <img
-                            src={`http://cloud.thingsroot.com${message.icon_image}`}
+                            src={`http://cloud.thingsroot.com${app_info.icon_image}`}
                             alt="图片"
                         />
                     </div>
                     <div className="appInfo">
-                        <p className="appName">{message.app_name}</p>
+                        <p className="appName">{app_info.app_name}</p>
                         <p className="info">
-                            <span>    发布者：{message.owner}</span>
+                            <span>    发布者：{app_info.owner}</span>
                             <span>创建时间：{time}</span><br/>
-                            <span>应用分类：{message.category === null ? '----' : message.category}</span>
-                            <span>通讯协议：{message.protocol === null ? '----' : message.protocol}</span><br/>
-                            <span>适配型号：{message.device_serial === null ? '----' : message.device_serial}</span>
-                            <span>设备厂商：{message.device_supplier === null ? '----' : message.device_supplier}</span>
+                            <span>应用分类：{app_info.category === null ? '----' : app_info.category}</span>
+                            <span>通讯协议：{app_info.protocol === null ? '----' : app_info.protocol}</span><br/>
+                            <span>适配型号：{app_info.device_serial === null ? '----' : app_info.device_serial}</span>
+                            <span>设备厂商：{app_info.device_supplier === null ? '----' : app_info.device_supplier}</span>
                         </p>
                     </div>
                     <div className="btnGroup">
 
                         <Link
                             className="button"
-                            style={message.owner === user ? block : none}
-                            to={`/appsettings/edit/${message.name}`}
+                            style={app_info.owner === user ? block : none}
+                            to={`/appedit/${app_info.name}`}
                         >
                             <Icon type="setting" />
                             设置
                         </Link>
                         <Link
                             className="button"
-                            style={message.owner === user ? block : none}
-                            to={`/appeditorcode/${message.name}/${message.app_name}`}
+                            style={app_info.owner === user ? block : none}
+                            to={`/appeditorcode/${app_info.name}/${app_info.app_name}`}
                         >
                             <Icon type="edit" />
                             代码编辑
                         </Link>
                         <Link
                             className="button"
-                            to={`/appsinstall/${this.props.store.codeStore.firstGateway}/${message.name}/install`}
+                            to={`/appsinstall/${this.props.store.codeStore.firstGateway}/${app_info.name}/install`}
                         >
                             <Icon type="download" />
                             安装此应用
                         </Link>
                         <Link
                             className="button"
-                            style={message.fork_from ? block : none}
-                            to={`/appdetails/${message.fork_from}`}
-                            onClick={
-                                ()=>{
-                                    this.getDetails(message.fork_from);
-                                    this.setState({
-                                        app: this.props.match.params.name
-                                    });
-                                }
-                            }
+                            style={app_info.fork_from ? block : none}
+                            to={`/appdetails/${app_info.fork_from}`}
                         >
                             <Icon type="share-alt" />
                             分支
@@ -154,7 +167,7 @@ class AppDetails extends Component {
                         tab="描述"
                         key="description"
                     >
-                        <AppDescription source={this.state.desc}/>
+                        <AppDescription source={desc}/>
                     </TabPane>
                     <TabPane
                         tab="版本列表"
@@ -162,8 +175,10 @@ class AppDetails extends Component {
                     >
                         <VersionList
                             app={app}
+                            initialVersion={this.state.versionLatest}
                             dataSource={this.state.versionList}
-                            user={message.owner === user ? true : false}
+                            onUpdate={this.updateVersionList}
+                            user={app_info.owner === user ? true : false}
                         />
                     </TabPane>
                     <TabPane

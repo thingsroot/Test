@@ -25,12 +25,14 @@ class VersionList extends PureComponent {
     handleCancel = () => {
         this.setState({visible: false})
     };
-    handleClose = () => {
+    handleSuccess = () => {
         this.setState({visible: false})
+        this.props.onUpdate()
     };
 
     render () {
-        let { app, dataSource } = this.props;
+        let { app, dataSource, onUpdate, initialVersion } = this.props;
+        onUpdate;
         return (
             <div className="versionList">
                 <div>
@@ -42,8 +44,9 @@ class VersionList extends PureComponent {
                     </Button>
                     <UploadForm
                         visible={this.state.visible}
+                        initialValue={initialVersion}
                         onCancel={this.handleCancel}
-                        onClose={this.handleClose}
+                        onSuccess={this.handleSuccess}
                         app={app}
                     />
                 </div>
