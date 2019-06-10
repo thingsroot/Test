@@ -69,9 +69,9 @@ const newConfigItem = (name, desc, type, default_value, depends, values, cols) =
             this.cols = value;
         },
         setValue (value) {
-            //console.log(this.name, this.type, value)
             if (value === undefined) {
                 this.value = createDefaultValue(this.type, this.default, this.values)
+                console.log(this.name, this.type, value)
                 return
             }
 
@@ -80,12 +80,19 @@ const newConfigItem = (name, desc, type, default_value, depends, values, cols) =
             } else if (this.type === 'number') {
                 this.value = Number(value)
             } else if (this.type === 'table') {
-                this.value = Array(value)
+                this.value = value instanceof Array ? value : []
+                this.value.map((item, index)=>{
+                    item.key = item.key !== undefined ? item.key : index
+                })
             } else if (this.type === 'templates') {
-                this.value = Array(value)
+                this.value = value instanceof Array ? value : []
+                this.value.map((item, index)=>{
+                    item.key = item.key !== undefined ? item.key : index
+                })
             } else {
                 this.value = value;
             }
+            console.log(this.name, this.type, value)
         },
         setHide (value) {
             this.hide = value;
@@ -155,7 +162,7 @@ class ConfigSection {
     }
 
     @action setHide (value, key) {
-        console.log(value ? 'hide' : 'show', this.name, key)
+        // console.log(value ? 'hide' : 'show', this.name, key)
         if (key === undefined) {
             this.hide = value
             return

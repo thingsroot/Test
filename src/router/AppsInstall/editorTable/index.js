@@ -253,7 +253,6 @@ class EditableTable extends React.Component {
                 ...col,
                 onCell: record => ({
                     record,
-                    id: col.id,
                     editable: col.editable,
                     dataIndex: col.dataIndex,
                     title: col.title,

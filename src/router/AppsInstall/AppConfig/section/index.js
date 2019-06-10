@@ -336,7 +336,7 @@ class AppConfigSection extends Component {
                         </Button>
                     </div>
                     <Table
-                        rowKey="name"
+                        rowKey="key"
                         dataSource={templateStore}
                         columns={addTempLists}
                         pagination={false}
