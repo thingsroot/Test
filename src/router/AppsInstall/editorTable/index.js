@@ -63,7 +63,6 @@ class EditableCell extends React.Component {
         return (
         <Input ref={node => (this.input = node)}
             onPressEnter={this.save}
-            defaultValue=""
             onBlur={this.save}
         /> )
     };
