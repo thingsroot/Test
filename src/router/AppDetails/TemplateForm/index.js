@@ -9,6 +9,21 @@ const TemplateForm = Form.create({ name: 'template_form' })(
     @inject('store')
     @observer
     class extends Component {
+        state = {
+            userGroups: []
+        }
+        componentDidMount () {
+            if (!this.props.store.session.companies) {
+                return
+            }
+            http.get('/api/user_groups_list').then(res=>{
+                if (res.ok) {
+                    this.setState({ userGroups: res.data})
+                } else {
+                    message.error('获取用户组失败')
+                }
+            });
+        }
         onCreate = ()=>{
             const form = this.props.form;
             form.validateFields((err, values) => {
@@ -26,31 +41,31 @@ const TemplateForm = Form.create({ name: 'template_form' })(
                 if (params.owner_type === 'User') {
                     params['owner_id'] = this.props.store.session.user_id
                 } else {
-                    params['owner_id'] = this.props.store.codeStore.groupName
+                    if (this.state.userGroups.length < 0) {
+                        return;
+                    }
+                    params['owner_id'] = this.state.userGroups[0].name
                 }
                 console.log(params);
                 http.post('/api/configurations_create', params).then(res=>{
                     if (res.ok === false) {
-                        message.error('新版本上传失败！');
+                        message.error('创建应用模板失败！');
                     } else {
-                        message.success('新版本上传成功！');
-                        let list = this.props.store.codeStore.templateList;
-                        list.unshift(res.data);
-                        this.props.store.codeStore.setTemplateList(list)
+                        message.success('创建应用模板成功！');
+                        this.props.onSuccess(res.data)
                     }
                 });
 
                 setTimeout(()=>{
-                    this.props.store.codeStore.setTemplateVisible(false);
+                    this.props.onOK();
                     form.resetFields();
                 }, 500)
             });
         };
 
         render () {
-            const {
-                visible, onCancel, form
-            } = this.props;
+            const { visible, onCancel, form, onSuccess } = this.props;
+            onSuccess;
             const { getFieldDecorator } = form;
             return (
                 <Modal
@@ -84,7 +99,7 @@ const TemplateForm = Form.create({ name: 'template_form' })(
                                 initialValue: 'User'
                             })(
                                 <Radio.Group>
-                                    <Radio value="Cloud Company Group">公司</Radio>
+                                    {this.state.userGroups.length > 0 ? <Radio value="Cloud Company Group">公司</Radio> : ''}
                                     <Radio value="User">个人</Radio>
                                 </Radio.Group>
                             )}

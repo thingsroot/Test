@@ -4,7 +4,6 @@ import { Button, message, Tabs, Modal, Table, Divider } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import TemplateForm from '../TemplateForm';
 import CopyForm from '../CopyForm';
-import {inject, observer} from 'mobx-react';
 const TabPane = Tabs.TabPane;
 const block = {
     display: 'block'
@@ -14,8 +13,6 @@ const none = {
 };
 
 @withRouter
-@inject('store')
-@observer
 class TemplateList extends Component {
     constructor () {
         super();
@@ -23,7 +20,11 @@ class TemplateList extends Component {
             deleteName: '',
             type: '',
             conf: '',
+            myList: [],
             templateList: [],
+            showNew: false,
+            showCopy: false,
+            copyData: {},
             columns: [
                 {
                     title: '模板名称',
@@ -101,7 +102,7 @@ class TemplateList extends Component {
                                 style={{cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={(record)=>{
-                                    this.getName(record.name)
+                                    this.deleteTemplate(record.name)
                                 }}
                             >删除</a>
                         </span>
@@ -174,6 +175,7 @@ class TemplateList extends Component {
                     });
                 }
             });
+        this.refreshMyList()
     }
 
     editContent = (conf, name, desc, version, publics, owner_type, type)=>{
@@ -197,31 +199,32 @@ class TemplateList extends Component {
                 .then(res=>{
                     if (res.ok) {
                         data.data = res.data;
-                        this.props.store.codeStore.setCopyData(data);
+                        this.setState({copyData: data, showCopy: true})
                     } else {
                         message.error(res.error);
                     }
                 })
         } else {
-            this.props.store.codeStore.setCopyData(data);
+            this.setState({copyData: data, showCopy: true})
         }
-
-        this.props.store.codeStore.setCopyVisible(true);
     };
 
-    CancelCopy = ()=>{
-        this.props.store.codeStore.setCopyVisible(false)
-    };
+    handleCreateSuccess = (newData) => {
+        let newList = [...this.state.myList, newData]
+        this.setState({
+            myList: newList
+        })
+        //list.unshift(res.data);
+    }
 
-    showModal = () => {
-        this.props.store.codeStore.setTemplateVisible(true)
-    };
+    refreshMyList = ()=> {
+        const { app } = this.props;
+        http.get('/api/user_configurations_list?app=' + app).then(res=>{
+            this.setState({myList: res.data})
+        });
+    }
 
-    handleCancel = () => {
-        this.props.store.codeStore.setTemplateVisible(false)
-    };
-
-    getName = (name)=>{
+    deleteTemplate = (name)=>{
         this.setState({
             visible: true,
             deleteName: name
@@ -252,30 +255,45 @@ class TemplateList extends Component {
 
     render () {
         const { app } = this.props;
-        let myList = this.props.store.codeStore.templateList;
-        const { type, conf, templateList, columns, columns2 } = this.state;
+        const { myList, type, conf, templateList, columns, columns2, showNew, showCopy, copyData } = this.state;
         return (
             <div className="templateList">
                 <Button
                     type="primary"
-                    onClick={this.showModal}
+                    onClick={() => {
+                        this.setState({showNew: true})
+                    }}
                 >
                     新建模板
                 </Button>
                 <TemplateForm
                     type={type}
                     conf={conf}
-                    visible={this.props.store.codeStore.templateVisible}
-                    onCancel={this.handleCancel}
+                    visible={showNew}
+                    onCancel={() => {
+                        this.setState({showNew: false})
+                    }}
+                    onOK={() => {
+                        this.setState({showNew: false})
+                    }}
+                    onSuccess={this.handleCreateSuccess}
                     app={app}
                 />
                 <CopyForm
                     type={type}
                     conf={conf}
-                    visible={this.props.store.codeStore.copyVisible}
-                    onCancel={this.CancelCopy}
+                    visible={showCopy}
+                    onCancel={() => {
+                        this.setState({showCopy: false})
+                    }}
+                    onOK={() => {
+                        this.setState({showCopy: false}, ()=>{
+                            this.refreshMyList()
+                        })
+                    }}
+                    onSuccess={this.handleCreateSuccess}
                     app={app}
-                    copyData={this.props.store.codeStore.copyData}
+                    copyData={copyData}
                 />
                 <Modal
                     title="提示信息"

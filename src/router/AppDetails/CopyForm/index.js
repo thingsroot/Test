@@ -5,10 +5,25 @@ import {
 import http from '../../../utils/Server';
 import {inject, observer} from 'mobx-react';
 
-const CapyForm = Form.create({ name: 'copy_form' })(
+const CopyForm = Form.create({ name: 'copy_form' })(
     @inject('store')
     @observer
     class extends Component {
+        state = {
+            userGroups: []
+        }
+        componentDidMount () {
+            if (!this.props.store.session.companies) {
+                return
+            }
+            http.get('/api/user_groups_list').then(res=>{
+                if (res.ok) {
+                    this.setState({ userGroups: res.data})
+                } else {
+                    message.error('获取用户组失败')
+                }
+            });
+        }
         onCreate = ()=>{
             let conf_name = '';
             const form = this.props.form;
@@ -28,23 +43,24 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                 if (params.owner_type === 'User') {
                     params['owner_id'] = this.props.store.session.user_id
                 } else if (params.owner_type === 'Cloud Company Group') {
-                    params['owner_id'] = this.props.store.codeStore.groupName
+                    if (this.state.userGroups.length < 0) {
+                        return;
+                    }
+                    params['owner_id'] = this.state.userGroups[0].name
                 }
                 if (this.props.type === '复制') {
                     http.post('/api/configurations_create', params).then(res=>{
+                        let conf_info = res.data;
                         conf_name = res.data.name;
                         if (res.ok === false) {
                             message.error('复制模板信息失败！');
                         } else {
-                            let list = this.props.store.codeStore.templateList;
-                            list.unshift(res.data);
-                            this.props.store.codeStore.setTemplateList(list)
-                            if (this.props.store.codeStore.copyData.version !== 0) {
+                            if (this.props.copyData.version !== 0) {
                                 let params = {
                                     name: conf_name,
                                     version: 1,
                                     comment: 'V1',
-                                    data: this.props.store.codeStore.copyData.data
+                                    data: this.props.copyData.data
                                 };
                                 http.post('/api/configurations_versions_create', params)
                                     .then(res=>{
@@ -53,6 +69,8 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                                         } else {
                                             message.error('复制模板内容失败！');
                                         }
+                                        this.props.onSuccess(conf_info)
+                                        this.props.onOK();
                                     })
                             }
                             message.success('新版本上传成功！');
@@ -64,27 +82,19 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                         .then(res=>{
                             if (res.ok) {
                                 message.success('更新模板信息成功！');
-                                http.get('/api/user_configurations_list?app=' + params.app)
-                                    .then(res=>{
-                                        this.props.store.codeStore.setTemplateList(res.data)
-                                    });
+                                this.props.onOK();
                             } else {
                                 message.error('更新模板信息失败！');
                             }
                         });
                 }
-                setTimeout(()=>{
-                    this.props.store.codeStore.setCopyVisible(false);
-                    form.resetFields();
-                }, 500)
             });
         };
 
         render () {
             const {
-                visible, onCancel, form
+                visible, onCancel, form, copyData
             } = this.props;
-            const copyData = this.props.store.codeStore.copyData;
             const { getFieldDecorator } = form;
             return (
                 <Modal
@@ -117,7 +127,7 @@ const CapyForm = Form.create({ name: 'copy_form' })(
                             {getFieldDecorator('owner_type', { initialValue: copyData.owner_type }
                             )(
                                 <Radio.Group>
-                                    <Radio value="Cloud Company Group">公司</Radio>
+                                    {this.state.userGroups.length > 0 ? <Radio value="Cloud Company Group">公司</Radio> : ''}
                                     <Radio value="User">个人</Radio>
                                 </Radio.Group>
                             )}
@@ -139,4 +149,4 @@ const CapyForm = Form.create({ name: 'copy_form' })(
         }
     }
 );
-export default CapyForm;
+export default CopyForm;

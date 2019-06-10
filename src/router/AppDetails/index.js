@@ -34,9 +34,6 @@ class AppDetails extends Component {
 
     componentDidMount (){
         this.loadApp()
-        http.get('/api/user_groups_list').then(res=>{
-            this.props.store.codeStore.setGroupName(res.data[0].name)
-        });
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
@@ -74,10 +71,6 @@ class AppDetails extends Component {
             this.props.store.codeStore.setVersionList(res.data.versionList.data);
             this.props.store.codeStore.setVersionLatest(res.data.versionLatest.data)
         });
-        http.get('/api/user_configurations_list?app=' + app)
-            .then(res=>{
-                this.props.store.codeStore.setTemplateList(res.data)
-            });
     };
     updateVersionList = ()=> {
         http.get('/api/versions_list?app=' + this.props.match.params.name).then(res=>{

@@ -164,30 +164,35 @@ class Action extends Component {
                     this.setState({appdebug: false})
                 }
             } else {
-                if (res.error && res.error.indexOf('已经克隆过') !== -1){
-                    http.get('/api/applications_forks_list?name=' + record.name + '&version=' + record.version).then(result=>{
-                        if (result.ok){
-                            if (result.data && result.data.length > 0){
-                                this.props.history.push('/appeditorcode/' + result.data[0].name + '/' + result.data[0].app_name);
-                                this.setState({appdebug: false})
-                            } else {
-                                this.setState({appdebug: false})
-                            }
-                        }
-                    })
-                } else {
-                    message.error(res.error)
-                    this.setState({appdebug: false})
-                }
+                message.error(res.error)
+                this.setState({appdebug: false})
             }
         })
     }
-    isfork (record){
+    onDebug = (record) =>{
         if (record.data){
-            if (record.data.data.owner !== this.props.store.session.user_id){
+            let user_id = this.props.store.session.user_id
+            let app = record.data.data.name
+            let app_name = record.data.data.app_name
+            if (record.data.data.owner === user_id){
+                this.props.history.push('/appeditorcode/' + app + '/' + app_name);
                 this.setState({appdebug: false})
             } else {
-                this.sendForkCreate(record)
+                let url = `/api/applications_forks_list?name=${app}&version=${record.version}&owner=${user_id}`
+                http.get(url).then(result=>{
+                    if (result.ok){
+                        if (result.data && result.data.length > 0){
+                            this.props.history.push(`/appeditorcode/${app}/${app_name}`);
+                            this.setState({appdebug: false})
+                        } else {
+                            this.setState({appdebug: true})
+                        }
+                    } else {
+                        this.setState({appdebug: true})
+                    }
+                }).catch(err => {
+                    message.error('获取克隆版本错误' + err)
+                })
             }
         }
     }
@@ -241,9 +246,7 @@ class Action extends Component {
                         应用配置
                     </Button>
                     <Button
-                        onClick={()=>{
-                        this.showModal('appdebug')
-                        }}
+                        onClick={this.onDebug.bind(this, record)}
                     >
                         应用调试
                     </Button>
@@ -266,7 +269,7 @@ class Action extends Component {
                     <Button
                         disabled={this.state.running_action || actionSwi}
                         onClick={()=>{
-                        this.appSwitch('stop')
+                            this.appSwitch('stop')
                         }}
                     >
                         关闭应用
@@ -274,7 +277,7 @@ class Action extends Component {
                     <Button
                         disabled={this.state.running_action || actionSwi}
                         onClick={()=>{
-                        this.appSwitch('restart')
+                            this.appSwitch('restart')
                         }}
                     >
                         重启应用
@@ -332,7 +335,7 @@ class Action extends Component {
                         }}
                         destroyOnClose
                         onCancel={()=>{
-                            this.setState({appdebug: false})
+                            this.setState({appdebug: false, running_action: false})
                         }}
                     >
                         您不是{record.data && record.data.data.app_name}的应用所有者，如要继续远程调试，会将此应用当前版本克隆一份到您的账户下，而且在代码调试页面编辑的是您克隆的代码，在代码调试页面下载应用会将克隆到你名下的应用覆盖网关中的应用！
