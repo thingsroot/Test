@@ -15,7 +15,7 @@ const UserSettings = LoadableComponent(()=>import('../../router/UserSettings'));
 const AccessKeys = LoadableComponent(()=>import('../../router/AccessKeys'));
 const VirtualGateways = LoadableComponent(()=>import('../../router/VirtualGateways'));
 const GatewayDevices = LoadableComponent(()=>import('../../router/GatewayDevices'));
-const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
+//const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
 const PlatformMessage = LoadableComponent(()=>import('../../router/PlatformMessage'));
 const DeviceMessage = LoadableComponent(()=>import('../../router/DeviceMessage'));
 const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHistory'));
@@ -130,14 +130,9 @@ class ContentMain extends Component {
                     title={'虚拟网关'}
                 />
                 <PrivateRoute
-                    path="/gatewaydevices/:sn"
+                    path="/gateway/:sn"
                     component={GatewayDevices}
                     title={'设备列表'}
-                />
-                <PrivateRoute
-                    path="/gatewayappsinstall/:sn"
-                    component={GatewayAppInstall}
-                    title={'安装应用'}
                 />
                 <PrivateRoute
                     path="/platformmessage"
