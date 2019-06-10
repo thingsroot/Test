@@ -66,7 +66,7 @@ class CommandList extends Component {
             gateway: sn,
             name: vsn,
             command: record.name,
-            param: value, //JSON.parse(value),
+            param: JSON.parse(value),
             id: id
         }
         http.post('/api/gateways_dev_commands', params).then(res=>{
