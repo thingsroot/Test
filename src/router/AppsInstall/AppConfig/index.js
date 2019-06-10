@@ -435,8 +435,7 @@ class AppConfig extends Component {
                                 showLineNumbers: true,
                                 tabSize: 2
                             }}
-                        />
-                        : ''
+                          /> : ''
                     }
 
                     <br/>
