@@ -140,6 +140,12 @@ class AppConfig extends Component {
             app_info: this.props.app_info,
             pre_configuration: this.props.pre_configuration
         }, ()=>{
+            const {app_info} = this.state;
+            if (app_info !== undefined && app_info.name !== undefined) {
+                this.getConfig(app_info)
+            } else {
+                this.getNoAppConfig()
+            }
             console.log(this.state.pre_configuration)
         })
     }
@@ -153,8 +159,7 @@ class AppConfig extends Component {
         this.setState({
             app_inst: nextProps.app_inst,
             app_info: nextProps.app_info,
-            pre_configuration: nextProps.pre_configuration,
-            activeKey: 'ui'
+            pre_configuration: nextProps.pre_configuration
         }, () => {
             const {app_info} = this.state;
             if (app_info !== undefined && app_info.name !== undefined) {
