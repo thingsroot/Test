@@ -79,6 +79,10 @@ const newConfigItem = (name, desc, type, default_value, depends, values, cols) =
                 this.value = Boolean(value) ? Boolean(value) : (value === 1 || value === '1')
             } else if (this.type === 'number') {
                 this.value = Number(value)
+            } else if (this.type === 'table') {
+                this.value = Array(value)
+            } else if (this.type === 'templates') {
+                this.value = Array(value)
             } else {
                 this.value = value;
             }

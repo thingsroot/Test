@@ -39,7 +39,7 @@ class AppSettings extends Component {
     }
 
     getDetails = ()=>{
-        http.get('/api/applications_details?name=' + this.state.app).then(res=>{
+        http.get('/api/applications_read?name=' + this.state.app).then(res=>{
             if (!res.ok) {
                 message.error('获取应用信息失败:' + res.error)
                 return

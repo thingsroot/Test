@@ -291,7 +291,12 @@ class AppConfig extends Component {
             for (let section of sections) {
                 this.props.configStore.addSection(section)
             }
-            this.props.configStore.setValue(pre_configuration)
+            try {
+                this.props.configStore.setValue(pre_configuration)
+            } catch ( e ) {
+                console.log(e)
+                message.error(e)
+            }
         } else {
             this.setState({activeKey: 'json'})
         }
