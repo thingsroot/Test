@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Button } from 'antd';
 // import http from '../../../utils/Server';
-import CollectionCreateForm from '../UploadForm';
-import {inject, observer} from 'mobx-react';
+import UploadForm from '../UploadForm';
 
 const block = {
     display: 'block',
@@ -12,25 +11,26 @@ const none = {
     display: 'none',
     cursor: 'pointer'
 };
-@inject('store')
-@observer
 class VersionList extends PureComponent {
     state = {
         user: '',
-        name: ''
+        name: '',
+        visible: false
     };
 
     showModal = () => {
-        this.props.store.codeStore.setVersionVisible(true)
+        this.setState({visible: true})
     };
 
     handleCancel = () => {
-        this.props.store.codeStore.setVersionVisible(false)
+        this.setState({visible: false})
+    };
+    handleClose = () => {
+        this.setState({visible: false})
     };
 
     render () {
-        let { app } = this.props;
-        let { versionList } = this.props.store.codeStore;
+        let { app, dataSource } = this.props;
         return (
             <div className="versionList">
                 <div>
@@ -40,15 +40,16 @@ class VersionList extends PureComponent {
                     >
                         上传新版本
                     </Button>
-                    <CollectionCreateForm
-                        visible={this.props.store.codeStore.versionVisible}
+                    <UploadForm
+                        visible={this.state.visible}
                         onCancel={this.handleCancel}
+                        onClose={this.handleClose}
                         app={app}
                     />
                 </div>
                 <ul>
                     {
-                        versionList && versionList.length > 0 && versionList.map((v, key)=>{
+                        dataSource && dataSource.length > 0 && dataSource.map((v, key)=>{
                                 return <li key={key}>
                                     <div><p>版本号：<span className="fontColor">{v.version}</span>
                                         {
@@ -68,7 +69,7 @@ class VersionList extends PureComponent {
                 </ul>
                 <p
                     className="empty"
-                    style={versionList.length > 0 ? none : block}
+                    style={dataSource.length > 0 ? none : block}
                 >请先上传版本！</p>
             </div>
         );

@@ -62,7 +62,7 @@ var get = function (url, params) {
  * @method post
  * @param {url, params} 请求地址，请求参数，是否需要加载层
  */
-var post = function (url, data) {
+var postNoToken = function (url, data) {
   return new Promise((resolve, reject) => {
     // qs.stringify(data)
     axios(url, {
@@ -99,7 +99,7 @@ var form = function (url, data) {
     });
 };
 
-var postToken = function (url, data) {
+var post = function (url, data) {
   return new Promise((resolve, reject) => {
     const token = _getCookie('T&R_auth_token');
     // qs.stringify(data)
@@ -119,4 +119,4 @@ var postToken = function (url, data) {
       })
   });
 };
-export default { get, post, postToken, form };
+export default { get, post, postNoToken, form };

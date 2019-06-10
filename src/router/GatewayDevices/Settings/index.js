@@ -257,7 +257,7 @@ class GatewaySettings extends Component {
             [inst]: type
         }
         let title = `开启${record === 'beta' ? '测试模式' : '开机自启'}`
-        http.postToken('/api/gateways_' + record + '_enable', params).then(res=>{
+        http.post('/api/gateways_' + record + '_enable', params).then(res=>{
             if (res.ok){
                 this.props.store.action.pushAction(res.data, title, '', params, 10000)
             } else {
@@ -272,7 +272,7 @@ class GatewaySettings extends Component {
             id: `gateways/${url}/${this.state.sn}/${new Date() * 1}`,
             name: this.state.sn
         }
-        http.postToken('/api/gateways_' + url, data).then(res=>{
+        http.post('/api/gateways_' + url, data).then(res=>{
             if (res.ok){
                 message.success('重启成功，请稍等...')
                 if (url === 'restart') {
@@ -681,7 +681,7 @@ class GatewaySettings extends Component {
                                                     id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
                                                 }
                                                 this.setState({upgrading: true})
-                                                http.postToken('/api/gateways_upgrade', data).then(res=>{
+                                                http.post('/api/gateways_upgrade', data).then(res=>{
                                                     if (res.ok) {
                                                         this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 10000,  (result)=> {
                                                             if (result.ok){

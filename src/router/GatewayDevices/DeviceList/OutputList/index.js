@@ -84,7 +84,7 @@ class OutputList extends Component {
             value: value,
             id: id
         }
-        http.postToken('/api/gateways_dev_outputs', params).then(res=>{
+        http.post('/api/gateways_dev_outputs', params).then(res=>{
             if (res.ok){
                 this.props.store.action.pushAction(res.data, '设备指令执行', '', params, 10000)
             } else {

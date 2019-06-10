@@ -39,7 +39,8 @@ const CollectionCreateForm = Form.create()(
                         uploading: false
                       });
                       message.success('上传成功.');
-                      this.props.store.codeStore.setVersionVisible(false);
+                      //this.props.store.codeStore.setVersionVisible(false);
+                      this.props.onClose()
                       http.get('/api/versions_list?app=' + this.props.match.params.name).then(res=>{
                           this.props.store.codeStore.setVersionList(res.data);
                       });

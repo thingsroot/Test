@@ -80,7 +80,7 @@ class Logviewer extends Component {
                 name: this.props.match.params.sn,
                 id: `sys_enable_log/${this.props.match.params.sn}/${new Date() * 1}`
             }
-            http.postToken('/api/gateways_enable_log', data)
+            http.post('/api/gateways_enable_log', data)
     }
     handleChange = (value)=> {
         this.props.store.appStore.searchtype =  value.key
@@ -101,7 +101,7 @@ class Logviewer extends Component {
             name: this.props.match.params.sn,
             id: `sys_enable_log/${this.props.match.params.sn}/${new Date() * 1}`
         }
-        http.postToken('/api/gateways_enable_log', data)
+        http.post('/api/gateways_enable_log', data)
     }
     onClose = ()=>{
         this.setState({maxNum: false})

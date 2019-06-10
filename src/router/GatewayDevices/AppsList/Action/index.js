@@ -31,7 +31,7 @@ class Action extends Component {
             inst: record.inst_name,
             id: `app_remove/${sn}/${record.inst_name}/${new Date() * 1}`
         }
-        http.postToken('/api/gateways_applications_remove', data).then(res=>{
+        http.post('/api/gateways_applications_remove', data).then(res=>{
             if (res.data){
                 if (res.ok){
                     let title = '卸载应用' + data.inst + '请求成功!'
@@ -100,7 +100,7 @@ class Action extends Component {
             conf: {},
             id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
         }
-        http.postToken('/api/gateways_applications_upgrade', data).then(res=>{
+        http.post('/api/gateways_applications_upgrade', data).then(res=>{
             if (res.ok) {
                 this.props.store.action.pushAction(res.data, '应用升级', '', data, 10000,  ()=> {
                     this.props.update_app_list();

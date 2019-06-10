@@ -105,7 +105,7 @@ export function isAdmin (){
 // 拼接网关操作
 export function deviceAppOption (appName, option, value, gateSn, type, sn){
   const id = `${type}/${gateSn}/${appName}/autorun/${sn}`;
-  http.postToken('/api/method/iot.device_api.app_option', {
+  http.post('/api/method/iot.device_api.app_option', {
       data: {
         inst: appName,
         option: option,

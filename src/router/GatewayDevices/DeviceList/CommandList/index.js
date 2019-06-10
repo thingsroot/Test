@@ -72,7 +72,7 @@ class CommandList extends Component {
             param: value, //JSON.parse(value),
             id: id
         }
-        http.postToken('/api/gateways_dev_commands', params).then(res=>{
+        http.post('/api/gateways_dev_commands', params).then(res=>{
             if (res.ok && res.data === id){
                 openNotification('提交设备指令成功', '网关:' + sn + '\n设备:' + vsn + '\n参数:' + value);
                 if (res.ok && res.data === id){

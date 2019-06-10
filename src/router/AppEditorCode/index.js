@@ -237,7 +237,7 @@ class AppEditorCode extends Component {
             visible: false
         });
         let url = '/apis/api/method/app_center.editor.editor_revert';
-        http.postToken(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
+        http.post(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
             .then(res=>{
                 this.props.store.codeStore.change();
                 message.success(res.message);
@@ -250,7 +250,7 @@ class AppEditorCode extends Component {
             message.warning('文件未改动！')
         } else {
             let url = '/apis/api/method/app_center.editor.editor';
-            http.postToken(url + '?app=' + this.state.app +
+            http.post(url + '?app=' + this.state.app +
                 '&operation=set_content&id=' + this.props.store.codeStore.fileName +
                 '&text=' + this.props.store.codeStore.newEditorContent)
                 .then(res=>{
@@ -284,7 +284,7 @@ class AppEditorCode extends Component {
         })
     };
     newVersion = ()=>{
-        http.postToken('/apis/api/method/app_center.editor.editor_release?app=' + this.state.app +
+        http.post('/apis/api/method/app_center.editor.editor_release?app=' + this.state.app +
             '&operation=set_content&version=' + this.state.newVersion +
             '&comment=' + this.state.comment)
             .then(res=>{
@@ -560,7 +560,7 @@ class AppEditorCode extends Component {
                                 id: this.props.store.codeStore.fileName,
                                 text: this.props.store.codeStore.newEditorContent[0]
                             };
-                            http.postToken(url, params)
+                            http.post(url, params)
                                 .then(res=>{
                                     res;
                                     this.set(selectedKeys, info)

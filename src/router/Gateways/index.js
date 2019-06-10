@@ -223,7 +223,7 @@ class MyGates extends Component {
     }
     confirm (record) {
         if (record.device_status === 'ONLINE'){
-            http.postToken('/api/gateways_remove', {
+            http.post('/api/gateways_remove', {
                 name: record.name
             }).then(res=>{
                 if (res.ok){
@@ -270,7 +270,7 @@ class MyGates extends Component {
             confirmLoading: true
           }, ()=>{
               if (type === 'create'){
-                http.postToken('/api/gateways_create', data).then(res=>{
+                http.post('/api/gateways_create', data).then(res=>{
                     if (res.ok) {
                       message.success('绑定成功')
                       this.refreshDevicesList(0)
@@ -280,7 +280,7 @@ class MyGates extends Component {
                 })
               } else {
                   const {record} = this.state;
-                  http.postToken('/api/gateways_update', {
+                  http.post('/api/gateways_update', {
                         name: record.sn,
                         dev_name: record.dev_name,
                         description: record.description,

@@ -12,7 +12,7 @@ class Sign extends PureComponent {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                http.post('/api/user_login', {
+                http.postNoToken('/api/user_login', {
                     username: values.userName,
                     password: values.password
                 }).then(res=>{

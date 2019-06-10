@@ -81,7 +81,7 @@ class MyGatesLogviewer extends Component {
                 name: this.props.match.params.sn,
                 id: `sys_enable_comm/${this.props.match.params.sn}/${new Date() * 1}`
             }
-            http.postToken('/api/gateways_enable_comm', data)
+            http.post('/api/gateways_enable_comm', data)
     }
     handleChange = (value)=> {
         this.props.store.messageStore.searchtype =  value.key
@@ -102,7 +102,7 @@ class MyGatesLogviewer extends Component {
             name: this.props.match.params.sn,
             id: `sys_enable_comm/${this.props.match.params.sn}/${new Date() * 1}`
         }
-        http.postToken('/api/gateways_enable_comm', data)
+        http.post('/api/gateways_enable_comm', data)
     }
     onClose = ()=>{
         this.setState({maxNum: false})

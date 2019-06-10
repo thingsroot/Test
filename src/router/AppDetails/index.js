@@ -54,6 +54,8 @@ class AppDetails extends Component {
         http.get('/api/applications_read?app=' + app).then(res=>{
             this.setState({
                 message: res.data.data,
+                versionList: res.data.versionList.data,
+                versionLatest: res.data.versionLatest.data,
                 desc: res.data.data.description,
                 time: res.data.data.modified.substr(0, 11)
             });
@@ -160,6 +162,7 @@ class AppDetails extends Component {
                     >
                         <VersionList
                             app={app}
+                            dataSource={this.state.versionList}
                             user={message.owner === user ? true : false}
                         />
                     </TabPane>
