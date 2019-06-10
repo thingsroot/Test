@@ -41,14 +41,15 @@ class MyGates extends Component {
                 render: (props, record)=>{
                     return (
                         <div>
-                            {record.dev_name}
                             {record.owner_type !== 'Cloud Company Group'
                                 ? <Tag
+                                    color="lime"
+                                  >个人</Tag>
+                                : <Tag
                                     color="cyan"
-                                    style={{marginLeft: 20}}
-                                  >个人设备</Tag>
-                                : ''
+                                  >公司</Tag>
                             }
+                            <b>{record.dev_name}</b>
                         </div>
                     )
                 }
