@@ -4,7 +4,6 @@ import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
-import {inject, observer} from 'mobx-react';
 import reqwest from 'reqwest';
 
 const Option = Select.Option;
@@ -15,8 +14,6 @@ function callback (key) {
 }
 
 @withRouter
-@inject('store')
-@observer
 class AppSettings extends Component {
     state = {
         expand: false,
@@ -27,7 +24,10 @@ class AppSettings extends Component {
         imageUrl: '',
         checkValue: 0,
         app: '',
-        app_info: {}
+        app_info: {},
+        description: '',
+        conf_template: '',
+        pre_configuration: ''
     };
     componentDidMount (){
         this.setState({
@@ -46,12 +46,16 @@ class AppSettings extends Component {
             }
             this.setState({
                 app_info: res.data,
+                description: res.data.description,
+                conf_template: res.data.conf_template,
+                pre_configuration: res.data.pre_configuration,
                 imgSrc: 'http://cloud.thingsroot.com' + res.data.icon_image
             })
         })
     };
     handleSubmit = (e) => {
-        const { description, configuration, predefined } = this.props.store.codeStore;
+        const { app_info, description, conf_template, pre_configuration } = this.state;
+        app_info;
         e.preventDefault();
         if (this.props.store.session.is_developer === '1') {
             this.props.form.validateFields((err, values) => {
@@ -64,10 +68,10 @@ class AppSettings extends Component {
                     published: values.published === true ? 1 : 0,
                     license_type: 'Open',
                     description: description,
-                    conf_template: configuration,
-                    pre_configuration: predefined
+                    conf_template: conf_template,
+                    pre_configuration: pre_configuration
                 };
-                if (configuration) {
+                if (conf_template && conf_template !== '') {
                     params['has_conf_template'] = 1
                 } else {
                     params['has_conf_template'] = 0
@@ -155,7 +159,7 @@ class AppSettings extends Component {
 
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { settingData } = this.props.store.codeStore;
+        const { app_info} = this.state;
         return (
             <div>
                 <Icon
@@ -197,7 +201,7 @@ class AppSettings extends Component {
                                 <Form.Item label="应用名称">
                                     {getFieldDecorator('app_name', {
                                         rules: [{ required: true, message: '不能为空！' }],
-                                        initialValue: settingData.appName ? settingData.appName : ''
+                                        initialValue: app_info.app_name ? app_info.app_name : ''
                                     })(
                                         <Input type="text"
                                             style={{width: '240px'}}
@@ -212,7 +216,7 @@ class AppSettings extends Component {
                                             pattern: /^[0-9a-zA-Z_]{1,}$/,
                                             message: '应用ID须包含字母，数字或特殊字符！'
                                         }],
-                                        initialValue: settingData.codeName ? settingData.codeName : ''
+                                        initialValue: app_info.code_name ? app_info.code_name : ''
                                     })(
                                         <Input
                                             type="text"
@@ -225,7 +229,7 @@ class AppSettings extends Component {
                                 <Form.Item label="授权类型">
                                     {getFieldDecorator('license_type', {
                                         rules: [{ required: true, message: '不能为空！' }],
-                                        initialValue: settingData.licenseType !== undefined ? settingData.licenseType : ''
+                                        initialValue: app_info.licenseType !== undefined ? app_info.licenseType : ''
                                     })(
                                         <Select
                                             style={{ width: 240 }}
@@ -239,7 +243,7 @@ class AppSettings extends Component {
                                 <Form.Item label="发布到应用市场">
                                     {getFieldDecorator('published', {
                                         valuePropName: 'checked',
-                                        initialValue: settingData.published === 1 ?  true : false
+                                        initialValue: app_info.published === 1 ?  true : false
                                     })(
                                         <Checkbox
                                             onChange={this.checkChange}

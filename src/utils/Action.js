@@ -25,6 +25,7 @@ export function doUpdate (actions, cb) {
         }
         if (now > action.start + action.timeout) {
             cb(action, 'timeout', 'Action timeout')
+            action.finish_action(false)
             return
         }
         if (now > action.last + 1000){

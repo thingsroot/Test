@@ -209,9 +209,7 @@ class MyGatesAppsInstall extends Component {
                 this.installLatestVersion(app_info.name, this.state.gateway_sn, inst_name, configuration)
             }).catch(err=>{
                 message.error(err)
-                this.setState({
-                    install_btn_disabled: false
-                });
+                this.setState({ install_btn_disabled: false });
             });
         }
     };
