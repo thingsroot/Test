@@ -8,13 +8,13 @@ import PrivateRoute from '../PrivateRoute';
 const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
 const Home = LoadableComponent(()=>import('../../router/Home'));
-const Gateways = LoadableComponent(()=>import('../../router/Gateways'));
+const GatewayList = LoadableComponent(()=>import('../../router/GatewayList'));
 const MyApps = LoadableComponent(()=>import('../../router/MyApps'));
 const AppStore = LoadableComponent(()=>import('../../router/AppStore'));
 const UserSettings = LoadableComponent(()=>import('../../router/UserSettings'));
 const AccessKeys = LoadableComponent(()=>import('../../router/AccessKeys'));
 const VirtualGateways = LoadableComponent(()=>import('../../router/VirtualGateways'));
-const GatewayDevices = LoadableComponent(()=>import('../../router/GatewayDevices'));
+const Gateway = LoadableComponent(()=>import('../../router/Gateway'));
 //const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
 const PlatformMessage = LoadableComponent(()=>import('../../router/PlatformMessage'));
 const DeviceMessage = LoadableComponent(()=>import('../../router/DeviceMessage'));
@@ -71,7 +71,7 @@ class ContentMain extends Component {
                 />
                 <PrivateRoute
                     path="/gateways"
-                    component={Gateways}
+                    component={GatewayList}
                     title={'我的网关'}
                 />
                 <PrivateRoute
@@ -83,6 +83,11 @@ class ContentMain extends Component {
                     path="/appstore"
                     component={AppStore}
                     title={'应用商店'}
+                />
+                <PrivateRoute
+                    path="/gateway/:sn"
+                    component={Gateway}
+                    title={'网关详情'}
                 />
                 <PrivateRoute
                     path="/appdetails/:name/:action?"
@@ -128,11 +133,6 @@ class ContentMain extends Component {
                     path="/virtualgateways"
                     component={VirtualGateways}
                     title={'虚拟网关'}
-                />
-                <PrivateRoute
-                    path="/gateway/:sn"
-                    component={GatewayDevices}
-                    title={'设备列表'}
                 />
                 <PrivateRoute
                     path="/platformmessage"
