@@ -128,7 +128,8 @@ class AppConfig extends Component {
             errorCode: false,
             instanceName: '',
             activeKey: 'json',
-            configValue: ''
+            configValue: '',
+            valueChange: false
         };
     }
 
@@ -138,6 +139,8 @@ class AppConfig extends Component {
             app_inst: this.props.app_inst,
             app_info: this.props.app_info,
             pre_configuration: this.props.pre_configuration
+        }, ()=>{
+            console.log(this.state.pre_configuration)
         })
     }
 
@@ -150,7 +153,8 @@ class AppConfig extends Component {
         this.setState({
             app_inst: nextProps.app_inst,
             app_info: nextProps.app_info,
-            pre_configuration: nextProps.pre_configuration
+            pre_configuration: nextProps.pre_configuration,
+            activeKey: 'ui'
         }, () => {
             const {app_info} = this.state;
             if (app_info !== undefined && app_info.name !== undefined) {
@@ -161,9 +165,9 @@ class AppConfig extends Component {
         });
     }
     prettyJson (str) {
-        let data = JSON.parse(str)
+        let data = JSON.parse(str);
         if (!data) {
-            message.error('JSON解析错误')
+            message.error('JSON解析错误');
             return str
         }
         return JSON.stringify(data, null, 4)
@@ -401,28 +405,34 @@ class AppConfig extends Component {
                             this.setState({ app_inst: value })
                         }}
                     />
-                    <AceEditor
-                        placeholder="Placeholder Text"
-                        mode="json"
-                        theme="monokai"
-                        name="config_json_editor"
-                        onChange={(value) => {
-                            this.onJsonChange(value)
-                        }}
-                        fontSize={14}
-                        showPrintMargin
-                        showGutter
-                        highlightActiveLine
-                        value={this.state.configValue}
-                        style={{width: '100%'}}
-                        setOptions={{
-                            enableBasicAutocompletion: false,
-                            enableLiveAutocompletion: false,
-                            enableSnippets: false,
-                            showLineNumbers: true,
-                            tabSize: 2
-                        }}
-                    />
+                    {console.log('configValueType:', typeof this.state.configValue)}
+                    {
+                        activeKey === 'json'
+                        ? <AceEditor
+                            placeholder="Placeholder Text"
+                            mode="json"
+                            theme="monokai"
+                            name="config_json_editor"
+                            onChange={(value) => {
+                                this.onJsonChange(value)
+                            }}
+                            fontSize={14}
+                            showPrintMargin
+                            showGutter
+                            highlightActiveLine
+                            value={this.state.configValue}
+                            style={{width: '100%'}}
+                            setOptions={{
+                                enableBasicAutocompletion: false,
+                                enableLiveAutocompletion: false,
+                                enableSnippets: false,
+                                showLineNumbers: true,
+                                tabSize: 2
+                            }}
+                        />
+                        : ''
+                    }
+
                     <br/>
                     <Button
                         type="primary"
