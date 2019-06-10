@@ -23,11 +23,6 @@ export function doUpdate (actions, cb) {
         if (action.status !== 'running' ) {
             return
         }
-        if (now > action.start + action.timeout) {
-            cb(action, 'timeout', 'Action timeout')
-            action.finish_action(false)
-            return
-        }
         if (now > action.last + 1000){
             action.last = now + 3000
             exec_result(action.id).then( ([result, msg]) => {
@@ -43,6 +38,11 @@ export function doUpdate (actions, cb) {
             }).catch( err=> {
                 console.log(err)
             })
+        }
+        if (now > action.start + action.timeout) {
+            cb(action, 'timeout', 'Action timeout')
+            action.finish_action(false)
+            return
         }
     })
 }

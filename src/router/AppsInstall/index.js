@@ -156,7 +156,7 @@ class MyGatesAppsInstall extends Component {
                     gateway: sn,
                     params: params
                 }
-                this.props.store.action.pushAction(res.data, '网关' + sn + '安装应用' + params.inst, '', info, 10000,  (result)=> {
+                this.props.store.action.pushAction(res.data, '网关' + sn + '安装应用' + params.inst, '', info, 30000,  (result)=> {
                     if (result) {
                         this.setState({ showLinkSelection: true })
                     } else {
