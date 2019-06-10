@@ -121,16 +121,6 @@ class LeftNav extends Component {
                         <p>高级功能</p>
                         <ul>
                             <Link
-                                to={`${url}/onlinerecords`}
-                                onClick={()=>{
-                                    this.setState({index: 5})
-                                }}
-                            >
-                                <li
-                                    className={index === 5 ? 'active' : ''}
-                                ><Icon type="reconciliation"/>&nbsp;&nbsp;在线记录</li>
-                            </Link>
-                            <Link
                                 to={`${url}/logviewer`}
                                 onClick={()=>{
                                     this.setState({index: 6})
@@ -169,6 +159,16 @@ class LeftNav extends Component {
                                 <li
                                     className={index === 9 ? 'active' : ''}
                                 ><Icon type="message"/>&nbsp;&nbsp;设备事件</li>
+                            </Link>
+                            <Link
+                                to={`${url}/onlinerecords`}
+                                onClick={()=>{
+                                    this.setState({index: 5})
+                                }}
+                            >
+                                <li
+                                    className={index === 5 ? 'active' : ''}
+                                ><Icon type="reconciliation"/>&nbsp;&nbsp;在线记录</li>
                             </Link>
                         </ul>
                 </div>
