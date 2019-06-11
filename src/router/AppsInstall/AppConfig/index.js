@@ -121,13 +121,13 @@ class AppConfig extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            config: [],
-            appTemplateList: [],
-            app_inst: '',
-            app_info: {},
-            errorCode: false,
-            instanceName: '',
-            activeKey: 'json',
+            config: [], // 缓存UI配置信息
+            appTemplateList: [],  // 应用模板列表（全部）
+            app_inst: '', // 应用示例名
+            app_info: {}, // 应用信息
+            errorCode: false, // 可视化JSON是否有错误
+            activeKey: 'json', // Tab Active
+            uiEnabled: false, // 可视化是否加载
             configValue: '',
             valueChange: false
         };
@@ -246,9 +246,7 @@ class AppConfig extends Component {
         this.refreshTemplateList()
         this.props.configStore.cleanSetion()
 
-        if ( (!show_json) && app.has_conf_template && conf_template && conf_template[0] === '[') {
-            this.setState({activeKey: 'ui'})
-
+        if (app.has_conf_template === 1 && conf_template && conf_template[0] === '[') {
             config = JSON.parse(conf_template);
             this.setState({
                 config: config
@@ -295,6 +293,7 @@ class AppConfig extends Component {
 
             this.setState({
                 errorCode: errorCode,
+                uiEnabled: !errorCode,
                 config: sections
             });
             for (let section of sections) {
@@ -307,14 +306,33 @@ class AppConfig extends Component {
                 message.error(e)
             }
         } else {
+            show_json = true
+            this.setState({uiEnabled: false})
+        }
+
+        if (show_json) {
             this.setState({activeKey: 'json'})
+        } else {
+            this.setState({activeKey: 'ui'})
         }
     };
 
     onSubmit = ()=>{
-        const {app_inst, app_info} = this.state;
+        const {app_inst, app_info, uiEnabled, configValue} = this.state;
         const {configStore} = this.props;
-        this.props.onSubmit(app_inst, app_info, configStore.Value);
+        if (uiEnabled) {
+            this.props.onSubmit(app_inst, app_info, configStore.Value);
+        } else {
+            let value = undefined
+            try {
+                value = JSON.parse(configValue)
+            } catch (err) {
+                message.error('数据格式不正确:' + err)
+            }
+            if (value !== undefined) {
+                this.props.onSubmit(app_inst, app_info, value)
+            }
+        }
     };
 
     onTabActiveChange (key){
