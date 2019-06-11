@@ -70,6 +70,10 @@ class GatewayInfo {
     @observable apps = {}
     @observable apps_count = 0
 
+    @observable get ActionEnable () {
+        return this.device_status === 'ONLINE' && this.enabled && this.sn && this.sn !== ''
+    }
+
     @action updateStatus (data) {
         let self_keys = Object.getOwnPropertyNames(this.__proto__)
         for (let [k, v] of Object.entries(data)) {

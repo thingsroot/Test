@@ -25,7 +25,7 @@ class Action extends Component {
         clearInterval(timer)
     }
     confirm = (record, sn)=>{
-        if (!this.props.store.appStore.actionSwi) {
+        if (!this.props.store.gatewayInfo.ActionEnable) {
         const data = {
             gateway: sn,
             inst: record.inst_name,

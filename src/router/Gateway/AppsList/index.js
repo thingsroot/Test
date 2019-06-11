@@ -6,7 +6,7 @@ import { withRouter } from 'react-router-dom';
 import Action from './Action';
 import app from '../../../assets/images/app.png'
 import AppConfig from '../../AppsInstall/AppConfig';
-import {ConfigStore} from '../../../utils/app_config';
+import {ConfigStore} from '../../../utils/ConfigUI';
 import './style.scss';
 // const openNotification = () => {
 //   notification.open({

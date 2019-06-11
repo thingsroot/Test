@@ -9,7 +9,7 @@ import './style.scss';
 import GatewaysDrawer from '../../common/GatewaysDrawer';
 import AppConfig from './AppConfig'
 import LazyLoad from 'react-lazy-load';
-import {ConfigStore} from '../../utils/app_config'
+import {ConfigStore} from '../../utils/ConfigUI'
 
 const Search = Input.Search;
 const openNotification = (title, message) => {

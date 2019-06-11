@@ -337,7 +337,7 @@ class GatewaySettings extends Component {
         }
     }
     render () {
-        const { actionSwi } = this.props.store.appStore;
+        const { ActionEnable } = this.props.store.gatewayInfo;
         const {  upgrading, flag, title, update, config, newdata, opendata, loading
             , DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, EVENT_UPLOAD, EVENT_UPLOAD_VALUE } = this.state;
         return (
@@ -348,7 +348,7 @@ class GatewaySettings extends Component {
                     >
                         <div className="setbutton">
                             <Button
-                                disabled={actionSwi}
+                                disabled={ActionEnable}
                                 onClick={()=>{
                                     this.setState({update: true})
                                 }}
@@ -666,7 +666,7 @@ class GatewaySettings extends Component {
                                     {
                                         config.version < this.state.version || config.skynet_version < this.state.skynet_version
                                         ? <Button
-                                            disabled={upgrading || actionSwi}
+                                            disabled={upgrading || ActionEnable}
                                             onClick={()=>{
                                                 const data = config.skynet_version < this.state.skynet_version
                                                 ? {
