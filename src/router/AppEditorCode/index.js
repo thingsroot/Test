@@ -43,6 +43,7 @@ class AppEditorCode extends Component {
             appName: appName,
             app: app
         });
+        this.props.store.codeStore.setShowFileName('version')
         //设备应用和平台应用对比
         http.get('/apis/api/method/app_center.editor.editor_worksapce_version?app=' + app)
             .then(res=>{
@@ -124,6 +125,11 @@ class AppEditorCode extends Component {
             this.getTree('#')
         });
 
+    }
+
+    componentWillUnmount () {
+        this.props.store.codeStore.setShowFileName('');
+        this.props.store.codeStore.setEditorContent('')
     }
 
     getTree =  id => new Promise((resolve => {
