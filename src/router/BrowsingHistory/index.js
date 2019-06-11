@@ -141,7 +141,7 @@ class BrowsingHistory extends Component {
           } else {
             record.vt = 'float';
           }
-            axios(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=${record.name}&vt=${record.vt || 'float'}&time_condition=time > now() - ${scope}&value_method=${way}&group_time_span=${domain}&_=1551251898530`, {
+            axios(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=${record.name}&vt=${record.vt || 'float'}&start=-${scope}&value_method=${way}&group_time_span=${domain}&_=1551251898530`, {
               method: 'get',
               headers: {
                   Accept: 'application/json, text/javascript, */*; q=0.01'
