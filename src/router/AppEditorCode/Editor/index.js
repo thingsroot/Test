@@ -41,6 +41,7 @@ class MyCode extends Component {
             this.getContent();
         }
     }
+
     //获取文件内容
     getContent = ()=>{
         if (this.props.store.codeStore.folderType === 'file') {
