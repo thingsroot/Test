@@ -215,8 +215,9 @@ class GatewaySettings extends Component {
             let params = {
                 gateway: gateway,
                 inst: record,
-                app: record ===  'Network' ? 'network_uci' : 'frpc',
+                app: record ===  'ioe_network' ? 'network_uci' : 'frpc',
                 version: 'latest',
+                from_web: '1',
                 conf: {
                     auto_start: true,
                     enable_web: true
@@ -226,7 +227,7 @@ class GatewaySettings extends Component {
             http.post('/api/gateways_applications_install', params).then(res=>{
                 if (res.ok) {
                     message.info('功能开启请求成功. 等待网关响应!')
-                    this.props.store.action.pushAction(res.data, '功能开启', '', params, 10000,  ()=> {
+                    this.props.store.action.pushAction(res.data, '功能开启', '', params, 30000,  ()=> {
                       this.getData();
                     })
                 } else {
@@ -550,10 +551,10 @@ class GatewaySettings extends Component {
                             <Switch
                                 checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
-                                checked={config.Net_Manager}
+                                checked={config.ioe_network}
                                 onChange={()=>{
-                                    this.changeState('Net_Manager');
-                                    this.setConfig('Network', config.Net_Manager)
+                                    this.changeState('ioe_network');
+                                    this.setConfig('ioe_network', config.ioe_network)
                                 }}
                             />
                         </div>
@@ -564,10 +565,10 @@ class GatewaySettings extends Component {
                             <Switch
                                 checkedChildren="ON&nbsp;"
                                 unCheckedChildren="OFF"
-                                checked={config.p2p_vpn}
+                                checked={config.ioe_frpc}
                                 onChange={()=>{
-                                    this.changeState('p2p_vpn');
-                                    this.setConfig('ioe_frpc', config.p2p_vpn)
+                                    this.changeState('ioe_frpc');
+                                    this.setConfig('ioe_frpc', config.ioe_frpc)
                                 }}
                             />
                         </div>

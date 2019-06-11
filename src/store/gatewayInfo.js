@@ -60,8 +60,8 @@ class GatewayInfo {
     @observable enabled = 0
 
     @observable install_apps = [] // Instance name list from realtime-data for running
-    @observable Net_Manager = false
-    @observable p2p_vpn = false
+    @observable ioe_network = false
+    @observable ioe_frpc = false
     @observable cpu = ''
     @observable data = new GatewayData()
 

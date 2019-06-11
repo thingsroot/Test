@@ -33,8 +33,6 @@ class MyGatesDevices extends Component {
         this.state = {
             gateway: '',
             visible: false,
-            flag: true,
-            VPNflag: false,
             url: window.location.pathname,
             mqtt: new GatewayMQTT()
         }
@@ -44,18 +42,8 @@ class MyGatesDevices extends Component {
             this.sendAjax()
             this.props.store.timer.setGateStatusLast(0)
         })
-        if (this.props.location.pathname.indexOf('VPN') !== -1){
-            this.setState({flag: false})
-        } else {
-            this.setState({flag: true})
-        }
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (nextProps.location.pathname.indexOf('VPN') !== -1){
-            this.setState({flag: false})
-        } else {
-            this.setState({flag: true})
-        }
         if (this.props.match.params.sn !== nextProps.match.params.sn){
             this.setState({gateway: nextProps.match.params.sn}, ()=>{
                 this.state.mqtt.disconnect(true)
@@ -70,12 +58,11 @@ class MyGatesDevices extends Component {
             return;
         }
         http.get('/api/gateways_app_list?gateway=' + gateway).then(res=>{
-            if (Object.values(res.data).filter(item=> item.inst_name === 'ioe_frpc' && item.name === 'frpc').length > 0){
-                this.setState({VPNflag: true})
+            if (res.ok) {
+                this.props.store.gatewayInfo.setApps(res.data);
             } else {
-                this.setState({VPNflag: false})
+                message.error(res.error)
             }
-            this.props.store.gatewayInfo.setApps(res.data);
         })
         http.get('/api/gateways_dev_list?gateway=' + gateway).then(res=>{
             if (res.ok) {
@@ -104,7 +91,6 @@ class MyGatesDevices extends Component {
     //   return arr.join('/')
     // }
     render () {
-      const { flag } = this.state;
       const { path } = this.props.match;
         return (
             <div>
@@ -114,18 +100,13 @@ class MyGatesDevices extends Component {
                             prop={this.props.match.params}
                             gateway={this.state.gateway}
                             mqtt={this.state.mqtt}
-                            vpnflag={this.state.VPNflag}
                         />
-                        {
-                            flag
-                            ? <Button type="primary"
-                                onClick={this.showDrawer}
-                                className="listbutton"
-                              >
-                                <Icon type="swap"/><br />
-                            </Button>
-                            : ''
-                        }
+                        <Button type="primary"
+                            onClick={this.showDrawer}
+                            className="listbutton"
+                        >
+                            <Icon type="swap"/><br />
+                        </Button>
                     <GatewaysDrawer
                         gateway={this.state.gateway}
                         onClose={this.onClose}

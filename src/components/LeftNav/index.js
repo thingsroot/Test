@@ -177,7 +177,7 @@ class LeftNav extends Component {
                     <p>扩展功能</p>
                     <ul>
                         {
-                            this.vserialflag
+                            gatewayInfo.ioe_ser2net
                             ? <Link to={`${url}/vserial`}
                                 key="4"
                                 onClick={()=>{
@@ -190,7 +190,7 @@ class LeftNav extends Component {
                         : ''
                         }
                         {
-                            this.props.vpnflag
+                            gatewayInfo.ioe_frpc
                             ? <Link to={`${url}/VPN`}
                                 key="4"
                                 onClick={()=>{
