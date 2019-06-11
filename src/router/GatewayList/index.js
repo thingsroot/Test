@@ -330,7 +330,7 @@ class MyGates extends Component {
         data.map(item=>{
             if (item.dev_name.toLowerCase().indexOf(text) !== -1 ||
                 item.sn.toLowerCase().indexOf(text) !== -1 ||
-                item.description && item.description.toLowerCase().indexOf(text) !== -1){
+                ( item.description && item.description.toLowerCase().indexOf(text) !== -1)){
                 arr.push(item)
             }
         });

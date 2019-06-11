@@ -34,7 +34,7 @@ const newMessageChannel = (topic, max_count) => {
         data: [],
         allData: [],
         filter: undefined,
-        searchType: 'content',
+        searchType: 'all',
         isShow: true,
         newArrive: 0,
         active: false,
@@ -53,7 +53,7 @@ const newMessageChannel = (topic, max_count) => {
             if (this.filter === undefined) {
                 this.data.push(value)
             } else {
-                if (value[this.searchType].toLowerCase().indexOf(this.filter.toLowerCase()) !== -1) {
+                if (this.isDataApplyToFilter(value)) {
                     this.data.push(value)
                 }
             }
@@ -66,20 +66,48 @@ const newMessageChannel = (topic, max_count) => {
             this.allData.clear()
             this.newArrive = 0
         },
+        isDataApplyToFilter (item) {
+            if (this.filter) {
+                let text = this.filter.toLowerCase()
+                if (this.searchType !== 'all') {
+                    return item[this.searchType] && item[this.searchType].toLowerCase().indexOf(text) !== -1;
+                }
+                return (item.id && item.id.toLowerCase().indexOf(text) !== -1) ||
+                    (item.content && item.content.toLowerCase().indexOf(text) !== -1) ||
+                    (item.direction && item.direction.toLowerCase().indexOf(text) !== -1) ||
+                    (item.level && item.level.toLowerCase().indexOf(text) !== -1)
+            } else {
+                return true
+            }
+        },
+        applyFilter () {
+            if (this.filter) {
+                let text = this.filter.toLowerCase()
+                if (this.searchType !== 'all') {
+                    this.data = this.allData.filter(item=> item[this.searchType] &&
+                        item[this.searchType].toLowerCase().indexOf(text) !== -1);
+                } else {
+                    this.data = this.allData.filter(item=> (item.id && item.id.toLowerCase().indexOf(text) !== -1) ||
+                        (item.content && item.content.toLowerCase().indexOf(text) !== -1) ||
+                        (item.direction && item.direction.toLowerCase().indexOf(text) !== -1) ||
+                        (item.level && item.level.toLowerCase().indexOf(text) !== -1)
+                    );
+                }
+            } else {
+                this.data = this.AllData
+            }
+        },
         setFilter (value) {
             this.filter = value
-            if (this.filter) {
-                this.data = this.allData.filter(item=>item[this.searchType].toLowerCase().indexOf(this.filter.toLowerCase()) !== -1);
-            }
+            this.applyFilter()
         },
         clearFilter () {
             this.filter = undefined
+            this.data = this.allData
         },
         setSearchType (value) {
             this.searchType = value
-            if (this.filter) {
-                this.data = this.allData.filter(item=>item[this.searchType].toLowerCase().indexOf(this.filter.toLowerCase()) !== -1);
-            }
+            this.applyFilter()
         },
         setShow (value) {
             this.isShow = value
@@ -253,7 +281,7 @@ class GatewayMQTT {
         msg;
         const obj = {
             time: getLocalTime(msg[1]),
-            type: msg[0],
+            level: msg[0],
             id: msg[2].split(']:')[0] + ']',
             content: msg[2].split(']:')[1]
         }
