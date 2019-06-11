@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Button, Switch, message, InputNumber, Icon } from 'antd';
+import { Card, Button, Switch, message, InputNumber } from 'antd';
 import { inject, observer} from 'mobx-react';
 import { withRouter, Link } from 'react-router-dom';
 import http from '../../../utils/Server';
@@ -10,6 +10,9 @@ import  'echarts/lib/chart/pie';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/tooltip';
 import './style.scss';
+
+import Upgrade from './Upgrade'
+
 function getMin (i, date) {
     let Dates = new Date(date - i * 60000)
     let min = Dates.getMinutes();
@@ -337,7 +340,7 @@ class GatewaySettings extends Component {
         }
     }
     render () {
-        const { ActionEnable } = this.props.store.gatewayInfo;
+        const { actionEnable } = this.props.store.gatewayInfo;
         const {  upgrading, flag, title, update, config, newdata, opendata, loading
             , DATA_UPLOAD_PERIOD, DATA_UPLOAD_PERIOD_VALUE, COV_TTL, COV_TTL_VALUE, EVENT_UPLOAD, EVENT_UPLOAD_VALUE } = this.state;
         return (
@@ -348,7 +351,7 @@ class GatewaySettings extends Component {
                     >
                         <div className="setbutton">
                             <Button
-                                disabled={!ActionEnable}
+                                disabled={!actionEnable}
                                 onClick={()=>{
                                     this.setState({update: true})
                                 }}
@@ -623,130 +626,56 @@ class GatewaySettings extends Component {
                             >网关重启</Button>
                         </div>
                     </Card>
-        </div>
+            </div>
                 <div className={!flag && !update ? 'update show' : 'update hide'}>
-                                <Button
-                                    onClick={()=>{
-                                        this.setState({update: false, flag: true, upgrading: true})
-                                    }}
-                                >X</Button>
-                    <div>
-                        <div className="title">
-                                    <p>固件升级</p>
-                                    <div>
-                                        <div className="Icon">
-                                            <Icon type="setting" />
-                                        </div>
-                                        <div>
-                                            <h3>FreeIOE</h3>
-                                            <p>
-                                                {config.version < this.state.version
-                                                ? <span>{config.version} -> {this.state.version}</span>
-                                                : <span>{this.state.version}</span>
-                                            }</p>
-                                        </div>
-                                        {
-                                            config.skynet_version >= this.state.skynet_version
-                                            ? ''
-                                            : <div style={{display: 'flex'}}>
-                                                    <div className="Icon"
-                                                        style={{marginLeft: 100}}
-                                                    >
-                                                    <Icon type="setting" />
-                                                </div>
-                                                <div>
-                                                    <h3>openwrt x86_64_skynet</h3>
-                                                    <p>
-                                                        {config.skynet_version < this.state.skynet_version ? <span>{config.skynet_version} -> {this.state.skynet_version}</span> : <span>{this.state.skynet_version}</span>}</p>
-                                                    <span>{title === 'FreeIOE' ? config.version === this.state.version ? '已经是最新版' : '可升级到最新版' : config.skynet_version === this.state.skynet_version ? '已经是最新版' : '可升级到最新版'}</span>
-                                                </div>
-                                              </div>
-                                        }
-                                    </div>
-                                    {
-                                        config.version < this.state.version || config.skynet_version < this.state.skynet_version
-                                        ? <Button
-                                            disabled={upgrading || !ActionEnable}
-                                            onClick={()=>{
-                                                const data = config.skynet_version < this.state.skynet_version
-                                                ? {
-                                                    name: config.sn,
-                                                    skynet_version: this.state.skynet_version,
-                                                    version: this.state.version,
-                                                    no_ack: 1,
-                                                    id: `sys_upgrade/${config.sn}/${new Date() * 1}`
-                                                }
-                                                : {
-                                                    name: this.props.match.params.sn,
-                                                    version: this.state.version,
-                                                    no_ack: 1,
-                                                    id: `sys_upgrade/${config.sn}/${new Date() * 1}`
-                                                }
-                                                this.setState({upgrading: true})
-                                                http.post('/api/gateways_upgrade', data).then(res=>{
-                                                    if (res.ok) {
-                                                        this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 10000,  (result)=> {
-                                                            if (result.ok){
-                                                                this.setState({update: false, flag: true})
-                                                            } else {
-                                                                this.setState({upgrading: false})
-                                                            }
-                                                        })
-                                                    } else {
-                                                        message.error('网关固件升级失败！ 错误:' + res.error)
-                                                        this.setState({upgrading: false})
-                                                    }
-                                                }).catch((err)=>{
-                                                    message.error('网关固件升级失败！ 错误:' + err)
-                                                    this.setState({upgrading: false})
-                                                })
-                                            }}
-                                          >升级更新</Button> : <Button>检查更新</Button>
-                                    }
-                        </div>
-                        <div style={{display: 'flex', flexWrap: 'wrap'}}>
-                            <div style={{width: '50%', padding: 10, boxSizing: 'border-box'}}>
-                            <h1>FreeIOE</h1>
-                                {
-                                    newdata && newdata.length > 0 && newdata.map((v, i)=>{
-                                        return (
-                                            <Card
-                                                title={`应用名称：${v.app_name}`}
-                                                key={i}
-                                                style={{marginTop: 10, lineHeight: '30px'}}
-                                            >
-                                                <p>版本号：{v.version}</p>
-                                                <p>更新时间：{v.modified.split('.')[0]}</p>
-                                                <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, '<br />') }}></p>
-                                            </Card>
-                                        )
-                                    })
-                                }
-                            </div>
-                            <div style={{width: '50%', padding: 10}}>
-                            {
-                                config.skynet_version < this.state.skynet_version
-                                ? <h1>{this.state.config.platform}_skynet</h1>
-                                : ''
+                    <Button
+                        onClick={()=>{
+                            this.setState({update: false, flag: true})
+                        }}
+                    >X</Button>
+                    <Upgrade
+                        config={config}
+                        title={title}
+                        upgrading={upgrading}
+                        version={this.state.version}
+                        skynet_version={this.state.skynet_version}
+                        version_data={newdata}
+                        skynet_version_data={opendata}
+                        onUpgrade={()=>{
+                            this.setState({upgrading: true})
+                            const data = config.data && config.data.skynet_version < this.state.skynet_version
+                            ? {
+                                name: config.sn,
+                                skynet_version: this.state.skynet_version,
+                                version: this.state.version,
+                                no_ack: 1,
+                                id: `sys_upgrade/${config.sn}/${new Date() * 1}`
                             }
-                                {
-                                    opendata && opendata.length > 0 && opendata.map((v, i)=>{
-                                        return (
-                                            <Card
-                                                title={`应用名称：${v.app_name}`}
-                                                key={i}
-                                                style={{marginTop: 10, lineHeight: '30px'}}
-                                            >
-                                                <p>版本号：{v.version}</p>
-                                                <p>更新时间：{v.modified.split('.')[0]}</p>
-                                                <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, '<br />') }}></p>
-                                            </Card>
-                                        )
+                            : {
+                                name: config.sn,
+                                version: this.state.version,
+                                no_ack: 1,
+                                id: `sys_upgrade/${config.sn}/${new Date() * 1}`
+                            }
+                            http.post('/api/gateways_upgrade', data).then(res=>{
+                                if (res.ok) {
+                                    this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 10000,  (result)=> {
+                                        if (result.ok){
+                                            this.setState({update: false, flag: true})
+                                        } else {
+                                            this.setState({upgrading: false})
+                                        }
                                     })
+                                } else {
+                                    message.error('网关固件升级失败！ 错误:' + res.error)
+                                    this.setState({upgrading: false})
                                 }
-                            </div>
-                        </div>
-                    </div>
+                            }).catch((err)=>{
+                                message.error('网关固件升级失败！ 错误:' + err)
+                                this.setState({upgrading: false})
+                            })
+                        }}
+                    />
                 </div>
             </div>
         );

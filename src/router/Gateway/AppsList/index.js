@@ -273,7 +273,7 @@ class AppsList extends Component {
                     app_inst={edit_app_inst}
                     inst_editable={false}
                     pre_configuration={edit_app_conf}
-                    disabled={!this.props.store.gatewayInfo.ActionEnable}
+                    disabled={!this.props.store.gatewayInfo.actionEnable}
                     onSubmit={this.onSubmitAppConfig}
                 />
                 </div>

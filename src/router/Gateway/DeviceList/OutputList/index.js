@@ -39,7 +39,7 @@ class OutputList extends Component {
             render: (record)=>{
                 return (
                     <Button
-                        disabled={!this.props.store.gatewayInfo.ActionEnable}
+                        disabled={!this.props.store.gatewayInfo.actionEnable}
                         onClick={()=>{
                         this.showModal(record)
                     }}

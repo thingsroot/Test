@@ -86,7 +86,7 @@ class GatewayInfo {
             }
         }
 
-        this.actionEnable = this.device_status === 'ONLINE' && this.enabled && this.sn && this.sn !== ''
+        this.actionEnable = this.device_status === 'ONLINE' && this.enabled === 1 && this.sn && this.sn !== '' ? true : false
         //console.log(this)
     }
 
