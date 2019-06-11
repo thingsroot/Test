@@ -106,7 +106,6 @@ class MyGatesDevices extends Component {
     render () {
       const { flag } = this.state;
       const { path } = this.props.match;
-      // const { gateList, status } = this.props.store.appStore;
         return (
             <div>
                 <GatewayStatus gateway={this.state.gateway}/>
