@@ -80,7 +80,11 @@ class Status extends Component {
                 </div>
                     {
                         this.props.location.pathname.indexOf('/appsinstall') === -1
-                        ? <div>
+                        ? <div
+                            onClick={()=>{
+                                localStorage.setItem('url', this.props.location.pathname)
+                            }}
+                        >
                             <Link to={`/appsinstall/${this.state.gateway}`}>
                                 安装新应用
                             </Link>

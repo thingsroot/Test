@@ -390,7 +390,7 @@ class MyGatesAppsInstall extends Component {
                                    className="rollback"
                                    type="rollback"
                                    onClick={()=>{
-                                       this.props.history.go(-1)
+                                       window.location.href = localStorage.getItem('url')
                                    }}
                                />
                            </div>
