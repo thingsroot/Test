@@ -58,6 +58,8 @@ class GatewayInfo {
     @observable sn = ''
     @observable description = ''
     @observable enabled = 0
+    @observable longitude = ''
+    @observable latitude = ''
 
     @observable install_apps = [] // Instance name list from realtime-data for running
     @observable ioe_network = false
