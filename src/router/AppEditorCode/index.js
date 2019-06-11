@@ -239,8 +239,13 @@ class AppEditorCode extends Component {
         let url = '/apis/api/method/app_center.editor.editor_revert';
         http.post(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
             .then(res=>{
+                res;
                 this.props.store.codeStore.change();
-                message.success(res.message);
+                message.success('工作区将重置到版本' + this.state.version);
+                setTimeout(()=>{
+                    window.location.reload();
+                }, 1500)
+
             })
     };
     //重置版本结束
@@ -255,6 +260,7 @@ class AppEditorCode extends Component {
                 '&text=' + this.props.store.codeStore.newEditorContent)
                 .then(res=>{
                     console.log(res);
+                    console.log(this.props.store.codeStore.newEditorContent)
                     message.success('文件保存成功！')
                 })
         }
@@ -288,14 +294,15 @@ class AppEditorCode extends Component {
             '&operation=set_content&version=' + this.state.newVersion +
             '&comment=' + this.state.comment)
             .then(res=>{
-                message.success(res.message);
+                message.success(res.message + ', 即将跳转到新版本！');
             });
         setTimeout(()=>{
             this.setState({
                 isShow: false
             });
             this.props.store.codeStore.change();
-        }, 1000)
+            window.location.reload()
+        }, 1500)
     };
 
     //添加文件
@@ -347,7 +354,6 @@ class AppEditorCode extends Component {
     };
 
     //添加文件夹
-
     addFolderShow = ()=>{
         if (this.props.store.codeStore.folderType === 'folder') {
             this.setState({
@@ -399,8 +405,6 @@ class AppEditorCode extends Component {
     renderTreeNodes = (data, delData)=>data.map((item, i) => {
         if (delData !== '0') {
             //如果循环的节点数据中有跟你传过来要删的数据delData.key相同的 那就将这条数据丛树节点删掉
-            console.log()
-            console.log(delData.node.props.dataRef.key)
             if (item.key === delData.node.props.dataRef.key) {
                 data.splice(i, 1);
                 this.setState({
