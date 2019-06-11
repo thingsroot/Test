@@ -36,7 +36,7 @@ class CommandList extends Component {
             render: (record)=>{
                 return (
                     <Button
-                        disabled={this.props.store.gatewayInfo.ActionEnable}
+                        disabled={!this.props.store.gatewayInfo.ActionEnable}
                         onClick={()=>{
                         this.showModal(record)
                     }}

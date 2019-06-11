@@ -348,7 +348,7 @@ class GatewaySettings extends Component {
                     >
                         <div className="setbutton">
                             <Button
-                                disabled={ActionEnable}
+                                disabled={!ActionEnable}
                                 onClick={()=>{
                                     this.setState({update: true})
                                 }}
@@ -666,7 +666,7 @@ class GatewaySettings extends Component {
                                     {
                                         config.version < this.state.version || config.skynet_version < this.state.skynet_version
                                         ? <Button
-                                            disabled={upgrading || ActionEnable}
+                                            disabled={upgrading || !ActionEnable}
                                             onClick={()=>{
                                                 const data = config.skynet_version < this.state.skynet_version
                                                 ? {
