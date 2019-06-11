@@ -598,14 +598,9 @@ class MyGates extends Component {
                     {
                         <Tabs
                             type="card"
+                            activeKey={this.state.status}
                             onChange={(value)=>{
-                                let status = 'all'
-                                if (value === '1') {
-                                    status = 'online'
-                                }
-                                if (value === '2') {
-                                    status = 'offline'
-                                }
+                                let status = value
                                 let data = this.state[status + 'data']
                                 let loading = data && data.length > 0 ? false : true
                                 this.setState({loading: loading, status: status}, ()=>{
@@ -614,7 +609,7 @@ class MyGates extends Component {
                             }}
                         >
                         <TabPane tab="在线"
-                            key="1"
+                            key="online"
                         >
                             <Table columns={
                                         this.state.columns
@@ -635,7 +630,7 @@ class MyGates extends Component {
                                 }}
                             /></TabPane>
                         <TabPane tab="离线"
-                            key="2"
+                            key="offline"
                         >
                             <Table columns={this.state.columns}
                                 dataSource={
@@ -655,7 +650,7 @@ class MyGates extends Component {
                             />
                         </TabPane>
                         <TabPane tab="全部"
-                            key="3"
+                            key="all"
                         >
                             <Table columns={this.state.columns}
                                 dataSource={
