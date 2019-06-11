@@ -51,9 +51,23 @@ class MyCode extends Component {
                 })
         }
     };
-
+    autoSave = (newValue)=>{
+        if (this.timer){
+            clearTimeout(this.timer)
+        }
+        this.timer = setTimeout(()=>{
+            let url = '/apis/api/method/app_center.editor.editor';
+            http.post(url + '?app=' + this.props.match.params.app +
+                '&operation=set_content&id=' + this.props.store.codeStore.fileName +
+                '&text=' + newValue)
+                .then(res=>{
+                    res;
+                })
+        }, 3000)
+    };
     onChange = (newValue)=>{
         this.props.store.codeStore.setNewEditorContent(newValue);
+        this.autoSave(newValue)
     };
 
     render () {
