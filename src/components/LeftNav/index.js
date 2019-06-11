@@ -91,6 +91,7 @@ class LeftNav extends Component {
     render () {
         const { list, index } = this.state;
         const { url } = this.props.match;
+        const { gatewayInfo } = this.props.store;
         return (
             <div className="leftnav">
                 <div className="navlist">
@@ -106,10 +107,10 @@ class LeftNav extends Component {
                                         }}
                                     ><li className={index === i ? 'active' : ''}>
                                     {
-                                        v.href.toLowerCase() === '/devslist' ? <div className="gatecount count">{this.props.store.appStore.devs_len}</div> : ''
+                                        v.href.toLowerCase() === '/devslist' ? <div className="gatecount count">{gatewayInfo.devices_count}</div> : ''
                                     }
                                     {
-                                        v.href.toLowerCase() === '/appslist' ? <div className="appcount count">{this.props.store.appStore.apps_len}</div> : ''
+                                        v.href.toLowerCase() === '/appslist' ? <div className="appcount count">{gatewayInfo.apps_count}</div> : ''
                                     }
                                     <Icon type={v.icon}/>&nbsp;&nbsp;{v.text}</li></Link>
                                 )

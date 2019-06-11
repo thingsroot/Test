@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import http from '../../../utils/Server';
-import { Table } from 'antd';
+import { Table, message } from 'antd';
 import { inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import Collapses from './Collapses';
@@ -60,51 +60,59 @@ class DevicesList extends Component {
 
     state = {
         data: [],
-        loading: true,
-        sn: this.props.match.params.sn,
-        devList: []
+        loading: false,
+        gateway: this.props.gateway
     }
     componentDidMount (){
-        this.setState({sn: this.props.match.params.sn}, ()=>{
-            this.getData(this.state.sn);
+        this.setState({gateway: this.props.gateway}, ()=>{
+            this.timer = setInterval(()=>{
+                this.getData();
+            }, 3000)
+            this.setData(this.props.store.gatewayInfo.devices)
+            if (this.props.store.gatewayInfo.devices_count === 0) {
+                this.setState({loading: true})
+            }
+            this.getData()
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (nextProps.location.pathname !== this.props.location.pathname){
-          clearInterval(this.timer)
-          const sn = nextProps.match.params.sn;
-          this.setState({
-              sn,
-              loading: true
-          }, ()=>{
-              this.getData(this.state.sn);
-          });
+        if (nextProps.gateway !== this.props.gateway){
+            this.setState({
+                gateway: nextProps.gateway,
+                loading: true
+            }, ()=>{
+                this.getData();
+            });
         }
     }
     componentWillUnmount (){
         clearInterval(this.timer)
     }
-    getData (sn){
-        http.get('/api/gateways_dev_list?gateway=' + sn).then(res=>{
+    getData (){
+        http.get('/api/gateways_dev_list?gateway=' + this.state.gateway).then(res=>{
             if (res.ok) {
-                let data = [];
-                if (res.data && res.data.length > 0){
-                    res.data.map((item=>{
-                        item.meta.ioc = '' + (item.inputs ? item.inputs.length : '0') + '/' + (item.outputs ? Object.keys(item.outputs).length : '0') + '/' + (item.commands ? item.commands.length : '0');
-                        if (item.meta.outputs > 0){
-                            item.meta.set_data = true
-                        }
-                        item.meta.Gate_Sn = this.props.match.params.sn;
-                        data.push(item);
-                    }))
-                }
-                this.setState({
-                    data,
-                    devList: res.data,
-                    loading: false
-                })
-                this.props.store.appStore.dev_list = data;
+                this.props.store.gatewayInfo.setDevices(res.data);
+                this.setData(res.data)
+            } else {
+                message.error(res.error)
             }
+            this.setState({loading: false})
+        })
+    }
+    setData (devices) {
+        let data = [];
+        if (devices && devices.length > 0){
+            devices.map((item=>{
+                item.meta.ioc = '' + (item.inputs ? item.inputs.length : '0') + '/' + (item.outputs ? Object.keys(item.outputs).length : '0') + '/' + (item.commands ? item.commands.length : '0');
+                if (item.meta.outputs > 0){
+                    item.meta.set_data = true
+                }
+                item.meta.Gate_Sn = this.state.gateway;
+                data.push(item);
+            }))
+        }
+        this.setState({
+            data: data
         })
     }
     render () {

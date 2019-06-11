@@ -50,7 +50,6 @@ class GatewaysDrawer extends Component {
     }
 
     render () {
-        // const { gateList } = this.props.store.appStore;
         const { gateways, status, gateway_sn } = this.state;
         status, gateway_sn;
         const { onClose, onChange, visible, gateway } = this.props;

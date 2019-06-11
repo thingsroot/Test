@@ -7,7 +7,7 @@ import GatewayRoute from '../../components/GatewayRoute';
 import './style.scss';
 import http from '../../utils/Server';
 import { inject, observer } from 'mobx-react';
-import { Button, Icon } from 'antd';
+import { Button, Icon, message } from 'antd';
 import GatewayMQTT from '../../utils/GatewayMQTT';
 
 const DeviceList = LoadableComponent(()=>import('./DeviceList'));
@@ -75,10 +75,14 @@ class MyGatesDevices extends Component {
             } else {
                 this.setState({VPNflag: false})
             }
-            this.props.store.appStore.setApplen(Object.keys(res.data).length);
+            this.props.store.gatewayInfo.setApps(res.data);
         })
-        http.get('/api/gateways_dev_len?gateway=' + gateway).then(res=>{
-            this.props.store.appStore.setDevlen(res.length);
+        http.get('/api/gateways_dev_list?gateway=' + gateway).then(res=>{
+            if (res.ok) {
+                this.props.store.gatewayInfo.setDevices(res.data)
+            } else {
+                message.error(res.error)
+            }
         })
     }
     showDrawer = () => {

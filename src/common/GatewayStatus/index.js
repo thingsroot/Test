@@ -84,7 +84,7 @@ class Status extends Component {
                             onClick={()=>{
                                 localStorage.setItem('url', this.props.location.pathname)
                             }}
-                        >
+                          >
                             <Link to={`/appsinstall/${this.state.gateway}`}>
                                 安装新应用
                             </Link>

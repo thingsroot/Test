@@ -28,7 +28,7 @@ class AppsList extends Component {
         this.state = {
             data: [],
             pagination: {},
-            loading: true,
+            loading: false,
             configStore: new ConfigStore(),
             edit_app_info: {},
             edit_app_inst: '',
@@ -111,18 +111,22 @@ class AppsList extends Component {
         }
     }
     componentDidMount () {
-        this.setState({gateway_sn: this.props.match.params.sn}, () =>{
+        this.setState({gateway_sn: this.props.gateway}, () =>{
+            this.setData(this.props.store.gatewayInfo.apps)
+            if (this.props.store.gatewayInfo.apps_count === 0) {
+                this.setState({loading: true})
+            }
             this.fetch();
             this.timer = setInterval(() => {
                 this.fetch()
-            }, 10000);
+            }, 3000);
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (nextProps.match.params.sn !== this.state.gateway_sn){
+        if (nextProps.gateway !== this.state.gateway_sn){
             this.setState({
                 loading: true,
-                gateway_sn: nextProps.match.params.sn
+                gateway_sn: nextProps.gateway
             }, ()=>{
                 this.fetch();
             })
@@ -146,7 +150,6 @@ class AppsList extends Component {
     //   });
     // }
     fetch = () => {
-        const pagination = { ...this.state.pagination };
         const {gatewayInfo} = this.props.store
         let enable_beta = gatewayInfo.data.enable_beta
         if (enable_beta === undefined) {
@@ -154,19 +157,19 @@ class AppsList extends Component {
         }
         http.get('/api/gateways_app_list?gateway=' + this.state.gateway_sn + '&beta=' + enable_beta).then(res=>{
             if (res.ok){
-                this.props.store.appStore.setApplen(res.data && res.data.length)
-                this.setState({
-                    data: res.data,
-                    loading: false,
-                    pagination
-                })
+                this.props.store.gatewayInfo.setApps(res.data)
+                this.setData(res.data)
             } else {
-                this.setState({
-                data: [],
-                loading: false,
-                pagination
-                })
+                message.error(res.error)
             }
+            this.setState({loading: false})
+        })
+    }
+    setData = (apps)=> {
+        const pagination = { ...this.state.pagination };
+        this.setState({
+            data: apps,
+            pagination
         })
     }
 

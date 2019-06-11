@@ -59,11 +59,16 @@ class GatewayInfo {
     @observable description = ''
     @observable enabled = 0
 
-    @observable install_apps = [] // Instance name list
+    @observable install_apps = [] // Instance name list from realtime-data for running
     @observable Net_Manager = false
     @observable p2p_vpn = false
     @observable cpu = ''
     @observable data = new GatewayData()
+
+    @observable devices = []
+    @observable devices_count = 0
+    @observable apps = {}
+    @observable apps_count = 0
 
     @action updateStatus (data) {
         let self_keys = Object.getOwnPropertyNames(this.__proto__)
@@ -79,6 +84,15 @@ class GatewayInfo {
             }
         }
         //console.log(this)
+    }
+
+    @action setDevices (value) {
+        this.devices = value
+        this.devices_count = value.length
+    }
+    @action setApps (value) {
+        this.apps = value
+        this.apps_count = Object.keys(value).length
     }
 }
 
