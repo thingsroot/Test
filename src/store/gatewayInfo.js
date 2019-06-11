@@ -100,4 +100,4 @@ class GatewayInfo {
     }
 }
 
-export default new GatewayInfo()
+export default GatewayInfo

@@ -60,7 +60,7 @@ class DevicesList extends Component {
 
     state = {
         data: [],
-        loading: false,
+        loading: true,
         gateway: this.props.gateway
     }
     componentDidMount (){
@@ -69,8 +69,8 @@ class DevicesList extends Component {
                 this.getData();
             }, 3000)
             this.setData(this.props.store.gatewayInfo.devices)
-            if (this.props.store.gatewayInfo.devices_count === 0) {
-                this.setState({loading: true})
+            if (this.props.store.gatewayInfo.devices_count !== 0) {
+                this.setState({loading: false})
             }
             this.getData()
         })

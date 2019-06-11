@@ -15,15 +15,14 @@ class MyGates extends Component {
         super(props)
         this.state = {
             onlinedata: [],
-            onlinedatas: [],
             offlinedata: [],
-            offlinedatas: [],
             alldata: [],
-            alldatas: [],
             status: 'online',
+            filter_text: '',
             loading: true,
             visible: false,
             confirmLoading: false,
+            refreshing: false,
             sn: '',
             role: {},
             name: '',
@@ -195,30 +194,43 @@ class MyGates extends Component {
                 })
             }
         });
-        this.refreshDevicesList(0);
+        let {all, online, offline} = this.props.store.gatewayList;
+        let loading = online.length !== 0 ? false : true
+        this.setState({
+            loading: loading,
+            alldata: all,
+            onlinedata: online,
+            offlinedata: offline
+        })
+
+        this.refreshDevicesList();
         timer = setInterval(() => {
-            this.refreshDevicesList(1)
+            this.refreshDevicesList()
         }, 10000);
     }
     componentWillUnmount () {
         clearInterval(timer)
     }
 
-    refreshDevicesList (num){
+    refreshDevicesList (){
         let status = this.state.status;
         http.get('/api/gateways_list?status=' + status).then(res=>{
             if (res.ok) {
                 const data = status + 'data';
-                const datas = status + 'datas';
+                if (status === 'online') {
+                    this.props.store.gatewayList.setOnline(res.data)
+                }
+                if (status === 'offline') {
+                    this.props.store.gatewayList.setOffline(res.data)
+                }
+                if (status === 'all') {
+                    this.props.store.gatewayList.setAll(res.data)
+                }
+                let arr = this.filterGatewayList(res.data, this.state.filter_text)
                 this.setState({
                     loading: false,
-                    [data]: res.data
+                    [data]: arr
                 });
-                if (num === 0) {
-                    this.setState({
-                        [datas]: res.data
-                    })
-                }
             }
         })
     }
@@ -230,7 +242,7 @@ class MyGates extends Component {
                 if (res.ok){
                     message.success('移除网关成功')
                 }
-                this.refreshDevicesList(0)
+                this.refreshDevicesList()
             })
         }
     }
@@ -245,7 +257,7 @@ class MyGates extends Component {
     }
     showModal = (name) => {
         this.setState({
-          [name]: true
+            [name]: true
         }, ()=>{
             if (name === 'visible') {
                 http.get('/api/user_groups_list').then(res=>{
@@ -255,100 +267,100 @@ class MyGates extends Component {
                 })
             }
         });
-      };
-      handleOk = (type) => {
-          const { sn, name, desc, index} = this.state;
-          const owner_id = index === 1 ? this.state.role.name : this.props.store.session.user_id;
-          const owner_type = index === 1 ? 'Cloud Company Group' : 'User';
-          const data = {
-            'name': sn,
-            'dev_name': name,
-            'description': desc,
-            'owner_type': owner_type,
-            'owner_id': owner_id
-          };
+    };
+    handleOk = (type) => {
+        const { sn, name, desc, index} = this.state;
+        const owner_id = index === 1 ? this.state.role.name : this.props.store.session.user_id;
+        const owner_type = index === 1 ? 'Cloud Company Group' : 'User';
+        const data = {
+        'name': sn,
+        'dev_name': name,
+        'description': desc,
+        'owner_type': owner_type,
+        'owner_id': owner_id
+        };
         this.setState({
             confirmLoading: true
-          }, ()=>{
-              if (type === 'create'){
-                http.post('/api/gateways_create', data).then(res=>{
+        }, ()=>{
+            if (type === 'create'){
+            http.post('/api/gateways_create', data).then(res=>{
+                if (res.ok) {
+                    message.success('绑定成功')
+                    this.refreshDevicesList()
+                } else {
+                    message.error(res.error)
+                }
+            })
+            } else {
+                const {record} = this.state;
+                http.post('/api/gateways_update', {
+                    name: record.sn,
+                    dev_name: record.dev_name,
+                    description: record.description,
+                    owner_type: owner_type,
+                    owner_id: owner_id
+                }).then(res=>{
                     if (res.ok) {
-                      message.success('绑定成功')
-                      this.refreshDevicesList(0)
-                    } else {
-                      message.error(res.error)
+                        message.success('更改成功')
+                        this.setState({
+                            setName: false
+                        })
                     }
                 })
-              } else {
-                  const {record} = this.state;
-                  http.post('/api/gateways_update', {
-                        name: record.sn,
-                        dev_name: record.dev_name,
-                        description: record.description,
-                        owner_type: owner_type,
-                        owner_id: owner_id
-                  }).then(res=>{
-                      if (res.ok) {
-                          message.success('更改成功')
-                          this.setState({
-                              setName: false
-                          })
-                      }
-                  })
-              }
-          });
+            }
+        });
         setTimeout(() => {
-        this.setState({
-            visible: false,
-            confirmLoading: false
-        });
+            this.setState({
+                visible: false,
+                confirmLoading: false
+            });
         }, 2000);
-      }
-      handleCancel = (name) => {
+    }
+    handleCancel = (name) => {
         this.setState({
-          [name]: false
+            [name]: false
         });
-      }
-    filter = (text)=>{
-        this.setState({
-            loading: true
+    }
+    filterGatewayList = (data, filter_text) => {
+        if (filter_text === undefined || filter_text === '') {
+            return data
+        }
+        let text = filter_text.toLowerCase()
+        let arr = [];
+        data.map(item=>{
+            if (item.dev_name.toLowerCase().indexOf(text) !== -1 ||
+                item.sn.toLowerCase().indexOf(text) !== -1 ||
+                item.description && item.description.toLowerCase().indexOf(text) !== -1){
+                arr.push(item)
+            }
         });
+        return arr;
+    }
+    changeFilter = (text)=>{
         if (this.timer){
             clearTimeout(this.timer)
         }
-        this.timer = setTimeout(() => {
-            const name = this.state.status + 'data';
-            const names = this.state.status + 'datas';
-            const data = this.state[name];
-            const arr = [];
-            if (text) {
-                data.map(item=>{
-                    if (item.dev_name.toLowerCase().indexOf(text.toLowerCase()) !== -1 ||
-                        item.sn.indexOf(text.toLowerCase()) !== -1 ||
-                        item.description && item.description.toLowerCase().indexOf(text.toLowerCase()) !== -1){
-                        arr.push(item)
-                    }
-                });
+        this.setState({
+            loading: true,
+            filter_text: text
+        }, () => {
+            this.timer = setTimeout(() => {
+                const name = this.state.status + 'data';
+                const data = this.props.store.gatewayList[name];
+                let arr = this.filterGatewayList(data, this.state.filter_text)
                 this.setState({
-                    [names]: arr,
+                    [name]: arr,
                     loading: false
                 })
-            } else {
-                this.setState({
-                    [names]: data,
-                    loading: false
-                })
-            }
-        }, 1000);
-
-
+            }, 1000);
+        });
     }
     search = (e)=>{
-          let text = e.target.value;
-          this.filter(text)
+        let text = e.target.value;
+        this.changeFilter(text)
     }
     render (){
-        let { alldatas, onlinedatas, offlinedatas, confirmLoading } = this.state;
+        let { alldata, onlinedata, offlinedata, confirmLoading } = this.state;
         return (
             <div
                 style={{
@@ -563,9 +575,14 @@ class MyGates extends Component {
                 </Modal>
                 <div style={{position: 'relative'}}>
                     <Button
+                        disabled={this.state.refreshing}
                         style={{position: 'absolute', left: 200, top: 0, zIndex: 999}}
                         onClick={()=>{
-                            this.refreshDevicesList(0)
+                            this.setState({refreshing: true})
+                            this.refreshDevicesList()
+                            setTimeout(()=> {
+                                this.setState({refreshing: false})
+                            }, 2000)
                         }}
                     >
                         <Icon type="sync"/>
@@ -584,7 +601,7 @@ class MyGates extends Component {
                                 let data = this.state[status + 'data']
                                 let loading = data && data.length > 0 ? false : true
                                 this.setState({loading: loading, status: status}, ()=>{
-                                    this.refreshDevicesList(0)
+                                    this.refreshDevicesList()
                                 })
                             }}
                         >
@@ -595,7 +612,7 @@ class MyGates extends Component {
                                         this.state.columns
                                     }
                                 dataSource={
-                                    onlinedatas && onlinedatas.length > 0 ? onlinedatas : []
+                                    onlinedata && onlinedata.length > 0 ? onlinedata : []
                                 }
                                 bordered
                                 loading={this.state.loading}
@@ -614,7 +631,7 @@ class MyGates extends Component {
                         >
                             <Table columns={this.state.columns}
                                 dataSource={
-                                    offlinedatas && offlinedatas.length > 0 ? offlinedatas : []
+                                    offlinedata && offlinedata.length > 0 ? offlinedata : []
                                 }
                                 rowKey="sn"
                                 rowClassName={(record, index) => {
@@ -634,7 +651,7 @@ class MyGates extends Component {
                         >
                             <Table columns={this.state.columns}
                                 dataSource={
-                                    alldatas && alldatas.length > 0 ? alldatas : []
+                                    alldata && alldata.length > 0 ? alldata : []
                                 }
                                 rowClassName={(record, index) => {
                                     let className = 'light-row';

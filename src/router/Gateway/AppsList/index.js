@@ -28,7 +28,7 @@ class AppsList extends Component {
         this.state = {
             data: [],
             pagination: {},
-            loading: false,
+            loading: true,
             configStore: new ConfigStore(),
             edit_app_info: {},
             edit_app_inst: '',
@@ -113,8 +113,8 @@ class AppsList extends Component {
     componentDidMount () {
         this.setState({gateway_sn: this.props.gateway}, () =>{
             this.setData(this.props.store.gatewayInfo.apps)
-            if (this.props.store.gatewayInfo.apps_count === 0) {
-                this.setState({loading: true})
+            if (this.props.store.gatewayInfo.apps_count !== 0) {
+                this.setState({loading: false})
             }
             this.fetch();
             this.timer = setInterval(() => {
