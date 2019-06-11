@@ -526,7 +526,7 @@ class AppEditorCode extends Component {
                 case 'xml' : suffixName = 'xml'; break;
                 case 'rb' : suffixName = 'ruby'; break;
                 case 'scss' : suffixName = 'sass'; break;
-                case 'less' : suffixName = 'sass'; break;
+                // case 'less' : suffixName = 'sass'; break;
                 case 'md' : suffixName = 'markdown'; break;
                 case 'sql' : suffixName = 'mysql'; break;
                 case 'json' : suffixName = 'json'; break;
@@ -536,64 +536,28 @@ class AppEditorCode extends Component {
                 default : suffixName = 'java'
             }
             this.props.store.codeStore.setSuffixName(suffixName);
-
         } else {
             this.props.store.codeStore.setSuffixName('text');
         }
-    }
+    };
 
     onSelect = (selectedKeys, info) => {
-        console.log(this.props.store.codeStore.newEditorContent[0]);
+        if (this.props.store.codeStore.editorContent !== this.props.store.codeStore.newEditorContent) {
+            let url = '/apis/api/method/app_center.editor.editor';
+            http.post(url + '?app=' + this.state.app +
+                '&operation=set_content&id=' + this.props.store.codeStore.fileName +
+                '&text=' + this.props.store.codeStore.newEditorContent)
+                .then(res=>{
+                    console.log(res);
+                })
+        }
         this.setState({
             treeNode: info
         });
         if (selectedKeys.length > 0) {
             if (info.node.props.dataRef.type === 'file') {
-                if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent){
-                    this.set(selectedKeys, info)
-                } else {
-                    // this.props.store.codeStore.setEditorContent(this.props.store.codeStore.newEditorContent);
-                    //保存提示
-                    const pro = ()=>{
-                        return new Promise(() => {
-                            console.log(this.props.store.codeStore.newEditorContent[0])
-                            let url = '/apis/api/method/app_center.editor.editor';
-                            let params = {
-                                app: this.state.app,
-                                operation: 'set_content',
-                                id: this.props.store.codeStore.fileName,
-                                text: this.props.store.codeStore.newEditorContent[0]
-                            };
-                            http.post(url, params)
-                                .then(res=>{
-                                    res;
-                                    this.set(selectedKeys, info)
-                                })
-                        })
-                    };
-                    const cancel = ()=>{
-                        this.set(selectedKeys, info)
-                    };
-                    confirm({
-                        title: '提示信息',
-                        okText: '确定',
-                        cancelText: '取消',
-                        content: '是否保存当前文件？',
-                        onOk () {
-                            pro().then(res=>{
-                                res;
-                                message.success('保存成功！')
-                            }).catch(req=>{
-                                req;
-                                message.error('保存失败！')
-                            })
-                        },
-                        onCancel () {
-                            cancel()
-                        }
-                    });
-                }
-            } else if (info.node.props.dataRef.type === 'folder') {
+                this.set(selectedKeys, info)
+            } else {
                 this.setState({ selectedKeys }, ()=>{
                     this.props.store.codeStore.setFileName(this.state.selectedKeys);
                 });
