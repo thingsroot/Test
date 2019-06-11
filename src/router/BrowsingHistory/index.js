@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Table, Select, Button, Icon } from 'antd';
 import { inject, observer } from 'mobx-react';
-import Status from '../../common/status';
+import GatewayStatus from '../../common/GatewayStatus';
 import axios from 'axios';
 import './style.scss';
 const Option = Select.Option;
@@ -219,7 +219,7 @@ class BrowsingHistory extends Component {
     render () {
         return (
             <div className="historywrap">
-                <Status gateway={this.state.gateway}/>
+                <GatewayStatus gateway={this.state.gateway}/>
                 <div className="history">
                     <div className="historyleft">
                         <div style={{display: 'flex'}}>

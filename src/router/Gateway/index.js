@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter, Switch, Redirect } from 'react-router-dom';
-import Status from '../../common/status';
+import GatewayStatus from '../../common/GatewayStatus';
 import LeftNav from '../../components/LeftNav';
 import LoadableComponent from '../../utils/LoadableComponent';
 import GatewayRoute from '../../components/GatewayRoute';
@@ -105,7 +105,7 @@ class MyGatesDevices extends Component {
       // const { gateList, status } = this.props.store.appStore;
         return (
             <div>
-                <Status gateway={this.state.gateway}/>
+                <GatewayStatus gateway={this.state.gateway}/>
                     <div className="mygatesdevices">
                         <LeftNav
                             prop={this.props.match.params}

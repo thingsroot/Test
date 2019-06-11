@@ -3,6 +3,7 @@ import { inject, observer } from 'mobx-react';
 import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
+
 @withRouter
 @inject('store')
 @observer
@@ -60,7 +61,7 @@ class Status extends Component {
     render () {
         const { device_status, dev_name, description } = this.props.store.gatewayInfo;
         return (
-            <div className="statusWrap">
+            <div className="GatesStatusWrap">
                 <div>
                     <div className="status"></div>
                     &nbsp; <span className={device_status === 'ONLINE' ? 'online' : 'offline'}>{device_status ? device_status : 'OFFLINE'}</span>
