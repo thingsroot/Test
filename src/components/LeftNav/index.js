@@ -95,7 +95,7 @@ class LeftNav extends Component {
         return (
             <div className="leftnav">
                 <div className="navlist">
-                    <p>基本功能</p>
+                    <p className="FeaturesGroup">基本功能</p>
                     <ul>
                         {
                             list.map((v, i)=>{
@@ -119,7 +119,7 @@ class LeftNav extends Component {
                     </ul>
                 </div>
                 <div className="navlist">
-                        <p>高级功能</p>
+                        <p className="FeaturesGroup">高级功能</p>
                         <ul>
                             <Link
                                 to={`${url}/logviewer`}
@@ -174,7 +174,7 @@ class LeftNav extends Component {
                         </ul>
                 </div>
                 <div className="navlist">
-                    <p>扩展功能</p>
+                    <p className="FeaturesGroup">扩展功能</p>
                     <ul>
                         {
                             gatewayInfo.ioe_ser2net
