@@ -102,13 +102,13 @@ const templates_childs = [
         'type': 'string'
     },
     {
-        'name': 'version',
+        'name': 'ver',
         'desc': '版本',
         'type': 'number'
     }
 ];
 const templates_section = {
-    'name': 'templates',
+    'name': 'tpls',
     'desc': '模板选择',
     'type': 'templates',
     'child': templates_childs
