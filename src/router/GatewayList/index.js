@@ -322,7 +322,7 @@ class MyGates extends Component {
         });
     }
     filterGatewayList = (data, filter_text) => {
-        if (filter_text === undefined || filter_text === '') {
+        if (filter_text === undefined || filter_text === '' || data === undefined) {
             return data
         }
         let text = filter_text.toLowerCase()
@@ -341,18 +341,26 @@ class MyGates extends Component {
             clearTimeout(this.timer)
         }
         this.setState({
-            loading: true,
             filter_text: text
         }, () => {
             this.timer = setTimeout(() => {
                 const name = this.state.status + 'data';
-                const data = this.props.store.gatewayList[name];
+                let data = [];
+                const {all, online, offline} = this.props.store.gatewayList;
+                if (this.state.status === 'all') {
+                    data = all
+                }
+                if (this.state.status === 'online') {
+                    data = online
+                }
+                if (this.state.status === 'offline') {
+                    data = offline
+                }
                 let arr = this.filterGatewayList(data, this.state.filter_text)
                 this.setState({
-                    [name]: arr,
-                    loading: false
+                    [name]: arr
                 })
-            }, 1000);
+            }, 200);
         });
     }
     search = (e)=>{
