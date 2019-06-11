@@ -190,7 +190,7 @@ class AppConfigSection extends Component {
         config.cols && config.cols.length && config.cols.map((col, col_key)=>{
             let tableReference = col.reference
             if (tableReference === undefined && col.type === 'template') {
-                tableReference = 'templates'
+                tableReference = 'tpls'
             }
 
             tableColumns.push({
