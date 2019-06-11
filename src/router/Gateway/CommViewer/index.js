@@ -16,6 +16,7 @@ class CommViewer extends Component {
     constructor (props){
         super(props);
         this.mqtt_topic = '/comm'
+        this.search_timer = null
         this.state = {
             type: '',
             title: '',
@@ -68,20 +69,25 @@ class CommViewer extends Component {
     }
     handleChange = (value)=> {
         const { mqtt } = this.props;
-        if (value !== undefined && value !== '') {
-            mqtt.comm_channel.setSearchType(value)
+        if (value !== undefined && value.key !== undefined && value.key !== '') {
+            mqtt.comm_channel.setSearchType(value.key)
         }
     }
-    filter = (value)=>{
-        const lvalue = value.toLowerCase();
+    filter = (e)=>{
+        let text = e.target.value;
+        const value = text.toLowerCase();
 
-        const { mqtt } = this.props;
-        if (lvalue !== undefined && lvalue !== '') {
-            mqtt.comm_channel.setFilter(lvalue)
-
-        } else {
-            mqtt.comm_channel.clearFilter()
+        if (this.search_timer){
+            clearTimeout(this.search_timer)
         }
+        this.search_timer = setTimeout(() => {
+            const { mqtt } = this.props;
+            if (value !== undefined && value !== '') {
+                mqtt.comm_channel.setFilter(value)
+            } else {
+                mqtt.comm_channel.clearFilter()
+            }
+        }, 200)
     }
     startChannel =()=>{
         const { mqtt } = this.props;
@@ -134,19 +140,20 @@ class CommViewer extends Component {
                 <div className="searwrap">
                     <Select
                         labelInValue
-                        defaultValue={{ key: 'content' }}
-                        style={{ width: 120 }}
+                        defaultValue={{ key: 'all' }}
+                        style={{ width: 200 }}
                         onChange={this.handleChange}
                     >
+                        <Option value="all">全部</Option>
                         <Option value="content">内容</Option>
-                        <Option value="id">ID</Option>
-                        <Option value="type">类型</Option>
+                        <Option value="direction">方向</Option>
+                        <Option value="id">设备序列号</Option>
                     </Select>
                     <span style={{padding: '0 5px'}} />
                     <Search
-                        placeholder="input search text"
-                        onSearch={this.filter}
-                        enterButton
+                        placeholder="输入搜索内容"
+                        onChange={this.filter}
+                        style={{ width: 400 }}
                     />
                 </div>
                 {
@@ -166,7 +173,7 @@ class CommViewer extends Component {
                     <div style={{width: '100%'}}>
                         <div className="tableHeaders">
                             <div>时间</div>
-                            <div>设备ID</div>
+                            <div>设备序列号</div>
                             <div>方向</div>
                             <div>报文</div>
                         </div>

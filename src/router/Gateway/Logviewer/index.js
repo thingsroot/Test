@@ -16,6 +16,7 @@ class Logviewer extends Component {
     constructor (props){
         super(props);
         this.mqtt_topic = '/log'
+        this.search_timer = null
         this.state = {
             type: '',
             title: '',
@@ -68,20 +69,25 @@ class Logviewer extends Component {
     }
     handleChange = (value)=> {
         const { mqtt } = this.props;
-        if (value !== undefined && value !== '') {
-            mqtt.log_channel.setSearchType(value)
+        if (value !== undefined && value.key !== undefined && value.key !== '') {
+            mqtt.log_channel.setSearchType(value.key)
         }
     }
-    filter = (value)=>{
-        const lvalue = value.toLowerCase();
+    filter = (e)=>{
+        let text = e.target.value;
+        const value = text.toLowerCase();
 
-        const { mqtt } = this.props;
-        if (lvalue !== undefined && lvalue !== '') {
-            mqtt.log_channel.setFilter(lvalue)
-
-        } else {
-            mqtt.log_channel.clearFilter()
+        if (this.search_timer){
+            clearTimeout(this.search_timer)
         }
+        this.search_timer = setTimeout(() => {
+            const { mqtt } = this.props;
+            if (value !== undefined && value !== '') {
+                mqtt.log_channel.setFilter(value)
+            } else {
+                mqtt.log_channel.clearFilter()
+            }
+        }, 200)
     }
     startChannel =()=>{
         const { mqtt } = this.props;
@@ -130,19 +136,20 @@ class Logviewer extends Component {
                 <div className="searwrap">
                     <Select
                         labelInValue
-                        defaultValue={{ key: 'content' }}
-                        style={{ width: 120 }}
+                        defaultValue={{ key: 'all' }}
+                        style={{ width: 200 }}
                         onChange={this.handleChange}
                     >
+                        <Option value="all">全部</Option>
                         <Option value="content">内容</Option>
-                        <Option value="id">ID</Option>
-                        <Option value="type">类型</Option>
+                        <Option value="level">等级</Option>
+                        <Option value="id">应用示例名</Option>
                     </Select>
                     <span style={{padding: '0 5px'}} />
                     <Search
-                        placeholder="input search text"
-                        onSearch={this.filter}
-                        enterButton
+                        placeholder="输入搜索内容"
+                        onChange={this.filter}
+                        style={{ width: 400 }}
                     />
                 </div>
                 {
@@ -163,8 +170,8 @@ class Logviewer extends Component {
                     <div style={{width: '100%'}}>
                         <div className="tableHeaders">
                             <div>时间</div>
-                            <div>类型</div>
-                            <div>实例ID</div>
+                            <div>等级</div>
+                            <div>应用实例名</div>
                             <div>内容</div>
                         </div>
                             <div
@@ -184,7 +191,7 @@ class Logviewer extends Component {
                                             return (<div key={key}>
                                                 <div className="tableHeaders">
                                                     <div>{mqtt.log_channel.Data[key].time}</div>
-                                                    <div>{mqtt.log_channel.Data[key].type}</div>
+                                                    <div>{mqtt.log_channel.Data[key].level}</div>
                                                     <div>{mqtt.log_channel.Data[key].id}</div>
                                                     <div>{mqtt.log_channel.Data[key].content}</div>
                                                 </div>

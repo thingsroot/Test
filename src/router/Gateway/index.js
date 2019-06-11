@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { withRouter, Switch, Redirect } from 'react-router-dom';
-import Status from '../../common/status';
+import GatewayStatus from '../../common/GatewayStatus';
 import LeftNav from '../../components/LeftNav';
 import LoadableComponent from '../../utils/LoadableComponent';
 import GatewayRoute from '../../components/GatewayRoute';
 import './style.scss';
 import http from '../../utils/Server';
 import { inject, observer } from 'mobx-react';
-import { Button, Icon } from 'antd';
+import { Button, Icon, message } from 'antd';
 import GatewayMQTT from '../../utils/GatewayMQTT';
 
 const DeviceList = LoadableComponent(()=>import('./DeviceList'));
@@ -33,8 +33,6 @@ class MyGatesDevices extends Component {
         this.state = {
             gateway: '',
             visible: false,
-            flag: true,
-            VPNflag: false,
             url: window.location.pathname,
             mqtt: new GatewayMQTT()
         }
@@ -44,18 +42,8 @@ class MyGatesDevices extends Component {
             this.sendAjax()
             this.props.store.timer.setGateStatusLast(0)
         })
-        if (this.props.location.pathname.indexOf('VPN') !== -1){
-            this.setState({flag: false})
-        } else {
-            this.setState({flag: true})
-        }
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (nextProps.location.pathname.indexOf('VPN') !== -1){
-            this.setState({flag: false})
-        } else {
-            this.setState({flag: true})
-        }
         if (this.props.match.params.sn !== nextProps.match.params.sn){
             this.setState({gateway: nextProps.match.params.sn}, ()=>{
                 this.state.mqtt.disconnect(true)
@@ -70,15 +58,18 @@ class MyGatesDevices extends Component {
             return;
         }
         http.get('/api/gateways_app_list?gateway=' + gateway).then(res=>{
-            if (Object.values(res.data).filter(item=> item.inst_name === 'ioe_frpc' && item.name === 'frpc').length > 0){
-                this.setState({VPNflag: true})
+            if (res.ok) {
+                this.props.store.gatewayInfo.setApps(res.data);
             } else {
-                this.setState({VPNflag: false})
+                message.error(res.error)
             }
-            this.props.store.appStore.setApplen(Object.keys(res.data).length);
         })
-        http.get('/api/gateways_dev_len?gateway=' + gateway).then(res=>{
-            this.props.store.appStore.setDevlen(res.length);
+        http.get('/api/gateways_dev_list?gateway=' + gateway).then(res=>{
+            if (res.ok) {
+                this.props.store.gatewayInfo.setDevices(res.data)
+            } else {
+                message.error(res.error)
+            }
         })
     }
     showDrawer = () => {
@@ -100,29 +91,22 @@ class MyGatesDevices extends Component {
     //   return arr.join('/')
     // }
     render () {
-      const { flag } = this.state;
       const { path } = this.props.match;
-      // const { gateList, status } = this.props.store.appStore;
         return (
             <div>
-                <Status gateway={this.state.gateway}/>
+                <GatewayStatus gateway={this.state.gateway}/>
                     <div className="mygatesdevices">
                         <LeftNav
                             prop={this.props.match.params}
                             gateway={this.state.gateway}
                             mqtt={this.state.mqtt}
-                            vpnflag={this.state.VPNflag}
                         />
-                        {
-                            flag
-                            ? <Button type="primary"
-                                onClick={this.showDrawer}
-                                className="listbutton"
-                              >
-                                <Icon type="swap"/><br />
-                            </Button>
-                            : ''
-                        }
+                        <Button type="primary"
+                            onClick={this.showDrawer}
+                            className="listbutton"
+                        >
+                            <Icon type="swap"/><br />
+                        </Button>
                     <GatewaysDrawer
                         gateway={this.state.gateway}
                         onClose={this.onClose}

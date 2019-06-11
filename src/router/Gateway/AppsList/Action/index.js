@@ -25,24 +25,24 @@ class Action extends Component {
         clearInterval(timer)
     }
     confirm = (record, sn)=>{
-        if (!this.props.store.appStore.actionSwi) {
-        const data = {
-            gateway: sn,
-            inst: record.inst_name,
-            id: `app_remove/${sn}/${record.inst_name}/${new Date() * 1}`
-        }
-        http.post('/api/gateways_applications_remove', data).then(res=>{
-            if (res.data){
-                if (res.ok){
-                    let title = '卸载应用' + data.inst + '请求成功!'
-                    message.info(title + '等待网关响应!')
-                    this.props.store.action.pushAction(res.data, title, '', data, 10000,  ()=> {
-                      this.props.update_app_list();
-                    })
-                } else {
-                    message.error('卸载应用' + data.inst + '请求失败!')
-                }
+        if (this.props.store.gatewayInfo.actionEnable) {
+            const data = {
+                gateway: sn,
+                inst: record.inst_name,
+                id: `app_remove/${sn}/${record.inst_name}/${new Date() * 1}`
             }
+            http.post('/api/gateways_applications_remove', data).then(res=>{
+                if (res.data){
+                    if (res.ok){
+                        let title = '卸载应用' + data.inst + '请求成功!'
+                        message.info(title + '等待网关响应!')
+                        this.props.store.action.pushAction(res.data, title, '', data, 10000,  ()=> {
+                        this.props.update_app_list();
+                        })
+                    } else {
+                        message.error('卸载应用' + data.inst + '请求失败!')
+                    }
+                }
             })
         }
     }
@@ -197,7 +197,7 @@ class Action extends Component {
         }
     }
     render () {
-        const { actionSwi } = this.props.store.appStore;
+        const { actionEnable } = this.props.store.gatewayInfo;
         const { record, show_app_config } = this.props;
         const { upgradeLoading, visible, setName, setNameConfirmLoading, nameValue, appdebug } = this.state;
         return (
@@ -220,7 +220,7 @@ class Action extends Component {
                         <Switch checkedChildren=" ON"
                             unCheckedChildren="OFF"
                             defaultChecked={Number(record.auto) === 0 ? false : true}
-                            disabled={this.state.running_action || actionSwi}
+                            disabled={this.state.running_action || !actionEnable}
                             onChange={(checked)=>{
                                 this.setAutoDisabled(record, checked)
                             }}
@@ -228,7 +228,7 @@ class Action extends Component {
                     </div>
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <Button
-                        disabled={this.state.running_action || actionSwi}
+                        disabled={this.state.running_action || !actionEnable}
                         onClick={()=>{
                             this.showModal('setName')
                         }}
@@ -247,11 +247,12 @@ class Action extends Component {
                     </Button>
                     <Button
                         onClick={this.onDebug.bind(this, record)}
+                        disabled={this.state.running_action || !actionEnable}
                     >
                         应用调试
                     </Button>
                     <Button
-                        disabled={record.latestVersion === undefined || record.latestVersion <= record.version || this.state.running_action || actionSwi}
+                        disabled={record.latestVersion === undefined || record.latestVersion <= record.version || this.state.running_action || !actionEnable}
                         onClick={()=>{
                             this.showModal('visible')
                         }}
@@ -262,12 +263,12 @@ class Action extends Component {
                         onClick={()=>{
                             this.appSwitch('start')
                         }}
-                        disabled={this.state.running_action || actionSwi}
+                        disabled={this.state.running_action || !actionEnable}
                     >
                         启动应用
                     </Button>
                     <Button
-                        disabled={this.state.running_action || actionSwi}
+                        disabled={this.state.running_action || !actionEnable}
                         onClick={()=>{
                             this.appSwitch('stop')
                         }}
@@ -275,7 +276,7 @@ class Action extends Component {
                         关闭应用
                     </Button>
                     <Button
-                        disabled={this.state.running_action || actionSwi}
+                        disabled={this.state.running_action || !actionEnable}
                         onClick={()=>{
                             this.appSwitch('restart')
                         }}
@@ -283,7 +284,7 @@ class Action extends Component {
                         重启应用
                     </Button>
                     <Popconfirm
-                        disabled={this.state.running_action || actionSwi}
+                        disabled={this.state.running_action || !actionEnable}
                         title="确定要卸载此应用吗?"
                         onConfirm={()=>{
                             this.confirm(record, this.props.match.params.sn, this)
@@ -293,7 +294,7 @@ class Action extends Component {
                         cancelText="否"
                     >
                         <Button
-                            disabled={this.state.running_action || actionSwi}
+                            disabled={this.state.running_action || !actionEnable}
                             type="danger"
                         >应用卸载</Button>
                     </Popconfirm>

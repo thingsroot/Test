@@ -91,10 +91,11 @@ class LeftNav extends Component {
     render () {
         const { list, index } = this.state;
         const { url } = this.props.match;
+        const { gatewayInfo } = this.props.store;
         return (
             <div className="leftnav">
                 <div className="navlist">
-                    <p>基本功能</p>
+                    <p className="FeaturesGroup">基本功能</p>
                     <ul>
                         {
                             list.map((v, i)=>{
@@ -106,10 +107,10 @@ class LeftNav extends Component {
                                         }}
                                     ><li className={index === i ? 'active' : ''}>
                                     {
-                                        v.href.toLowerCase() === '/devslist' ? <div className="gatecount count">{this.props.store.appStore.devs_len}</div> : ''
+                                        v.href.toLowerCase() === '/devslist' ? <div className="gatecount count">{gatewayInfo.devices_count}</div> : ''
                                     }
                                     {
-                                        v.href.toLowerCase() === '/appslist' ? <div className="appcount count">{this.props.store.appStore.apps_len}</div> : ''
+                                        v.href.toLowerCase() === '/appslist' ? <div className="appcount count">{gatewayInfo.apps_count}</div> : ''
                                     }
                                     <Icon type={v.icon}/>&nbsp;&nbsp;{v.text}</li></Link>
                                 )
@@ -118,7 +119,7 @@ class LeftNav extends Component {
                     </ul>
                 </div>
                 <div className="navlist">
-                        <p>高级功能</p>
+                        <p className="FeaturesGroup">高级功能</p>
                         <ul>
                             <Link
                                 to={`${url}/logviewer`}
@@ -173,10 +174,10 @@ class LeftNav extends Component {
                         </ul>
                 </div>
                 <div className="navlist">
-                    <p>扩展功能</p>
+                    <p className="FeaturesGroup">扩展功能</p>
                     <ul>
                         {
-                            this.vserialflag
+                            gatewayInfo.ioe_ser2net
                             ? <Link to={`${url}/vserial`}
                                 key="4"
                                 onClick={()=>{
@@ -189,7 +190,7 @@ class LeftNav extends Component {
                         : ''
                         }
                         {
-                            this.props.vpnflag
+                            gatewayInfo.ioe_frpc
                             ? <Link to={`${url}/VPN`}
                                 key="4"
                                 onClick={()=>{

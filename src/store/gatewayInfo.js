@@ -59,11 +59,18 @@ class GatewayInfo {
     @observable description = ''
     @observable enabled = 0
 
-    @observable install_apps = [] // Instance name list
-    @observable Net_Manager = false
-    @observable p2p_vpn = false
+    @observable install_apps = [] // Instance name list from realtime-data for running
+    @observable ioe_network = false
+    @observable ioe_frpc = false
     @observable cpu = ''
     @observable data = new GatewayData()
+
+    @observable devices = []
+    @observable devices_count = 0
+    @observable apps = {}
+    @observable apps_count = 0
+
+    @observable actionEnable = false
 
     @action updateStatus (data) {
         let self_keys = Object.getOwnPropertyNames(this.__proto__)
@@ -78,8 +85,19 @@ class GatewayInfo {
                 }
             }
         }
+
+        this.actionEnable = this.device_status === 'ONLINE' && this.enabled === 1 && this.sn && this.sn !== '' ? true : false
         //console.log(this)
+    }
+
+    @action setDevices (value) {
+        this.devices = value
+        this.devices_count = value.length
+    }
+    @action setApps (value) {
+        this.apps = value
+        this.apps_count = Object.keys(value).length
     }
 }
 
-export default new GatewayInfo()
+export default GatewayInfo

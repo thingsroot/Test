@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';     //
 import {Input, Icon, Button, message, notification, Rate, Modal } from 'antd';  //
 import { inject, observer} from 'mobx-react';
-import Status from '../../common/status';
+import GatewayStatus from '../../common/GatewayStatus';
 import http from '../../utils/Server';
 import ReactMarkdown from 'react-markdown'
 import './style.scss';
 import GatewaysDrawer from '../../common/GatewaysDrawer';
 import AppConfig from './AppConfig'
 import LazyLoad from 'react-lazy-load';
-import {ConfigStore} from '../../utils/app_config'
+import {ConfigStore} from '../../utils/ConfigUI'
 
 const Search = Input.Search;
 const openNotification = (title, message) => {
@@ -234,7 +234,7 @@ class MyGatesAppsInstall extends Component {
     render () {
         const { gateway_sn, app_show, install_step, app_inst, app_info, showLinkSelection } = this.state;
         return (<div>
-            <Status gateway={this.state.gateway_sn}/>
+            <GatewayStatus gateway={this.state.gateway_sn}/>
                 <div className="AppInstall">
                     <Button
                         type="primary"
