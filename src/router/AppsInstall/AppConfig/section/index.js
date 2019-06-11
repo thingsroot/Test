@@ -31,7 +31,7 @@ class AppConfigSection extends Component {
             id: name,
             name: conf_name,
             description: desc,
-            version: version
+            ver: version
         })
         config.setValue(val)
         this.props.onChange()

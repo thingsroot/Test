@@ -94,7 +94,7 @@ class EditorTemplates extends React.Component {
         }, {
             title: '版本',
             key: 'version',
-            dataIndex: 'version',
+            dataIndex: 'ver',
             editable: true
         }, {
             title: '操作',
