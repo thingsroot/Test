@@ -460,7 +460,7 @@ class MyTree extends Component {
         onSelect;
         const { root, selectedKeys } = this.state
         return (
-            <div>
+            <div className="fileTree">
                 <div className="iconGroup">
                     <p style={{width: '220px'}}>
                         <Icon

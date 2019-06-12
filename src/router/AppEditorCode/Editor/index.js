@@ -250,7 +250,7 @@ class MyCode extends Component {
         const { fontSize } = this.props;
 
         return (
-            <div>
+            <div className="codeEditor">
                 <div className="iconGroup">
                     <p style={{width: 'auto', position: 'resolute'}}>
                         <Icon

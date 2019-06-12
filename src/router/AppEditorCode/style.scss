@@ -19,7 +19,7 @@
     min-height: 620px;
     position: relative;
   }
-  .tree{
+  .fileTree{
     width: 240px;
     position: absolute;
     left: -24px;
@@ -27,7 +27,7 @@
     bottom: 0;
     overflow-y: auto;
   }
-  .code{
+  .codeEditor{
     position: absolute;
     top: 0;
     right: -24px;

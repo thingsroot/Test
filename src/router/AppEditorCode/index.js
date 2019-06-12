@@ -212,21 +212,17 @@ class AppEditorCode extends Component {
         return (
             <div className="appEditorCode">
                 <div className="main">
-                    <div className="tree">
-                        <FileTree
-                            app={app}
-                            onSelect={this.onSelect}
-                            appName={appName}
-                        />
-                    </div>
-                    <div className="code">
-                        <CodeEditor
-                            app={app}
-                            filePath={selectedFile}
-                            fileType={selectedFileType}
-                            onChange={this.onContentChange}
-                        />
-                    </div>
+                    <FileTree
+                        app={app}
+                        onSelect={this.onSelect}
+                        appName={appName}
+                    />
+                    <CodeEditor
+                        app={app}
+                        filePath={selectedFile}
+                        fileType={selectedFileType}
+                        onChange={this.onContentChange}
+                    />
                 </div>
                 <Modal
                     title="重置编辑器工作区内容版本到"
