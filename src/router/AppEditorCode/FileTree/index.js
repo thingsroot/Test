@@ -14,6 +14,7 @@ const MyIcon = Icon.createFromIconfontCN({
 const newNodeItem = (title, isLeaf, type, key, icon) => {
     var item = observable({
         // observable 属性:
+        parent: null,
         title: title,
         isLeaf: isLeaf,
         type: type,
@@ -21,14 +22,41 @@ const newNodeItem = (title, isLeaf, type, key, icon) => {
         icon: icon,
         children: [],
 
+        setKey (value) {
+            this.key = value
+        },
+        setTitle (value) {
+            this.title = value
+        },
+        setValue (value) {
+            this.title = value.text
+            this.isLeaf = !value.children
+            this.type = value.type
+            this.key = value.id,
+            this.icon = value.icon.substr(value.icon.indexOf('.') + 1, value.icon.length)
+        },
         addChild (item) {
+            item.parent = this
             this.children.push(item)
+        },
+        removeChild (item) {
+            let arr = []
+            this.children.map(v => {
+                if (v.key !== item.key) {
+                    arr.push(v)
+                }
+            })
+            this.children = arr
         }
     }, {
-        setData: action,
+        setValue: action,
         addChild: action
     });
     return item;
+}
+
+const newNodeItemFromData = (value) => {
+    return newNodeItem(value.text, !value.children, value.type,  value.id, value.icon.substr(value.icon.indexOf('.') + 1, value.icon.length))
 }
 
 @withRouter
@@ -40,33 +68,56 @@ class MyTree extends Component {
         this.state = {
             expandedKeys: [],
             autoExpandParent: true,
-            root: []
+            root: [],
+            selectedKeys: [],
+            app: '',
+            appName: '',
+
+            selectedNodeData: {},
+            newInputValue: '',
+            showNewFileModal: false,
+            showNewFolderModal: false,
+            showRenameModal: false
         }
     }
 
     componentDidMount () {
-        this.updateProps(this.props)
+        if (this.props.app === undefined || this.props.app === '') {
+            return
+        }
+        this.setState({
+            app: this.props.app,
+            appName: this.props.appName,
+            root: []
+        }, () => {
+            this.loadTree()
+        })
     }
 
     UNSAFE_componentWillReceiveProps (nextProps) {
         if (this.state.app !== nextProps.app) {
-            this.updateProps(nextProps)
+            this.setState({
+                app: nextProps.app,
+                appName: nextProps.appName,
+                root: []
+            }, () => {
+                this.loadTree()
+            })
         }
     }
-    updateProps (props) {
+    loadTree () {
+        if (this.state.app === '') {
+            return
+        }
         let data = []
-        data.push(newNodeItem(props.appName, false, 'folder', '#', 'folder'))
-        this.setState({app: props.app, root: data}, () => {
+        data.push(newNodeItem(this.state.appName, false, 'folder', '#', 'folder'))
+        this.setState({app: this.state.app, root: data}, () => {
             this.load()
         })
     }
 
     load = () => {
         this.loadChild(this.state.app, this.state.root[0])
-    }
-
-    newItem (value) {
-        return newNodeItem( value.text, !value.children, value.type,  value.id, value.icon.substr(value.icon.indexOf('.') + 1, value.icon.length))
     }
 
     loadChild = (app, item) => {
@@ -78,7 +129,7 @@ class MyTree extends Component {
                 }
 
                 res.map((v)=>{
-                    let child = this.newItem(v)
+                    let child = newNodeItemFromData(v)
                     item.addChild(child)
                     if (!child.isLeaf) {
                         this.loadChild(app, child)
@@ -87,228 +138,288 @@ class MyTree extends Component {
             });
     }
 
-    //添加文件
-    addFile = ()=>{
-        const {codeStore} = this.props;
-        let myFolder = codeStore.myFolder[0];
-        if (myFolder === this.state.appName) {
-            myFolder = '/'
+    findChild = (node, id) => {
+        if (node.key === id) {
+            return node
         }
-        if (codeStore.addFileName !== '') {
-            let url = '/apis/api/method/app_center.editor.editor';
-            http.get(url + '?app=' + this.state.app + '&operation=create_node&type=file&id=' +
-                myFolder + '&text=' + codeStore.addFileName)
-                .then(res=>{
-                    let newData = {
-                        title: codeStore.addFileName,
-                        isLeaf: true,
-                        type: 'file',
-                        key: res.id,
-                        icon: 'no'
-                    };
-                    let treeNode = this.state.treeNode;
-                    treeNode.node.props.dataRef.children.push(newData);
-                    this.setState({
-                        arr: [...this.state.arr]
-                    })
-                });
-            this.addFileHide();
-        } else {
-            message.warning('请输入文件名！')
-        }
-    };
-    addFileHide = ()=>{
-        this.setState({
-            isAddFileShow: false
+        node.children.map((v) => {
+            let node = this.findChild(v, id)
+            if (node !== undefined) {
+                return node
+            }
         })
-    };
-    addFileShow = ()=>{
-        const {codeStore} = this.props;
-        if (codeStore.folderType === 'folder') {
-            this.setState({
-                isAddFileShow: true
-            })
-        } else {
-            message.warning('请先选择目录！')
+    }
+
+    findNode = (id) => {
+        this.findChild(this.state.root[0], id)
+    }
+
+    get SelectedNodeBasePath () {
+        if (this.SelectedNodeID === undefined) {
+            message.error('没有选中的节点')
         }
 
+        if (this.SelectedNodeID === '#') {
+            return ''
+        }
+        if (this.SelectedNodeType === 'folder') {
+            return this.SelectedNodeID + '/'
+        } else {
+            if (this.SelectedNodeID.indexOf('/') !== -1) {
+                return this.SelectedNodeID.substr(0, this.SelectedNodeID.indexOf('/')) + '/'
+            } else {
+                return ''
+            }
+        }
+    }
+    get SelectedNodeBaseNode () {
+        if (this.SelectedNodeType === 'folder') {
+            return this.state.selectedNodeData
+        } else {
+            return this.state.selectedNodeData.parent
+        }
+    }
+    get SelectedNodeID (){
+        return this.state.selectedNodeData.key
+    }
+    get SelectedNodeText () {
+        return this.state.selectedNodeData.title
+    }
+    get SelectedNodeType () {
+        return this.state.selectedNodeData.type
+    }
+
+    onShowNewFile = ()=>{
+        if (this.SelectedNodeID === undefined) {
+            message.error('请先选择一个目录')
+            return
+        }
+        this.setState({
+            showNewFileModal: true,
+            newInputValue: ''
+        }, ()=> {
+            console.log(this.state.newNodeFolder)
+        })
     };
-    addFileName = ()=>{
-        const {codeStore} = this.props;
-        codeStore.setAddFileName(event.target.value );
+
+    onAddNewFile = ()=>{
+        const {app, newInputValue} = this.state
+        if (newInputValue === '') {
+            this.setState({
+                showNewFileModal: false
+            })
+            return
+        }
+        let new_id = this.SelectedNodeBasePath + newInputValue
+        let folder_node = this.SelectedNodeBaseNode
+        let node = this.findNode(new_id)
+        if (node) {
+            message.error('文件名称重复')
+            return
+        }
+
+        let url = '/apis/api/method/app_center.editor.editor';
+        let params = {
+            app: app,
+            operation: 'create_node',
+            type: 'file',
+            id: this.SelectedNodeBasePath,
+            text: newInputValue
+        }
+        http.post(url, params)
+            .then(res=>{
+                if (res.id === params.text) {
+                    let newItem = newNodeItem( res.text ? res.text : newInputValue, true, 'file', res.id, '' )
+                    this.setState({
+                        showNewFileModal: false
+                    })
+                    folder_node.addChild(newItem)
+                    message.success('创建文件成功');
+                } else {
+                    message.error('创建文件失败')
+                }
+            });
     };
 
     //添加文件夹
-    addFolderShow = ()=>{
-        const {codeStore} = this.props;
-        if (codeStore.folderType === 'folder') {
-            this.setState({
-                isAddFolderShow: true
-            })
-        } else {
-            message.warning('请先选择目录！')
+    onShowNewFolder = ()=>{
+        if (this.SelectedNodeID === undefined) {
+            message.error('请先选择一个目录')
+            return
         }
-    };
-    addFolderHide = ()=>{
         this.setState({
-            isAddFolderShow: false
+            showNewFolderModal: true,
+            newNodeName: ''
+        }, ()=> {
+            console.log(this.state.newNodeFolder)
         })
     };
-    addFolderName = ()=>{
-        const {codeStore} = this.props;
-        codeStore.setAddFolderName(event.target.value)
-    };
-    addFolder = ()=>{
-        const {codeStore} = this.props;
-        let myFolder = codeStore.myFolder[0];
-        if (codeStore.addFolderName !== '') {
-            let url = '/apis/api/method/app_center.editor.editor';
-            if (myFolder === this.state.appName) {
-                myFolder = '/'
-            }
-            http.get(url + '?app=' + this.state.app + '&operation=create_node&type=folder&id=' +
-                myFolder + '&text=' + codeStore.addFolderName)
-                .then(res=>{
-                    res;
-                    let newData = {
-                        children: [],
-                        title: codeStore.addFolderName,
-                        isLeaf: false,
-                        type: 'folder',
-                        key: res.id,
-                        icon: 'folder'
-                    };
-                    let treeNode = this.state.treeNode;
-                    console.log(treeNode);
-                    treeNode.node.props.dataRef.children.push(newData);
-                    this.setState({
-                        arr: [...this.state.arr]
-                    })
-                });
-            message.success('创建文件夹成功');
-            this.addFolderHide();
+    onAddNewFolder = ()=>{
+        const {app, newInputValue} = this.state
+        if (newInputValue === '') {
+            this.setState({
+                showNewFolderModal: false
+            })
+            return
         }
+
+        let new_id = this.SelectedNodeBasePath + newInputValue
+        let folder_node = this.SelectedNodeBaseNode
+        let node = this.findNode(new_id)
+        if (node) {
+            message.error('文件夹名称重复')
+            return
+        }
+
+        let url = '/apis/api/method/app_center.editor.editor';
+        let params = {
+            app: app,
+            operation: 'create_node',
+            type: 'folder',
+            id: this.SelectedNodeBasePath,
+            text: newInputValue
+        }
+        http.post(url, params)
+            .then(res=>{
+                if (res.id === params.text) {
+                    let newItem = newNodeItem( res.text ? res.text : newInputValue, false, 'folder', res.id, 'folder' )
+                    this.setState({
+                        showNewFolderModal: false
+                    })
+                    folder_node.addChild(newItem)
+                    message.success('创建文件夹成功');
+                } else {
+                    message.error('创建文件夹失败')
+                }
+            });
     };
     //删除节点
-    renderTreeNodes = (data, delData)=>data.map((item, i) => {
-        if (delData !== '0') {
-            //如果循环的节点数据中有跟你传过来要删的数据delData.key相同的 那就将这条数据丛树节点删掉
-            if (item.key === delData.node.props.dataRef.key) {
-                data.splice(i, 1);
-                this.setState({
-                    delData: '0'
-                });
-            }
-        }
-        if (item.children) {
-            this.renderTreeNodes(item.children, this.state.treeNode)
-        }
-        this.setState({
-            arr: data
-        });
-        return data;
-    });
-
     showConfirm = (content)=>{
-        const {codeStore} = this.props;
-        const pro = ()=>{
-            return new Promise(() => {
-                let myFolder = codeStore.myFolder[0];
+        if (this.SelectedNodeID === undefined) {
+            return
+        }
+        const to_delete_id = this.SelectedNodeID
+        const delete_node = ()=>{
                 let url = '/apis/api/method/app_center.editor.editor';
-                http.get(url + '?app=' + this.state.app + '&operation=delete_node&type=folder&id=' + myFolder)
+                let params = {
+                    app: this.state.app,
+                    operation: 'delete_node',
+                    id: to_delete_id,
+                    type: this.SelectedNodeType
+                }
+                http.post(url, params)
                     .then(res=>{
-                        res;
-                        this.renderTreeNodes(this.state.arr, this.state.treeNode);
+                        if (res.status === 'OK') {
+                            message.success('删除成功！')
+                            let node = this.findNode(to_delete_id)
+                            if (node) {
+                                node.parent.removeChild(node)
+                            }
+                        } else {
+                            message.error('删除失败！')
+                        }
                     });
-            })
         };
         confirm({
-            title: '提示信息',
+            title: `确定要删除${this.SelectedNodeText}[${to_delete_id}]`,
             okText: '确定',
             cancelText: '取消',
             content: content,
             onOk () {
-                pro().then(res=>{
-                    res;
-                    message.success('删除成功！')
-                }).catch(req=>{
-                    req;
-                    message.error('删除失败！')
-                })
+                delete_node()
             },
             onCancel () {}
         });
     };
+
+
     deleteFileShow = ()=>{
-        const {codeStore} = this.props;
-        if (codeStore.folderType === 'folder') {
+        if (this.SelectedNodeID === undefined) {
+            return
+        }
+
+        if (this.SelectedNodeType === 'folder') {
             this.showConfirm('确认删除此文件夹？')
-        } else if (codeStore.folderType === 'file') {
+        } else if (this.SelectedNodeType === 'file') {
             this.showConfirm('确认删除此文件？')
-        } else if (codeStore.folderType === '') {
-            message.warning('请选择文件！')
         }
     };
 
     //编辑文件名称
-    editorFileShow = ()=>{
-        const {codeStore} = this.props;
-        if (codeStore.folderType) {
+    onShowEditName = ()=>{
+        if (this.SelectedNodeID !== undefined) {
             this.setState({
-                isEditorFileShow: true
+                showRenameModal: true,
+                newInputValue: this.SelectedNodeText
             })
-        } else if (!codeStore.folderType) {
-            message.warning('请先选择目录！')
         }
     };
     editorFileHide = ()=>{
         this.setState({
-            isEditorFileShow: false
+            showRenameModal: false
         })
     };
-    editorFileName = ()=>{
-        this.setState({
-            editorFileName: event.target.value
-        })
-    };
-    editorFile = ()=>{
-        const {codeStore} = this.props;
-        let myFolder = codeStore.myFolder[0];
-        if (this.state.editorFileName !== '') {
-            let url = '/apis/api/method/app_center.editor.editor';
-            http.get(url + '?app=' + this.state.app + '&operation=rename_node&type=folder&id=' +
-                myFolder + '&text=' + this.state.editorFileName)
-                .then(res=>{
-                    res;
-                    let treeNode = this.state.treeNode;
-                    treeNode.node.props.dataRef.title = this.state.editorFileName;
-                    this.setState({
-                        arr: [...this.state.arr]
-                    });
-                    message.success('编辑文件成功');
-                })
-                .catch(err=>{
-                    err;
-                    message.error('编辑文件失败');
-                })
 
-            this.addFolderHide();
-        } else {
-            message.warning('请输入文件名！')
+    onChangeNodeName = ()=>{
+        if (this.SelectedNodeID === undefined) {
+            this.setState({
+                showRenameModal: false
+            })
+            message.warning('节点不存在')
+            return
         }
-        this.editorFileHide()
+
+        let url = '/apis/api/method/app_center.editor.editor';
+        let params = {
+            app: this.state.app,
+            operation: 'rename_node',
+            id: this.SelectedNodeID,
+            text: this.state.newInputValue
+        }
+        let cur_node = this.state.selectedNodeData
+        http.post(url, params)
+            .then(res=>{
+                if (res.id === params.text) {
+                    this.setState({ showRenameModal: false })
+                    message.success('更改名称成功')
+                    cur_node.setKey(res.id)
+                    cur_node.setTitle(params.text)
+                } else {
+                    message.error('更改名称失败');
+                }
+            })
+            .catch(err=>{
+                err;
+                message.error('更改名称失败');
+            })
     };
     onExpand = (expandedKeys) => {
         this.setState({
             expandedKeys,
             autoExpandParent: false
         });
+    };
 
+    onSelect = (selectedKeys, info) => {
+        console.log(info)
+        if (info.selected) {
+            this.setState({
+                selectedKeys: selectedKeys,
+                selectedNodeData: info.node.props.dataRef
+            })
+            this.props.onSelect(info.node.props.dataRef)
+        } else {
+            // this.setState({
+            //     selectedKeys: selectedKeys,
+            //     selectedNodeID: '',
+            //     selectedNodeIDNew: info.node.props.dataRef.text,
+            //     selectedNodeType: info.node.props.dataRef.type
+            // })
+        }
     };
 
     renderTreeNodes = data =>
         data.map(item => {
-            console.log(item.icon);
             if (item.children) {
 
                 return (
@@ -345,27 +456,28 @@ class MyTree extends Component {
         });
 
     render () {
-        const { selectedKeys, onSelect } = this.props;
-        const { root } = this.state
+        const { onSelect } = this.props;
+        onSelect;
+        const { root, selectedKeys } = this.state
         return (
             <div>
                 <div className="iconGroup">
                     <p style={{width: '220px'}}>
                         <Icon
                             type="file-add"
-                            onClick={this.addFileShow}
+                            onClick={this.onShowNewFile}
                         />
                         <Icon
                             type="folder-add"
-                            onClick={this.addFolderShow}
+                            onClick={this.onShowNewFolder}
                         />
                         <Icon
                             type="edit"
-                            onClick={this.editorFileShow}
+                            onClick={this.onShowEditName}
                         />
                         <Icon
                             type="delete"
-                            onClick={this.deleteFileShow}
+                            onClick={this.onDeleteNode}
                         />
                     </p>
                 </div>
@@ -374,9 +486,10 @@ class MyTree extends Component {
                         root.length > 0
                         ? <Tree
                             showIcon
+                            multiple={false}
                             onExpand={this.onExpand}
                             expandedKeys={this.state.expandedKeys}
-                            onSelect={onSelect}
+                            onSelect={this.onSelect}
                             selectedKeys={selectedKeys}
                           >
                             {this.renderTreeNodes(root)}
@@ -385,46 +498,67 @@ class MyTree extends Component {
                 </div>
                 <Modal
                     title="新建文件"
-                    visible={this.state.isAddFileShow}
-                    onOk={this.addFile}
-                    onCancel={this.addFileHide}
+                    visible={this.state.showNewFileModal}
+                    onOk={this.onAddNewFile}
+                    onCancel={()=> {
+                        this.setState({
+                            showNewFileModal: false
+                        })
+                    }}
                     okText="确认"
                     cancelText="取消"
                 >
                     <span style={{padding: '0 20px'}}>文件名</span>
                     <Input
                         type="text"
-                        onChange={this.addFileName}
+                        value={this.state.newInputValue}
+                        onChange={(e) => {
+                            this.setState({newInputValue: e.target.value})
+                        }}
                         style={{ width: 350 }}
                     />
                 </Modal>
                 <Modal
-                    title="更改文件名"
-                    visible={this.state.isEditorFileShow}
-                    onOk={this.editorFile}
-                    onCancel={this.editorFileHide}
+                    title="更改名称"
+                    visible={this.state.showRenameModal}
+                    onOk={this.onChangeNodeName}
+                    onCancel={()=> {
+                        this.setState({
+                            showRenameModal: false
+                        })
+                    }}
                     okText="确认"
                     cancelText="取消"
                 >
                     <span style={{padding: '0 20px'}}>重命名</span>
                     <Input
                         type="text"
-                        onChange={this.editorFileName}
+                        value={this.state.newInputValue}
+                        onChange={(e) => {
+                            this.setState({newInputValue: e.target.value})
+                        }}
                         style={{ width: 350 }}
                     />
                 </Modal>
                 <Modal
                     title="新建文件夹"
-                    visible={this.state.isAddFolderShow}
-                    onOk={this.addFolder}
-                    onCancel={this.addFolderHide}
+                    visible={this.state.showNewFolderModal}
+                    onOk={this.onAddNewFolder}
+                    onCancel={()=> {
+                        this.setState({
+                            isAddFolderShow: false
+                        })
+                    }}
                     okText="确认"
                     cancelText="取消"
                 >
                     <span style={{padding: '0 20px'}}>文件夹名</span>
                     <Input
                         type="text"
-                        onChange={this.addFolderName}
+                        value={this.state.newInputValue}
+                        onChange={(e) => {
+                            this.setState({newInputValue: e.target.value})
+                        }}
                         style={{ width: 350 }}
                     />
                 </Modal>

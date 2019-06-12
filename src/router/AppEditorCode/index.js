@@ -20,7 +20,6 @@ class AppEditorCode extends Component {
         this.state = {
             codeStore: new codeStore(),
             app: '',
-            fontSize: 16,
             appName: '',
             version: '',
             visible: false,
@@ -28,7 +27,8 @@ class AppEditorCode extends Component {
             isShow: false,
             versionList: [],
             comment: '',
-            editorFileName: '',
+            selectedFile: '',
+            selectedFileType: '',
             isAddFileShow: false,
             isAddFolderShow: false,
             isEditorFileShow: false,
@@ -44,8 +44,11 @@ class AppEditorCode extends Component {
         this.setState({
             appName: appName,
             app: app
+        }, () => {
+            if (app !== '') {
+                this.loadWorkspace()
+            }
         });
-        this.loadWorkspace()
     }
 
     componentWillUnmount () {
@@ -83,10 +86,9 @@ class AppEditorCode extends Component {
                     this.resetWorkspace(latestVersion)
                 }
             } else if (version === latestVersion ) {
-                //提示当前工作区是基于最新版本（弹框）
                 this.loadVersionList()
-                this.fetchFileTree()
-                this.info('版本提示', '当前工作区是基于最新版本' + latestVersion + '.');
+                // TODO:
+                //this.info('版本提示', '当前工作区是基于最新版本' + latestVersion + '.');
             }
         });
     }
@@ -121,7 +123,7 @@ class AppEditorCode extends Component {
         const {codeStore, app} = this.state
         codeStore.setShowFileName('version')
         //设备应用和平台应用对比
-        http.get('/apis/api/method/app_center.editor.editor_worksapce_version?app=' + app)
+        http.get('/apis/api/method/app_center.editor.editor_workspace_version?app=' + app)
             .then(res=>{
                 let worksapceVersion = res.message;
                 this.setState({version: worksapceVersion ? worksapceVersion : 0}, () => {
@@ -184,104 +186,51 @@ class AppEditorCode extends Component {
         }, 1500)
     };
 
-
-    set = (selectedKeys, info)=>{
-        const {codeStore} = this.state
-        codeStore.setEditorContent(codeStore.newEditorContent)
-        codeStore.setShowFileName(selectedKeys);
-        this.setState({ selectedKeys }, ()=>{
-            codeStore.setFileName(this.state.selectedKeys);
-        });
-        codeStore.setMyFolder(selectedKeys);
-        codeStore.setFolderType(info.node.props.dataRef.type);
-        if (selectedKeys[0].indexOf('.') !== -1) {
-            let suffixName = '';
-            switch (selectedKeys[0].substr(selectedKeys[0].indexOf('.') + 1, selectedKeys[0].length)) {
-                case 'js' : suffixName = 'javascript'; break;
-                case 'html' : suffixName = 'html'; break;
-                case 'java' : suffixName = 'java'; break;
-                case 'py' : suffixName = 'python'; break;
-                case 'lua' : suffixName = 'lua'; break;
-                case 'xml' : suffixName = 'xml'; break;
-                case 'rb' : suffixName = 'ruby'; break;
-                case 'scss' : suffixName = 'sass'; break;
-                // case 'less' : suffixName = 'sass'; break;
-                case 'md' : suffixName = 'markdown'; break;
-                case 'sql' : suffixName = 'mysql'; break;
-                case 'json' : suffixName = 'json'; break;
-                case 'ts' : suffixName = 'typescript'; break;
-                case 'css' : suffixName = 'css'; break;
-                case '' : suffixName = 'javascript'; break;
-                default : suffixName = 'java'
-            }
-            codeStore.setSuffixName(suffixName);
-        } else {
-            codeStore.setSuffixName('text');
-        }
+    onSelect = (dataNode) => {
+       this.setState({
+           selectedFile: dataNode.key,
+           selectedFileType: dataNode.type
+       })
     };
 
-    onSelect = (selectedKeys, info) => {
-        const {codeStore} = this.state
-        if (codeStore.editorContent !== codeStore.newEditorContent) {
-            let url = '/apis/api/method/app_center.editor.editor';
-            http.post(url + '?app=' + this.state.app +
-                '&operation=set_content&id=' + codeStore.fileName +
-                '&text=' + codeStore.newEditorContent)
-                .then(res=>{
-                    console.log(res);
-                })
-        }
-        this.setState({
-            treeNode: info
-        });
-        if (selectedKeys.length > 0) {
-            if (info.node.props.dataRef.type === 'file') {
-                this.set(selectedKeys, info)
-            } else {
-                this.setState({ selectedKeys }, ()=>{
-                    codeStore.setFileName(this.state.selectedKeys);
-                });
-                codeStore.setMyFolder(selectedKeys);
-                codeStore.setFolderType(info.node.props.dataRef.type);
-            }
-        }
-    };
+    onContentChange () {
+        console.log('changed')
+    }
 
     render () {
         const {
-            fontSize,
-            codeStore,
             versionList,
-            arr,
             app,
-            selectedKeys,
-            appName
+            appName,
+            selectedFile,
+            selectedFileType,
+            visiable,
+            isShow,
+            newVersion,
+            comment
         } = this.state;
         return (
             <div className="appEditorCode">
                 <div className="main">
                     <div className="tree">
                         <FileTree
-                            treeData={arr}
-                            getFileName={this.getFileName}
                             app={app}
                             onSelect={this.onSelect}
-                            selectedKeys={selectedKeys}
                             appName={appName}
-                            codeStore={codeStore}
                         />
                     </div>
                     <div className="code">
                         <CodeEditor
-                            fontSize={fontSize}
-                            showFileName={codeStore.showFileName}
-                            isChange={codeStore.isChange}
+                            app={app}
+                            filePath={selectedFile}
+                            fileType={selectedFileType}
+                            onChange={this.onContentChange}
                         />
                     </div>
                 </div>
                 <Modal
                     title="重置编辑器工作区内容版本到"
-                    visible={this.state.visible}
+                    visible={visiable}
                     onOk={this.resetVersion}
                     onCancel={this.hideModal}
                     okText="确认"
@@ -310,7 +259,7 @@ class AppEditorCode extends Component {
                 </Modal>
                 <Modal
                     title="发布新版本"
-                    visible={this.state.isShow}
+                    visible={isShow}
                     onOk={this.newVersion}
                     onCancel={this.hide}
                     okText="确认"
@@ -320,7 +269,7 @@ class AppEditorCode extends Component {
                         <span style={{padding: '5px 20px'}}>填写版本</span>
                         <Input
                             type="text"
-                            defaultValue={this.state.newVersion}
+                            defaultValue={newVersion}
                             style={{width: '320px'}}
                             onChange={this.versionChange}
                         />
@@ -332,7 +281,7 @@ class AppEditorCode extends Component {
                         <TextArea
                             row={8}
                             style={{width: '320px'}}
-                            defaultValue={this.state.comment}
+                            defaultValue={comment}
                             onChange={this.commentChange}
                         />
                     </p>

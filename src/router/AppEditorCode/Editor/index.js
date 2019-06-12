@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
-import { split as SplitEditor} from 'react-ace';
-import { Icon, message } from 'antd';
+import AceEditor from 'react-ace';
+import { Icon, message, Modal } from 'antd';
 import http from '../../../utils/Server';
 import 'brace/mode/javascript';//
 import 'brace/mode/html';//
@@ -18,58 +18,158 @@ import 'brace/mode/json';//
 import 'brace/mode/css';//
 import 'brace/mode/typescript';
 import 'brace/theme/tomorrow';//
+import 'brace/theme/monokai';
+
+const confirm = Modal.confirm
+
+
 @withRouter
 @inject('store')
 @observer
-
-
 class MyCode extends Component {
     constructor (props){
         super(props);
+        this.timer = null
         this.state = {
             editorContent: '',
-            mode: '',
+            mode: 'lua',
             app: '',
-            fileName: '',
-            newContent: ''
+            filePath: '',
+            fileType: '',
+            changed: false,
+            fontSize: 16,
+            readOnly: true
         }
     }
     componentDidMount () {
-        this.getContent();
+        this.setState( {
+            app: this.props.app,
+            filePath: this.props.filePath,
+            fileType: this.props.fileType,
+            editorContent: '',
+            changed: false,
+            readOnly: true
+        }, () => {
+            this.getContent();
+        })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (this.props.showFileName !== nextProps.showFileName){
-            this.getContent();
+        if (this.state.app !== nextProps.app || this.state.filePath !== nextProps.filePath){
+            if (this.state.changed) {
+                this.showChangesConfirm(this.state.app, this.state.filePath, this.state.editorContent)
+            }
+            this.setState( {
+                app: nextProps.app,
+                filePath: nextProps.filePath,
+                fileType: nextProps.fileType,
+                editorContent: '',
+                changed: false,
+                readOnly: true
+            }, () => {
+                this.getContent();
+            })
         }
     }
-
+    componentWillUnmount () {
+        if (this.timer){
+            clearTimeout(this.timer)
+        }
+    }
+    getMode () {
+        let mode = '';
+        if (this.state.fileType === 'file') {
+            let filePath = this.state.filePath
+            switch (filePath.substr(filePath.indexOf('.') + 1, filePath.length)) {
+                case 'js' : mode = 'javascript'; break;
+                case 'html' : mode = 'html'; break;
+                case 'java' : mode = 'java'; break;
+                case 'py' : mode = 'python'; break;
+                case 'lua' : mode = 'lua'; break;
+                case 'xml' : mode = 'xml'; break;
+                case 'rb' : mode = 'ruby'; break;
+                case 'scss' : mode = 'sass'; break;
+                // case 'less' : mode = 'sass'; break;
+                case 'md' : mode = 'markdown'; break;
+                case 'sql' : mode = 'mysql'; break;
+                case 'json' : mode = 'json'; break;
+                case 'ts' : mode = 'typescript'; break;
+                case 'css' : mode = 'css'; break;
+                case '' : mode = 'javascript'; break;
+                default : mode = 'text'
+            }
+        }
+        return mode
+    }
+    showChangesConfirm (app, filePath, content) {
+        let file_app = app
+        let file_path = filePath
+        let file_content = content
+        //保存提示
+        const save_file = ()=>{
+            let url = '/apis/api/method/app_center.editor.editor';
+            let params = {
+                app: file_app,
+                operation: 'set_content',
+                id: file_path,
+                text: file_content
+            };
+            http.post(url, params)
+                .then(res=>{
+                    if (res.status === 'OK') {
+                        message.success(`保存文件${file_path}成功`)
+                    } else {
+                        message.error(`保存文件${file_path}失败! ${res.error}`)
+                    }
+                }).catch( err => {
+                    message.error(`保存文件${file_path}失败! ${err}`)
+                })
+        };
+        confirm({
+            title: '提示信息',
+            okText: '确定',
+            cancelText: '取消',
+            content: `文件${file_path}已修改，是否保存这个文件？`,
+            onOk () {
+                save_file()
+            }
+        });
+    }
     //获取文件内容
     getContent = ()=>{
-        if (this.props.codeStore.folderType === 'file') {
-            http.get('/apis/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_content&id=' + this.props.codeStore.showFileName)
+        this.setState({readOnly: true})
+        if (this.state.fileType === 'file') {
+            http.get('/apis/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_content&id=' + this.state.filePath)
                 .then(res=>{
-                    this.props.codeStore.setEditorContent(res.content);
-                    this.props.codeStore.setNewEditorContent(res.content);
+                    let mode = this.getMode()
+                    this.setState({
+                        mode: mode,
+                        editorContent: res.content,
+                        changed: false,
+                        readOnly: false
+                    }, ()=>{
+                        console.log(this.state.filePath, this.state.fileType, this.state.mode)
+                        //console.log(this.state.editorContent)
+                        this.autoSave()
+                    })
                 })
         }
     };
-    autoSave = (newValue)=>{
+    autoSave = ()=>{
         if (this.timer){
             clearTimeout(this.timer)
         }
         this.timer = setTimeout(()=>{
-            let url = '/apis/api/method/app_center.editor.editor';
-            http.post(url + '?app=' + this.props.match.params.app +
-                '&operation=set_content&id=' + this.props.codeStore.fileName +
-                '&text=' + newValue)
-                .then(res=>{
-                    res;
-                })
-        }, 3000)
+            if (this.state.changed) {
+                this.saveFile()
+            }
+        }, 15000)
     };
     onChange = (newValue)=>{
-        this.props.codeStore.setNewEditorContent(newValue);
-        this.autoSave(newValue)
+        this.setState({
+            editorContent: newValue,
+            changed: true
+        })
+        this.props.onChange(newValue)
     };
     //+
     zoomIn = ()=>{
@@ -117,25 +217,35 @@ class MyCode extends Component {
 
             })
     };
-
     //重置版本结束
+
     //保存文件
     saveFile = ()=>{
-        const {codeStore} = this.props
-        if (codeStore.editorContent === codeStore.newEditorContent) {
+        if (!this.state.changed) {
             message.warning('文件未改动！')
         } else {
             let url = '/apis/api/method/app_center.editor.editor';
-            http.post(url + '?app=' + this.state.app +
-                '&operation=set_content&id=' + codeStore.fileName +
-                '&text=' + codeStore.newEditorContent)
+            let params = {
+                app: this.state.app,
+                operation: 'set_content',
+                id: this.state.filePath,
+                text: this.state.editorContent
+            };
+            http.post(url, params)
                 .then(res=>{
-                    console.log(res);
-                    console.log(codeStore.newEditorContent)
-                    message.success('文件保存成功！')
+                    if (res.status === 'OK') {
+                        this.setState({changed: false})
+                        message.success(`保存文件${this.state.filePath}成功`)
+                    } else {
+                        message.error(`保存文件${this.state.filePath}失败! ${res.error}`)
+                    }
+                    this.autoSave()
+                }).catch( err => {
+                    message.error(`保存文件${this.state.filePath}失败! ${err}`)
                 })
         }
     };//保存文件结束
+
     render () {
         const { fontSize } = this.props;
 
@@ -187,23 +297,32 @@ class MyCode extends Component {
                 </div>
                 <div className="myCode">
                     <p className="color">
-                        <span>编辑状态：</span>
-                        <span>{this.props.codeStore.showFileName}</span>
+                        <span>当前文件：{this.state.filePath}</span>
+                        <span>{this.state.changed ? '已修改' : '未修改'}</span>
                     </p>
-                    <SplitEditor
-                        style={{width: '100%', height: '80vh'}}
-                        mode={this.props.codeStore.suffixName}
-                        splits={1}
-                        theme="tomorrow"
-                        ref="editor"
-                        fontSize={fontSize}
-                        onChange={this.onChange}
-                        value={typeof this.props.codeStore.editorContent === 'string'
-                            ? [this.props.codeStore.editorContent]
-                            : [JSON.stringify(this.props.codeStore.editorContent)]}
-                        name="UNIQUE_ID_OF_DIV"
-                        editorProps={{$blockScrolling: true}}
-                    />
+                    {
+                        this.state.readOnly ? ''
+                        : <AceEditor
+                            mode={this.state.mode}
+                            readOnly={this.state.readOnly}
+                            theme="monokai"
+                            name="app_code_editor"
+                            onChange={this.onChange}
+                            fontSize={fontSize}
+                            showPrintMargin
+                            showGutter
+                            highlightActiveLine
+                            value={this.state.editorContent}
+                            style={{width: '100%'}}
+                            setOptions={{
+                                enableBasicAutocompletion: false,
+                                enableLiveAutocompletion: false,
+                                enableSnippets: false,
+                                showLineNumbers: true,
+                                tabSize: 4
+                            }}
+                          />
+                    }
                 </div>
             </div>
         );
