@@ -5,6 +5,8 @@ import './style.scss'
 import http from '../../utils/Server';
 import axios from 'axios';
 import {inject, observer} from 'mobx-react';
+import CodeStore from '../AppEditorCode/codeStore'
+
 const InputGroup = Input.Group;
 const Option = Select.Option;
 const disposed = {
@@ -72,7 +74,8 @@ class PlatformMessage extends Component {
         unconfirmed: 0,
         messageCount: 0,
         flag: false,
-        sync: false
+        sync: false,
+        codeStore: new CodeStore()
     };
     componentDidMount (){
         let hours = Date.parse(new Date()) - 72 * 60 * 60 * 1000;
@@ -153,8 +156,8 @@ class PlatformMessage extends Component {
                         }
                     });
                 });
-                this.props.store.codeStore.setPlatformData(platform);
-                this.props.store.codeStore.setTableData(platform);
+                this.state.codeStore.setPlatformData(platform);
+                this.state.codeStore.setTableData(platform);
                 this.setState({
                     selectedRowKeys: [],
                     loading: false,
@@ -192,8 +195,8 @@ class PlatformMessage extends Component {
                     v.disposed = 1;
                 }
             });
-            this.props.store.codeStore.setPlatformData(platform);
-            this.props.store.codeStore.setTableData(platform);
+            this.state.codeStore.setPlatformData(platform);
+            this.state.codeStore.setTableData(platform);
             this.setState({
                 selectedRowKeys: [],
                 loading: false,
@@ -386,8 +389,8 @@ class PlatformMessage extends Component {
                     sync: false,
                     messageCount: res.data.data.count
                 });
-                this.props.store.codeStore.setPlatformData(data);
-                this.props.store.codeStore.setTableData(data);
+                this.state.codeStore.setPlatformData(data);
+                this.state.codeStore.setTableData(data);
                 if (this.state.text !== '') {
                     this.tick(this.state.text)
                 }
@@ -463,7 +466,7 @@ class PlatformMessage extends Component {
             }, ()=>{
                 if (text) {
                     let newData = [];
-                    let tableData = this.props.store.codeStore.tableData;
+                    let tableData = this.state.codeStore.tableData;
                     tableData.map((v)=>{
                         if (v[this.state.selectValue].toLowerCase().indexOf(text.toLowerCase()) !== -1) {
                             newData.push(v)
@@ -473,7 +476,7 @@ class PlatformMessage extends Component {
                         platform: newData,
                         loading: false
                     });
-                    this.props.store.codeStore.setPlatformData(newData);
+                    this.state.codeStore.setPlatformData(newData);
                 } else {
                     let params = {
                         category: this.state.category,
@@ -524,8 +527,8 @@ class PlatformMessage extends Component {
             });
             this.getMessageList(params);
         } else {
-            let data = this.props.store.codeStore.tableData;
-            this.props.store.codeStore.setPlatformData(data);
+            let data = this.state.codeStore.tableData;
+            this.state.codeStore.setPlatformData(data);
             this.setState({
                 platform: data
             });
@@ -566,7 +569,7 @@ class PlatformMessage extends Component {
     render () {
         let { selectedRowKeys, columns, category, flag,
             unconfirmed, messageCount, isgateway } = this.state;
-        const { platformData } = this.props.store.codeStore;
+        const { platformData } = this.state.codeStore;
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange

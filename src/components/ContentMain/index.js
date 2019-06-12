@@ -140,7 +140,12 @@ class ContentMain extends Component {
                     title={'平台消息'}
                 />
                 <PrivateRoute
-                    path="/devicemessage/:sn/:time"
+                    path="/devicemessage/:limitTime"
+                    component={DeviceMessage}
+                    title={'设备消息'}
+                />
+                <PrivateRoute
+                    path="/gatewaydevicemessage/:gateway/:limitTime"
                     component={DeviceMessage}
                     title={'设备消息'}
                 />

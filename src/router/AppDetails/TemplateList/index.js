@@ -166,7 +166,10 @@ class TemplateList extends Component {
     }
 
     componentDidMount (){
-        const { app } = this.props;
+        const { app, newTemplateVisiable } = this.props;
+        if (newTemplateVisiable) {
+            this.setState({showNew: newTemplateVisiable})
+        }
         http.get('/api/store_configurations_list?app=' + app + '&conf_type=Template')
             .then(res=>{
                 if (res.ok) {

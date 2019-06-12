@@ -46,6 +46,10 @@ class Siders extends PureComponent {
             this.setState({
                 key: '5'
             })
+        } else if (pathname.indexOf('/gatewaydevicemessage') !== -1) {
+            this.setState({
+                key: '5'
+            })
         } else if (pathname.indexOf('/appeditorcode') !== -1) {
             this.setState({
                 key: '3'
@@ -125,7 +129,7 @@ class Siders extends PureComponent {
                         </Link>
                     </Menu.Item>
                     <Menu.Item key="5">
-                        <Link to="/devicemessage/1/24">
+                        <Link to="/devicemessage/24">
                             <Icon type="message" />
                             <span>设备消息</span>
                         </Link>

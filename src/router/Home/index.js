@@ -31,7 +31,7 @@ const todayColumns = [{
         return (
             <Link
                 style={{cursor: 'pointer'}}
-                to={`/DeviceMessage/${record.sn}/24`}
+                to={`/gatewaydevicemessage/${record.sn}/24`}
             >
             {text}
         </Link>
@@ -66,7 +66,7 @@ const weekColumns = [{
         return (
             <Link
                 style={{cursor: 'pointer'}}
-                to={`/DeviceMessage/${record.sn}/168`}
+                to={`/gatewaydevicemessage/${record.sn}/168`}
             >
             {text}
         </Link>

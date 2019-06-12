@@ -340,7 +340,6 @@ class AppConfig extends Component {
     }
 
     onJsonChange (value){
-        //this.props.store.codeStore.setInstallConfiguration(this.prettyJson(value[0]))
         this.setState({configValue: value})
 
         try {

@@ -47,7 +47,6 @@ class AppConfigSection extends Component {
         dataSource && dataSource.length > 0 && dataSource.map((item)=>{
             a.push(item.conf_name)
         });
-        this.props.store.codeStore.setTemplate(a);
         let addTempList = this.state.addTempList;
         this.setState({
             addTempList: addTempList

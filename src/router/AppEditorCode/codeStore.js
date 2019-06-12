@@ -225,4 +225,4 @@ class CodeStore {
 
 }
 
-export default new CodeStore()
+export default CodeStore

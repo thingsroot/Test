@@ -1,4 +1,3 @@
-import codeStore from './codeStore';
 import timer from './timer'
 import action from './action'
 import session from './session'
@@ -9,7 +8,6 @@ const store = {
     timer,
     action,
     session,
-    codeStore,
     gatewayInfo: new gatewayInfo(),
     gatewayList: new gatewayList()
 };

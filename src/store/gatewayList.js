@@ -15,6 +15,10 @@ class GatewayList {
     @action setAll (value) {
         this.all = value ? value : []
     }
+
+    get FirstGateway () {
+        return this.online[0]
+    }
 }
 
 export default GatewayList

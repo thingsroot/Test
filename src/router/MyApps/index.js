@@ -55,12 +55,6 @@ class MyApps extends Component {
                 })
             }
         });
-        http.get('/api/gateways_list?status=online')
-            .then(res=>{
-                if (res.ok) {
-                    this.props.store.codeStore.setFirstGateway(res.data[0].name)
-                }
-            });
     }
     tick = (text)=>{
         if (this.timer){
@@ -111,9 +105,6 @@ class MyApps extends Component {
                     <Button
                         type="primary"
                         style={{margin: '0 20px'}}
-                        onClick={()=>{
-                            this.props.store.codeStore.setSettingData('');
-                        }}
                     >
                         <Link to={'/appnew'}>创建新应用</Link>
                     </Button>

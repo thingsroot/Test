@@ -29,7 +29,8 @@ class AppDetails extends Component {
         time: '',
         app: '',
         desc: '',
-        groupName: ''
+        groupName: '',
+        newTemplateVisiable: false
     };
 
     componentDidMount (){
@@ -45,8 +46,7 @@ class AppDetails extends Component {
         let app = this.props.match.params.name;
         let action = this.props.match.params.action ? this.props.match.params.action : 'description'
         if (action === 'new_template') {
-            this.props.store.codeStore.setTemplateVisible(true)
-            this.setState( {activeKey: 'templates'} )
+            this.setState( {activeKey: 'templates', newTemplateVisiable: true} )
         } else {
             this.setState( {activeKey: action})
         }
@@ -68,8 +68,6 @@ class AppDetails extends Component {
                 time: res.data.data.modified.substr(0, 11)
             });
             sessionStorage.setItem('app_name', res.data.data.app_name);
-            this.props.store.codeStore.setVersionList(res.data.versionList.data);
-            this.props.store.codeStore.setVersionLatest(res.data.versionLatest.data)
         });
     };
     updateVersionList = ()=> {
@@ -133,13 +131,16 @@ class AppDetails extends Component {
                             <Icon type="edit" />
                             代码编辑
                         </Link>
-                        <Link
-                            className="button"
-                            to={`/appsinstall/${this.props.store.codeStore.firstGateway}/${app_info.name}/install`}
-                        >
-                            <Icon type="download" />
-                            安装此应用
-                        </Link>
+                        {
+                            this.props.store.gatewayList.FirstGateway
+                            ? <Link
+                                className="button"
+                                to={`/appsinstall/${this.props.store.gatewayList.FirstGateway.sn}/${app_info.name}/install`}
+                              >
+                                <Icon type="download" />
+                                安装此应用
+                            </Link> : ''
+                        }
                         <Link
                             className="button"
                             style={app_info.fork_from ? block : none}
@@ -179,6 +180,7 @@ class AppDetails extends Component {
                     >
                         <TemplateList
                             app={app}
+                            newTemplateVisiable={this.state.newTemplateVisiable}
                         />
                     </TabPane>
                 </Tabs>

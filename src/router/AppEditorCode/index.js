@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
-import { Icon, Modal, Select, message, Input } from 'antd';
+import { Modal, Select, message, Input } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { inject, observer} from 'mobx-react';
 import FileTree from './FileTree';
 import CodeEditor from './Editor';
 import './style.scss';
+import codeStore from './codeStore'
+
 import http from '../../utils/Server';
 const Option = Select.Option;
 const { TextArea } = Input;
-const confirm = Modal.confirm;
 
 @withRouter
 @inject('store')
@@ -17,6 +18,7 @@ class AppEditorCode extends Component {
     constructor (props){
         super(props);
         this.state = {
+            codeStore: new codeStore(),
             app: '',
             fontSize: 16,
             appName: '',
@@ -24,14 +26,14 @@ class AppEditorCode extends Component {
             visible: false,
             newVersion: 0,
             isShow: false,
-            optionData: [],
+            versionList: [],
             comment: '',
             editorFileName: '',
             isAddFileShow: false,
             isAddFolderShow: false,
             isEditorFileShow: false,
-            arr: [],
-            a: 1,
+            fileNodes: [],
+            currentNode: 1,
             selectedKeys: ['version'],
             treeNode: {}
         }
@@ -43,64 +45,53 @@ class AppEditorCode extends Component {
             appName: appName,
             app: app
         });
-        this.props.store.codeStore.setShowFileName('version')
-        //设备应用和平台应用对比
-        http.get('/apis/api/method/app_center.editor.editor_worksapce_version?app=' + app)
-            .then(res=>{
-                let worksapceVersion = res.message;
-                if (worksapceVersion && worksapceVersion !== 'undefined') {
-                    http.get('/apis/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
-                        .then(data=>{
-                            let lastVersion = data.message;
-                            console.log(lastVersion);
-                            if (worksapceVersion !== lastVersion) {
-                                //提示当前工作区是会基于worksapceVersion，当前的最新版本为latest_version（弹框）
-                                this.info('版本提示', '当前工作区是会基于版本    ' + worksapceVersion + '，当前的最新版本为    ' + lastVersion + '.');
-                                this.setState({
-                                    version: worksapceVersion
-                                })
-                            } else if (worksapceVersion === lastVersion ) {
-                                //提示当前工作区是基于最新版本（弹框）
-                                this.info('版本提示', '当前工作区是基于最新版本' + lastVersion + '.');
-                                this.setState({
-                                    version: lastVersion
-                                })
-                            }
-                        });
-                } else {
-                    http.get('/apis/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
-                        .then(data=>{
-                            if (data.message === 0) {
-                                //工作区为空，不显示title（title还没写）
-                                //暂时还没有版本，请先上传（全局提示）
-                                this.info('版本提示', '暂时还没有版本，请先上传!');
-                                this.setState({
-                                    version: ''
-                                })
-                            } else if (data.message > 0 ) {
-                                //初始化工作区域到最新版本
-                                http.get('/apis/api/method/app_center.editor.editor_init?app=' + app + '&version=' + data.message)
-                                    .then(res=>{
-                                        let initVersion = res.message;
-                                        // console.log(initVersion);
-                                        this.setState({
-                                            version: initVersion
-                                        });
-                                        //提示：当前工作区是基于版本initVersion,
-                                        // 请将设备中的应用升级到版本initVersion，或者将工作区重置到之前版本。
-                                        this.info('版本提示',
-                                            '当前工作区是基于版本' + initVersion,
-                                            '请将设备中的应用升级到版本' + initVersion,
-                                            '或者将工作区重置到之前版本.'
-                                        );
-                                        window.location.reload();
-                                    })
-                            }
+        this.loadWorkspace()
+    }
 
-                        });
-                    //http
+    componentWillUnmount () {
+    }
+
+    notifyVersionDiff () {
+        //提示：当前工作区是基于版本initVersion,
+        // 请将设备中的应用升级到版本initVersion，或者将工作区重置到之前版本。
+        const {initVersion} = this.state
+        this.info('版本提示',
+            '当前工作区是基于版本' + initVersion,
+            '请将设备中的应用升级到版本' + initVersion,
+            '或者将工作区重置到之前版本.'
+        );
+    }
+
+    checkVersionAndLoad () {
+        const {version, app} = this.state
+        http.get('/apis/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
+        .then(data=>{
+            let latestVersion = data.message;
+            console.log(latestVersion);
+            this.setState({latestVersion: latestVersion})
+            if (latestVersion === undefined || latestVersion === 0){
+                this.info('版本提示', '暂时还没有版本，请先上传!');
+                return
+            }
+
+            if (version !== latestVersion) {
+                if (version !== undefined && version !== 0) {
+                    //提示当前工作区是会基于worksapceVersion，当前的最新版本为latest_version（弹框）
+                    this.info('版本提示', '当前工作区是会基于版本    ' + version + '，当前的最新版本为    ' + latestVersion + '.');
+                } else {
+                    message.info('初始化工作区')
+                    this.resetWorkspace(latestVersion)
                 }
-            });
+            } else if (version === latestVersion ) {
+                //提示当前工作区是基于最新版本（弹框）
+                this.loadVersionList()
+                this.fetchFileTree()
+                this.info('版本提示', '当前工作区是基于最新版本' + latestVersion + '.');
+            }
+        });
+    }
+    loadVersionList () {
+        const {app} = this.state
         //应用版本列表
         http.get('/apis/api/method/app_center.api.get_versions?app=' + app + '&beta=1')
             .then(res=>{
@@ -111,90 +102,34 @@ class AppEditorCode extends Component {
                 data.sort(function (a, b) {
                     return b - a;
                 });
-                let newVersion = data[0] + 1;
-                this.setState({
-                    optionData: data,
-                    newVersion: newVersion,
-                    comment: 'v' + newVersion
-                })
+                this.setState({ versionList: data })
             });
-        this.setState({
-            a: 1,
-            arr: []
-        }, ()=>{
-            this.getTree('#')
-        });
-
+    }
+    resetWorkspace (version) {
+        const {app} = this.state
+        //初始化工作区域到最新版本
+        http.get('/apis/api/method/app_center.editor.editor_init?app=' + app + '&version=' + version)
+        .then(res=>{
+            let version = res.message;
+            // console.log(initVersion);
+            this.setState({ version: version  });
+            window.location.reload();
+        })
     }
 
-    componentWillUnmount () {
-        this.props.store.codeStore.setShowFileName('');
-        this.props.store.codeStore.setEditorContent('')
-    }
-
-    getTree =  id => new Promise((resolve => {
-        let data = [];
-        http.get('/apis/api/method/app_center.editor.editor?app=' + this.props.match.params.app + '&operation=get_node&id=' + id)
+    loadWorkspace () {
+        const {codeStore, app} = this.state
+        codeStore.setShowFileName('version')
+        //设备应用和平台应用对比
+        http.get('/apis/api/method/app_center.editor.editor_worksapce_version?app=' + app)
             .then(res=>{
-                res.map((v)=>{
-                    data.push(v);
-                });
-                resolve(this.format(data, this.state.a))
-            });
-    }));
-
-    format = (list, a)=>{
-        let arr = [];
-        list && list.length > 0 && list.map((v, key)=>{
-            console.log(v.icon.substr(v.icon.indexOf('.') + 1, v.icon.length));
-            key;
-            if (v.children === true){
-                this.getTree(v.id).then(data=>{
-                    let a = {
-                        children: data,
-                        title: v.text,
-                        isLeaf: !v.children,
-                        type: v.type,
-                        key: v.id,
-                        icon: v.icon.substr(v.icon.indexOf('.') + 1, v.icon.length)
-                    };
-                    arr.push(a);
+                let worksapceVersion = res.message;
+                this.setState({version: worksapceVersion ? worksapceVersion : 0}, () => {
+                    this.checkVersionAndLoad()
                 })
-            } else {
-                let a = {
-                    title: v.text,
-                    isLeaf: !v.children,
-                    type: v.type,
-                    key: v.id,
-                    icon: v.icon.substr(v.icon.indexOf('.') + 1, v.icon.length)
-                };
-                arr.push(a);
-            }
-        });
-        if (a === 1) {
-            let data = [
-                {
-                    title: this.state.appName,
-                    isLeaf: false,
-                    type: 'folder',
-                    key: this.state.appName,
-                    children: arr,
-                    icon: 'folder'
-                }
-            ];
-            this.setState({
-                arr: data,
-                a: this.state.a + 1
-            }, ()=>{
-                this.props.store.codeStore.setTreeData(this.state.arr);
             });
-        }
-        this.setState({
-            a: this.state.a + 1
-        });
+    }
 
-        return arr;
-    };
 
     //提示弹框
     info = (title, content)=>{
@@ -208,69 +143,6 @@ class AppEditorCode extends Component {
             onOk () {}
         });
     };
-    //+
-    zoomIn = ()=>{
-        let size = this.state.fontSize - 2;
-        this.setState({
-            fontSize: size
-        })
-    };
-    //-
-    zoomOut = ()=>{
-        let size = this.state.fontSize + 2;
-        this.setState({
-            fontSize: size
-        })
-    };
-    //重置版本
-    showModal = () => {
-        this.setState({
-            visible: true
-        });
-    };
-    hideModal = () => {
-        this.setState({
-            visible: false
-        });
-    };
-    getVersion = (value)=>{
-        this.setState({
-            version: value
-        });
-    };
-    resetVersion = ()=>{
-        this.setState({
-            visible: false
-        });
-        let url = '/apis/api/method/app_center.editor.editor_revert';
-        http.post(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
-            .then(res=>{
-                res;
-                this.props.store.codeStore.change();
-                message.success('工作区将重置到版本' + this.state.version);
-                setTimeout(()=>{
-                    window.location.reload();
-                }, 1500)
-
-            })
-    };
-    //重置版本结束
-    //保存文件
-    saveFile = ()=>{
-        if (this.props.store.codeStore.editorContent === this.props.store.codeStore.newEditorContent) {
-            message.warning('文件未改动！')
-        } else {
-            let url = '/apis/api/method/app_center.editor.editor';
-            http.post(url + '?app=' + this.state.app +
-                '&operation=set_content&id=' + this.props.store.codeStore.fileName +
-                '&text=' + this.props.store.codeStore.newEditorContent)
-                .then(res=>{
-                    console.log(res);
-                    console.log(this.props.store.codeStore.newEditorContent)
-                    message.success('文件保存成功！')
-                })
-        }
-    };//保存文件结束
 
     //发布新版本
     show = () => {
@@ -296,6 +168,7 @@ class AppEditorCode extends Component {
         })
     };
     newVersion = ()=>{
+        const {codeStore} = this.state
         http.post('/apis/api/method/app_center.editor.editor_release?app=' + this.state.app +
             '&operation=set_content&version=' + this.state.newVersion +
             '&comment=' + this.state.comment)
@@ -306,221 +179,21 @@ class AppEditorCode extends Component {
             this.setState({
                 isShow: false
             });
-            this.props.store.codeStore.change();
+            codeStore.change();
             window.location.reload()
         }, 1500)
     };
 
-    //添加文件
-    addFile = ()=>{
-        let myFolder = this.props.store.codeStore.myFolder[0];
-        if (myFolder === this.state.appName) {
-            myFolder = '/'
-        }
-        if (this.props.store.codeStore.addFileName !== '') {
-            let url = '/apis/api/method/app_center.editor.editor';
-            http.get(url + '?app=' + this.state.app + '&operation=create_node&type=file&id=' +
-                myFolder + '&text=' + this.props.store.codeStore.addFileName)
-                .then(res=>{
-                    let newData = {
-                        title: this.props.store.codeStore.addFileName,
-                        isLeaf: true,
-                        type: 'file',
-                        key: res.id,
-                        icon: 'no'
-                    };
-                    let treeNode = this.state.treeNode;
-                    treeNode.node.props.dataRef.children.push(newData);
-                    this.setState({
-                        arr: [...this.state.arr]
-                    })
-                });
-            this.addFileHide();
-        } else {
-            message.warning('请输入文件名！')
-        }
-    };
-    addFileHide = ()=>{
-        this.setState({
-            isAddFileShow: false
-        })
-    };
-    addFileShow = ()=>{
-        if (this.props.store.codeStore.folderType === 'folder') {
-            this.setState({
-                isAddFileShow: true
-            })
-        } else {
-            message.warning('请先选择目录！')
-        }
-
-    };
-    addFileName = ()=>{
-        this.props.store.codeStore.setAddFileName(event.target.value );
-    };
-
-    //添加文件夹
-    addFolderShow = ()=>{
-        if (this.props.store.codeStore.folderType === 'folder') {
-            this.setState({
-                isAddFolderShow: true
-            })
-        } else {
-            message.warning('请先选择目录！')
-        }
-    };
-    addFolderHide = ()=>{
-        this.setState({
-            isAddFolderShow: false
-        })
-    };
-    addFolderName = ()=>{
-        this.props.store.codeStore.setAddFolderName(event.target.value)
-    };
-    addFolder = ()=>{
-        let myFolder = this.props.store.codeStore.myFolder[0];
-        if (this.props.store.codeStore.addFolderName !== '') {
-            let url = '/apis/api/method/app_center.editor.editor';
-            if (myFolder === this.state.appName) {
-                myFolder = '/'
-            }
-            http.get(url + '?app=' + this.state.app + '&operation=create_node&type=folder&id=' +
-                myFolder + '&text=' + this.props.store.codeStore.addFolderName)
-                .then(res=>{
-                    res;
-                    let newData = {
-                        children: [],
-                        title: this.props.store.codeStore.addFolderName,
-                        isLeaf: false,
-                        type: 'folder',
-                        key: res.id,
-                        icon: 'folder'
-                    };
-                    let treeNode = this.state.treeNode;
-                    console.log(treeNode);
-                    treeNode.node.props.dataRef.children.push(newData);
-                    this.setState({
-                        arr: [...this.state.arr]
-                    })
-                });
-            message.success('创建文件夹成功');
-            this.addFolderHide();
-        }
-    };
-    //删除节点
-    renderTreeNodes = (data, delData)=>data.map((item, i) => {
-        if (delData !== '0') {
-            //如果循环的节点数据中有跟你传过来要删的数据delData.key相同的 那就将这条数据丛树节点删掉
-            if (item.key === delData.node.props.dataRef.key) {
-                data.splice(i, 1);
-                this.setState({
-                    delData: '0'
-                });
-            }
-        }
-        if (item.children) {
-            this.renderTreeNodes(item.children, this.state.treeNode)
-        }
-        this.setState({
-            arr: data
-        });
-        return data;
-    });
-
-    showConfirm = (content)=>{
-        const pro = ()=>{
-            return new Promise(() => {
-                let myFolder = this.props.store.codeStore.myFolder[0];
-                let url = '/apis/api/method/app_center.editor.editor';
-                http.get(url + '?app=' + this.state.app + '&operation=delete_node&type=folder&id=' + myFolder)
-                    .then(res=>{
-                        res;
-                        this.renderTreeNodes(this.state.arr, this.state.treeNode);
-                    });
-            })
-        };
-        confirm({
-            title: '提示信息',
-            okText: '确定',
-            cancelText: '取消',
-            content: content,
-            onOk () {
-                pro().then(res=>{
-                    res;
-                    message.success('删除成功！')
-                }).catch(req=>{
-                    req;
-                    message.error('删除失败！')
-                })
-            },
-            onCancel () {}
-        });
-    };
-    deleteFileShow = ()=>{
-        if (this.props.store.codeStore.folderType === 'folder') {
-            this.showConfirm('确认删除此文件夹？')
-        } else if (this.props.store.codeStore.folderType === 'file') {
-            this.showConfirm('确认删除此文件？')
-        } else if (this.props.store.codeStore.folderType === '') {
-            message.warning('请选择文件！')
-        }
-    };
-
-    //编辑文件名称
-    editorFileShow = ()=>{
-        if (this.props.store.codeStore.folderType) {
-            this.setState({
-                isEditorFileShow: true
-            })
-        } else if (!this.props.store.codeStore.folderType) {
-            message.warning('请先选择目录！')
-        }
-    };
-    editorFileHide = ()=>{
-        this.setState({
-            isEditorFileShow: false
-        })
-    };
-    editorFileName = ()=>{
-        this.setState({
-            editorFileName: event.target.value
-        })
-    };
-    editorFile = ()=>{
-        let myFolder = this.props.store.codeStore.myFolder[0];
-        if (this.state.editorFileName !== '') {
-            let url = '/apis/api/method/app_center.editor.editor';
-            http.get(url + '?app=' + this.state.app + '&operation=rename_node&type=folder&id=' +
-                myFolder + '&text=' + this.state.editorFileName)
-                .then(res=>{
-                    res;
-                    let treeNode = this.state.treeNode;
-                    treeNode.node.props.dataRef.title = this.state.editorFileName;
-                    this.setState({
-                        arr: [...this.state.arr]
-                    });
-                    message.success('编辑文件成功');
-                })
-                .catch(err=>{
-                    err;
-                    message.error('编辑文件失败');
-                })
-
-            this.addFolderHide();
-        } else {
-            message.warning('请输入文件名！')
-        }
-        this.editorFileHide()
-    };
 
     set = (selectedKeys, info)=>{
-        this.props.store.codeStore.setEditorContent(this.props.store.codeStore.newEditorContent)
-        this.props.store.codeStore.setShowFileName(selectedKeys);
+        const {codeStore} = this.state
+        codeStore.setEditorContent(codeStore.newEditorContent)
+        codeStore.setShowFileName(selectedKeys);
         this.setState({ selectedKeys }, ()=>{
-            this.props.store.codeStore.setFileName(this.state.selectedKeys);
+            codeStore.setFileName(this.state.selectedKeys);
         });
-        this.props.store.codeStore.setMyFolder(selectedKeys);
-        this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+        codeStore.setMyFolder(selectedKeys);
+        codeStore.setFolderType(info.node.props.dataRef.type);
         if (selectedKeys[0].indexOf('.') !== -1) {
             let suffixName = '';
             switch (selectedKeys[0].substr(selectedKeys[0].indexOf('.') + 1, selectedKeys[0].length)) {
@@ -541,18 +214,19 @@ class AppEditorCode extends Component {
                 case '' : suffixName = 'javascript'; break;
                 default : suffixName = 'java'
             }
-            this.props.store.codeStore.setSuffixName(suffixName);
+            codeStore.setSuffixName(suffixName);
         } else {
-            this.props.store.codeStore.setSuffixName('text');
+            codeStore.setSuffixName('text');
         }
     };
 
     onSelect = (selectedKeys, info) => {
-        if (this.props.store.codeStore.editorContent !== this.props.store.codeStore.newEditorContent) {
+        const {codeStore} = this.state
+        if (codeStore.editorContent !== codeStore.newEditorContent) {
             let url = '/apis/api/method/app_center.editor.editor';
             http.post(url + '?app=' + this.state.app +
-                '&operation=set_content&id=' + this.props.store.codeStore.fileName +
-                '&text=' + this.props.store.codeStore.newEditorContent)
+                '&operation=set_content&id=' + codeStore.fileName +
+                '&text=' + codeStore.newEditorContent)
                 .then(res=>{
                     console.log(res);
                 })
@@ -565,10 +239,10 @@ class AppEditorCode extends Component {
                 this.set(selectedKeys, info)
             } else {
                 this.setState({ selectedKeys }, ()=>{
-                    this.props.store.codeStore.setFileName(this.state.selectedKeys);
+                    codeStore.setFileName(this.state.selectedKeys);
                 });
-                this.props.store.codeStore.setMyFolder(selectedKeys);
-                this.props.store.codeStore.setFolderType(info.node.props.dataRef.type);
+                codeStore.setMyFolder(selectedKeys);
+                codeStore.setFolderType(info.node.props.dataRef.type);
             }
         }
     };
@@ -576,7 +250,8 @@ class AppEditorCode extends Component {
     render () {
         const {
             fontSize,
-            optionData,
+            codeStore,
+            versionList,
             arr,
             app,
             selectedKeys,
@@ -584,68 +259,6 @@ class AppEditorCode extends Component {
         } = this.state;
         return (
             <div className="appEditorCode">
-                <div className="iconGroup">
-                    <p style={{width: '220px'}}>
-                        <Icon
-                            type="file-add"
-                            onClick={this.addFileShow}
-                        />
-                        <Icon
-                            type="folder-add"
-                            onClick={this.addFolderShow}
-                        />
-                        <Icon
-                            type="edit"
-                            onClick={this.editorFileShow}
-                        />
-                        <Icon
-                            type="delete"
-                            onClick={this.deleteFileShow}
-                        />
-                    </p>
-                    <p style={{width: 'auto', position: 'resolute'}}>
-                        <Icon
-                            type="sync"
-                            onClick={this.showModal}
-                        />
-                        <Icon
-                            type="zoom-in"
-                            onClick={this.zoomOut}
-                        />
-                        <Icon
-                            type="zoom-out"
-                            onClick={this.zoomIn}
-                        />
-                        <Icon
-                            type="save"
-                            onClick={this.saveFile}
-                        />
-                        <Icon
-                            type="upload"
-                            onClick={this.show}
-                        />
-                        {/*<Icon*/}
-                        {/*type="undo"*/}
-                        {/*onClick={this.undo}*/}
-                        {/*/>*/}
-                        {/*<Icon type="redo" onClick={this.keyPress} />*/}
-                        <Icon
-                            style={{position: 'absolute', right: 60, top: 85}}
-                            type="cloud-upload"
-                            onClick={()=>{
-                                console.log('1')
-                            }}
-                        />
-                        <Icon
-                            style={{position: 'absolute', right: 30, top: 85}}
-                            type="rollback"
-                            onClick={()=>{
-                                this.props.history.go(-1)
-                            }}
-                        />
-
-                    </p>
-                </div>
                 <div className="main">
                     <div className="tree">
                         <FileTree
@@ -655,13 +268,14 @@ class AppEditorCode extends Component {
                             onSelect={this.onSelect}
                             selectedKeys={selectedKeys}
                             appName={appName}
+                            codeStore={codeStore}
                         />
                     </div>
                     <div className="code">
                         <CodeEditor
                             fontSize={fontSize}
-                            showFileName={this.props.store.codeStore.showFileName}
-                            isChange={this.props.store.codeStore.isChange}
+                            showFileName={codeStore.showFileName}
+                            isChange={codeStore.isChange}
                         />
                     </div>
                 </div>
@@ -679,7 +293,7 @@ class AppEditorCode extends Component {
                         style={{ width: 350 }}
                     >
                         {
-                            optionData && optionData.length > 0 && optionData.map((v)=>{
+                            versionList && versionList.length > 0 && versionList.map((v)=>{
                                 return (
                                     <Option
                                         key={v}
@@ -693,51 +307,6 @@ class AppEditorCode extends Component {
                             })
                         }
                     </Select>
-                </Modal>
-                <Modal
-                    title="新建文件"
-                    visible={this.state.isAddFileShow}
-                    onOk={this.addFile}
-                    onCancel={this.addFileHide}
-                    okText="确认"
-                    cancelText="取消"
-                >
-                    <span style={{padding: '0 20px'}}>文件名</span>
-                    <Input
-                        type="text"
-                        onChange={this.addFileName}
-                        style={{ width: 350 }}
-                    />
-                </Modal>
-                <Modal
-                    title="更改文件名"
-                    visible={this.state.isEditorFileShow}
-                    onOk={this.editorFile}
-                    onCancel={this.editorFileHide}
-                    okText="确认"
-                    cancelText="取消"
-                >
-                    <span style={{padding: '0 20px'}}>重命名</span>
-                    <Input
-                        type="text"
-                        onChange={this.editorFileName}
-                        style={{ width: 350 }}
-                    />
-                </Modal>
-                <Modal
-                    title="新建文件夹"
-                    visible={this.state.isAddFolderShow}
-                    onOk={this.addFolder}
-                    onCancel={this.addFolderHide}
-                    okText="确认"
-                    cancelText="取消"
-                >
-                    <span style={{padding: '0 20px'}}>文件夹名</span>
-                    <Input
-                        type="text"
-                        onChange={this.addFolderName}
-                        style={{ width: 350 }}
-                    />
                 </Modal>
                 <Modal
                     title="发布新版本"
