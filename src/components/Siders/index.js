@@ -30,7 +30,7 @@ class Siders extends PureComponent {
             this.setState({
                 key: '1'
             })
-        } else if (pathname.indexOf('/gateways') !== -1 || pathname.indexOf('/appsinstall') !== -1) {
+        } else if (pathname.indexOf('/gateways') !== -1 || pathname.indexOf('/gateway/') !== -1 || pathname.indexOf('/appsinstall') !== -1) {
             this.setState({
                 key: '2'
             })
