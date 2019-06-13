@@ -38,7 +38,7 @@ class MyGatesAppsInstall extends Component {
         },
         config: [],
         gateway_list_visible: false,
-        install_btn_disabled: false,
+        installing: false,
         configStore: new ConfigStore(),
         showLinkSelection: false
     };
@@ -54,6 +54,7 @@ class MyGatesAppsInstall extends Component {
         this.setState({
             app: app,
             install_step: install_step,
+            installing: false,
             gateway_sn: gateway_sn
         }, () => {
             if (install_step === 'install') {
@@ -140,11 +141,12 @@ class MyGatesAppsInstall extends Component {
                 this.appInstall(params, sn)
             } else {
                 message.error('应用暂时没有版本，无法安装！');
-                this.setState({ install_btn_disabled: false })
+                this.setState({ installing: false })
             }
         }).catch(err=> {
             err;
             message.error('安装应用最新版本失败!')
+            this.setState({ installing: false })
         })
     };
 
@@ -159,19 +161,19 @@ class MyGatesAppsInstall extends Component {
                 }
                 this.props.store.action.pushAction(res.data, '网关' + sn + '安装应用' + params.inst, '', info, 30000,  (result)=> {
                     if (result) {
-                        this.setState({ showLinkSelection: true })
+                        this.setState({ showLinkSelection: true, installing: false })
                     } else {
-                        this.setState({ install_btn_disabled: false });
+                        this.setState({ installing: false });
                     }
                 })
             } else {
-                this.setState({ install_btn_disabled: false });
+                this.setState({ installing: false });
                 openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
             }
         }).catch( (err)=> {
             err;
             openNotification('提交任务失败', '网关' + sn + '安装' + params.inst + '应用.')
-            this.setState({ install_btn_disabled: false });
+            this.setState({ installing: false });
         })
     };
 
@@ -198,19 +200,19 @@ class MyGatesAppsInstall extends Component {
     });
 
     onInstallSubmit = (inst_name, app_info, configuration)=>{
-        this.setState({
-            install_btn_disabled: true
-        });
         if (inst_name === '' || inst_name === undefined) {
             message.error('实例名不能为空！');
             return;
         } else {
+            this.setState({
+                installing: true
+            });
             //判断实例名是否存在
             this.checkInstanceName(this.state.gateway_sn, inst_name).then(()=>{
                 this.installLatestVersion(app_info.name, this.state.gateway_sn, inst_name, configuration)
             }).catch(err=>{
                 message.error(err)
-                this.setState({ install_btn_disabled: false });
+                this.setState({ installing: false });
             });
         }
     };
@@ -218,7 +220,7 @@ class MyGatesAppsInstall extends Component {
     onClose = () => {
         this.setState({
             gateway_list_visible: false,
-			install_btn_disabled: false
+			installing: false
         })
     };
 
@@ -369,7 +371,7 @@ class MyGatesAppsInstall extends Component {
                                 configStore={this.state.configStore}
                                 app_inst={app_inst}
                                 inst_editable
-                                disabled={this.state.install_btn_disabled}
+                                disabled={this.state.installing}
                                 app_info={app_info}
                                 onSubmit={this.onInstallSubmit}
                             />
