@@ -97,7 +97,6 @@ class Action extends Component {
             app: record.name,
             inst: record.inst_name,
             version: record.latestVersion,
-            conf: {},
             id: `sys_upgrade/${this.props.match.params.sn}/${new Date() * 1}`
         }
         http.post('/api/gateways_applications_upgrade', data).then(res=>{
