@@ -18,10 +18,15 @@ class Inst extends React.Component {
             this.setState({errorMessage: ''})
         }
     };
-
     instChange = (e)=>{
-        this.props.onChange(e.target.value)
-        setTimeout(this.checkInstanceName, 1000)
+        let value = e.target.value
+        value = value.replace(/[^A-Za-z0-9_]/, '')
+        if (this.state.inst_name !== value) {
+            this.setState({inst_name: value}, () => {
+                this.props.onChange(value)
+                setTimeout(this.checkInstanceName, 1000)
+            })
+        }
     };
 
     checkInstanceName = ()=>{
@@ -51,6 +56,7 @@ class Inst extends React.Component {
                         type="text"
                         style={{width: '300px'}}
                         value={inst_name}
+                        allowClear
                         onChange={this.instChange}
                         onBlur={this.instBlur}
                     />
