@@ -9,6 +9,7 @@ import http from '../../utils/Server';
 import { inject, observer } from 'mobx-react';
 import { Button, Icon, message } from 'antd';
 import GatewayMQTT from '../../utils/GatewayMQTT';
+import { setInterval } from 'timers';
 
 const DeviceList = LoadableComponent(()=>import('./DeviceList'));
 const AppsList = LoadableComponent(()=>import('./AppsList'));
@@ -30,6 +31,7 @@ class MyGatesDevices extends Component {
     constructor (props){
         super(props);
         this.data_len = 0
+        this.timer = null
         this.state = {
             gateway: '',
             visible: false,
@@ -39,7 +41,7 @@ class MyGatesDevices extends Component {
     }
     componentDidMount (){
         this.setState({gateway: this.props.match.params.sn}, ()=>{
-            this.sendAjax()
+            this.timer = setInterval(() => this.sendAjax(), 3000)
             this.props.store.timer.setGateStatusLast(0)
         })
     }
@@ -47,10 +49,12 @@ class MyGatesDevices extends Component {
         if (this.props.match.params.sn !== nextProps.match.params.sn){
             this.setState({gateway: nextProps.match.params.sn}, ()=>{
                 this.state.mqtt.disconnect(true)
-                this.sendAjax()
                 this.props.store.timer.setGateStatusLast(0)
             })
         }
+    }
+    componentWillUnmount (){
+        clearInterval(this.timer)
     }
     sendAjax = () => {
         const {gateway} = this.state;

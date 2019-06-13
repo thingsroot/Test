@@ -65,9 +65,9 @@ class DevicesList extends Component {
     }
     componentDidMount (){
         this.setState({gateway: this.props.gateway}, ()=>{
-            this.timer = setInterval(()=>{
-                this.getData();
-            }, 3000)
+            // this.timer = setInterval(()=>{
+            //     this.getData();
+            // }, 3000)
             this.setData(this.props.store.gatewayInfo.devices)
             if (this.props.store.gatewayInfo.devices_count !== 0) {
                 this.setState({loading: false})
@@ -86,7 +86,7 @@ class DevicesList extends Component {
         }
     }
     componentWillUnmount (){
-        clearInterval(this.timer)
+        //clearInterval(this.timer)
     }
     getData (){
         http.get('/api/gateways_dev_list?gateway=' + this.state.gateway).then(res=>{

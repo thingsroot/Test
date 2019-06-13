@@ -117,9 +117,9 @@ class AppsList extends Component {
                 this.setState({loading: false})
             }
             this.fetch();
-            this.timer = setInterval(() => {
-                this.fetch()
-            }, 3000);
+            // this.timer = setInterval(() => {
+            //     this.fetch()
+            // }, 3000);
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -133,7 +133,7 @@ class AppsList extends Component {
         }
     }
     componentWillUnmount (){
-        clearInterval(this.timer)
+        //clearInterval(this.timer)
     }
     // handleTableChange = (pagination, filters) => {
     //   const pager = { ...this.state.pagination };
