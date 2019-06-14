@@ -20,7 +20,7 @@ class DeviceMessage extends Component {
         if (nextProps.match.params.gateway !== this.state.gateway ||
             nextProps.match.params.limitTime !== this.state.limitTime){
             this.setState({
-                gateway: nextProps.match.params.sn,
+                gateway: nextProps.match.params.gateway,
                 limitTime: nextProps.match.params.limitTime
             })
         }
