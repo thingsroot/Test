@@ -12,7 +12,7 @@ const MyIcon = Icon.createFromIconfontCN({
 });
 
 const newNodeItem = (title, isLeaf, type, key, icon) => {
-    var item = observable({
+    let item = observable({
         // observable 属性:
         parent: null,
         title: title,
@@ -33,14 +33,15 @@ const newNodeItem = (title, isLeaf, type, key, icon) => {
             this.isLeaf = !value.children
             this.type = value.type
             this.key = value.id,
-            this.icon = value.icon.substr(value.icon.indexOf('.') + 1, value.icon.length)
+                this.icon = value.icon.substr(value.icon.indexOf('.') + 1, value.icon.length)
         },
         addChild (item) {
             item.parent = this
             this.children.push(item)
         },
         removeChild (item) {
-            let arr = []
+            console.log(item)
+            let arr = [];
             this.children.map(v => {
                 if (v.key !== item.key) {
                     arr.push(v)
@@ -66,13 +67,13 @@ class MyTree extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            expandedKeys: [],
+            expandedKeys: ['#'],
+            // expendArr: ['#'],
             autoExpandParent: true,
             root: [],
-            selectedKeys: [],
+            selectedKeys: ['version'],
             app: '',
             appName: '',
-
             selectedNodeData: {},
             newInputValue: '',
             showNewFileModal: false,
@@ -88,28 +89,34 @@ class MyTree extends Component {
         this.setState({
             app: this.props.app,
             appName: this.props.appName,
+            // expandedKeys: [this.props.appName],
             root: []
         }, () => {
             this.loadTree()
         })
     }
 
-    UNSAFE_componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps (nextProps) {
         if (this.state.app !== nextProps.app) {
             this.setState({
                 app: nextProps.app,
                 appName: nextProps.appName,
+                expandedKeys: ['#'],
                 root: []
             }, () => {
                 this.loadTree()
             })
+        } else {
+            // this.setState({
+            //     expandedKeys: this.state.expendArr
+            // })
         }
     }
     loadTree () {
         if (this.state.app === '') {
             return
         }
-        let data = []
+        let data = [];
         data.push(newNodeItem(this.state.appName, false, 'folder', '#', 'folder'))
         this.setState({app: this.state.app, root: data}, () => {
             this.load()
@@ -118,7 +125,7 @@ class MyTree extends Component {
 
     load = () => {
         this.loadChild(this.state.app, this.state.root[0])
-    }
+    };
 
     loadChild = (app, item) => {
         http.get('/apis/api/method/app_center.editor.editor?app=' + app + '&operation=get_node&id=' + item.key)
@@ -138,21 +145,27 @@ class MyTree extends Component {
             });
     }
 
-    findChild = (node, id) => {
+    findChild = (node, id) => new Promise((resolve => {
         if (node.key === id) {
-            return node
+            console.log('=================')
+            console.log(node)
+            resolve(node)
         }
         node.children.map((v) => {
-            let node = this.findChild(v, id)
+            let node = this.findChild(v, id);
+
             if (node !== undefined) {
-                return node
+                resolve(node)
             }
         })
-    }
+    }))
 
-    findNode = (id) => {
-        this.findChild(this.state.root[0], id)
-    }
+    // findNode = (id) => {
+    //     this.findChild(this.state.root[0], id).then(node=>{
+    //         data = node;
+    //     })
+    //
+    // };
 
     get SelectedNodeBasePath () {
         if (this.SelectedNodeID === undefined) {
@@ -201,23 +214,17 @@ class MyTree extends Component {
             console.log(this.state.newNodeFolder)
         })
     };
-
     onAddNewFile = ()=>{
         const {app, newInputValue} = this.state
         if (newInputValue === '') {
             this.setState({
                 showNewFileModal: false
-            })
+            });
             return
         }
-        let new_id = this.SelectedNodeBasePath + newInputValue
+        // let new_id = this.SelectedNodeBasePath + newInputValue
         let folder_node = this.SelectedNodeBaseNode
-        let node = this.findNode(new_id)
-        if (node) {
-            message.error('文件名称重复')
-            return
-        }
-
+        //请求接口
         let url = '/apis/api/method/app_center.editor.editor';
         let params = {
             app: app,
@@ -225,20 +232,27 @@ class MyTree extends Component {
             type: 'file',
             id: this.SelectedNodeBasePath,
             text: newInputValue
-        }
+        };
         http.post(url, params)
             .then(res=>{
-                if (res.id === params.text) {
+                if (res.id.indexOf(params.text) !== -1) {
                     let newItem = newNodeItem( res.text ? res.text : newInputValue, true, 'file', res.id, '' )
                     this.setState({
                         showNewFileModal: false
-                    })
-                    folder_node.addChild(newItem)
+                    });
+                    folder_node.addChild(newItem);
                     message.success('创建文件成功');
                 } else {
                     message.error('创建文件失败')
                 }
             });
+        // this.findChild(this.state.root[0], new_id).then(node=>{
+        //     if (node) {
+        //         message.error('文件名称重复');
+        //         return
+        //     }
+        //
+        // });
     };
 
     //添加文件夹
@@ -250,8 +264,6 @@ class MyTree extends Component {
         this.setState({
             showNewFolderModal: true,
             newNodeName: ''
-        }, ()=> {
-            console.log(this.state.newNodeFolder)
         })
     };
     onAddNewFolder = ()=>{
@@ -259,18 +271,11 @@ class MyTree extends Component {
         if (newInputValue === '') {
             this.setState({
                 showNewFolderModal: false
-            })
+            });
             return
         }
-
-        let new_id = this.SelectedNodeBasePath + newInputValue
+        // let new_id = this.SelectedNodeBasePath + newInputValue
         let folder_node = this.SelectedNodeBaseNode
-        let node = this.findNode(new_id)
-        if (node) {
-            message.error('文件夹名称重复')
-            return
-        }
-
         let url = '/apis/api/method/app_center.editor.editor';
         let params = {
             app: app,
@@ -278,47 +283,61 @@ class MyTree extends Component {
             type: 'folder',
             id: this.SelectedNodeBasePath,
             text: newInputValue
-        }
+        };
         http.post(url, params)
             .then(res=>{
-                if (res.id === params.text) {
+                if (res.id.indexOf(params.text) !== -1) {
                     let newItem = newNodeItem( res.text ? res.text : newInputValue, false, 'folder', res.id, 'folder' )
                     this.setState({
                         showNewFolderModal: false
-                    })
-                    folder_node.addChild(newItem)
+                    });
+                    folder_node.addChild(newItem);
                     message.success('创建文件夹成功');
                 } else {
                     message.error('创建文件夹失败')
                 }
             });
+        // this.findChild(this.state.root[0], new_id).then(node=>{
+        //     if (node) {
+        //         message.error('文件夹名称重复');
+        //         return;
+        //     }
+        // })
     };
     //删除节点
     showConfirm = (content)=>{
         if (this.SelectedNodeID === undefined) {
             return
         }
-        const to_delete_id = this.SelectedNodeID
+        const to_delete_id = this.SelectedNodeID;
         const delete_node = ()=>{
-                let url = '/apis/api/method/app_center.editor.editor';
-                let params = {
-                    app: this.state.app,
-                    operation: 'delete_node',
-                    id: to_delete_id,
-                    type: this.SelectedNodeType
-                }
-                http.post(url, params)
-                    .then(res=>{
-                        if (res.status === 'OK') {
-                            message.success('删除成功！')
-                            let node = this.findNode(to_delete_id)
+            let url = '/apis/api/method/app_center.editor.editor';
+            let params = {
+                app: this.state.app,
+                operation: 'delete_node',
+                id: to_delete_id,
+                type: this.SelectedNodeType
+            };
+            http.post(url, params)
+                .then(res=>{
+                    console.log(res);
+                    if (res.status === 'OK') {
+                        message.success('删除成功！');
+                        this.findChild(this.state.root[0], to_delete_id).then(node=>{
+                            console.log(node);
                             if (node) {
-                                node.parent.removeChild(node)
+                                node.parent.removeChild(node);
                             }
-                        } else {
-                            message.error('删除失败！')
-                        }
-                    });
+                        })
+                        // let node = this.findNode(to_delete_id);
+                        // console.log(node)
+                        // if (node) {
+                        //     node.parent.removeChild(node);
+                        // }
+                    } else {
+                        message.error('删除失败！')
+                    }
+                });
         };
         confirm({
             title: `确定要删除${this.SelectedNodeText}[${to_delete_id}]`,
@@ -332,12 +351,10 @@ class MyTree extends Component {
         });
     };
 
-
     deleteFileShow = ()=>{
         if (this.SelectedNodeID === undefined) {
             return
         }
-
         if (this.SelectedNodeType === 'folder') {
             this.showConfirm('确认删除此文件夹？')
         } else if (this.SelectedNodeType === 'file') {
@@ -379,7 +396,11 @@ class MyTree extends Component {
         let cur_node = this.state.selectedNodeData
         http.post(url, params)
             .then(res=>{
-                if (res.id === params.text) {
+                if (res.id.indexOf(params.text) !== -1) {
+                    this.state.expandedKeys.push(params.text);
+                    this.setState({
+                        expandedKeys: [...this.state.expandedKeys]
+                    })
                     this.setState({ showRenameModal: false })
                     message.success('更改名称成功')
                     cur_node.setKey(res.id)
@@ -396,17 +417,17 @@ class MyTree extends Component {
     onExpand = (expandedKeys) => {
         this.setState({
             expandedKeys,
+            // expendArr: expandedKeys,
             autoExpandParent: false
         });
     };
 
     onSelect = (selectedKeys, info) => {
-        console.log(info)
         if (info.selected) {
             this.setState({
-                selectedKeys: selectedKeys,
+                selectedKeys,
                 selectedNodeData: info.node.props.dataRef
-            })
+            });
             this.props.onSelect(info.node.props.dataRef)
         } else {
             // this.setState({
@@ -455,10 +476,84 @@ class MyTree extends Component {
             );
         });
 
+    onDragEnter = info => {
+        console.log(info);
+        // expandedKeys 需要受控时设置
+        // this.setState({
+        //   expandedKeys: info.expandedKeys,
+        // });
+    };
+
+    onDrop = info => {
+        const dropKey = info.node.props.eventKey;
+        const dragKey = info.dragNode.props.eventKey;
+        const dropPos = info.node.props.pos.split('-');
+        const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+
+        const loop = (data, key, callback) => {
+            data.forEach((item, index, arr) => {
+                if (item.key === key) {
+                    return callback(item, index, arr);
+                }
+                if (item.children) {
+                    return loop(item.children, key, callback);
+                }
+            });
+        };
+        const data = [...this.state.root];
+
+        // Find dragObject
+        let dragObj;
+        loop(data, dragKey, (item, index, arr) => {
+            arr.splice(index, 1);
+            dragObj = item;
+        });
+
+        if (!info.dropToGap) {
+            // Drop on the content
+            loop(data, dropKey, item => {
+                item.children = item.children || [];
+                // where to insert 示例添加到尾部，可以是随意位置
+                item.children.push(dragObj);
+            });
+        } else if (
+            (info.node.props.children || []).length > 0 && // Has children
+            info.node.props.expanded && // Is expanded
+            dropPosition === 1 // On the bottom gap
+        ) {
+            loop(data, dropKey, item => {
+                item.children = item.children || [];
+                // where to insert 示例添加到尾部，可以是随意位置
+                console.log(item)
+                if (item.type === 'file') {
+                    item.children.unshift(dragObj);
+                } else {
+                    message.error('weizhicuowi')
+                }
+            });
+        } else {
+            let ar;
+            let i;
+            loop(data, dropKey, (item, index, arr) => {
+                ar = arr;
+                i = index;
+            });
+            if (dropPosition === -1) {
+                ar.splice(i, 0, dragObj);
+            } else {
+                ar.splice(i + 1, 0, dragObj);
+            }
+        }
+
+        this.setState({
+            root: data
+        });
+    };
+
     render () {
         const { onSelect } = this.props;
         onSelect;
-        const { root, selectedKeys } = this.state
+        const { root, selectedKeys } = this.state;
         return (
             <div className="fileTree">
                 <div className="iconGroup">
@@ -477,23 +572,27 @@ class MyTree extends Component {
                         />
                         <Icon
                             type="delete"
-                            onClick={this.onDeleteNode}
+                            onClick={this.deleteFileShow}
                         />
                     </p>
                 </div>
                 <div>
                     {
                         root.length > 0
-                        ? <Tree
-                            showIcon
-                            multiple={false}
-                            onExpand={this.onExpand}
-                            expandedKeys={this.state.expandedKeys}
-                            onSelect={this.onSelect}
-                            selectedKeys={selectedKeys}
-                          >
-                            {this.renderTreeNodes(root)}
-                        </Tree> : ''
+                            ? <Tree
+                                showIcon
+                                // draggable
+                                // blockNode
+                                // onDragEnter={this.onDragEnter}
+                                // onDrop={this.onDrop}
+                                multiple={false}
+                                onExpand={this.onExpand}
+                                expandedKeys={this.state.expandedKeys}
+                                onSelect={this.onSelect}
+                                selectedKeys={selectedKeys}
+                            >
+                                {this.renderTreeNodes(root)}
+                            </Tree> : ''
                     }
                 </div>
                 <Modal
