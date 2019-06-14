@@ -26,7 +26,7 @@ class Siders extends PureComponent {
     }
     UNSAFE_componentWillMount () {
         const pathname = this.props.location.pathname.toLowerCase();
-        if (pathname.indexOf('/home') !== -1){
+        if (pathname.indexOf('/dashboard') !== -1){
             this.setState({
                 key: '1'
             })
@@ -102,7 +102,7 @@ class Siders extends PureComponent {
                     defaultSelectedKeys={[this.state.key]}
                 >
                     <Menu.Item key="1">
-                    <Link to="/home">
+                    <Link to="/dashboard">
                         <Icon
                             type="dashboard"
                             // theme="twoTone"

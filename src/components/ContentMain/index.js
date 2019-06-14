@@ -7,7 +7,7 @@ import PrivateRoute from '../PrivateRoute';
 
 const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
-const Home = LoadableComponent(()=>import('../../router/Home'));
+const Dashboard = LoadableComponent(()=>import('../../router/Dashboard'));
 const GatewayList = LoadableComponent(()=>import('../../router/GatewayList'));
 const Developer = LoadableComponent(()=>import('../../router/Developer'));
 const AppStore = LoadableComponent(()=>import('../../router/AppStore'));
@@ -69,8 +69,8 @@ class ContentMain extends Component {
         return (
             <Switch>
                 <PrivateRoute
-                    path="/home"
-                    component={Home}
+                    path="/dashboad"
+                    component={Dashboard}
                     title={'Dashboard'}
                 />
                 <PrivateRoute
@@ -161,7 +161,7 @@ class ContentMain extends Component {
                 />
                 <Redirect
                     from="/"
-                    to="/home"
+                    to="/dashboard"
                 />
             </Switch>
         );

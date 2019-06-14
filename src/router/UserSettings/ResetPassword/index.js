@@ -19,7 +19,7 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
             const { getFieldDecorator } = form;
             //旧密码验证
             const verifyPassword = (rule, value, callback) => {
-                http.post('/home/api/method/iot_ui.iot_api.verify_password', {password: value})
+                http.post('/apis/api/method/iot_ui.iot_api.verify_password', {password: value})
                     .then(res=> {
                         res;
                         callback()
