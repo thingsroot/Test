@@ -138,7 +138,7 @@ class DeviceEventList extends Component {
             limitStart: limitStart ? limitStart : 0,
             limitLength: limitLength ? limitLength : 1000
         }, ()=>{
-            this.getMessageList();
+            this.fetchAll();
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -156,7 +156,7 @@ class DeviceEventList extends Component {
                 limitStart: limitStart ? limitStart : this.state.limitStart,
                 limitLength: limitLength ? limitLength : this.state.limitLength
             }, ()=>{
-                this.getMessageList()
+                this.fetchAll()
             })
         }
 
@@ -286,13 +286,22 @@ class DeviceEventList extends Component {
             console.log(err)
         })
     };
+
+    fetchAll = () => {
+        if (this.fetch_timer){
+            clearTimeout(this.fetch_timer)
+        }
+        this.fetch_timer = setTimeout(() => {
+            this.getMessageList()
+        }, 200);
+    }
     //获取消息列表
     getMessageList = ()=>{
         let filters = {
             creation: ['>', this.durationToTime(this.state.limitTime)]
         }
         if (this.state.gateway) {
-            filters['devices'] = this.state.gateway
+            filters['device'] = this.state.gateway
         }
         if (this.state.showUnDisposed) {
             filters['disposed'] = 0;
@@ -314,11 +323,11 @@ class DeviceEventList extends Component {
             method: 'GET',
             params: params
         }).then(res=>{
-            let sourceData = res.data.data.list.data;
             let data = [];
             let source = [];
             let unconfirmed = 0;
             if (res.data.ok === true) {
+                let sourceData = res.data.data.list
                 sourceData.map((v)=>{
                     if (v.disposed === 0) {
                         unconfirmed++
@@ -373,7 +382,7 @@ class DeviceEventList extends Component {
         this.setState({
             showUnDisposed: !this.state.showUnDisposed
         }, ()=>{
-            this.getMessageList()
+            this.fetchAll()
         })
     };
 
@@ -450,7 +459,7 @@ class DeviceEventList extends Component {
         this.setState({
             limitLength: num
         }, () => {
-            this.getMessageList();
+            this.fetchAll();
         })
     };
     //筛选消息类型
@@ -474,7 +483,7 @@ class DeviceEventList extends Component {
         this.setState({
             limitTime: Number(value)
         }, () => {
-            this.getMessageList();
+            this.fetchAll();
         })
     };
     //表格
@@ -486,7 +495,7 @@ class DeviceEventList extends Component {
         this.setState({
             sync: true
         }, ()=>{
-            this.getMessageList()
+            this.fetchAll()
         })
     };
 
@@ -505,6 +514,7 @@ class DeviceEventList extends Component {
                             this.confMessage(selectedRowKeys)
                         }}
                         >确认消息</Button>
+                        <span style={{padding: '0 3px'}} />
                         <Button onClick={()=>{
                             this.confAllMessage()
                         }}
@@ -526,6 +536,7 @@ class DeviceEventList extends Component {
                             <Option value="系统">消息类型：系统</Option>
                             <Option value="设备">消息类型：设备</Option>
                         </Select>
+                        <span style={{padding: '0 3px'}} />
                         <Select
                             value={String(this.state.filterLevel)}
                             style={{ width: 130 }}
@@ -537,6 +548,7 @@ class DeviceEventList extends Component {
                             <Option value="3">等级：警告</Option>
                             <Option value="99">等级：致命</Option>
                         </Select>
+                        <span style={{padding: '0 3px'}} />
                         <Select
                             value={String(this.state.limitLength)}
                             style={{ width: 140 }}
@@ -547,8 +559,9 @@ class DeviceEventList extends Component {
                             <Option value="500">记录数：500</Option>
                             <Option value="1000">记录数：1000</Option>
                         </Select>
+                        <span style={{padding: '0 3px'}} />
                         <Select
-                            value={String(this.state.limitTime)}
+                            value={`${this.state.limitTime}`}
                             style={{ width: 140 }}
                             onChange={this.onTotalTimeChange}
                         >
@@ -558,18 +571,17 @@ class DeviceEventList extends Component {
                             <Option value="72">时间：72小时</Option>
                             <Option value="168">时间：一周</Option>
                         </Select>
-                        &nbsp; &nbsp;
+                        <span style={{padding: '0 3px'}} />
                         <InputGroup compact>
                             <Select
                                 defaultValue=""
                                 onChange={this.onFilterColumnChange}
                                 style={{width: '100px'}}
+                                disabled={this.state.gateway !== undefined}
                             >
                                 <Option value="">全部</Option>
                                 <Option value="title">标题</Option>
-                                {
-                                    this.gateway ? null : <Option value="device">序列号</Option>
-                                }
+                                <Option value="device">序列号</Option>
                             </Select>
                             <Input
                                 style={{ width: 200 }}

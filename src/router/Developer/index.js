@@ -18,7 +18,7 @@ const none = {
 @inject('store')
 @observer
 
-class MyApps extends Component {
+class Developer extends Component {
     state = {
         appList: [],
         myList: [],
@@ -99,7 +99,7 @@ class MyApps extends Component {
     render () {
         const { appList, myList, forkList } = this.state;
         return (
-            <div className="myApps">
+            <div className="appList">
 
                 <div className="searchApp">
                     <Button
@@ -227,4 +227,4 @@ class MyApps extends Component {
         )
     }
 }
-export default MyApps;
+export default Developer;

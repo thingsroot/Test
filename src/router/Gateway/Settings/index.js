@@ -14,32 +14,21 @@ import './style.scss';
 import Upgrade from './Upgrade'
 import SettingsEdit from './Edit'
 
-function getMin (i, date) {
-    let Dates = new Date(date - i * 60000)
-    let min = Dates.getMinutes();
-    if (min < 10){
-      return '0' + min
-    } else {
-      return min;
-    }
-  }
 @withRouter
 @inject('store')
 @observer
 class GatewaySettings extends Component {
     state = {
         title: '',
-        address: '',
         skynet_version_list: [],
+        skynet_latest_version: 0,
         freeioe_version_list: [],
+        freeioe_latest_version: 0,
         loading: true,
         gateway: '',
         upgrading: false,
-        flag: true,
-        freeioe_latest_version: 0,
-        skynet_latest_version: 0,
-        update: false,
-        barData: []
+        showUpgrade: false,
+        showEdit: false
     }
     componentDidMount (){
         this.setState({
@@ -116,7 +105,7 @@ class GatewaySettings extends Component {
 
         http.get('/api/applications_versions_latest?app=' + gatewayInfo.data.platform + '_skynet&beta=' + (gatewayInfo.data.enable_beta ? 1 : 0)).then(res=>{
             this.setState({
-                skynet_version: res.data
+                skynet_latest_version: res.data
             })
         })
     }
@@ -124,9 +113,9 @@ class GatewaySettings extends Component {
         const { gatewayInfo } = this.props.store;
         axios.get('https://restapi.amap.com/v3/geocode/regeo?key=bac7bce511da6a257ac4cf2b24dd9e7e&location=' + gatewayInfo.longitude + ',' + gatewayInfo.latitude).then(location=>{
             if (location.data.regeocode){
-                this.setState({address: location.data.regeocode.formatted_address});
+                gatewayInfo.setDeviceAddress(location.data.regeocode.formatted_address);
             } else {
-                this.setState({address: '- -'});
+                gatewayInfo.setDeviceAddress('- -');
             }
         })
     }
@@ -144,12 +133,7 @@ class GatewaySettings extends Component {
     }
     fetchCharts () {
         const { gateway } = this.state;
-        http.get(`/api/gateways_historical_data?sn=${gateway}&tag=cpuload&vt=float&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
-            let data = [];
-            const date = new Date() * 1;
-            for (var i = 0;i < 10;i++){
-            data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
-            }
+        http.get(`/api/gateways_historical_data?sn=${gateway}&vsn=${gateway}&tag=cpuload&vt=float&start=-10m&value_method=raw&_=${new Date() * 1}`).then(res=>{
             let myCharts1 = this.refs.cpu
             if (myCharts1) {
                 this.myFaultTypeChart1 = echarts.init(myCharts1);
@@ -158,30 +142,31 @@ class GatewaySettings extends Component {
                         trigger: 'axis',
                         axisPointer: {
                             type: 'cross'
+                        },
+                        formatter: (params) => {
+                            let time = echarts.format.formatTime('yyyy-MM-dd\nhh:mm:ss', params[0].data[0])
+                            return `${time} <br />${params[0].seriesName}: ${params[0].data[1]}`
                         }
                     },
                     xAxis: {
-                        data: data
+                        type: 'time'
                     },
-                    yAxis: {},
-                    series: [
-                    {
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: {
                         name: '数值',
                         type: 'line',
                         color: '#37A2DA',
-                        data: res.data
+                        data: res.data.map(item=>{
+                            return [new Date(item.time), item.value]
+                        })
                     }
-                    ]
                 });
                 window.addEventListener('resize', this.resize, 20);
                 }
         })
-        http.get(`/api/gateways_historical_data?sn=${gateway}&tag=mem_used&vt=int&time_condition=time > now() -10m&value_method=raw&group_time_span=5s&_=${new Date() * 1}`).then(res=>{
-            let data = [];
-            const date = new Date() * 1;
-            for (var i = 0;i < 10;i++){
-            data.unshift(new Date(date - (i * 60000)).getHours() + ':' + getMin(i, date));
-            }
+        http.get(`/api/gateways_historical_data?sn=${gateway}&vsn=${gateway}&tag=mem_used&vt=int&start=-10m&value_method=raw&_=${new Date() * 1}`).then(res=>{
             let myCharts2 = this.refs.mem
             if (myCharts2) {
                 this.myFaultTypeChart2 = echarts.init(myCharts2);
@@ -190,20 +175,26 @@ class GatewaySettings extends Component {
                         trigger: 'axis',
                         axisPointer: {
                             type: 'cross'
+                        },
+                        formatter: (params) => {
+                            let time = echarts.format.formatTime('yyyy-MM-dd\nhh:mm:ss', params[0].data[0])
+                            return `${time} <br />${params[0].seriesName}: ${params[0].data[1]}`
                         }
                     },
                     xAxis: {
-                        data: data
+                        type: 'time'
                     },
-                    yAxis: {},
-                    series: [
-                    {
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: {
                         name: '数值',
                         type: 'line',
                         color: '#37A2DA',
-                        data: res.data
+                        data: res.data.map(item=>{
+                            return [new Date(item.time), item.value]
+                        })
                     }
-                    ]
                 });
                 window.addEventListener('resize', this.resize, 20);
                 }
@@ -226,11 +217,11 @@ class GatewaySettings extends Component {
     }
     render () {
         const { gatewayInfo } = this.props.store;
-        const { upgrading, flag, title, update, freeioe_version_list, skynet_version_list,
+        const { upgrading, showUpgrade, title, showEdit, freeioe_version_list, skynet_version_list,
             loading, freeioe_latest_version, skynet_latest_version } = this.state;
         return (
             <div className="settings">
-                <div className={flag && !update ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
+                <div className={!showUpgrade && !showEdit ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
                     <div style={{ background: '#ECECEC', padding: '30px' }}
                         className="linkstatus"
                     >
@@ -238,7 +229,7 @@ class GatewaySettings extends Component {
                             <Button
                                 disabled={!gatewayInfo.actionEnable}
                                 onClick={()=>{
-                                    this.setState({update: true})
+                                    this.setState({showEdit: true})
                                 }}
                             >高级设置</Button>
                         </div>
@@ -268,7 +259,7 @@ class GatewaySettings extends Component {
                                 to="#"
                                 style={{marginLeft: 200}}
                                 onClick={()=>{
-                                    this.setState({update: false, flag: false, title: 'openwrt x86_64_skynet'})
+                                    this.setState({showUpgrade: true, title: 'openwrt x86_64_skynet'})
                                 }}
                               >发现新版本></Link> : ''}</p>
                             <p><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}{freeioe_latest_version >  (gatewayInfo.data ? gatewayInfo.data.version : 0)
@@ -276,7 +267,7 @@ class GatewaySettings extends Component {
                                 to="#"
                                 style={{marginLeft: 200}}
                                 onClick={()=>{
-                                    this.setState({update: false, flag: false, title: 'FreeIOE'})
+                                    this.setState({showUpgrade: true, title: 'FreeIOE'})
                                 }}
                               >发现新版本></Link> : ''}</p>
                             {/* <p><b>公网IP:</b>{gatewayInfo.public_ip}</p> */}
@@ -306,17 +297,20 @@ class GatewaySettings extends Component {
                         </Card>
                     </div>
                  </div>
-                <div className={flag && update === true ? 'linkstatuswrap show' : 'linkstatuswrap hide'}>
+                <div className={!showUpgrade && showEdit ? 'linkstatuswrap show' : 'linkstatuswrap hide'}>
                     <SettingsEdit
                         gatewayInfo={gatewayInfo}
                         gateway={this.state.gateway}
                         refreshGatewayData={this.fetchGatewayData}
+                        onClose={()=>{
+                            this.setState({showEdit: false})
+                        }}
                     />
             </div>
-                <div className={!flag && !update ? 'update show' : 'update hide'}>
+                <div className={showUpgrade && !showEdit ? 'upgrade show' : 'upgrade hide'}>
                     <Button
                         onClick={()=>{
-                            this.setState({update: false, flag: true})
+                            this.setState({showUpgrade: false})
                         }}
                     >X</Button>
                     <Upgrade
@@ -347,7 +341,7 @@ class GatewaySettings extends Component {
                                 if (res.ok) {
                                     this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 10000,  (result)=> {
                                         if (result.ok){
-                                            this.setState({update: false, flag: true})
+                                            this.setState({showUpgrade: false})
                                         } else {
                                             this.setState({upgrading: false})
                                         }

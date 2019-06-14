@@ -65,6 +65,10 @@ class GatewayInfo {
     @observable ioe_network = false
     @observable ioe_frpc = false
     @observable cpu = ''
+    @observable ram = ''
+    @observable rom = ''
+    @observable os = ''
+    @observable address = ''
     @observable data = new GatewayData()
 
     @observable devices = []
@@ -99,6 +103,9 @@ class GatewayInfo {
     @action setApps (value) {
         this.apps = value
         this.apps_count = Object.keys(value).length
+    }
+    @action setDeviceAddress (value) {
+        this.address = value
     }
 }
 

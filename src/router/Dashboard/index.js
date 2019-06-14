@@ -31,7 +31,7 @@ const todayColumns = [{
         return (
             <Link
                 style={{cursor: 'pointer'}}
-                to={`/gatewaydevicemessage/${record.sn}/24`}
+                to={`/gatewayevent/${record.sn}/24`}
             >
             {text}
         </Link>
@@ -66,7 +66,7 @@ const weekColumns = [{
         return (
             <Link
                 style={{cursor: 'pointer'}}
-                to={`/gatewaydevicemessage/${record.sn}/168`}
+                to={`/gatewayevent/${record.sn}/168`}
             >
             {text}
         </Link>
@@ -97,7 +97,7 @@ function compare (property){
     }
 }
 
-class Home extends PureComponent {
+class Dashboard extends PureComponent {
     state = {
         todayData: [],
         weekData: [],
@@ -446,4 +446,4 @@ class Home extends PureComponent {
     }
 }
 
-export default Home;
+export default Dashboard;

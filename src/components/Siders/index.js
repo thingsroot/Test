@@ -26,7 +26,7 @@ class Siders extends PureComponent {
     }
     UNSAFE_componentWillMount () {
         const pathname = this.props.location.pathname.toLowerCase();
-        if (pathname.indexOf('/home') !== -1){
+        if (pathname.indexOf('/dashboard') !== -1){
             this.setState({
                 key: '1'
             })
@@ -34,19 +34,19 @@ class Siders extends PureComponent {
             this.setState({
                 key: '2'
             })
-        } else if (pathname.indexOf('/myapps') !== -1) {
+        } else if (pathname.indexOf('/developer') !== -1) {
             this.setState({
                 key: '3'
             })
-        } else if (pathname.indexOf('/platformmessage') !== -1) {
+        } else if (pathname.indexOf('/platformevents') !== -1) {
             this.setState({
                 key: '4'
             })
-        } else if (pathname.indexOf('/devicemessage') !== -1) {
+        } else if (pathname.indexOf('/gatewayevents') !== -1) {
             this.setState({
                 key: '5'
             })
-        } else if (pathname.indexOf('/gatewaydevicemessage') !== -1) {
+        } else if (pathname.indexOf('/gatewayevent') !== -1) {
             this.setState({
                 key: '5'
             })
@@ -102,7 +102,7 @@ class Siders extends PureComponent {
                     defaultSelectedKeys={[this.state.key]}
                 >
                     <Menu.Item key="1">
-                    <Link to="/home">
+                    <Link to="/dashboard">
                         <Icon
                             type="dashboard"
                             // theme="twoTone"
@@ -117,19 +117,20 @@ class Siders extends PureComponent {
                     </Link>
                     </Menu.Item>
                     <Menu.Item key="3">
-                        <Link to="/myapps">
+                        <Link to="/developer">
                         <Icon type="table" />
+                        {/* <span>开发者中心</span> */}
                         <span>我的应用</span>
                         </Link>
                     </Menu.Item>
                     <Menu.Item key="4">
-                        <Link to="/platformmessage">
+                        <Link to="/platformevents">
                             <Icon type="desktop" />
                             <span>平台消息</span>
                         </Link>
                     </Menu.Item>
                     <Menu.Item key="5">
-                        <Link to="/devicemessage/24">
+                        <Link to="/gatewayevents/24">
                             <Icon type="message" />
                             <span>设备消息</span>
                         </Link>

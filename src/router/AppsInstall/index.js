@@ -293,7 +293,7 @@ class MyGatesAppsInstall extends Component {
                             shape="round"
                             icon="download"
                         >
-                            <Link to={`/gateway/${gateway_sn}/appslist`}> 查看应用列表 </Link>
+                            <Link to={`/gateway/${gateway_sn}/apps`}> 查看应用列表 </Link>
                         </Button>
                     </Modal>
                     <div className={install_step === '' ? 'hide appsdetail' : 'show appsdetail'}>

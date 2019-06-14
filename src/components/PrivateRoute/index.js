@@ -5,7 +5,7 @@ import { isAuthenticated } from '../../utils/Session';
 const PrivateRoute = ({component: Component, ...rest}) => (
   <Route {...rest}
       render={(props) => {
-        document.title = rest.title ? '冬笋云 · ' + rest.title : '冬笋云';
+        document.title = rest.title ? '冬笋云 · ' + rest.title : '冬笋云 · 冬笋科技';
         return (
           !!isAuthenticated()
           ? <Component {...props} />

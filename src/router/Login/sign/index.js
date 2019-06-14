@@ -4,7 +4,7 @@ import {
     Form, Icon, Input, Button, Checkbox, message
 } from 'antd';
 import http  from '../../../utils/Server';
-import { _getCookie, _setCookie, authenticateSuccess } from '../../../utils/Session';
+import { _getCookie, _setCookie, authenticateSuccess, isDeveloper } from '../../../utils/Session';
 
 @withRouter
 class Sign extends PureComponent {
@@ -18,18 +18,7 @@ class Sign extends PureComponent {
                 }).then(res=>{
                     if (res.ok) {
                         _setCookie('companies', res.data.companies[0])
-                        http.get('/api/developers_read?name=' + _getCookie('user_id'))
-                            .then(res=>{
-                                if (res.ok && res.data) {
-                                    if (res.data.enabled === 1) {
-                                        _setCookie('is_developer', '1')
-                                    } else {
-                                        _setCookie('is_developer', '0')
-                                    }
-                                } else {
-                                    _setCookie('is_developer', '0')
-                                }
-                            });
+                        isDeveloper()
                         authenticateSuccess(res.data.csrf_token)
                         message.success('登录成功，正在跳转', 1).then(()=>{
                             console.log(_getCookie('user_id'))

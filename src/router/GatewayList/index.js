@@ -96,7 +96,7 @@ class MyGates extends Component {
                   return (
                       <span>
                         <Link to={{
-                            pathname: `/gateway/${record.sn}/devslist`,
+                            pathname: `/gateway/${record.sn}/devices`,
                             state: record
                         }}
                         >
@@ -104,7 +104,7 @@ class MyGates extends Component {
                         </Link>
                         <Divider type="vertical" />
                         <Link to={{
-                            pathname: `/gateway/${record.sn}/appslist`,
+                            pathname: `/gateway/${record.sn}/apps`,
                             state: record
                         }}
                         >

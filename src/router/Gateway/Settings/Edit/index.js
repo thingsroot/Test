@@ -215,16 +215,14 @@ class GatewaySettingsEdit extends Component {
     }
 
     render () {
-        const { gateway, refreshGatewayData, gatewayInfo } = this.props;
+        const { gateway, refreshGatewayData, gatewayInfo, onClose } = this.props;
         refreshGatewayData;
         return (
             <Card
                 title="高级设置"
                 extra={
                     <Button
-                        onClick={()=>{
-                            this.setState({flag: true, update: false})
-                        }}
+                        onClick={onClose}
                     >X</Button>}
                 // loading={loading}
                 style={{ width: '100%' }}

@@ -1,29 +1,30 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {notification } from 'antd';  //
-import { Switch, Redirect, withRouter} from 'react-router-dom';
+import { Switch, withRouter} from 'react-router-dom';
 import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
 
 const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
-const Home = LoadableComponent(()=>import('../../router/Home'));
+const Dashboard = LoadableComponent(()=>import('../../router/Dashboard'));
 const GatewayList = LoadableComponent(()=>import('../../router/GatewayList'));
-const MyApps = LoadableComponent(()=>import('../../router/MyApps'));
+const Developer = LoadableComponent(()=>import('../../router/Developer'));
 const AppStore = LoadableComponent(()=>import('../../router/AppStore'));
 const UserSettings = LoadableComponent(()=>import('../../router/UserSettings'));
 const AccessKeys = LoadableComponent(()=>import('../../router/AccessKeys'));
 const VirtualGateways = LoadableComponent(()=>import('../../router/VirtualGateways'));
 const Gateway = LoadableComponent(()=>import('../../router/Gateway'));
 //const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
-const PlatformMessage = LoadableComponent(()=>import('../../router/PlatformMessage'));
-const DeviceMessage = LoadableComponent(()=>import('../../router/DeviceMessage'));
+const PlatformEvents = LoadableComponent(()=>import('../../router/PlatformEvents'));
+const DeviceEvents = LoadableComponent(()=>import('../../router/DeviceEvents'));
 const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHistory'));
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
 const TemplateDetails = LoadableComponent(()=>import('../../router/TemplateDetails'));
 
 import { doUpdate } from '../../utils/Action';
+import { refreshToken } from '../../utils/Session'
 
 let timer;
 const openNotification = (title, message) => {
@@ -39,6 +40,9 @@ const openNotification = (title, message) => {
 class ContentMain extends Component {
     componentDidMount (){
         this.startTimer()
+
+        // Make sure we have the csrf_token
+        refreshToken()
     }
     componentWillUnmount (){
         clearInterval(timer);
@@ -65,8 +69,8 @@ class ContentMain extends Component {
         return (
             <Switch>
                 <PrivateRoute
-                    path="/home"
-                    component={Home}
+                    path="/dashboard"
+                    component={Dashboard}
                     title={'Dashboard'}
                 />
                 <PrivateRoute
@@ -75,8 +79,8 @@ class ContentMain extends Component {
                     title={'我的网关'}
                 />
                 <PrivateRoute
-                    path="/myapps"
-                    component={MyApps}
+                    path="/developer"
+                    component={Developer}
                     title={'我的应用'}
                 />
                 <PrivateRoute
@@ -135,29 +139,30 @@ class ContentMain extends Component {
                     title={'虚拟网关'}
                 />
                 <PrivateRoute
-                    path="/platformmessage"
-                    component={PlatformMessage}
+                    path="/platformevents"
+                    component={PlatformEvents}
                     title={'平台消息'}
                 />
                 <PrivateRoute
-                    path="/devicemessage/:limitTime"
-                    component={DeviceMessage}
+                    path="/gatewayevents/:limitTime"
+                    component={DeviceEvents}
                     title={'设备消息'}
                 />
                 <PrivateRoute
-                    path="/gatewaydevicemessage/:gateway/:limitTime"
-                    component={DeviceMessage}
+                    path="/gatewayevent/:gateway/:limitTime"
+                    component={DeviceEvents}
                     title={'设备消息'}
                 />
 
                 <PrivateRoute
-                    path="/browsinghistory/:sn/:vsn"
+                    path="/browsinghistory/:sn/:vsn/:input?"
                     component={BrowsingHistory}
-                    title={'Dashboard'}
+                    title={'设备数据 · 历史浏览'}
                 />
-                <Redirect
-                    from="/"
-                    to="/home"
+                <PrivateRoute
+                    path="/"
+                    component={Dashboard}
+                    title={'Dashboard'}
                 />
             </Switch>
         );

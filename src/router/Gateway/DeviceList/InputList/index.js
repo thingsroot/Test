@@ -154,7 +154,7 @@ class ExpandedRowRender extends PureComponent {
         this.setState({
             visible: false
         });
-        this.props.history.push(`/browsinghistory/${record.sn}/${record.vsn}`)
+        this.props.history.push(`/browsinghistory/${record.sn}/${record.vsn}/${record.name}`)
         if (myFaultTypeChart) {
             myFaultTypeChart.dispose();
         }
