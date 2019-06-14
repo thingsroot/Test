@@ -6,7 +6,7 @@ class Session {
         return this._sid.value
     }
     setSid = value => {
-        this._sid.set(value, { expires: 1 }) // 2 day expiry
+        this._sid.set(value)
     }
     unsetSid = () => {
         this._sid.remove()
@@ -17,7 +17,7 @@ class Session {
         return this._user_id.value
     }
     setUserId = value => {
-        this._user_id.set(value, { expires: 1 }) // 2 day expiry
+        this._user_id.set(value)
     }
     unsetUserId = () => {
         this._user_id.remove()
@@ -28,7 +28,7 @@ class Session {
         return this._is_developer.value
     }
     setIsDeveloper = value => {
-        this._is_developer.set(value, { expires: 1 }) // 2 day expiry
+        this._is_developer.set(value)
     }
     unsetIsDeveloper = () => {
         this._is_developer.remove()
@@ -37,12 +37,12 @@ class Session {
     _csrf_token = new Cookie('csrf_auth_token');
     get csrf_token () {
         if (this._user_id === 'Guest') {
-            this._csrf_token.set('', {expires: 1})
+            this._csrf_token.set('')
         }
         return this._csrf_token.value
     }
     setCSRFToken = value => {
-        this._csrf_token.set(value, { expires: 1 }) // 2 day expiry
+        this._csrf_token.set(value)
     }
     unsetCSRFToken = () => {
         this._csrf_token.remove()
@@ -53,7 +53,7 @@ class Session {
         return this._companies.value
     }
     setCompanies = value => {
-        this._companies.set(value, { expires: 1 }) // 2 day expiry
+        this._companies.set(value)
     }
     unsetCompanies  = () => {
         this._companies.remove()
@@ -64,7 +64,7 @@ class Session {
         return this._is_admin.value
     }
     setIsAdmin = value => {
-        this._is_admin.set(value, { expires: 1 }) // 2 day expiry
+        this._is_admin.set(value)
     }
     unsetIsAdmin  = () => {
         this._is_admin.remove()
@@ -75,7 +75,7 @@ class Session {
         return this._system.value
     }
     setSystem = value => {
-        this._system.set(value, { expires: 1 }) // 2 day expiry
+        this._system.set(value)
     }
     unsetSystem  = () => {
         this._system.remove()
@@ -86,7 +86,7 @@ class Session {
         return this._full_name.value
     }
     setFullName = value => {
-        this._full_name.set(value, { expires: 1 }) // 2 day expiry
+        this._full_name.set(value)
     }
     unsetFullName  = () => {
         this._full_name.remove()

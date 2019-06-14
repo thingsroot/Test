@@ -35,10 +35,10 @@ class GatewaySettings extends Component {
         loading: true,
         gateway: '',
         upgrading: false,
-        flag: true,
+        showUpgrade: false,
+        showEdit: false,
         freeioe_latest_version: 0,
         skynet_latest_version: 0,
-        update: false,
         barData: []
     }
     componentDidMount (){
@@ -226,11 +226,11 @@ class GatewaySettings extends Component {
     }
     render () {
         const { gatewayInfo } = this.props.store;
-        const { upgrading, flag, title, update, freeioe_version_list, skynet_version_list,
+        const { upgrading, showUpgrade, title, showEdit, freeioe_version_list, skynet_version_list,
             loading, freeioe_latest_version, skynet_latest_version } = this.state;
         return (
             <div className="settings">
-                <div className={flag && !update ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
+                <div className={!showUpgrade && !showEdit ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
                     <div style={{ background: '#ECECEC', padding: '30px' }}
                         className="linkstatus"
                     >
@@ -238,7 +238,7 @@ class GatewaySettings extends Component {
                             <Button
                                 disabled={!gatewayInfo.actionEnable}
                                 onClick={()=>{
-                                    this.setState({update: true})
+                                    this.setState({showEdit: true})
                                 }}
                             >高级设置</Button>
                         </div>
@@ -268,7 +268,7 @@ class GatewaySettings extends Component {
                                 to="#"
                                 style={{marginLeft: 200}}
                                 onClick={()=>{
-                                    this.setState({update: false, flag: false, title: 'openwrt x86_64_skynet'})
+                                    this.setState({showUpgrade: true, title: 'openwrt x86_64_skynet'})
                                 }}
                               >发现新版本></Link> : ''}</p>
                             <p><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}{freeioe_latest_version >  (gatewayInfo.data ? gatewayInfo.data.version : 0)
@@ -276,7 +276,7 @@ class GatewaySettings extends Component {
                                 to="#"
                                 style={{marginLeft: 200}}
                                 onClick={()=>{
-                                    this.setState({update: false, flag: false, title: 'FreeIOE'})
+                                    this.setState({showUpgrade: true, title: 'FreeIOE'})
                                 }}
                               >发现新版本></Link> : ''}</p>
                             {/* <p><b>公网IP:</b>{gatewayInfo.public_ip}</p> */}
@@ -306,17 +306,20 @@ class GatewaySettings extends Component {
                         </Card>
                     </div>
                  </div>
-                <div className={flag && update === true ? 'linkstatuswrap show' : 'linkstatuswrap hide'}>
+                <div className={!showUpgrade && showEdit ? 'linkstatuswrap show' : 'linkstatuswrap hide'}>
                     <SettingsEdit
                         gatewayInfo={gatewayInfo}
                         gateway={this.state.gateway}
                         refreshGatewayData={this.fetchGatewayData}
+                        onClose={()=>{
+                            this.setState({showEdit: false})
+                        }}
                     />
             </div>
-                <div className={!flag && !update ? 'update show' : 'update hide'}>
+                <div className={showUpgrade && !showEdit ? 'upgrade show' : 'upgrade hide'}>
                     <Button
                         onClick={()=>{
-                            this.setState({update: false, flag: true})
+                            this.setState({showUpgrade: false})
                         }}
                     >X</Button>
                     <Upgrade
@@ -347,7 +350,7 @@ class GatewaySettings extends Component {
                                 if (res.ok) {
                                     this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 10000,  (result)=> {
                                         if (result.ok){
-                                            this.setState({update: false, flag: true})
+                                            this.setState({showUpgrade: false})
                                         } else {
                                             this.setState({upgrading: false})
                                         }

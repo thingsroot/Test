@@ -24,6 +24,7 @@ const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode')
 const TemplateDetails = LoadableComponent(()=>import('../../router/TemplateDetails'));
 
 import { doUpdate } from '../../utils/Action';
+import { refreshToken } from '../../utils/Session'
 
 let timer;
 const openNotification = (title, message) => {
@@ -39,6 +40,9 @@ const openNotification = (title, message) => {
 class ContentMain extends Component {
     componentDidMount (){
         this.startTimer()
+
+        // Make sure we have the csrf_token
+        refreshToken()
     }
     componentWillUnmount (){
         clearInterval(timer);
