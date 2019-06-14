@@ -28,6 +28,7 @@ class Headers extends PureComponent {
                 <Menu.Item key="15"
                     style={{padding: 0, textAlign: 'center'}}
                 >
+                <span style={{padding: '5px 0'}} />
                     <Button type="danger"
                         block
                         onClick={()=>{

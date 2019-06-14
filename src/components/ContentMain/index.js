@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {notification } from 'antd';  //
-import { Switch, Redirect, withRouter} from 'react-router-dom';
+import { Switch, withRouter} from 'react-router-dom';
 import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
 
@@ -69,7 +69,7 @@ class ContentMain extends Component {
         return (
             <Switch>
                 <PrivateRoute
-                    path="/dashboad"
+                    path="/dashboard"
                     component={Dashboard}
                     title={'Dashboard'}
                 />
@@ -157,11 +157,12 @@ class ContentMain extends Component {
                 <PrivateRoute
                     path="/browsinghistory/:sn/:vsn/:input?"
                     component={BrowsingHistory}
-                    title={'Dashboard'}
+                    title={'设备数据 · 历史浏览'}
                 />
-                <Redirect
-                    from="/"
-                    to="/dashboard"
+                <PrivateRoute
+                    path="/"
+                    component={Dashboard}
+                    title={'Dashboard'}
                 />
             </Switch>
         );

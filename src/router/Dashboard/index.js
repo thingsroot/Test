@@ -97,7 +97,7 @@ function compare (property){
     }
 }
 
-class Home extends PureComponent {
+class Dashboard extends PureComponent {
     state = {
         todayData: [],
         weekData: [],
@@ -446,4 +446,4 @@ class Home extends PureComponent {
     }
 }
 
-export default Home;
+export default Dashboard;
