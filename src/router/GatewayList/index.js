@@ -403,13 +403,12 @@ class MyGates extends Component {
                     style={{
                         display: 'flex',
                         position: 'absolute',
-                        right: 300,
+                        right: 240,
                         top: 0,
                         zIndex: 999,
                         lineHeight: '30px'
                     }}
                 >
-                    <span>搜索：</span>
                     <Search
                         placeholder="网关名称、描述、序列号"
                         onChange={this.search}
