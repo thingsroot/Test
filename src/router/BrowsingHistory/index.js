@@ -54,9 +54,9 @@ class BrowsingHistory extends Component {
         rowid: -1,
         detail: [],
         defaultvalue: '--',
-        way: 'raw',
-        domain: '5m',
-        scope: '1h',
+        value_function: 'raw',
+        value_group_time: '5m',
+        value_time_duration: '1h',
         vt: '',
         record: {},
         gateway: '',
@@ -141,7 +141,7 @@ class BrowsingHistory extends Component {
         });
       }
       getData = (record)=>{
-        const { way, scope, domain} = this.state;
+        const { value_function, value_group_time, value_time_duration, gateway, device_sn} = this.state;
         this.setState({
           rowId: record.id,
           vt: record.vt,
@@ -156,7 +156,7 @@ class BrowsingHistory extends Component {
           } else {
             record.vt = 'float';
           }
-            axios(`/api/gateways_historical_data?sn=${this.props.match.params.sn}&vsn=${this.props.match.params.vsn}&tag=${record.name}&vt=${record.vt || 'float'}&start=-${scope}&value_method=${way}&group_time_span=${domain}&_=1551251898530`, {
+            axios(`/api/gateways_historical_data?sn=${gateway}&vsn=${device_sn}&tag=${record.name}&vt=${record.vt || 'float'}&start=-${value_time_duration}&value_method=${value_function}&group_time_span=${value_group_time}&_=1551251898530`, {
               method: 'get',
               headers: {
                   Accept: 'application/json, text/javascript, */*; q=0.01'
@@ -169,7 +169,7 @@ class BrowsingHistory extends Component {
                 if (res.data !== undefined){
                   res.data.map((val, ind)=>{
                     val.id = ind + 1;
-                    val.type = this.state.way;
+                    val.type = this.state.value_function;
                   })
                   this.setState({
                       detail: res.data,
@@ -197,22 +197,22 @@ class BrowsingHistory extends Component {
       handleChange (type, value) {
         console.log(value)
         switch (type){
-          case 'way':
-              this.setState({way: value}, ()=>{
+          case 'value_function':
+              this.setState({value_function: value}, ()=>{
                 if (Object.keys(this.state.record).length > 0) {
                   this.getData(this.state.record)
                 }
               });
               break;
-          case 'domain':
-              this.setState({domain: value}, ()=>{
+          case 'value_group_time':
+              this.setState({value_group_time: value}, ()=>{
                 if (Object.keys(this.state.record).length > 0) {
                   this.getData(this.state.record)
                 }
               });
               break;
-          case 'scope':
-              this.setState({scope: value}, ()=>{
+          case 'value_time_duration':
+              this.setState({value_time_duration: value}, ()=>{
                 if (Object.keys(this.state.record).length > 0) {
                   this.getData(this.state.record)
                 }
@@ -280,7 +280,7 @@ class BrowsingHistory extends Component {
                                 disabled={this.state.vt === 'string'}
                                 style={{ width: 120 }}
                                 onChange={(value)=>{
-                                  this.handleChange('way', value)
+                                  this.handleChange('value_function', value)
                                 }}
                             >
                               <Option value="raw">原始值</Option>
@@ -293,33 +293,37 @@ class BrowsingHistory extends Component {
                           统计时域：
                             <Select defaultValue="5m"
                                 style={{ width: 120 }}
-                                disabled={this.state.way === 'raw' ? true : false}
+                                disabled={this.state.value_function === 'raw' ? true : false}
                                 onChange={(value)=>{
-                              this.handleChange('domain', value)
+                              this.handleChange('value_group_time', value)
                             }}
                             >
-                              <Option value="5m">5m</Option>
-                              <Option value="10m">10m</Option>
-                              <Option value="1h">1h</Option>
-                              <Option value="2h">2h</Option>
-                              <Option value="6h">6h</Option>
-                              <Option value="1d">1d</Option>
+                              <Option value="5s">五秒</Option>
+                              <Option value="10s">十秒</Option>
+                              <Option value="30s">三十秒</Option>
+                              <Option value="1m">一分钟</Option>
+                              <Option value="5m">五分钟</Option>
+                              <Option value="10m">十分钟</Option>
+                              <Option value="30m">半小时</Option>
+                              <Option value="1h">一小时</Option>
+                              <Option value="1d">一天</Option>
                             </Select>
                           时间范围：
                           <Select defaultValue="1h"
                               style={{ width: 120 }}
                               onChange={(value)=>{
-                            this.handleChange('scope', value)
-                          }}
+                                this.handleChange('value_time_duration', value)
+                              }}
                           >
-                              <Option value="15m">15m</Option>
-                              <Option value="30m">30m</Option>
-                              <Option value="1h">1h</Option>
-                              <Option value="2h">2h</Option>
-                              <Option value="12h">12h</Option>
-                              <Option value="1d">1d</Option>
-                              <Option value="3d">3d</Option>
-                              <Option value="7d">7d</Option>
+                              <Option value="15m">十五分钟</Option>
+                              <Option value="30m">半小时</Option>
+                              <Option value="1h">一小时</Option>
+                              <Option value="2h">两小时</Option>
+                              <Option value="12h">半天</Option>
+                              <Option value="1d">一天</Option>
+                              <Option value="3d">三天</Option>
+                              <Option value="7d">一周</Option>
+                              <Option value="30d">一个月</Option>
                             </Select>
                         </div>
                         <Table
