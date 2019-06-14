@@ -40,7 +40,7 @@ class MyCode extends Component {
             changed: false,
             fontSize: 16,
             readOnly: true,
-            visible: false,
+            showRevertModal: false,
             versionList: [],
             showReleaseModal: false,
             newVersion: '',
@@ -215,22 +215,22 @@ class MyCode extends Component {
     //重置版本
     showModal = () => {
         this.setState({
-            visible: true
+            showRevertModal: true
         });
     };
     hideModal = () => {
         this.setState({
-            visible: false
+            showRevertModal: false
         });
     };
     getVersion = (value)=>{
         this.setState({
-            version: value
+            showRevertModal: value
         });
     };
     resetVersion = ()=>{
         this.setState({
-            visible: false
+            showRevertModal: false
         });
         let url = '/apis/api/method/app_center.editor.editor_revert';
         http.post(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
@@ -314,7 +314,7 @@ class MyCode extends Component {
     };//保存文件结束
 
     render () {
-        const { fontSize, visible, versionList, showReleaseModal, newVersion, comment } = this.state;
+        const { fontSize, showRevertModal, versionList, showReleaseModal, newVersion, comment } = this.state;
         return (
             <div className="codeEditor">
                 <div className="iconGroup">
@@ -345,14 +345,14 @@ class MyCode extends Component {
                         {/*/>*/}
                         {/*<Icon type="redo" onClick={this.keyPress} />*/}
                         <Icon
-                            style={{position: 'absolute', right: 60, top: 85}}
+                            style={{position: 'absolute', right: 60, top: 10}}
                             type="cloud-upload"
                             onClick={()=>{
                                 console.log('1')
                             }}
                         />
                         <Icon
-                            style={{position: 'absolute', right: 30, top: 85}}
+                            style={{position: 'absolute', right: 30, top: 10}}
                             type="rollback"
                             onClick={()=>{
                                 this.props.history.go(-1)
@@ -379,6 +379,7 @@ class MyCode extends Component {
                             highlightActiveLine
                             value={this.state.editorContent}
                             style={{width: '100%'}}
+                            height={800}
                             setOptions={{
                                 enableBasicAutocompletion: false,
                                 enableLiveAutocompletion: false,
@@ -392,7 +393,7 @@ class MyCode extends Component {
                 </div>
                 <Modal
                     title="重置编辑器工作区内容版本到"
-                    visible={visible}
+                    visible={showRevertModal}
                     onOk={this.resetVersion}
                     onCancel={this.hideModal}
                     okText="确认"
