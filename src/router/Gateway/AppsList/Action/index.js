@@ -139,17 +139,21 @@ class Action extends Component {
         }
         http.post('/api/gateways_applications_' + type, data).then(res=>{
             if (res.ok) {
-            this.props.store.action.pushAction(res.data, action + '应用', '', data, 10000,  ()=> {
-                this.props.update_app_list();
-            })
+                message.success(action + data.inst + '请求发送成功')
+                this.props.store.action.pushAction(res.data, action + '应用', '', data, 10000,  ()=> {
+                    this.props.update_app_list();
+                })
+                setTimeout(()=> {
+                    this.setState({ running_action: false })
+                }, 2000)
             } else {
-                message.error(res.error)
+                message.error(action +  data.inst + '请求发送失败。 错误:' + res.error)
+                this.setState({ running_action: false });
             }
-            this.setState({ running_action: false });
         }).catch(req=>{
             req;
-            this.setState({ running_action: false });
             message.error('发送请求失败！')
+            this.setState({ running_action: false });
         })
     }
     sendForkCreate (record){
