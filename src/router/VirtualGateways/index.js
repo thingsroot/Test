@@ -41,8 +41,8 @@ class MyVirtualGates extends React.Component {
                     } else {
                         return (
                             <span>
-                                <Link to={`/gateways/${record.sn}/devslist`}>设备</Link>/
-                                <Link to={`/gateways/${record.sn}/appslist`}>应用</Link>
+                                <Link to={`/gateways/${record.sn}/devices`}>设备</Link>/
+                                <Link to={`/gateways/${record.sn}/apps`}>应用</Link>
                             </span>
                         )
                     }

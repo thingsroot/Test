@@ -20,7 +20,7 @@ const OnlineRecords = LoadableComponent(()=>import('./OnlineRecords'));
 const Logviewer = LoadableComponent(()=>import('./Logviewer'));
 const Comm = LoadableComponent(()=>import('./CommViewer'));
 const Appconfig = LoadableComponent(()=>import('../AppsInstall/AppConfig'));
-const Platformevent = LoadableComponent(()=>import('../PlatformMessage'));
+const Platformevent = LoadableComponent(()=>import('../PlatformEvents'));
 const DeviceEvents = LoadableComponent(()=>import('./DeviceEvents'));
 const GatewaysDrawer = LoadableComponent(()=>import('../../common/GatewaysDrawer'));
 
@@ -119,12 +119,12 @@ class MyGatesDevices extends Component {
                     />
                     <div className="mygateslist">
                       <Switch>
-                        <GatewayRoute path={`${path}/devsList`}
+                        <GatewayRoute path={`${path}/devices`}
                             component={DeviceList}
                             title="我的网关·设备列表"
                             gateway={this.state.gateway}
                         />
-                        <GatewayRoute path={`${path}/appslist`}
+                        <GatewayRoute path={`${path}/apps`}
                             component={AppsList}
                             title="我的网关·应用列表"
                             gateway={this.state.gateway}
@@ -149,24 +149,24 @@ class MyGatesDevices extends Component {
                             title="我的网关·在线记录"
                             gateway={this.state.gateway}
                         />
-                        <GatewayRoute path={`${path}/logviewer`}
+                        <GatewayRoute path={`${path}/logs`}
                             component={Logviewer}
                             title="我的网关·日志"
                             mqtt={this.state.mqtt}
                             gateway={this.state.gateway}
                         />
-                        <GatewayRoute path={`${path}/commviewer`}
+                        <GatewayRoute path={`${path}/comms`}
                             component={Comm}
                             title="我的网关·报文"
                             mqtt={this.state.mqtt}
                             gateway={this.state.gateway}
                         />
-                        <GatewayRoute path={`${path}/platformevent`}
+                        <GatewayRoute path={`${path}/platformevents`}
                             component={Platformevent}
                             title="我的网关·平台事件"
                             gateway={this.state.gateway}
                         />
-                        <GatewayRoute path={`${path}/devicesevent`}
+                        <GatewayRoute path={`${path}/events`}
                             component={DeviceEvents}
                             title="我的网关·设备事件"
                             gateway={this.state.gateway}
@@ -177,7 +177,7 @@ class MyGatesDevices extends Component {
                             gateway={this.state.gateway}
                         />
                         <Redirect from={path}
-                            to={`${path}/devslist`}
+                            to={`${path}/devices`}
                         />
                       </Switch>
                     </div>

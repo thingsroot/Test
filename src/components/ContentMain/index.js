@@ -9,15 +9,15 @@ const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
 const Home = LoadableComponent(()=>import('../../router/Home'));
 const GatewayList = LoadableComponent(()=>import('../../router/GatewayList'));
-const MyApps = LoadableComponent(()=>import('../../router/MyApps'));
+const Developer = LoadableComponent(()=>import('../../router/Developer'));
 const AppStore = LoadableComponent(()=>import('../../router/AppStore'));
 const UserSettings = LoadableComponent(()=>import('../../router/UserSettings'));
 const AccessKeys = LoadableComponent(()=>import('../../router/AccessKeys'));
 const VirtualGateways = LoadableComponent(()=>import('../../router/VirtualGateways'));
 const Gateway = LoadableComponent(()=>import('../../router/Gateway'));
 //const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
-const PlatformMessage = LoadableComponent(()=>import('../../router/PlatformMessage'));
-const DeviceMessage = LoadableComponent(()=>import('../../router/DeviceMessage'));
+const PlatformEvents = LoadableComponent(()=>import('../../router/PlatformEvents'));
+const DeviceEvents = LoadableComponent(()=>import('../../router/DeviceEvents'));
 const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHistory'));
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
@@ -79,8 +79,8 @@ class ContentMain extends Component {
                     title={'我的网关'}
                 />
                 <PrivateRoute
-                    path="/myapps"
-                    component={MyApps}
+                    path="/developer"
+                    component={Developer}
                     title={'我的应用'}
                 />
                 <PrivateRoute
@@ -139,18 +139,18 @@ class ContentMain extends Component {
                     title={'虚拟网关'}
                 />
                 <PrivateRoute
-                    path="/platformmessage"
-                    component={PlatformMessage}
+                    path="/platformevents"
+                    component={PlatformEvents}
                     title={'平台消息'}
                 />
                 <PrivateRoute
-                    path="/devicemessage/:limitTime"
-                    component={DeviceMessage}
+                    path="/gatewayevents/:limitTime"
+                    component={DeviceEvents}
                     title={'设备消息'}
                 />
                 <PrivateRoute
-                    path="/gatewaydevicemessage/:gateway/:limitTime"
-                    component={DeviceMessage}
+                    path="/gatewayevent/:gateway/:limitTime"
+                    component={DeviceEvents}
                     title={'设备消息'}
                 />
 

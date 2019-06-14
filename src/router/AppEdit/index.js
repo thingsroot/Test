@@ -100,7 +100,7 @@ class AppEdit extends Component {
                                 }
                             });
                             setTimeout(()=>{
-                                window.location.href = '/myapps'
+                                window.location.href = '/developer'
                             }, 1500)
                         } else {
                             message.error('应用创建失败！')

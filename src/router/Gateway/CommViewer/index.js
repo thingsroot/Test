@@ -25,7 +25,7 @@ class CommViewer extends Component {
     }
     componentDidMount (){
         const pathname = this.props.location.pathname.toLowerCase();
-        if (pathname.indexOf('commviewer') !== -1){
+        if (pathname.indexOf('comms') !== -1){
             this.setState({
                 title: '报文',
                 type: '/comm'

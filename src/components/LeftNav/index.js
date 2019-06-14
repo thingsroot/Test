@@ -18,11 +18,11 @@ class LeftNav extends Component {
             {
                 icon: 'profile',
                 text: '设备列表',
-                href: '/devslist'
+                href: '/devices'
             }, {
                 icon: 'appstore',
                 text: '应用列表',
-                href: '/appslist'
+                href: '/apps'
             }, {
                 icon: 'database',
                 text: '网关设置',
@@ -36,11 +36,11 @@ class LeftNav extends Component {
             this.getNum()
         }, 500);
         const pathname = this.props.location.pathname.toLowerCase();
-        if (pathname.indexOf('/devslist') !== -1) {
+        if (pathname.indexOf('/devices') !== -1) {
             this.setState({
                 index: 0
             })
-        } else if (pathname.indexOf('/appslist') !== -1){
+        } else if (pathname.indexOf('/apps') !== -1){
             this.setState({
                 index: 1
             });
@@ -56,19 +56,19 @@ class LeftNav extends Component {
             this.setState({
                 index: 5
             })
-        } else if (pathname.indexOf('/logviewer') !== -1){
+        } else if (pathname.indexOf('/logs') !== -1){
             this.setState({
                 index: 6
             })
-        } else if (pathname.indexOf('/commviewer') !== -1){
+        } else if (pathname.indexOf('/comms') !== -1){
             this.setState({
                 index: 7
             })
-        } else if (pathname.indexOf('/platformevent') !== -1){
+        } else if (pathname.indexOf('/platformevents') !== -1){
             this.setState({
                 index: 8
             })
-        } else if (pathname.indexOf('/devicesevent') !== -1){
+        } else if (pathname.indexOf('/events') !== -1){
             this.setState({
                 index: 9
             })
@@ -107,10 +107,10 @@ class LeftNav extends Component {
                                         }}
                                     ><li className={index === i ? 'active' : ''}>
                                     {
-                                        v.href.toLowerCase() === '/devslist' ? <div className="gatecount count">{gatewayInfo.devices_count}</div> : ''
+                                        v.href.toLowerCase() === '/devices' ? <div className="gatecount count">{gatewayInfo.devices_count}</div> : ''
                                     }
                                     {
-                                        v.href.toLowerCase() === '/appslist' ? <div className="appcount count">{gatewayInfo.apps_count}</div> : ''
+                                        v.href.toLowerCase() === '/apps' ? <div className="appcount count">{gatewayInfo.apps_count}</div> : ''
                                     }
                                     <Icon type={v.icon}/>&nbsp;&nbsp;{v.text}</li></Link>
                                 )
@@ -122,7 +122,7 @@ class LeftNav extends Component {
                         <p className="FeaturesGroup">高级功能</p>
                         <ul>
                             <Link
-                                to={`${url}/logviewer`}
+                                to={`${url}/logs`}
                                 onClick={()=>{
                                     this.setState({index: 6})
                                 }}
@@ -132,7 +132,7 @@ class LeftNav extends Component {
                                 >{this.state.lognum !== 0 ? <div className="logcount count">{this.state.lognum}</div> : ''}<Icon type="ordered-list"/>&nbsp;&nbsp;网关日志</li>
                             </Link>
                             <Link
-                                to={`${url}/commviewer`}
+                                to={`${url}/comms`}
                                 onClick={()=>{
                                     this.setState({index: 7})
                                 }}
@@ -142,7 +142,7 @@ class LeftNav extends Component {
                                 >{this.state.commnum !== 0 ? <div className="logcount count">{this.state.commnum}</div> : ''}<Icon type="select"/>&nbsp;&nbsp;网关报文</li>
                             </Link>
                             <Link
-                                to={`${url}/platformevent`}
+                                to={`${url}/platformevents`}
                                 onClick={()=>{
                                     this.setState({index: 8})
                                 }}
@@ -152,7 +152,7 @@ class LeftNav extends Component {
                                 ><Icon type="desktop"/>&nbsp;&nbsp;平台事件</li>
                             </Link>
                             <Link
-                                to={`${url}/devicesevent`}
+                                to={`${url}/events`}
                                 onClick={()=>{
                                     this.setState({index: 9})
                                 }}
