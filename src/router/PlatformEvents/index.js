@@ -20,7 +20,7 @@ const posed = {
 
 @inject('store')
 @observer
-class PlatformMessage extends Component {
+class PlatformEvents extends Component {
     state = {
         name: '',
         category: '',
@@ -575,7 +575,7 @@ class PlatformMessage extends Component {
             onChange: this.onSelectChange
         };
         return (
-            <div className="platformMessage">
+            <div className="platformEvents">
                 {
                     !isgateway
                     ? <div className="searchBox flex">
@@ -686,4 +686,4 @@ class PlatformMessage extends Component {
         );
     }
 }
-export default PlatformMessage;
+export default PlatformEvents;
