@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import AceEditor from 'react-ace';
-import { Icon, message, Modal } from 'antd';
+import {Icon, Input, message, Modal, Select} from 'antd';
 import http from '../../../utils/Server';
 import 'brace/mode/javascript';//
 import 'brace/mode/html';//
@@ -21,7 +21,8 @@ import 'brace/theme/tomorrow';//
 import 'brace/theme/monokai';
 
 const confirm = Modal.confirm
-
+const Option = Select.Option;
+const { TextArea } = Input;
 
 @withRouter
 @inject('store')
@@ -29,7 +30,7 @@ const confirm = Modal.confirm
 class MyCode extends Component {
     constructor (props){
         super(props);
-        this.timer = null
+        this.timer = null;
         this.state = {
             editorContent: '',
             mode: 'lua',
@@ -38,7 +39,12 @@ class MyCode extends Component {
             fileType: '',
             changed: false,
             fontSize: 16,
-            readOnly: true
+            readOnly: true,
+            visible: false,
+            versionList: [],
+            showReleaseModal: false,
+            newVersion: '',
+            comment: ''
         }
     }
     componentDidMount () {
@@ -50,7 +56,9 @@ class MyCode extends Component {
             changed: false,
             readOnly: true
         }, () => {
+            console.log(this.props.filePath)
             this.getContent();
+            this.loadVersionList()
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -66,6 +74,7 @@ class MyCode extends Component {
                 changed: false,
                 readOnly: true
             }, () => {
+                console.log(this.state.filePath)
                 this.getContent();
             })
         }
@@ -78,7 +87,7 @@ class MyCode extends Component {
     getMode () {
         let mode = '';
         if (this.state.fileType === 'file') {
-            let filePath = this.state.filePath
+            let filePath = this.state.filePath;
             switch (filePath.substr(filePath.indexOf('.') + 1, filePath.length)) {
                 case 'js' : mode = 'javascript'; break;
                 case 'html' : mode = 'html'; break;
@@ -88,7 +97,6 @@ class MyCode extends Component {
                 case 'xml' : mode = 'xml'; break;
                 case 'rb' : mode = 'ruby'; break;
                 case 'scss' : mode = 'sass'; break;
-                // case 'less' : mode = 'sass'; break;
                 case 'md' : mode = 'markdown'; break;
                 case 'sql' : mode = 'mysql'; break;
                 case 'json' : mode = 'json'; break;
@@ -134,8 +142,27 @@ class MyCode extends Component {
             }
         });
     }
+    loadVersionList () {
+        //应用版本列表
+        http.get('/apis/api/method/app_center.api.get_versions?app=' + this.props.app + '&beta=1')
+            .then(res=>{
+                let data = [];
+                res.message && res.message.length > 0 && res.message.map((v)=>{
+                    data.push(v.version)
+                });
+                data.sort(function (a, b) {
+                    return b - a;
+                });
+                this.setState({
+                    versionList: data,
+                    newVersion: data[0] + 1,
+                    comment: 'V' + (data[0] + 1)
+                })
+            });
+    }
     //获取文件内容
     getContent = ()=>{
+        console.log(this.state.filePath);
         this.setState({readOnly: true})
         if (this.state.fileType === 'file') {
             http.get('/apis/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_content&id=' + this.state.filePath)
@@ -209,7 +236,6 @@ class MyCode extends Component {
         http.post(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
             .then(res=>{
                 res;
-                this.props.codeStore.change();
                 message.success('工作区将重置到版本' + this.state.version);
                 setTimeout(()=>{
                     window.location.reload();
@@ -218,6 +244,47 @@ class MyCode extends Component {
             })
     };
     //重置版本结束
+
+    //发布新版本
+    showReleaseModal = () => {
+        this.setState({
+            showReleaseModal: true
+        });
+    };
+    hide = () => {
+        this.setState({
+            showReleaseModal: false
+        });
+    };
+    versionChange = (e)=>{
+        const { value } = e.target;
+        this.setState({
+            newVersion: value
+        })
+    };
+
+    commentChange = (e)=>{
+        const { value } = e.target;
+        this.setState({
+            comment: value
+        })
+    };
+    newVersion = ()=>{
+        const {codeStore} = this.state
+        http.post('/apis/api/method/app_center.editor.editor_release?app=' + this.state.app +
+            '&operation=set_content&version=' + this.state.newVersion +
+            '&comment=' + this.state.comment)
+            .then(res=>{
+                message.success(res.message + ', 即将跳转到新版本！');
+            });
+        setTimeout(()=>{
+            this.setState({
+                showReleaseModal: false
+            });
+            codeStore.change();
+            window.location.reload()
+        }, 1500)
+    };
 
     //保存文件
     saveFile = ()=>{
@@ -247,8 +314,7 @@ class MyCode extends Component {
     };//保存文件结束
 
     render () {
-        const { fontSize } = this.props;
-
+        const { fontSize, visible, versionList, showReleaseModal, newVersion, comment } = this.state;
         return (
             <div className="codeEditor">
                 <div className="iconGroup">
@@ -271,7 +337,7 @@ class MyCode extends Component {
                         />
                         <Icon
                             type="upload"
-                            onClick={this.show}
+                            onClick={this.showReleaseModal}
                         />
                         {/*<Icon*/}
                         {/*type="undo"*/}
@@ -301,8 +367,7 @@ class MyCode extends Component {
                         <span>{this.state.changed ? '已修改' : '未修改'}</span>
                     </p>
                     {
-                        this.state.readOnly ? ''
-                        : <AceEditor
+                        this.state.editorContent !== '' ? <AceEditor
                             mode={this.state.mode}
                             readOnly={this.state.readOnly}
                             theme="monokai"
@@ -321,9 +386,68 @@ class MyCode extends Component {
                                 showLineNumbers: true,
                                 tabSize: 4
                             }}
-                          />
+                        />
+                        : ''
                     }
                 </div>
+                <Modal
+                    title="重置编辑器工作区内容版本到"
+                    visible={visible}
+                    onOk={this.resetVersion}
+                    onCancel={this.hideModal}
+                    okText="确认"
+                    cancelText="取消"
+                >
+                    <span style={{padding: '0 20px'}}>版本</span>
+                    <Select
+                        defaultValue="请选择..."
+                        style={{ width: 350 }}
+                    >
+                        {
+                            versionList && versionList.length > 0 && versionList.map((v)=>{
+                                return (
+                                    <Option
+                                        key={v}
+                                        onClick={()=>{
+                                            this.getVersion(v)
+                                        }}
+                                    >
+                                        {v}
+                                    </Option>
+                                )
+                            })
+                        }
+                    </Select>
+                </Modal>
+                <Modal
+                    title="发布新版本"
+                    visible={showReleaseModal}
+                    onOk={this.newVersion}
+                    onCancel={this.hide}
+                    okText="确认"
+                    cancelText="取消"
+                >
+                    <p style={{display: 'flex'}}>
+                        <span style={{padding: '5px 20px'}}>填写版本</span>
+                        <Input
+                            type="text"
+                            defaultValue={newVersion}
+                            style={{width: '320px'}}
+                            onChange={this.versionChange}
+                        />
+                    </p>
+                    <br/>
+
+                    <p style={{display: 'flex'}}>
+                        <span style={{padding: '0 20px'}}>更新日志</span>
+                        <TextArea
+                            row={8}
+                            style={{width: '320px'}}
+                            defaultValue={comment}
+                            onChange={this.commentChange}
+                        />
+                    </p>
+                </Modal>
             </div>
         );
     }
