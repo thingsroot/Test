@@ -514,6 +514,7 @@ class DeviceEventList extends Component {
                             this.confMessage(selectedRowKeys)
                         }}
                         >确认消息</Button>
+                        <span style={{padding: '0 3px'}} />
                         <Button onClick={()=>{
                             this.confAllMessage()
                         }}
@@ -535,6 +536,7 @@ class DeviceEventList extends Component {
                             <Option value="系统">消息类型：系统</Option>
                             <Option value="设备">消息类型：设备</Option>
                         </Select>
+                        <span style={{padding: '0 3px'}} />
                         <Select
                             value={String(this.state.filterLevel)}
                             style={{ width: 130 }}
@@ -546,6 +548,7 @@ class DeviceEventList extends Component {
                             <Option value="3">等级：警告</Option>
                             <Option value="99">等级：致命</Option>
                         </Select>
+                        <span style={{padding: '0 3px'}} />
                         <Select
                             value={String(this.state.limitLength)}
                             style={{ width: 140 }}
@@ -556,6 +559,7 @@ class DeviceEventList extends Component {
                             <Option value="500">记录数：500</Option>
                             <Option value="1000">记录数：1000</Option>
                         </Select>
+                        <span style={{padding: '0 3px'}} />
                         <Select
                             value={`${this.state.limitTime}`}
                             style={{ width: 140 }}
@@ -567,18 +571,17 @@ class DeviceEventList extends Component {
                             <Option value="72">时间：72小时</Option>
                             <Option value="168">时间：一周</Option>
                         </Select>
-                        &nbsp; &nbsp;
+                        <span style={{padding: '0 3px'}} />
                         <InputGroup compact>
                             <Select
                                 defaultValue=""
                                 onChange={this.onFilterColumnChange}
                                 style={{width: '100px'}}
+                                disabled={this.state.gateway !== undefined}
                             >
                                 <Option value="">全部</Option>
                                 <Option value="title">标题</Option>
-                                {
-                                    this.gateway ? null : <Option value="device">序列号</Option>
-                                }
+                                <Option value="device">序列号</Option>
                             </Select>
                             <Input
                                 style={{ width: 200 }}
