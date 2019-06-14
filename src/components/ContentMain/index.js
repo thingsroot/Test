@@ -17,7 +17,7 @@ const VirtualGateways = LoadableComponent(()=>import('../../router/VirtualGatewa
 const Gateway = LoadableComponent(()=>import('../../router/Gateway'));
 //const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
 const PlatformEvents = LoadableComponent(()=>import('../../router/PlatformEvents'));
-const DeviceEvents = LoadableComponent(()=>import('../../router/DeviceEvents'));
+const DeviceEvents = LoadableComponent(()=>import('../../router/GatewayEvents'));
 const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHistory'));
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));

@@ -142,19 +142,10 @@ class DeviceEventList extends Component {
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        const {gateway, limitTime, limitLength, limitStart, showUnDisposed} = nextProps
-        if (gateway !== this.state.gateway ||
-            ( limitTime !== undefined && limitTime !== this.state.limitTime) ||
-            ( limitLength !== undefined && limitLength !== this.state.limitLength) ||
-            ( limitStart !== undefined && limitStart !== this.state.limitStart) ||
-            ( showUnDisposed !== undefined && showUnDisposed !== this.state.showUnDisposed)) {
+        const {gateway} = nextProps
+        if (gateway !== this.state.gateway) {
             this.setState({
-                gateway: gateway,
-                columns: gateway ? NoSNColumns : AllColumns,
-                showUnDisposed: showUnDisposed,
-                limitTime: limitTime ? limitTime : this.state.limitTime,
-                limitStart: limitStart ? limitStart : this.state.limitStart,
-                limitLength: limitLength ? limitLength : this.state.limitLength
+                gateway: gateway
             }, ()=>{
                 this.fetchAll()
             })
@@ -538,7 +529,7 @@ class DeviceEventList extends Component {
                         </Select>
                         <span style={{padding: '0 3px'}} />
                         <Select
-                            value={String(this.state.filterLevel)}
+                            value={`${this.state.filterLevel}`}
                             style={{ width: 130 }}
                             onChange={this.onLevelChange}
                         >
@@ -550,7 +541,7 @@ class DeviceEventList extends Component {
                         </Select>
                         <span style={{padding: '0 3px'}} />
                         <Select
-                            value={String(this.state.limitLength)}
+                            value={`${this.state.limitLength}`}
                             style={{ width: 140 }}
                             onChange={this.onTotalLengthChange}
                         >
