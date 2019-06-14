@@ -21,7 +21,7 @@ class GatewayUpgrade extends Component {
                             <h3>FreeIOE</h3>
                             <p>
                                 <span>
-                                {data.version < freeioe_latest_version  ? data.version : 0} -> {freeioe_latest_version}
+                                {data.version} -> {freeioe_latest_version}
                                 </span>
                             </p>
                         </div>
@@ -38,7 +38,7 @@ class GatewayUpgrade extends Component {
                                     <h3>openwrt x86_64_skynet</h3>
                                     <p>
                                         <span>
-                                        {data.skynet_version < skynet_latest_version  ? data.skynet_version : 0} -> {skynet_latest_version}
+                                        {data.skynet_version} -> {skynet_latest_version}
                                         </span>
                                     </p>
                                     <span>

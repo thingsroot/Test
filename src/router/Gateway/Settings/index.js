@@ -21,15 +21,14 @@ class GatewaySettings extends Component {
     state = {
         title: '',
         skynet_version_list: [],
+        skynet_latest_version: 0,
         freeioe_version_list: [],
+        freeioe_latest_version: 0,
         loading: true,
         gateway: '',
         upgrading: false,
         showUpgrade: false,
-        showEdit: false,
-        freeioe_latest_version: 0,
-        skynet_latest_version: 0,
-        barData: []
+        showEdit: false
     }
     componentDidMount (){
         this.setState({
@@ -106,7 +105,7 @@ class GatewaySettings extends Component {
 
         http.get('/api/applications_versions_latest?app=' + gatewayInfo.data.platform + '_skynet&beta=' + (gatewayInfo.data.enable_beta ? 1 : 0)).then(res=>{
             this.setState({
-                skynet_version: res.data
+                skynet_latest_version: res.data
             })
         })
     }
