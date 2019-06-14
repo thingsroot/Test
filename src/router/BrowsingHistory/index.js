@@ -63,19 +63,27 @@ class BrowsingHistory extends Component {
         device_sn: ''
       };
       componentDidMount () {
-        this.setState({gateway: this.props.match.params.sn, device_sn: this.props.match.params.vsn}, () =>{
+        this.setState({
+          gateway: this.props.match.params.sn,
+          device_sn: this.props.match.params.vsn,
+          input: this.props.match.params.input
+        }, () =>{
           this.fetch();
         })
         this.props.store.timer.setGateStatusLast(0)
         console.log(this)
       }
       UNSAFE_componentWillReceiveProps (nextProps){
-          if (this.props.match.params.sn !== nextProps.match.params.sn){
-            this.setState({gateway: this.props.match.params.sn, device_sn: this.props.match.params.vsn}, () =>{
-              this.fetch();
-            })
-            this.props.store.timer.setGateStatusLast(0)
-          }
+        if (this.props.match.params.sn !== nextProps.match.params.sn){
+          this.setState({
+            gateway: this.props.match.params.sn,
+            device_sn: this.props.match.params.vsn,
+            input: this.props.match.params.input
+          }, () =>{
+            this.fetch();
+          })
+          this.props.store.timer.setGateStatusLast(0)
+        }
       }
       handleTableChange = (pagination, filters, sorter) => {
         const pager = { ...this.state.pagination };
@@ -108,8 +116,12 @@ class BrowsingHistory extends Component {
           if (!res.ok) {
             return
           }
+          let current_record = undefined
           res.data.map((val, ind)=>{
               val.id = ind;
+              if (this.state.input && val.name === this.state.input) {
+                current_record = val;
+              }
           })
           const pagination = { ...this.state.pagination };
           // Read total count from server
@@ -122,6 +134,9 @@ class BrowsingHistory extends Component {
             pagination
           }, ()=>{
             console.log(this.state)
+            if (current_record) {
+              this.getData(current_record)
+            }
           });
         });
       }

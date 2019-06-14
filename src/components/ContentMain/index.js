@@ -155,7 +155,7 @@ class ContentMain extends Component {
                 />
 
                 <PrivateRoute
-                    path="/browsinghistory/:sn/:vsn"
+                    path="/browsinghistory/:sn/:vsn/:input?"
                     component={BrowsingHistory}
                     title={'Dashboard'}
                 />
