@@ -79,7 +79,7 @@ class Status extends Component {
                     &nbsp;序号: {this.state.gateway}
                 </div>
                     {
-                        this.props.location.pathname.indexOf('/appsinstall') === -1
+                        this.props.location.pathname.indexOf('/gateway/') !== -1
                         ? <div
                             onClick={()=>{
                                 localStorage.setItem('url', this.props.location.pathname)
