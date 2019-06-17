@@ -9,7 +9,6 @@ import http from '../../utils/Server';
 import { inject, observer } from 'mobx-react';
 import { Button, Icon, message } from 'antd';
 import GatewayMQTT from '../../utils/GatewayMQTT';
-import { setInterval } from 'timers';
 
 const DeviceList = LoadableComponent(()=>import('./DeviceList'));
 const AppsList = LoadableComponent(()=>import('./AppsList'));
