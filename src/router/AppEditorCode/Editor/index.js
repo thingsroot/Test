@@ -290,9 +290,7 @@ class MyCode extends Component {
 
     //保存文件
     saveFile = ()=>{
-        if (!this.state.changed) {
-            message.warning('文件未改动！')
-        } else {
+        if (this.state.changed) {
             let url = '/apis/api/method/app_center.editor.editor';
             let params = {
                 app: this.state.app,
@@ -335,6 +333,8 @@ class MyCode extends Component {
                         />
                         <Icon
                             type="save"
+                            disabled
+                            style={{color: this.state.changed ? '#333' : '#ccc'}}
                             onClick={this.saveFile}
                         />
                         <Icon
