@@ -169,7 +169,7 @@ class AppEditorCode extends Component {
         return (
             <div>
             {
-                //gateway !== undefined ? <GatewayStatus gateway={gateway}/> : ''
+                gateway !== undefined ? <GatewayStatus gateway={gateway}/> : ''
             }
             <div className="appEditorCode">
                 <div className="main">

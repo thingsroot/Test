@@ -272,6 +272,11 @@ class MyCode extends Component {
 
     uploadToGateway = () => {
         const {app_inst, app, gateway, version} = this.state;
+        const { actionEnable } = this.props.store.gatewayInfo;
+        if (!this.state.applyEnable || !actionEnable) {
+            return;
+        }
+
         if (app_inst === '' || app === '' || gateway === undefined) {
             message.error('找不到安装信息')
             return
@@ -373,6 +378,7 @@ class MyCode extends Component {
 
     render () {
         const { fontSize, gateway, showRevertModal, versionList, showReleaseModal, newVersion, comment } = this.state;
+        const { actionEnable } = this.props.store.gatewayInfo;
         return (
             <div className="codeEditor">
                 <div className="iconGroup">
@@ -381,7 +387,7 @@ class MyCode extends Component {
                             gateway !== undefined ? (
                             <Icon
                                 type="cloud-upload"
-                                style={{color: this.state.applyEnable ? '#333' : '#ccc'}}
+                                style={{color: this.state.applyEnable && actionEnable ? '#333' : '#ccc'}}
                                 onClick={this.uploadToGateway}
                             /> ) : null
                         }
