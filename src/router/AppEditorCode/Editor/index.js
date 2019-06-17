@@ -66,6 +66,7 @@ class MyCode extends Component {
             this.getContent();
             this.loadVersionList()
         })
+        document.addEventListener('keydown', this.onKeyDown)
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (this.state.app !== nextProps.app || this.state.filePath !== nextProps.filePath){
@@ -88,7 +89,20 @@ class MyCode extends Component {
         if (this.timer){
             clearTimeout(this.timer)
         }
+        document.removeEventListener('keydown', this.onKeyDown)
     }
+
+    onKeyDown = (e)=>{
+        if (e.keyCode === 83) {
+            e.preventDefault();
+            if (!this.state.changed) {
+                message.warning('文件未改动')
+            } else {
+                this.saveFile()
+            }
+        }
+    }
+
     getMode () {
         let mode = '';
         if (this.state.fileType === 'file') {
@@ -272,7 +286,7 @@ class MyCode extends Component {
         })
     };
     newVersion = ()=>{
-        const {codeStore} = this.state
+        const {codeStore} = this.state;
         http.post('/apis/api/method/app_center.editor.editor_release?app=' + this.state.app +
             '&operation=set_content&version=' + this.state.newVersion +
             '&comment=' + this.state.comment)
@@ -381,7 +395,7 @@ class MyCode extends Component {
                             highlightActiveLine
                             enableSnippets
                             value={this.state.editorContent}
-                            style={{width: '100%', height: '75vh'}}
+                            style={{width: '100%'}}
                             setOptions={{
                                 enableBasicAutocompletion: false,
                                 enableLiveAutocompletion: true,
