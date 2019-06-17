@@ -299,7 +299,7 @@ class AppConfigSection extends Component {
                     visible={this.state.showTemplateSelection}
                     onOk={this.handleCancelAddTempList}
                     onCancel={this.handleCancelAddTempList}
-                    wrapClassName={'tableModal'}
+                    wrapClassName={'templatesModal'}
                     okText="确定"
                     cancelText="取消"
                 >

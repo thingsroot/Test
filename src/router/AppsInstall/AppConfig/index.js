@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import Inst from '../Inst';
 import {Button, Tabs, message} from 'antd';
+import {withRouter} from 'react-router-dom';
+import {inject, observer} from 'mobx-react';
+import http from '../../../utils/Server';
 import AppConfigSection from './section';
 import AceEditor from 'react-ace';
 import 'brace/mode/json';
 import 'brace/theme/monokai';
-import {withRouter} from 'react-router-dom';
-import {inject, observer} from 'mobx-react';
-import http from '../../../utils/Server';
+import './style.scss';
+
 const TabPane = Tabs.TabPane;
 
 const block = {
