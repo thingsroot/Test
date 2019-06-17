@@ -142,17 +142,3 @@ pre{
         display: flex;
     }
 }
-.templatesModal{
-    .ant-modal-content {
-        width: 1000px!important;
-        height: 500px!important;
-        margin-left: -500px!important;
-        position: absolute;
-        left: 50%;
-        overflow-y: auto;
-    }
-    .ant-modal-body {
-        width: 1000px!important;
-        height: 390px!important;
-    }
-}

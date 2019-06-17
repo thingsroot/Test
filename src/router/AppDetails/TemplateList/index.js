@@ -222,6 +222,9 @@ class TemplateList extends Component {
 
     refreshMyList = ()=> {
         const { app } = this.props;
+        if (app === undefined) {
+            return
+        }
         http.get('/api/user_configurations_list?app=' + app).then(res=>{
             this.setState({myList: res.data})
         });

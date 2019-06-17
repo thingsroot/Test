@@ -183,6 +183,9 @@ class AppConfig extends Component {
     refreshTemplateList = () => {
         this.setState({appTemplateList: []})
         let app = this.state.app_info.name
+        if (app === undefined) {
+            return
+        }
         http.get('/api/store_configurations_list?conf_type=Template&app=' + app)
         .then(res=>{
             let list = this.state.appTemplateList;
