@@ -37,14 +37,14 @@ const newNodeItem = (title, isLeaf, type, key, icon) => {
         },
         addChild (item) {
             item.parent = this
-            this.children.push(item)
+            this.children.push(item);
         },
         removeChild (item) {
             console.log(item)
-            let arr = [];
+            let arr = this.children;
             this.children.map(v => {
                 if (v.key !== item.key) {
-                    arr.push(v)
+                    arr.splice(v, 1);
                 }
             })
             this.children = arr
@@ -310,6 +310,8 @@ class MyTree extends Component {
             return
         }
         const to_delete_id = this.SelectedNodeID;
+        let folder_node = this.SelectedNodeBaseNode;
+        let child_node = this.state.selectedNodeData;
         const delete_node = ()=>{
             let url = '/apis/api/method/app_center.editor.editor';
             let params = {
@@ -320,20 +322,9 @@ class MyTree extends Component {
             };
             http.post(url, params)
                 .then(res=>{
-                    console.log(res);
                     if (res.status === 'OK') {
+                        this.deleteNode(folder_node.children, child_node)
                         message.success('删除成功！');
-                        this.findChild(this.state.root[0], to_delete_id).then(node=>{
-                            console.log(node);
-                            if (node) {
-                                node.parent.removeChild(node);
-                            }
-                        })
-                        // let node = this.findNode(to_delete_id);
-                        // console.log(node)
-                        // if (node) {
-                        //     node.parent.removeChild(node);
-                        // }
                     } else {
                         message.error('删除失败！')
                     }
@@ -350,6 +341,22 @@ class MyTree extends Component {
             onCancel () {}
         });
     };
+
+    deleteNode = (data, delData) => {
+        data.map((item, i) => {
+            if (delData !== '0') {
+                //如果循环的节点数据中有跟你传过来要删的数据delData.key相同的 那就将这条数据丛树节点删掉
+                if (item.key === delData.key) {
+                    console.log(i)
+                    data.splice(i, 1);
+                }
+            }
+            this.setState({
+                root: [...this.state.root]
+            });
+            return data;
+        });
+    }
 
     deleteFileShow = ()=>{
         if (this.SelectedNodeID === undefined) {
@@ -417,7 +424,6 @@ class MyTree extends Component {
     onExpand = (expandedKeys) => {
         this.setState({
             expandedKeys,
-            // expendArr: expandedKeys,
             autoExpandParent: false
         });
     };
