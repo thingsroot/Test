@@ -19,7 +19,7 @@ import 'brace/mode/mysql';
 import 'brace/mode/json';//
 import 'brace/mode/css';//
 import 'brace/mode/typescript';
-import 'brace/theme/tomorrow';//
+import 'brace/theme/monokai';//
 
 const confirm = Modal.confirm;
 const Option = Select.Option;
@@ -71,7 +71,8 @@ class MyCode extends Component {
             this.getContent();
             this.loadVersionList()
         })
-        document.addEventListener('keydown', this.onKeyDown)
+        document.addEventListener('keydown', this.onKeyDown);
+        window.addEventListener('resize', this.resize);
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (this.state.app !== nextProps.app ||
@@ -100,6 +101,10 @@ class MyCode extends Component {
             clearTimeout(this.timer)
         }
         document.removeEventListener('keydown', this.onKeyDown)
+    }
+
+    resize = ()=>{
+        this.refs.editor.resize()
     }
 
     onKeyDown = (e)=>{
@@ -251,7 +256,7 @@ class MyCode extends Component {
     };
     getVersion = (value)=>{
         this.setState({
-            showRevertModal: value
+            version: value
         });
     };
     resetVersion = ()=>{
@@ -418,6 +423,13 @@ class MyCode extends Component {
                         {/*onClick={this.undo}*/}
                         {/*/>*/}
                         {/*<Icon type="redo" onClick={this.keyPress} />*/}
+                        <span
+                            style={{padding: '0 10px', position: 'absolute', right: 160, color: '#ccc'}}
+                            className="color"
+                        >
+                            <span>当前文件：{this.state.filePath}</span>
+                            <span>{this.state.changed ? '已修改' : '未修改'}</span>
+                        </span>
                         <Icon
                             style={{position: 'absolute', right: 60, top: 10}}
                             type="cloud-upload"
@@ -436,15 +448,11 @@ class MyCode extends Component {
                     </p>
                 </div>
                 <div className="myCode">
-                    <p className="color">
-                        <span>当前文件：{this.state.filePath}</span>
-                        <span>{this.state.changed ? '已修改' : '未修改'}</span>
-                    </p>
                     {
                         this.state.editorContent !== '' ? <AceEditor
                             mode={this.state.mode}
                             readOnly={this.state.readOnly}
-                            theme="tomorrow"
+                            theme="monokai"
                             name="app_code_editor"
                             onChange={this.onChange}
                             fontSize={fontSize}
@@ -453,7 +461,7 @@ class MyCode extends Component {
                             highlightActiveLine
                             enableSnippets
                             value={this.state.editorContent}
-                            style={{width: '100%'}}
+                            style={{width: '100%', height: '70vh'}}
                             setOptions={{
                                 enableBasicAutocompletion: false,
                                 enableLiveAutocompletion: true,
