@@ -461,7 +461,7 @@ class MyCode extends Component {
                             highlightActiveLine
                             enableSnippets
                             value={this.state.editorContent}
-                            style={{width: '100%', height: 800}}
+                            style={{width: '100%', height: '70vh'}}
                             setOptions={{
                                 enableBasicAutocompletion: false,
                                 enableLiveAutocompletion: true,
