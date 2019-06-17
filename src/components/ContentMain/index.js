@@ -139,7 +139,7 @@ class ContentMain extends Component {
                     title={'虚拟网关'}
                 />
                 <PrivateRoute
-                    path="/platformevents"
+                    path="/platformevents/:limitTime?"
                     component={PlatformEvents}
                     title={'平台消息'}
                 />

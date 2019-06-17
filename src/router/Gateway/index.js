@@ -20,7 +20,7 @@ const OnlineRecords = LoadableComponent(()=>import('./OnlineRecords'));
 const Logviewer = LoadableComponent(()=>import('./Logviewer'));
 const Comm = LoadableComponent(()=>import('./CommViewer'));
 const Appconfig = LoadableComponent(()=>import('../AppsInstall/AppConfig'));
-const Platformevent = LoadableComponent(()=>import('../PlatformEvents'));
+const PlatformEvents = LoadableComponent(()=>import('./PlatformEvents'));
 const DeviceEvents = LoadableComponent(()=>import('./DeviceEvents'));
 const GatewaysDrawer = LoadableComponent(()=>import('../../common/GatewaysDrawer'));
 
@@ -162,7 +162,7 @@ class MyGatesDevices extends Component {
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path={`${path}/platformevents`}
-                            component={Platformevent}
+                            component={PlatformEvents}
                             title="我的网关·平台事件"
                             gateway={this.state.gateway}
                         />
