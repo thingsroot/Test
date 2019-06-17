@@ -112,15 +112,17 @@ class AppsList extends Component {
         }
     }
     componentDidMount () {
+        const { gatewayInfo } = this.props.store;
         this.setState({gateway_sn: this.props.gateway}, () =>{
-            this.setData(this.props.store.gatewayInfo.apps)
-            if (this.props.store.gatewayInfo.apps_count !== 0) {
+            this.setData(gatewayInfo.apps)
+            gatewayInfo.setAppsIsShow(true)
+            if (gatewayInfo.apps_count !== 0) {
                 this.setState({loading: false})
             }
             this.fetch();
-            // this.timer = setInterval(() => {
-            //     this.fetch()
-            // }, 3000);
+            this.timer = setInterval(() => {
+                this.fetch()
+            }, 3000);
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -134,7 +136,9 @@ class AppsList extends Component {
         }
     }
     componentWillUnmount (){
-        //clearInterval(this.timer)
+        const { gatewayInfo } = this.props.store;
+        clearInterval(this.timer)
+        gatewayInfo.setAppsIsShow(false)
     }
     // handleTableChange = (pagination, filters) => {
     //   const pager = { ...this.state.pagination };

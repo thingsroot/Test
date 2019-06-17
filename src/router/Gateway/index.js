@@ -9,7 +9,6 @@ import http from '../../utils/Server';
 import { inject, observer } from 'mobx-react';
 import { Button, Icon, message } from 'antd';
 import GatewayMQTT from '../../utils/GatewayMQTT';
-import { setInterval } from 'timers';
 
 const DeviceList = LoadableComponent(()=>import('./DeviceList'));
 const AppsList = LoadableComponent(()=>import('./AppsList'));
@@ -41,40 +40,53 @@ class MyGatesDevices extends Component {
     }
     componentDidMount (){
         this.setState({gateway: this.props.match.params.sn}, ()=>{
-            this.timer = setInterval(() => this.sendAjax(), 3000)
             this.props.store.timer.setGateStatusLast(0)
+            this.fetch()
+            clearInterval(this.timer)
+            this.timer = setInterval(() => this.fetch(), 10000)
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (this.props.match.params.sn !== nextProps.match.params.sn){
+        if (this.props.match.params.sn !== nextProps.match.params.sn &&
+            this.state.gateway !== nextProps.match.params.sn){
             this.setState({gateway: nextProps.match.params.sn}, ()=>{
                 this.state.mqtt.disconnect(true)
                 this.props.store.timer.setGateStatusLast(0)
+                this.fetch()
+                clearInterval(this.timer)
+                console.log('ClearInterval', this.timer)
+                this.timer = setInterval(() => this.fetch(), 10000)
             })
         }
     }
     componentWillUnmount (){
         clearInterval(this.timer)
     }
-    sendAjax = () => {
+    fetch = () => {
+        console.log(new Date())
         const {gateway} = this.state;
         if (gateway === undefined || gateway === '') {
             return;
         }
-        http.get('/api/gateways_app_list?gateway=' + gateway).then(res=>{
-            if (res.ok) {
-                this.props.store.gatewayInfo.setApps(res.data);
-            } else {
-                message.error(res.error)
-            }
-        })
-        http.get('/api/gateways_dev_list?gateway=' + gateway).then(res=>{
-            if (res.ok) {
-                this.props.store.gatewayInfo.setDevices(res.data)
-            } else {
-                message.error(res.error)
-            }
-        })
+        const {gatewayInfo} = this.props.store;
+        if (!gatewayInfo.apps_is_show) {
+            http.get('/api/gateways_app_list?gateway=' + gateway).then(res=>{
+                if (res.ok) {
+                    gatewayInfo.setApps(res.data);
+                } else {
+                    message.error(res.error)
+                }
+            })
+        }
+        if (!gatewayInfo.devices_is_show) {
+            http.get('/api/gateways_dev_list?gateway=' + gateway).then(res=>{
+                if (res.ok) {
+                    gatewayInfo.setDevices(res.data)
+                } else {
+                    message.error(res.error)
+                }
+            })
+        }
     }
     showDrawer = () => {
         this.setState({
@@ -87,7 +99,7 @@ class MyGatesDevices extends Component {
         })
     }
     onChangeGateway = () => {
-        this.componentDidMount()
+        //this.componentDidMount()
     }
     // setUrl = (sn) => {
     //   let arr = location.pathname.split('/');

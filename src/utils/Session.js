@@ -1,5 +1,4 @@
 import http from './Server';
-import { message } from 'antd';
 import Cookie from 'mobx-cookie'
 
 
@@ -92,31 +91,4 @@ export function isDeveloper () {
                 _setCookie('is_developer', '0')
             }
         });
-}
-// 拼接网关操作
-export function deviceAppOption (appName, option, value, gateSn, type, sn){
-    const id = `${type}/${gateSn}/${appName}/autorun/${sn}`;
-    http.post('/api/method/iot.device_api.app_option', {
-        data: {
-          inst: appName,
-          option: option,
-          value: value
-        },
-        device: gateSn,
-        id: id
-    }).then(()=>{
-        let timer = setInterval(() => {
-            http.get('/api/gateways_exec_result?id=' + id).then(result=>{
-                if (result.ok && result.data){
-                    if (result.data.result){
-                        message.success('应用配置成功')
-                        clearInterval(timer)
-                    } else {
-                        message.error('应用配置失败')
-                        clearInterval(timer)
-                    }
-                }
-            })
-        }, 3000);
-    })
 }

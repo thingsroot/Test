@@ -26,11 +26,10 @@ function error (){
     message.success('连接服务器失败')
 }
 
-const newMessageChannel = (topic, max_count) => {
+const newMessageChannel = (topic) => {
     var item = observable({
         // observable 属性:
         topic: topic,
-        max_count: max_count,
         data: [],
         allData: [],
         filter: undefined,
@@ -45,10 +44,6 @@ const newMessageChannel = (topic, max_count) => {
         },
         pushData (value) {
             console.log(value)
-            if (this.allData.length > this.max_count) {
-                message.error('达到最大条数限制，丢弃信息')
-                return
-            }
             this.allData.push(value)
             if (this.filter === undefined) {
                 this.data.push(value)
@@ -136,6 +131,9 @@ const newMessageChannel = (topic, max_count) => {
         },
         get Active () {
             return this.active
+        },
+        get Size () {
+            return this.allData.length
         }
     }, {
         setTopic: action,
@@ -155,7 +153,7 @@ class GatewayMQTT {
     @observable timer = null;
     @observable die_time = 0;
     @observable localstor = [];
-    @observable maxNum = false;
+    @observable max_count = 5000;
     @observable flag = true;
     @observable connected = false;
     @observable gateway = '';
@@ -269,6 +267,11 @@ class GatewayMQTT {
     }
 
     onReceiveCommMsg = (msg) => {
+        if (this.comm_channel.Size >= this.max_count) {
+            message.error(`报文数量超过${this.max_count}条，订阅停止!!`)
+            this.unsubscribe('/comm')
+            this.comm_channel.setActive(false)
+        }
         const obj = {
             time: getLocalTime(msg[1]),
             direction: msg[0].split('/')[1],
@@ -278,7 +281,11 @@ class GatewayMQTT {
         this.comm_channel.pushData(obj)
     }
     onReceiveLogMsg = (msg) => {
-        msg;
+        if (this.log_channel.Size >= this.max_count) {
+            message.error(`日志数量超过${this.max_count}条，订阅停止!!`)
+            this.unsubscribe('/comm')
+            this.log_channel.setActive(false)
+        }
         const obj = {
             time: getLocalTime(msg[1]),
             level: msg[0],

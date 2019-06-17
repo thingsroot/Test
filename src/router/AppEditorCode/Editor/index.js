@@ -36,6 +36,9 @@ class MyCode extends Component {
             editorContent: '',
             mode: 'lua',
             app: '',
+            gateway: undefined,
+            applyEnable: true,
+            app_inst: '',
             filePath: '',
             fileType: '',
             changed: false,
@@ -57,6 +60,8 @@ class MyCode extends Component {
     componentDidMount () {
         this.setState( {
             app: this.props.app,
+            gateway: this.props.gateway,
+            app_inst: this.props.app_inst,
             filePath: this.props.filePath,
             fileType: this.props.fileType,
             editorContent: '',
@@ -70,12 +75,17 @@ class MyCode extends Component {
         window.addEventListener('resize', this.resize);
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (this.state.app !== nextProps.app || this.state.filePath !== nextProps.filePath){
+        if (this.state.app !== nextProps.app ||
+            this.state.filePath !== nextProps.filePath ||
+            this.state.gateway !== nextProps.gateway ||
+            this.state.app_inst !== nextProps.app_inst){
             if (this.state.changed) {
                 this.showChangesConfirm(this.state.app, this.state.filePath, this.state.editorContent)
             }
             this.setState( {
                 app: nextProps.app,
+                gateway: nextProps.gateway,
+                app_inst: nextProps.app_inst,
                 filePath: nextProps.filePath,
                 fileType: nextProps.fileType,
                 editorContent: '',
@@ -261,10 +271,49 @@ class MyCode extends Component {
                 setTimeout(()=>{
                     window.location.reload();
                 }, 1500)
-
             })
     };
     //重置版本结束
+
+    uploadToGateway = () => {
+        const {app_inst, app, gateway, version} = this.state;
+        const { actionEnable } = this.props.store.gatewayInfo;
+        if (!this.state.applyEnable || !actionEnable) {
+            return;
+        }
+
+        if (app_inst === '' || app === '' || gateway === undefined) {
+            message.error('找不到安装信息')
+            return
+        }
+        this.setState({applyEnable: false})
+        let url = '/apis/api/method/app_center.editor.editor_apply';
+        let params = {
+            app: app,
+            device: gateway,
+            inst: app_inst,
+            version: version,
+            id: `editor_apply/${gateway}/${app_inst}/${new Date() * 1}`
+        }
+        http.post(url, params)
+            .then(res=>{
+                if (res.message) {
+                    message.success('应用安装成功请求成功，请等待网关执行结果');
+                    this.props.store.action.pushAction(res.message, '应用安装调试区代码', '', params, 30000,  (result)=> {
+                        result;
+                        this.setState({applyEnable: true})
+                    })
+                } else {
+                    this.setState({applyEnable: true})
+                    message.error('应用安装成功请求失败!')
+                }
+            })
+            .catch( (err) => {
+                err;
+                this.setState({applyEnable: true})
+                message.error('发送应用安装成功请求失败')
+            })
+    }
 
     //发布新版本
     showReleaseModal = () => {
@@ -333,11 +382,24 @@ class MyCode extends Component {
     };//保存文件结束
 
     render () {
-        const { fontSize, showRevertModal, versionList, showReleaseModal, newVersion, comment } = this.state;
+        const { fontSize, gateway, showRevertModal, versionList, showReleaseModal, newVersion, comment } = this.state;
+        const { actionEnable } = this.props.store.gatewayInfo;
         return (
             <div className="codeEditor">
                 <div className="iconGroup">
                     <p style={{width: 'auto', position: 'resolute'}}>
+                        {
+                            gateway !== undefined ? (
+                            <Icon
+                                type="cloud-upload"
+                                style={{color: this.state.applyEnable && actionEnable ? '#333' : '#ccc'}}
+                                onClick={this.uploadToGateway}
+                            /> ) : null
+                        }
+                        <Icon
+                            type="tag"
+                            onClick={this.showReleaseModal}
+                        />
                         <Icon
                             type="sync"
                             onClick={this.showModal}
@@ -355,10 +417,6 @@ class MyCode extends Component {
                             disabled
                             style={{color: this.state.changed ? '#333' : '#ccc'}}
                             onClick={this.saveFile}
-                        />
-                        <Icon
-                            type="upload"
-                            onClick={this.showReleaseModal}
                         />
                         {/*<Icon*/}
                         {/*type="undo"*/}

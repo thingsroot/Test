@@ -157,13 +157,14 @@ class Action extends Component {
         })
     }
     sendForkCreate (record){
+        const {gatewayInfo} = this.props.store
         http.post('/api/applications_forks_create', {
             name: record.name,
             version: Number(record.version)
         }).then(res=>{
             if (res.ok){
                 if (res.data){
-                    this.props.history.push('/appeditorcode/' + res.data.name + '/' + res.data.app_name);
+                    this.props.history.push(`/appeditorcode/${res.data.name}/${res.data.app_name}/${gatewayInfo.sn}/${record.inst_name}`);
                     this.setState({appdebug: false})
                 }
             } else {
@@ -174,18 +175,21 @@ class Action extends Component {
     }
     onDebug = (record) =>{
         if (record.data){
+            const {gatewayInfo} = this.props.store
             let user_id = this.props.store.session.user_id
             let app = record.data.data.name
             let app_name = record.data.data.app_name
+            let app_inst = record.inst_name
             if (record.data.data.owner === user_id){
-                this.props.history.push('/appeditorcode/' + app + '/' + app_name);
+                this.props.history.push(`/appeditorcode/${app}/${app_name}/${gatewayInfo.sn}/${app_inst}`);
                 this.setState({appdebug: false})
             } else {
                 let url = `/api/applications_forks_list?name=${app}&version=${record.version}&owner=${user_id}`
                 http.get(url).then(result=>{
                     if (result.ok){
                         if (result.data && result.data.length > 0){
-                            this.props.history.push(`/appeditorcode/${app}/${app_name}`);
+                            let forked_app = result.data[0]
+                            this.props.history.push(`/appeditorcode/${forked_app.name}/${forked_app.app_name}/${gatewayInfo.sn}/${app_inst}`);
                             this.setState({appdebug: false})
                         } else {
                             this.setState({appdebug: true})
@@ -250,7 +254,7 @@ class Action extends Component {
                     </Button>
                     <Button
                         onClick={this.onDebug.bind(this, record)}
-                        disabled={this.state.running_action || !actionEnable}
+                        disabled={this.state.running_action || !actionEnable || record.islocal}
                     >
                         应用调试
                     </Button>
