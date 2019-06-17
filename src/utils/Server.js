@@ -48,7 +48,7 @@ var get = function (url, params) {
             Accept: 'application/json; charset=utf-8',
             'Content-Type': 'application/json; charset=utf-8',
             'dataType': 'json',
-            'X-Frappe-CSRF-Token': _getCookie('T&R_auth_token') || ''
+            'X-Frappe-CSRF-Token': _getCookie('csrf_auth_token') || ''
         }
     }).then(res=>{
         resolve(res.data)
@@ -101,7 +101,7 @@ var form = function (url, data) {
 
 var post = function (url, data) {
   return new Promise((resolve, reject) => {
-    const token = _getCookie('T&R_auth_token');
+    const token = _getCookie('csrf_auth_token') || '';
     // qs.stringify(data)
     axios(url, {
           method: 'post',

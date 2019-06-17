@@ -5,10 +5,11 @@ import { inject, observer} from 'mobx-react';
 import FileTree from './FileTree';
 import CodeEditor from './Editor';
 import './style.scss';
-import codeStore from './codeStore'
 
 import http from '../../utils/Server';
+import GatewayStatus from '../../common/GatewayStatus';
 
+GatewayStatus;
 
 @withRouter
 @inject('store')
@@ -17,7 +18,8 @@ class AppEditorCode extends Component {
     constructor (props){
         super(props);
         this.state = {
-            codeStore: new codeStore(),
+            gateway: undefined,
+            app_inst: '',
             app: '',
             appName: '',
             version: '',
@@ -30,9 +32,13 @@ class AppEditorCode extends Component {
     componentDidMount () {
         let app = this.props.match.params.app;
         let appName = this.props.match.params.name;
+        let gateway = this.props.match.params.gateway;
+        let app_inst = this.props.match.params.inst;
         this.setState({
             appName: appName,
-            app: app
+            app: app,
+            gateway: gateway,
+            app_inst: app_inst
         }, () => {
             if (app !== '') {
                 this.loadWorkspace()
@@ -103,14 +109,19 @@ class AppEditorCode extends Component {
         .then(res=>{
             let version = res.message;
             // console.log(initVersion);
-            this.setState({ version: version  });
-            window.location.reload();
+            //window.location.reload();
+            message.success(`工作区成功初始化至版本：${version}，编辑器加载中请稍候`)
+            this.setState({app: ''}) // Force the fileTree reload
+            setTimeout(() => {
+                this.setState({app: app}, ()=>{
+                    this.loadWorkspace()
+                })
+            }, 2000);
         })
     }
 
     loadWorkspace () {
-        const {codeStore, app} = this.state
-        codeStore.setShowFileName('version')
+        const {app} = this.state
         //设备应用和平台应用对比
         http.get('/apis/api/method/app_center.editor.editor_workspace_version?app=' + app)
             .then(res=>{
@@ -150,19 +161,29 @@ class AppEditorCode extends Component {
         const {
             app,
             appName,
+            gateway,
+            app_inst,
             selectedFile,
             selectedFileType
         } = this.state;
         return (
+            <div>
+            {
+                //gateway !== undefined ? <GatewayStatus gateway={gateway}/> : ''
+            }
             <div className="appEditorCode">
                 <div className="main">
                     <FileTree
                         app={app}
+                        gateway={gateway}
+                        app_inst={app_inst}
                         onSelect={this.onSelect}
                         appName={appName}
                     />
                     <CodeEditor
                         app={app}
+                        gateway={gateway}
+                        app_inst={app_inst}
                         filePath={selectedFile}
                         fileType={selectedFileType}
                         onChange={this.onContentChange}
@@ -170,6 +191,7 @@ class AppEditorCode extends Component {
                 </div>
 
 
+            </div>
             </div>
         );
     }

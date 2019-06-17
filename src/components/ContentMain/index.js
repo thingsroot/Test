@@ -114,7 +114,7 @@ class ContentMain extends Component {
                     title={'安装应用'}
                 />
                 <PrivateRoute
-                    path="/appeditorcode/:app/:name"
+                    path="/appeditorcode/:app/:name/:gateway?/:inst?"
                     component={AppEditorCode}
                     title={'代码编辑'}
                 />
