@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import {Table, Input, Select, Button, message, Icon} from 'antd'
+import { Table, Input, Select, Button, message, Icon } from 'antd'
+import SonTable from './SonTable';
 import './style.scss'
 import http from '../../utils/Server';
 import axios from 'axios';
 import {inject, observer} from 'mobx-react';
-import SonTables from './SonTables';
 
 const InputGroup = Input.Group;
 const Option = Select.Option;
@@ -12,6 +12,7 @@ const disposed = {
     color: '#367fa9',
     fontWeight: '600'
 };
+
 const posed = {
     color: 'rgba(0, 0, 0, 0.65)',
     fontWeight: 'normal'
@@ -21,12 +22,13 @@ const AllColumns = [
     {
         title: '标题',
         dataIndex: 'title',
-        width: '25%',
+        width: '30%',
         render: (text, record) => (
             <span
-                className="cursor"
+                className="cursor overflow"
                 style={record.disposed === 0 ? disposed : posed}
-            >{text}
+            >
+                {text}
             </span>
         )
     }, {
@@ -44,15 +46,8 @@ const AllColumns = [
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
-        title: '事件类型',
+        title: '消息类型',
         dataIndex: 'operation',
-        width: '10%',
-        render: (text, record) => (
-            <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-        )
-    }, {
-        title: '事件等级',
-        dataIndex: 'event_level',
         width: '10%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
@@ -64,12 +59,13 @@ const NoSNColumns = [
     {
         title: '标题',
         dataIndex: 'title',
-        width: '60%',
+        width: '70%',
         render: (text, record) => (
             <span
-                className="cursor"
+                className="cursor overflow"
                 style={record.disposed === 0 ? disposed : posed}
-            >{text}
+            >
+                {text}
             </span>
         )
     }, {
@@ -80,15 +76,8 @@ const NoSNColumns = [
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
-        title: '事件类型',
+        title: '消息类型',
         dataIndex: 'operation',
-        width: '10%',
-        render: (text, record) => (
-            <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
-        )
-    }, {
-        title: '事件等级',
-        dataIndex: 'event_level',
         width: '10%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
@@ -98,10 +87,10 @@ const NoSNColumns = [
 
 @inject('store')
 @observer
-class DeviceEventList extends Component {
+class PlatformEvents extends Component {
     state = {
+        name: '',
         category: '',
-        user: '',
         showUnDisposed: false,
         gateway: undefined,
         limitTime: 1,
@@ -109,15 +98,16 @@ class DeviceEventList extends Component {
         limitLength: 100,
         tableData: [],
         allData: [],
+        selectValue: 'title',
         filterColumn: '',
         filterType: '',
-        filterLevel: '',
         filterText: '',
         columns: [],
         loading: false,
         selectedRowKeys: [],
-        messageCount: 0,
+        visible: false,
         unconfirmed: 0,
+        messageCount: 0,
         sync: false
     };
     componentDidMount (){
@@ -151,16 +141,16 @@ class DeviceEventList extends Component {
             })
         }
     }
+
     onSelectChange = (selectedRowKeys) => {
         this.setState({ selectedRowKeys });
     };
-
     //确认消息
     confMessage = (toData)=>{
         if (toData.length === 0) {
             message.warning('请您先选择要确认的消息！');
         } else {
-            this.setState({ loading: true  });
+            this.setState({ loading: true });
 
             let arr = []
             let allData = this.state.allData;
@@ -180,10 +170,10 @@ class DeviceEventList extends Component {
 
             let params = {
                 category: this.state.category,
-                events: arr,
+                activities: arr,
                 disposed: 1
             };
-            http.post('/api/events_dispose', params).then(res=>{
+            http.post('/api/activities_dispose', params).then(res=>{
                 if (!res.ok) {
                     this.setState({  loading: false });
                     message.error(res.err)
@@ -222,7 +212,7 @@ class DeviceEventList extends Component {
             })
         }
     };
-    //确认所有消息
+    //确认全部消息
     confAllMessage = ()=>{
         this.setState({
             loading: true
@@ -237,11 +227,10 @@ class DeviceEventList extends Component {
         });
         let params = {
             category: this.state.category,
-            events: data,
+            activities: data,
             disposed: 1
         };
-
-        http.post('/api/events_dispose', params).then(res=>{
+        http.post('/api/activities_dispose', params).then(res=>{
             if (!res.ok) {
                 this.setState({  loading: false });
                 message.error(res.err)
@@ -274,7 +263,7 @@ class DeviceEventList extends Component {
                 loading: false,
                 allData: allData,
                 tableData: tableData,
-                unconfirmed: this.state.unconfirmed - data.length
+                unconfirmed: 0
             });
         }).catch(err=>{
             console.log(err)
@@ -288,6 +277,145 @@ class DeviceEventList extends Component {
         this.fetch_timer = setTimeout(() => {
             this.getMessageList()
         }, 200);
+    }
+    generateTitle = (activity, data) => {
+        let sub = '';
+        //设备状态
+        if (data.hasOwnProperty('device_status')) {
+            if (data.device_status === 'ONLINE'){
+                sub = '设备上线'
+            } else if (data.device_status === 'OFFLINE'){
+                sub = '设备离线'
+            }
+            //设备操作
+        } else if (data.hasOwnProperty('action')){
+            if (data.channel === 'app') {
+                if (data.action === 'option') {   //开机自启动
+                    if (data.data.value === 1 || data.data.value === '1') {
+                        sub = activity.full_name + '  开启应用' + data.data.inst + '开机自启动'
+                    } else if (data.data.value === 0 || data.data.value === '0') {
+                        sub = activity.full_name + '  关闭应用' + data.data.inst + '开机自启动'
+                    } else {
+                        sub = JSON.stringify(data)
+                    }
+                } else if (data.action === 'restart') {
+                    sub = activity.full_name + '    重启应用' + data.data.inst
+                } else if (data.action === 'start') {
+                    sub = activity.full_name + '    启动应用' + data.data.inst
+                } else if (data.action === 'stop') {
+                    sub = activity.full_name + '   停止应用' + data.data.inst
+                } else if (data.action === 'conf') {
+                    sub = activity.full_name + '   更改应用' + data.data.inst + '应用配置'
+                } else if (data.action === 'upload_comm') {
+                    if (data.data.sec === 0 || data.data.sec === '0') {
+                        sub = activity.full_name + '   停止上传应用' + data.data.inst + '报文'
+                    } else if (data.data.sec !== 0 || data.data.sec !== '0') {
+                        sub = activity.full_name + '   上传应用' + data.data.inst + '报文'
+                    } else {
+                        sub = JSON.stringify(data)
+                    }
+                } else if (data.action === 'install') {
+                    sub = activity.full_name + '   安装应用' + data.data.name + '实例名' + data.data.inst
+                } else if (data.action === 'uninstall') {
+                    sub = activity.full_name + '   卸载应用' + data.data.inst
+                } else if (data.action === 'query_comm') {
+                    sub = activity.full_name + '   查询应用' + data.data.inst + '报文'
+                } else if (data.action === 'query_log') {
+                    sub = activity.full_name + '   应用查询' + data.data.inst + '日志'
+                } else if (data.action === 'list') {
+                    sub = activity.full_name + '   刷新应用列表'
+                } else if (data.action === 'upgrade') {
+                    sub = activity.full_name + '   升级应用' + data.data.inst + '到最新版本'
+                } else if (data.action === 'rename') {
+                    sub = activity.full_name + '   重命名应用' + data.data.inst + '为' + data.data.new_name
+                } else {
+                    sub = JSON.stringify(data)
+                }
+            } else if (data.channel === 'sys') {
+                if (data.action === 'enable/beta') {
+                    if (data.data === 0 || data.data === '0') {
+                        sub = activity.full_name + '    关闭网关beta模式'
+                    } else if (data.data !== 0 || data.data !== '0') {
+                        sub = activity.full_name + '    开启网关beta模式'
+                    } else {
+                        sub = JSON.stringify(data)
+                    }
+                } else if (data.action === 'enable/data') {
+                    if (data.data === 0 || data.data === '0') {
+                        sub = activity.full_name + '    关闭网关数据上传'
+                    } else if (data.data !== 0 || data.data === '0') {
+                        sub = activity.full_name + '    开启网关数据上传'
+                    } else {
+                        sub = JSON.stringify(data)
+                    }
+                } else if (data.action === 'enable/log') {
+                    if (data.data === 0 || data.data === '0') {
+                        sub = activity.full_name + '    关闭网关日志上送'
+                    } else if (data.data !== 0 || data.data !== '0') {
+                        sub = activity.full_name + '    开启网关日志上送'
+                    } else {
+                        sub = JSON.stringify(data)
+                    }
+                } else if (data.action === 'enable/comm') {
+                    if (data.data === 0 || data.data === '0') {
+                        sub = activity.full_name + '    停止网关报文上送'
+                    } else if (data.data !== 0 || data.data !== '0') {
+                        sub = activity.full_name + '    开启网关报文上送'
+                    } else {
+                        sub = JSON.stringify(data)
+                    }
+                } else if (data.action === 'restart') {
+                    sub = activity.full_name + '    重启网关IOT程序'
+                } else if (data.action === 'reboot') {
+                    sub = activity.full_name + '    重启网关设备'
+                } else if (data.action === 'cloud_conf') {
+                    sub = activity.full_name + '    更新网关云中心配置选项'
+                } else if (data.action === 'enable/data_one_short') {
+                    if (data.data === 0  || data.data === '0') {
+                        sub = activity.full_name + '    关闭网关临时上传数据'
+                    } else if (data.data !== 0 || data.data !== '0') {
+                        sub = activity.full_name + '    开启网关临时上传数据'
+                    } else {
+                        sub = JSON.stringify(data)
+                    }
+                } else if (data.action === 'ext/upgrade') {
+                    sub = activity.full_name + '    更新网关扩展库' + data.data.name
+                } else if (data.action === 'ext/list') {
+                    sub = activity.full_name + '    上传网关扩展库列表'
+                } else if (data.action === 'cfg/download') {
+                    sub = activity.full_name + '    下载网关IOT固件配置'
+                } else if (data.action === 'cfg/upload') {
+                    sub = activity.full_name + '    上传网关IOT固件配置'
+                } else if (data.action === 'upgrade') {
+                    sub = activity.full_name + '    升级网关到最新版本'
+                } else if (data.action === 'enable/event') {
+                    sub = activity.full_name + '    更改网关事件上传等级'
+                } else if (data.action === 'enable/stat') {
+                    sub = activity.full_name + '    开启网关统计数据上传'
+                } else if (data.action === 'batch_script') {
+                    sub = activity.full_name + '    执行网关批量操作'
+                } else if (data.action === 'upgrade/ack') {
+                    sub = activity.full_name + '    确认升级网关IOT固件'
+                } else if (data.action === 'data/query') {
+                    sub = activity.full_name + '    请求立刻上传网关数据'
+                } else {
+                    sub = JSON.stringify(data)
+                }
+            } else if (data.channel === 'command') {
+                sub = activity.full_name + '    执行网关应用设备' + data.data.cmd + '指令'
+            } else if (data.channel === 'output') {
+                sub = activity.full_name + '    操作网关设备应用' + data.data.output + '数据输出'
+            } else if (data.action === 'Delete') {
+                sub = activity.full_name + '    删除了一台网关'
+            } else if (data.action === 'Add') {
+                sub = activity.full_name + '    增加了一台网关'
+            } else {
+                sub = JSON.stringify(data)
+            } //output
+        } else {
+            sub = JSON.stringify(data)
+        }
+        return sub
     }
     //获取消息列表
     getMessageList = ()=>{
@@ -313,13 +441,13 @@ class DeviceEventList extends Component {
             unconfirmed: 0
         });
         axios({
-            url: '/api/device_events_list',
+            url: '/api/platform_activities_lists',
             method: 'GET',
             params: params
         }).then(res=>{
             let data = [];
-            let message_count = 0;
             let unconfirmed = 0;
+            let message_count = 0;
             if (res.data.ok === true) {
                 let sourceData = res.data.data.list
                 message_count = res.data.data.count
@@ -327,34 +455,21 @@ class DeviceEventList extends Component {
                     if (v.disposed === 0) {
                         unconfirmed++
                     }
-                    let type = '';
-                    let level = '';
-                    if (v.event_type === 'EVENT') {
-                        type = '设备'
-                    } else {
-                        type = v.event_type
-                    }
-                    if (v.event_level === 1) {
-                        level = '常规'
-                    } else if (v.event_level === 2) {
-                        level = '错误'
-                    } else if (v.event_level >= 3 && v.event_level < 10) {
-                        level = '警告'
-                    } else if (v.event_level >= 10) {
-                        level = '致命'
-                    }
+                    let obj = JSON.parse(v.message);
+                    let sub = obj ? this.generateTitle(v, obj) : 'UNKNOWN TITLE'
                     data.push({
-                        title: v.event_info,
-                        device: v.event_source,
+                        title: sub,
+                        device: v.device,
                         creation: v.creation.split('.')[0],
-                        operation: type,
+                        operation: v.operation,
                         disposed: v.disposed,
-                        disposed_by: v.disposed_by,
                         name: v.name,
-                        data: v.event_data,
-                        event_level: level,
-                        event_type: type,
-                        event_time: v.creation.split('.')[0]
+                        status: v.status,
+                        message: v.message,
+                        user: v.user,
+                        fullName: v.full_name,
+                        disposed_by: v.disposed_by
+
                     });
                 });
             } else {
@@ -366,10 +481,10 @@ class DeviceEventList extends Component {
                 messageCount: message_count,
                 unconfirmed: unconfirmed,
                 sync: false
-            }, ()=> {
+            }, () => {
                 this.filterMessages()
             });
-        })
+        });
     };
     //查看所有、查看未确认
     toggleMessage = ()=>{
@@ -379,7 +494,6 @@ class DeviceEventList extends Component {
             this.fetchAll()
         })
     };
-
     //时间戳转换
     durationToTime = (duration)=>{
         let date = new Date(Date.parse(new Date()) - duration * 60 * 60 * 1000);
@@ -411,13 +525,10 @@ class DeviceEventList extends Component {
         })
     }
     filterMessages = ()=>{
-        const { filterColumn, allData, filterType, filterLevel, filterText } = this.state
+        const { filterColumn, allData, filterType, filterText } = this.state
         let newAllData = []
         allData.map( (v) => {
             if (filterType !== '' && v.event_type !== filterType) {
-                return
-            }
-            if (filterLevel !== '' && v.event_level !== filterLevel ) {
                 return
             }
             newAllData.push(v)
@@ -480,11 +591,6 @@ class DeviceEventList extends Component {
             this.fetchAll();
         })
     };
-    //表格
-    onChange = (pagination, filters, sorter)=>{
-        console.log('params', pagination, filters, sorter)
-    };
-
     refresh = ()=>{
         this.setState({
             sync: true
@@ -494,16 +600,16 @@ class DeviceEventList extends Component {
     };
 
     render () {
-        let { selectedRowKeys, columns, showUnDisposed,
+        const { selectedRowKeys, columns, showUnDisposed,
             messageCount, unconfirmed } = this.state;
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange
         };
         return (
-            <div className="deviceEventList">
+            <div className="platformEvents">
                 <div className="searchBox flex">
-                    <div style={{minWidth: 280}}>
+                    <div style={{minWidth: 250}}>
                         <Button onClick={()=>{
                             this.confMessage(selectedRowKeys)
                         }}
@@ -514,33 +620,20 @@ class DeviceEventList extends Component {
                         }}
                         >确认所有消息</Button>
                     </div>
-
                     <div
                         className="flex"
+                        style={{
+                            minWidth: 810
+                        }}
                     >
                         <Select
                             value={this.state.filterType}
-                            style={{ width: 150 }}
+                            style={{ width: 180 }}
                             onChange={this.onTypeChange}
                         >
                             <Option value="">消息类型：全部</Option>
-                            <Option value="通讯">消息类型：通讯</Option>
-                            <Option value="数据">消息类型：数据</Option>
-                            <Option value="应用">消息类型：应用</Option>
-                            <Option value="系统">消息类型：系统</Option>
-                            <Option value="设备">消息类型：设备</Option>
-                        </Select>
-                        <span style={{padding: '0 3px'}} />
-                        <Select
-                            value={`${this.state.filterLevel}`}
-                            style={{ width: 130 }}
-                            onChange={this.onLevelChange}
-                        >
-                            <Option value="">等级：全部</Option>
-                            <Option value="1">等级：常规</Option>
-                            <Option value="2">等级：错误</Option>
-                            <Option value="3">等级：警告</Option>
-                            <Option value="99">等级：致命</Option>
+                            <Option value="Action">消息类型：设备操作</Option>
+                            <Option value="Status">消息类型：设备消息</Option>
                         </Select>
                         <span style={{padding: '0 3px'}} />
                         <Select
@@ -566,7 +659,9 @@ class DeviceEventList extends Component {
                             <Option value="168">时间：一周</Option>
                         </Select>
                         <span style={{padding: '0 3px'}} />
-                        <InputGroup compact>
+                        <InputGroup
+                            compact
+                        >
                             <Select
                                 defaultValue=""
                                 onChange={this.onFilterColumnChange}
@@ -590,6 +685,7 @@ class DeviceEventList extends Component {
                             onClick={this.refresh}
                         />
                     </div>
+
                 </div>
                 <Table
                     rowSelection={rowSelection}
@@ -602,7 +698,7 @@ class DeviceEventList extends Component {
                     rowClassName={this.setClassName} //表格行点击高亮
                     expandedRowRender={record => {
                         return (
-                            <SonTables
+                            <SonTable
                                 data={record}
                                 onConfirm={this.confMessage}
                             />
@@ -611,14 +707,14 @@ class DeviceEventList extends Component {
                     footer={() => {
                         return (
                             <div className="none">
-                            {'全部消息' + messageCount + '条，列表中未确认消息' + unconfirmed + '条，'}
-                            <span
-                                style={{color: 'blue', cursor: 'pointer'}}
-                                onClick={this.toggleMessage}
-                            >
-                                {showUnDisposed ? '查看所有' : '查看未确认'}
-                            </span>
-                        </div>
+                                {'全部消息' + messageCount + '条，列表中未确认消息' + unconfirmed + '条，'}
+                                <span
+                                    style={{color: 'blue', cursor: 'pointer'}}
+                                    onClick={this.toggleMessage}
+                                >
+                                    {showUnDisposed ? '查看所有' : '查看未确认'}
+                                </span>
+                            </div>
                         )
                     }}
                 />
@@ -626,4 +722,4 @@ class DeviceEventList extends Component {
         );
     }
 }
-export default DeviceEventList;
+export default PlatformEvents;

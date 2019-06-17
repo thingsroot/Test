@@ -11,7 +11,7 @@ const block = {
 const none = {
     display: 'none'
 };
-
+Link;
 class AppConfigSection extends Component {
     constructor (props) {
         super(props);
@@ -58,9 +58,21 @@ class AppConfigSection extends Component {
         })
     };
 
-    createNewTemplate = () => {
+    onCreateNewTemplate = () => {
         const w = window.open('about: blank');
         w.location.href = '/appdetails/' + this.props.app_info.name + '/new_template'
+    }
+    onViewTemplate = (conf, version) => {
+        const w = window.open('about: blank');
+        if (version !== undefined && version !== 0) {
+            w.location.href = '/template/' + this.props.app_info.name + '/' + conf + '/' + version
+        } else {
+            w.location.href = '/template/' + this.props.app_info.name + '/' + conf
+        }
+    }
+    onCloneTemplate = (conf, version) => {
+        const w = window.open('about: blank');
+        w.location.href = '/template/' + this.props.app_info.name + '/' + conf + '/' + version + '/clone'
     }
 
     handleCancelAddTempList = ()=>{
@@ -231,13 +243,13 @@ class AppConfigSection extends Component {
         const addTempLists = [
             {
                 title: '名称',
-                width: '15%',
+                width: '20%',
                 dataIndex: 'conf_name',
                 key: 'conf_name',
                 render: text => <span>{text}</span>
             }, {
                 title: '描述',
-                width: '25%',
+                width: '30%',
                 dataIndex: 'description',
                 key: 'description'
             }, {
@@ -252,27 +264,44 @@ class AppConfigSection extends Component {
                 dataIndex: 'latest_version'
             }, {
                 title: '操作',
-                width: '40%',
+                width: '25%',
                 render: (record) => (
-                    record.latest_version !== undefined ? (
+                    record.latest_version !== undefined && record.latest_version !== 0 ? (
                     <span>
-                        <Button>
+                        {/* <Button>
                             <Link to={`/template/${record.app}/${record.name}/${record.latest_version}`}> 查看 </Link>
-                        </Button>
-                        <span style={{padding: '0 2px'}}> </span>
+                        </Button> */}
+                        {/* <span style={{padding: '0 2px'}}> </span>
                         <Button>
                             <Link to={`/template/${record.app}/${record.name}/${record.latest_version}/clone`}> 克隆 </Link>
-                        </Button>
+                        </Button> */}
+                        <Button
+                            onClick={()=>{
+                                this.onViewTemplate(record.name, record.latest_version)
+                            }}
+                        > 查看 </Button>
+                        <Button
+                            onClick={()=>{
+                                this.onCloneTemplate(record.name, record.latest_version)
+                            }}
+                        > 克隆 </Button>
                         <span style={{padding: '0 2px'}}> </span>
                         <Button
                             type="primary"
                             onClick={()=>{
                                 this.onAddTemplate(config, record.name, record.conf_name, record.description, record.latest_version)
                             }}
-                        >
+                            >
                             添加此模板
                         </Button>
-                    </span>) : ''
+                    </span>) : (
+                    <span>
+                        <Button
+                            onClick={()=>{
+                                this.onViewTemplate(record.name)
+                            }}
+                        > 查看 </Button>
+                    </span>)
                 )
             }
         ]
@@ -299,7 +328,7 @@ class AppConfigSection extends Component {
                     visible={this.state.showTemplateSelection}
                     onOk={this.handleCancelAddTempList}
                     onCancel={this.handleCancelAddTempList}
-                    wrapClassName={'tableModal'}
+                    wrapClassName={'templatesModal'}
                     okText="确定"
                     cancelText="取消"
                 >
@@ -329,7 +358,7 @@ class AppConfigSection extends Component {
                         <span style={{padding: '0 2px'}}> </span>
                         <Button
                             type="primary"
-                            onClick={this.createNewTemplate}
+                            onClick={this.onCreateNewTemplate}
                         >
                             创建新模板
                         </Button>

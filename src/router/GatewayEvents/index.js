@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import DeviceEventList from '../../components/DeviceEventList'
 
 @withRouter
-class DeviceMessage extends Component {
+class GatewayEvents extends Component {
     state = {
         gateway: undefined,
         limitTime: 24
@@ -13,7 +13,7 @@ class DeviceMessage extends Component {
         //const pathname = this.props.location.pathname.toLowerCase();
         this.setState({
             gateway: this.props.match.params.gateway,
-            limitTime: this.props.match.params.time
+            limitTime: this.props.match.params.limitTime
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -36,4 +36,4 @@ class DeviceMessage extends Component {
         );
     }
 }
-export default DeviceMessage;
+export default GatewayEvents;

@@ -22,9 +22,11 @@ class MyTemplateDetails extends PureComponent {
     constructor () {
         super();
         this.state = {
+            app: '',
             conf: '',
             conf_info: {},
             show_version: 0,
+            action: '',
             content: '',  //数据原型
             csvData: '',  //csv数据
             versionList: [],   //版本号列表
@@ -37,16 +39,20 @@ class MyTemplateDetails extends PureComponent {
         }
     }
     componentDidMount () {
+        let app = this.props.match.params.app;
         let conf = this.props.match.params.name;
         let version = this.props.match.params.version
+        let action = this.props.match.params.action;
         if (version === undefined) {
             version = 0
         } else {
             version = Number(version) ? Number(version) : 0
         }
         this.setState({
+            app: app,
             conf: conf,
-            show_version: version
+            show_version: version,
+            action: action
         }, ()=>{
             this.fetchInfo();
         });

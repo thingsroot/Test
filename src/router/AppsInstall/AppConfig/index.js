@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import Inst from '../Inst';
 import {Button, Tabs, message} from 'antd';
+import {withRouter} from 'react-router-dom';
+import {inject, observer} from 'mobx-react';
+import http from '../../../utils/Server';
 import AppConfigSection from './section';
 import AceEditor from 'react-ace';
 import 'brace/mode/json';
 import 'brace/theme/monokai';
-import {withRouter} from 'react-router-dom';
-import {inject, observer} from 'mobx-react';
-import http from '../../../utils/Server';
+import './style.scss';
+
 const TabPane = Tabs.TabPane;
 
 const block = {
@@ -181,6 +183,9 @@ class AppConfig extends Component {
     refreshTemplateList = () => {
         this.setState({appTemplateList: []})
         let app = this.state.app_info.name
+        if (app === undefined) {
+            return
+        }
         http.get('/api/store_configurations_list?conf_type=Template&app=' + app)
         .then(res=>{
             let list = this.state.appTemplateList;

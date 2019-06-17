@@ -5,7 +5,7 @@ import { _getCookie, isAuthenticated, authenticateClear } from '../../utils/Sess
 import http  from '../../utils/Server';
 
 @withRouter
-class Headers extends PureComponent {
+class HeaderBar extends PureComponent {
     UNSAFE_componentWillReceiveProps () {
         if (!isAuthenticated()) {
             this.props.history.push('/login')
@@ -28,7 +28,6 @@ class Headers extends PureComponent {
                 <Menu.Item key="15"
                     style={{padding: 0, textAlign: 'center'}}
                 >
-                <span style={{padding: '5px 0'}} />
                     <Button type="danger"
                         block
                         onClick={()=>{
@@ -66,4 +65,4 @@ class Headers extends PureComponent {
         );
     }
 }
-export default Headers;
+export default HeaderBar;

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Icon, message } from 'antd';
+import { Table, Button, Icon, message, Tooltip } from 'antd';
 import http from '../../../utils/Server';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
@@ -29,6 +29,7 @@ class AppsList extends Component {
             data: [],
             pagination: {},
             loading: true,
+            forceRefreshEnable: true,
             configStore: new ConfigStore(),
             edit_app_info: {},
             edit_app_inst: '',
@@ -246,13 +247,22 @@ class AppsList extends Component {
                         )
                     }}
                 />
-                <Button
-                    onClick={()=>{
-                        this.forceRefreshAppList()
-                    }}
+                <Tooltip placement="topLeft"
+                    title="请求网关上送其最新的应用列表数据"
                 >
-                    <Icon type="sync"/>请求上传网关上传列表
-                </Button>
+                    <Button
+                        disabled={!this.state.forceRefreshEnable}
+                        onClick={()=>{
+                            this.setState({forceRefreshEnable: false})
+                            this.forceRefreshAppList()
+                            setTimeout(()=>{
+                                this.setState({forceRefreshEnable: true})
+                            }, 5000)
+                        }}
+                    >
+                        <Icon type="sync"/>请求网关应用列表
+                    </Button>
+                </Tooltip>
                 </div>
                 <div
                     className={show_app_config ? 'show' : 'hide'}

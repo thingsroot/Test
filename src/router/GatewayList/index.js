@@ -61,7 +61,7 @@ class MyGates extends Component {
                 title: '上线时间',
                 dataIndex: 'last_updated',
                 key: 'last_updated',
-                width: '180px',
+                width: '160px',
                 sorter: (a, b) => a.last_updated && b.last_updated && new Date(a.last_updated) - new Date(b.last_updated)
               }, {
                 title: '状态',
@@ -78,19 +78,19 @@ class MyGates extends Component {
                     }
                 }
               }, {
-                title: '应用数',
-                key: 'device_apps_num',
-                dataIndex: 'device_apps_num',
-                width: '70px'
-                }, {
                 title: '设备数',
                 key: 'device_devs_num',
                 dataIndex: 'device_devs_num',
-                width: '70px'
+                width: '65px'
+                }, {
+                title: '应用数',
+                key: 'device_apps_num',
+                dataIndex: 'device_apps_num',
+                width: '65px'
                 }, {
                 title: '操作',
                 key: 'action',
-                width: '23%',
+                width: '240px',
                 render: (text, record, props) => {
                     props;
                   return (
@@ -403,13 +403,12 @@ class MyGates extends Component {
                     style={{
                         display: 'flex',
                         position: 'absolute',
-                        right: 300,
+                        right: 240,
                         top: 0,
                         zIndex: 999,
                         lineHeight: '30px'
                     }}
                 >
-                    <span>搜索：</span>
                     <Search
                         placeholder="网关名称、描述、序列号"
                         onChange={this.search}
