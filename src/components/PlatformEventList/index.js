@@ -131,10 +131,11 @@ class PlatformEvents extends Component {
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        const {gateway} = nextProps
+        const {gateway, limitTime} = nextProps
         if (gateway !== this.state.gateway) {
             this.setState({
-                gateway: gateway
+                gateway: gateway,
+                limitTime: limitTime
             }, ()=>{
                 this.fetchAll()
             })
