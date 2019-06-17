@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import AceEditor from 'react-ace';
+import 'brace/ext/language_tools';
+import 'brace/ext/searchbox';
 import {Icon, Input, message, Modal, Select} from 'antd';
 import http from '../../../utils/Server';
 import 'brace/mode/javascript';//
@@ -18,9 +20,8 @@ import 'brace/mode/json';//
 import 'brace/mode/css';//
 import 'brace/mode/typescript';
 import 'brace/theme/tomorrow';//
-import 'brace/theme/monokai';
 
-const confirm = Modal.confirm
+const confirm = Modal.confirm;
 const Option = Select.Option;
 const { TextArea } = Input;
 
@@ -44,7 +45,13 @@ class MyCode extends Component {
             versionList: [],
             showReleaseModal: false,
             newVersion: '',
-            comment: ''
+            comment: '',
+            codeEditorAllList: [
+                'one',
+                'two',
+                'three',
+                'four'
+            ]
         }
     }
     componentDidMount () {
@@ -56,7 +63,6 @@ class MyCode extends Component {
             changed: false,
             readOnly: true
         }, () => {
-            console.log(this.props.filePath)
             this.getContent();
             this.loadVersionList()
         })
@@ -74,7 +80,6 @@ class MyCode extends Component {
                 changed: false,
                 readOnly: true
             }, () => {
-                console.log(this.state.filePath)
                 this.getContent();
             })
         }
@@ -162,7 +167,6 @@ class MyCode extends Component {
     }
     //获取文件内容
     getContent = ()=>{
-        console.log(this.state.filePath);
         this.setState({readOnly: true})
         if (this.state.fileType === 'file') {
             http.get('/apis/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_content&id=' + this.state.filePath)
@@ -174,8 +178,6 @@ class MyCode extends Component {
                         changed: false,
                         readOnly: false
                     }, ()=>{
-                        console.log(this.state.filePath, this.state.fileType, this.state.mode)
-                        //console.log(this.state.editorContent)
                         this.autoSave()
                     })
                 })
@@ -370,18 +372,19 @@ class MyCode extends Component {
                         this.state.editorContent !== '' ? <AceEditor
                             mode={this.state.mode}
                             readOnly={this.state.readOnly}
-                            theme="monokai"
+                            theme="tomorrow"
                             name="app_code_editor"
                             onChange={this.onChange}
                             fontSize={fontSize}
                             showPrintMargin
                             showGutter
                             highlightActiveLine
+                            enableSnippets
                             value={this.state.editorContent}
-                            style={{width: '100%'}}
+                            style={{width: '100%', height: '75vh'}}
                             setOptions={{
                                 enableBasicAutocompletion: false,
-                                enableLiveAutocompletion: false,
+                                enableLiveAutocompletion: true,
                                 enableSnippets: false,
                                 showLineNumbers: true,
                                 tabSize: 4

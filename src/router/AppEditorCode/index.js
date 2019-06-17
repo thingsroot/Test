@@ -22,7 +22,7 @@ class AppEditorCode extends Component {
             appName: '',
             version: '',
             selectedFile: 'version',
-            selectedFileType: '',
+            selectedFileType: 'file',
             // fileNodes: [],
             currentNode: 1
         }
