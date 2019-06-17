@@ -228,7 +228,7 @@ class Action extends Component {
                         应用开发者：{record.data && record.data.owner || this.props.store.session.companies}
                     </div>
                     {
-                        record.data.fork_from ? (
+                        record.data && record.data.fork_from ? (
                         <div>
                             源自应用：{record.data && record.data.fork_from}
                             <span style={{color: 'blue', padding: '0 5px'}} >
@@ -247,7 +247,7 @@ class Action extends Component {
                         ) : null
                     }
                     {
-                        record.data.fork_from ? (
+                        record.data && record.data.fork_from ? (
                         <div>
                             源自版本：{record.data && record.data.fork_version}
                         </div>
