@@ -64,15 +64,17 @@ class DevicesList extends Component {
         gateway: this.props.gateway
     }
     componentDidMount (){
+        const { gatewayInfo } = this.props.store;
         this.setState({gateway: this.props.gateway}, ()=>{
-            // this.timer = setInterval(()=>{
-            //     this.getData();
-            // }, 3000)
-            this.setData(this.props.store.gatewayInfo.devices)
-            if (this.props.store.gatewayInfo.devices_count !== 0) {
+            this.setData(gatewayInfo.devices)
+            gatewayInfo.setDevicesIsShow(true)
+            if (gatewayInfo.devices_count !== 0) {
                 this.setState({loading: false})
             }
             this.getData()
+            this.timer = setInterval(()=>{
+                this.getData();
+            }, 3000)
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -86,7 +88,9 @@ class DevicesList extends Component {
         }
     }
     componentWillUnmount (){
-        //clearInterval(this.timer)
+        const { gatewayInfo } = this.props.store;
+        clearInterval(this.timer)
+        gatewayInfo.setDevicesIsShow(false)
     }
     getData (){
         http.get('/api/gateways_dev_list?gateway=' + this.state.gateway).then(res=>{

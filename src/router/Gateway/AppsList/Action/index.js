@@ -254,7 +254,7 @@ class Action extends Component {
                     </Button>
                     <Button
                         onClick={this.onDebug.bind(this, record)}
-                        disabled={this.state.running_action || !actionEnable}
+                        disabled={this.state.running_action || !actionEnable || record.islocal}
                     >
                         应用调试
                     </Button>

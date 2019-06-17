@@ -73,8 +73,10 @@ class GatewayInfo {
 
     @observable devices = []
     @observable devices_count = 0
+    @observable devices_is_show = false
     @observable apps = {}
     @observable apps_count = 0
+    @observable apps_is_show = false
 
     @observable actionEnable = false
 
@@ -100,9 +102,15 @@ class GatewayInfo {
         this.devices = value
         this.devices_count = value.length
     }
+    @action setDevicesIsShow (value) {
+        this.devices_is_show = value
+    }
     @action setApps (value) {
         this.apps = value
         this.apps_count = Object.keys(value).length
+    }
+    @action setAppsIsShow (value) {
+        this.apps_is_show = value
     }
     @action setDeviceAddress (value) {
         this.address = value
