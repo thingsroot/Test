@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {inject, observer} from 'mobx-react';
 import {Link} from 'react-router-dom';
 import {Button, Checkbox, Input, Modal, Select, Table, Divider} from 'antd';
 import EditableTable from '../../editorTable';
@@ -12,6 +13,9 @@ const none = {
     display: 'none'
 };
 Link;
+
+@inject('store')
+@observer
 class AppConfigSection extends Component {
     constructor (props) {
         super(props);
@@ -280,20 +284,22 @@ class AppConfigSection extends Component {
                                 this.onViewTemplate(record.name, record.latest_version)
                             }}
                         > 查看 </Button>
-                        <Button
-                            onClick={()=>{
-                                this.onCloneTemplate(record.name, record.latest_version)
-                            }}
-                        > 克隆 </Button>
-                        <span style={{padding: '0 2px'}}> </span>
+                        <span style={{padding: '0 1px'}}> </span>
+                        {
+                            record.owner !== this.props.store.session.user_id ? (
+                            <Button
+                                onClick={()=>{
+                                    this.onCloneTemplate(record.name, record.latest_version)
+                                }}
+                            > 克隆 </Button> ) : null
+                        }
+                        <span style={{padding: '0 1px'}}> </span>
                         <Button
                             type="primary"
                             onClick={()=>{
                                 this.onAddTemplate(config, record.name, record.conf_name, record.description, record.latest_version)
                             }}
-                            >
-                            添加此模板
-                        </Button>
+                        > 添加 </Button>
                     </span>) : (
                     <span>
                         <Button
