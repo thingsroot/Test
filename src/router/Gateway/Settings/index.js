@@ -36,6 +36,9 @@ class GatewaySettings extends Component {
             loading: true
         }, ()=> {
             this.getAllData();
+            this.timer = setInterval(() => {
+                this.fetchUpdate()
+            }, 10000);
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -51,11 +54,15 @@ class GatewaySettings extends Component {
     componentWillUnmount () {
         window.removeEventListener('resize', this.resize, 20)
         clearInterval(this.timer)
-        clearInterval(this.timer1)
     }
     resize () {
         this.myFaultTypeChart1 && this.myFaultTypeChart1.resize();
         this.myFaultTypeChart2 && this.myFaultTypeChart2.resize();
+    }
+    fetchUpdate () {
+        this.fetchFreeIOEVersion()
+        this.fetchSkynetVersion()
+        this.fetchCharts()
     }
     fetchFreeIOEVersion () {
         const { gatewayInfo } = this.props.store;
@@ -303,14 +310,18 @@ class GatewaySettings extends Component {
                         gateway={this.state.gateway}
                         refreshGatewayData={this.fetchGatewayData}
                         onClose={()=>{
-                            this.setState({showEdit: false})
+                            this.setState({showEdit: false}, ()=>{
+                                this.fetchUpdate()
+                            })
                         }}
                     />
             </div>
                 <div className={showUpgrade && !showEdit ? 'upgrade show' : 'upgrade hide'}>
                     <Button
                         onClick={()=>{
-                            this.setState({showUpgrade: false})
+                            this.setState({showUpgrade: false}, ()=>{
+                                this.fetchUpdate()
+                            })
                         }}
                     >X</Button>
                     <Upgrade
