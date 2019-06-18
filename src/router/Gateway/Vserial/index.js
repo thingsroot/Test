@@ -315,6 +315,7 @@ class Vserial extends Component {
                             </div>
                         </div>
                         <Table
+                            rowKey="serialPort"
                             columns={cloums}
                             dataSource={data}
                             pagination={false}

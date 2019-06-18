@@ -54,7 +54,7 @@ class MyGatesDevices extends Component {
                 this.props.store.timer.setGateStatusLast(0)
                 this.fetch()
                 clearInterval(this.timer)
-                console.log('ClearInterval', this.timer)
+                //console.log('ClearInterval', this.timer)
                 this.timer = setInterval(() => this.fetch(), 10000)
             })
         }
@@ -63,7 +63,7 @@ class MyGatesDevices extends Component {
         clearInterval(this.timer)
     }
     fetch = () => {
-        console.log(new Date())
+        //console.log(new Date())
         const {gateway} = this.state;
         if (gateway === undefined || gateway === '') {
             return;

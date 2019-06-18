@@ -451,7 +451,7 @@ class PlatformEvents extends Component {
             if (res.data.ok === true) {
                 let sourceData = res.data.data.list
                 message_count = res.data.data.count
-                console.log(sourceData)
+                //console.log(sourceData)
                 sourceData && sourceData.length > 0 && sourceData.map((v)=>{
                     if (v.disposed === 0) {
                         unconfirmed++

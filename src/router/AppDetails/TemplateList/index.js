@@ -321,6 +321,7 @@ class TemplateList extends Component {
                         <Table
                             style={myList === undefined || myList.length === 0 ? none : block}
                             columns={columns}
+                            rowKey="name"
                             dataSource={myList}
                         >
 
@@ -339,6 +340,7 @@ class TemplateList extends Component {
                         <Table
                             style={templateList === undefined || templateList.length === 0 ? none : block}
                             columns={columns2}
+                            rowKey="name"
                             dataSource={templateList}
                         >
 
