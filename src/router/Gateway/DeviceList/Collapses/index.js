@@ -24,7 +24,7 @@ class Collapses extends Component {
                     >
                         <InputList
                             inputs={this.props.inputs}
-                            sn={this.props.meta.Gate_Sn}
+                            sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
                         />
                     </Panel>
@@ -35,7 +35,7 @@ class Collapses extends Component {
                     >
                         <DevicesOutputs
                             outputs={this.props.outputs}
-                            sn={this.props.meta.Gate_Sn}
+                            sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
                         />
                     </Panel>
@@ -46,7 +46,7 @@ class Collapses extends Component {
                     >
                         <DevicesCommands
                             commands={this.props.commands}
-                            sn={this.props.meta.Gate_Sn}
+                            sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
                         />
                     </Panel>

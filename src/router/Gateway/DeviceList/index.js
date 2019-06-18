@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import http from '../../../utils/Server';
-import { Table, message } from 'antd';
+import { Table, message, Tooltip, Button, Icon } from 'antd';
 import { inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import Collapses from './Collapses';
@@ -40,7 +40,7 @@ const columns = [{
     //     return (<span>
     //       <Link
     //           disabled={record.set_data ? false : true}
-    //           to={`/MyGatesDevicesOutputs/${record.Gate_Sn}/${record.sn}`}
+    //           to={`/MyGatesDevicesOutputs/${record.gateway}/${record.sn}`}
     //           key="1"
     //       >数据下置</Link>
     //     </span>)
@@ -61,6 +61,7 @@ class DevicesList extends Component {
     state = {
         data: [],
         loading: true,
+        uploadOneShort: false,
         gateway: this.props.gateway
     }
     componentDidMount (){
@@ -75,21 +76,31 @@ class DevicesList extends Component {
             this.timer = setInterval(()=>{
                 this.getData();
             }, 3000)
+
+            if (!gatewayInfo.data.data_upload) {
+                message.info('网关未开启数据上送，如需查看数据请手工开启临时数据上传!')
+            }
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (nextProps.gateway !== this.props.gateway){
+        if (nextProps.gateway !== this.state.gateway){
             this.setState({
                 gateway: nextProps.gateway,
                 loading: true
             }, ()=>{
                 this.getData();
+                const { gatewayInfo } = this.props.store;
+                if (!gatewayInfo.data.data_upload && this.state.uploadOneShort) {
+                    message.info('网关未开启数据上送，临时开启中!')
+                    this.enableDataUploadOneShort(60)
+                }
             });
         }
     }
     componentWillUnmount (){
         const { gatewayInfo } = this.props.store;
         clearInterval(this.timer)
+        clearInterval(this.one_short_timer)
         gatewayInfo.setDevicesIsShow(false)
     }
     getData (){
@@ -111,7 +122,7 @@ class DevicesList extends Component {
                 if (item.meta.outputs > 0){
                     item.meta.set_data = true
                 }
-                item.meta.Gate_Sn = this.state.gateway;
+                item.meta.gateway = this.state.gateway;
                 data.push(item);
             }))
         }
@@ -119,8 +130,27 @@ class DevicesList extends Component {
             data: data
         })
     }
+    enableDataUploadOneShort (duration) {
+        const { gatewayInfo } = this.props.store;
+        const { gateway } = this.state;
+        if (!gatewayInfo.data.data_upload) {
+            let params = {
+                name: this.state.gateway,
+                duration: duration,
+                id: `enable_data_one_short/${gateway}/${new Date() * 1}`
+            }
+            http.post('/api/gateways_enable_data_one_short', params).then(res => {
+                if (!res.ok) {
+                    message.error('临时数据上送指令失败:' + res.error)
+                }
+            }).catch( err => {
+                message.error('临时数据上送指令失败:' + err)
+            })
+        }
+    }
     render () {
         let { data, loading } = this.state;
+        const { gatewayInfo } = this.props.store;
         return (
             <div>
                 <Table
@@ -140,6 +170,33 @@ class DevicesList extends Component {
                     expandedRowRender={Collapses}
                     expandRowByClick
                 />
+
+                {
+                    gatewayInfo.data.data_upload
+                    ? null
+                    : <Tooltip placement="topLeft"
+                        title="开启网关数据临时上传"
+                      >
+                        <Button
+                            onClick={()=>{
+                                this.setState({uploadOneShort: !this.state.uploadOneShort}, ()=>{
+                                    if (!this.state.uploadOneShort){
+                                        clearInterval(this.one_short_timer)
+                                        this.enableDataUploadOneShort(0)
+                                    } else {
+                                        this.one_short_timer = setInterval(()=>{
+                                            this.enableDataUploadOneShort(60)
+                                        }, 55000)
+                                    }
+                                })
+                            }}
+                        >
+                            <Icon type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
+                                theme="filled"
+                            />{this.state.uploadOneShort ? '停止上传' : '开启上传'}
+                        </Button>
+                    </Tooltip>
+                }
             </div>
         );
     }
