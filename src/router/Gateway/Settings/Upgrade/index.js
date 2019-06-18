@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer} from 'mobx-react';
-import { Card, Button, Icon } from 'antd';
+import { Button, Icon, Timeline, Divider, Tooltip } from 'antd';
 
 
 @inject('store')
@@ -8,22 +8,25 @@ import { Card, Button, Icon } from 'antd';
 class GatewayUpgrade extends Component {
     render () {
         const { actionEnable, data } = this.props.store.gatewayInfo;
-        const { freeioe_latest_version, skynet_latest_version, title, upgrading, version_data, skynet_version_data, onUpgrade } = this.props;
+        const { freeioe_latest_version, skynet_latest_version, upgrading, version_data, skynet_version_data, onUpgrade } = this.props;
         return (
             <div>
                 <div className="title">
-                    <p>固件升级</p>
+                    <h2>固件升级</h2>
                     <div>
                         <div className="Icon">
                             <Icon type="setting" />
                         </div>
                         <div>
-                            <h3>FreeIOE</h3>
+                            <h3>业务软件(FreeIOE)</h3>
                             <p>
                                 <span>
                                 {data.version} -> {freeioe_latest_version}
                                 </span>
                             </p>
+                            <span>
+                                {data.version === freeioe_latest_version ? '已经是最新版' : '可升级到最新版'}
+                            </span>
                         </div>
                         {
                             skynet_latest_version && data.skynet_version && data.skynet_version >= skynet_latest_version
@@ -35,19 +38,17 @@ class GatewayUpgrade extends Component {
                                     <Icon type="setting" />
                                 </div>
                                 <div>
-                                    <h3>openwrt x86_64_skynet</h3>
+                                    <Tooltip placement="bottom"
+                                        title={data.platform}
+                                    > <h3>核心软件(SKYNET)</h3> </Tooltip>
                                     <p>
                                         <span>
                                         {data.skynet_version} -> {skynet_latest_version}
                                         </span>
                                     </p>
                                     <span>
-                                    {title === 'FreeIOE'
-                                        ? data.version === freeioe_latest_version
-                                            ? '已经是最新版' : '可升级到最新版'
-                                        : data.skynet_version === skynet_latest_version
-                                            ? '已经是最新版' : '可升级到最新版'
-                                    }</span>
+                                    {data.skynet_version === skynet_latest_version ? '已经是最新版' : '可升级到最新版'}
+                                    </span>
                                 </div>
                             </div>
                         }
@@ -61,46 +62,51 @@ class GatewayUpgrade extends Component {
                           >升级更新</Button> : <Button>检查更新</Button>
                     }
                 </div>
+                <Divider/>
                 <div style={{display: 'flex', flexWrap: 'wrap'}}>
                     <div style={{width: '50%', padding: 10, boxSizing: 'border-box'}}>
-                    <h1>FreeIOE</h1>
+                    <h3>业务软件更新历史</h3>
+                        <Divider/>
+                        <Timeline>
                         {
                             version_data && version_data.length > 0 && version_data.map((v, i)=>{
                                 return (
-                                    <Card
-                                        title={`应用名称：${v.app_name}`}
-                                        key={i}
-                                        style={{marginTop: 10, lineHeight: '30px'}}
-                                    >
-                                        <p>版本号：{v.version}</p>
-                                        <p>更新时间：{v.modified.split('.')[0]}</p>
-                                        <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, '<br />') }}></p>
-                                    </Card>
+                                <Timeline.Item color={v.beta === 0 ? 'green' : 'red'}
+                                    key={i}
+                                >
+                                    <p>{v.modified.split('.')[0]}</p>
+                                    <p>V{v.version}</p>
+                                    <p dangerouslySetInnerHTML={{ __html: v.comment.replace(/\n/g, '<br />') }}></p>
+                                </Timeline.Item>
                                 )
                             })
                         }
+                        </Timeline>
                     </div>
                     <div style={{width: '50%', padding: 10}}>
                     {
                         data.skynet_version < skynet_latest_version
-                        ? <h1>{data.platform}_skynet</h1>
+                        ? <Tooltip placement="bottom"
+                            title={data.platform}
+                          > <h3>核心软件更新历史</h3> </Tooltip>
                         : ''
                     }
+                        <Divider/>
+                        <Timeline>
                         {
                             skynet_version_data && skynet_version_data.length > 0 && skynet_version_data.map((v, i)=>{
                                 return (
-                                    <Card
-                                        title={`应用名称：${v.app_name}`}
+                                    <Timeline.Item color={v.beta === 0 ? 'green' : 'red'}
                                         key={i}
-                                        style={{marginTop: 10, lineHeight: '30px'}}
                                     >
-                                        <p>版本号：{v.version}</p>
-                                        <p>更新时间：{v.modified.split('.')[0]}</p>
-                                        <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, '<br />') }}></p>
-                                    </Card>
-                                )
+                                        <p>{v.modified.split('.')[0]}</p>
+                                        <p>V{v.version}</p>
+                                        <p dangerouslySetInnerHTML={{ __html: v.comment.replace(/\n/g, '<br />') }}></p>
+                                    </Timeline.Item>
+                                    )
                             })
                         }
+                        </Timeline>
                     </div>
                 </div>
             </div>
