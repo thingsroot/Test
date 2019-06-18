@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Switch, Popconfirm, message, Modal, Input } from 'antd';
+import { Button, Switch, Popconfirm, message, Modal, Input, Icon } from 'antd';
 import http from '../../../../utils/Server';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import GatesAppsUpgrade from '../Upgrade';
 let timer;
@@ -177,10 +177,10 @@ class Action extends Component {
         if (record.data){
             const {gatewayInfo} = this.props.store
             let user_id = this.props.store.session.user_id
-            let app = record.data.data.name
-            let app_name = record.data.data.app_name
+            let app = record.data.name
+            let app_name = record.data.app_name
             let app_inst = record.inst_name
-            if (record.data.data.owner === user_id){
+            if (record.data.owner === user_id){
                 this.props.history.push(`/appeditorcode/${app}/${app_name}/${gatewayInfo.sn}/${app_inst}`);
                 this.setState({appdebug: false})
             } else {
@@ -211,14 +211,48 @@ class Action extends Component {
             <div style={{position: 'relative', paddingBottom: 50}}>
                 <div style={{lineHeight: '30px', paddingLeft: 20}}>
                     <div>
-                        应用ID: {record.data && record.data.data.name || '本地应用'}
+                        应用ID: {record.data && record.data.name || '本地应用'}
+                        {
+                            record.data && record.data.name
+                            ? <span style={{color: 'blue', padding: '0 5px'}} >
+                                <Link to={`/appdetails/${record.data.name}`}>
+                                    查看详情
+                                </Link>
+                            </span> : null
+                        }
                     </div>
                     <div>
-                        应用名称: {record.data && record.data.data.app_name || '本地应用'}
+                        应用名称: {record.data && record.data.app_name || '本地应用'}
                     </div>
                     <div>
-                        应用开发者：{record.data && record.data.data.owner || this.props.store.session.companies}
+                        应用开发者：{record.data && record.data.owner || this.props.store.session.companies}
                     </div>
+                    {
+                        record.data && record.data.fork_from ? (
+                        <div>
+                            源自应用：{record.data && record.data.fork_from}
+                            <span style={{color: 'blue', padding: '0 5px'}} >
+                                <Link to={`/appdetails/${record.data.name}`}>
+                                    查看详情
+                                </Link>
+                            </span>
+                            <span style={{color: 'orange', padding: '0 5px'}}
+                                onClick={()=>{
+                                    message.info('功能开发中.....')
+                                }}
+                            >
+                                使用源应用替换 <Icon type="rollback"/>
+                            </span>
+                        </div>
+                        ) : null
+                    }
+                    {
+                        record.data && record.data.fork_from ? (
+                        <div>
+                            源自版本：{record.data && record.data.fork_version}
+                        </div>
+                        ) : null
+                    }
                 </div>
                 <div style={{display: 'flex', justifyContent: 'space-around', marginTop: 20, minWidth: 840, position: 'absolute', right: 20, bottom: 15}}>
                     <div style={{paddingTop: 5}}>
@@ -254,7 +288,7 @@ class Action extends Component {
                     </Button>
                     <Button
                         onClick={this.onDebug.bind(this, record)}
-                        disabled={this.state.running_action || !actionEnable || record.islocal}
+                        disabled={this.state.running_action || !actionEnable || !(record.data && record.data.name)}
                     >
                         应用调试
                     </Button>
@@ -346,7 +380,7 @@ class Action extends Component {
                             this.setState({appdebug: false, running_action: false})
                         }}
                     >
-                        您不是{record.data && record.data.data.app_name}的应用所有者，如要继续远程调试，会将此应用当前版本克隆一份到您的账户下，而且在代码调试页面编辑的是您克隆的代码，在代码调试页面下载应用会将克隆到你名下的应用覆盖网关中的应用！
+                        您不是{record.data && record.data.app_name}的应用所有者，如要继续远程调试，会将此应用当前版本克隆一份到您的账户下，而且在代码调试页面编辑的是您克隆的代码，在代码调试页面下载应用会将克隆到你名下的应用覆盖网关中的应用！
                         如要继续，点击"继续"按钮！
                     </Modal>
                     <Modal

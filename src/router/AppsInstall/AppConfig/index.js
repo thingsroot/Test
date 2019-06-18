@@ -190,7 +190,8 @@ class AppConfig extends Component {
         .then(res=>{
             let list = this.state.appTemplateList;
             res.data && res.data.length > 0 && res.data.map((tp)=>{
-                if (undefined === list.find(item => item.name === tp.name) ) {
+                if (undefined === list.find(item => item.name === tp.name) &&
+                    tp.latest_version !== undefined && tp.latest_version !== 0 ) {
                     list.push(tp)
                 }
             });

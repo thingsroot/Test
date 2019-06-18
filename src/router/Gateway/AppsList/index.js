@@ -38,7 +38,7 @@ class AppsList extends Component {
             url: window.location.pathname,
             columns: [{
                 title: '',
-                dataIndex: 'data.data.icon_image',
+                dataIndex: 'data.icon_image',
                 key: 'img',
                 width: '100px',
                 render: (record)=>{
@@ -75,6 +75,12 @@ class AppsList extends Component {
                             return (
                                 <span style={{color: 'blue'}}>
                                   {props} <Icon type="arrow-up"/>
+                                </span>
+                            )
+                        } else if (record.islocal === 1) {
+                            return (
+                                <span style={{color: 'orange'}}>
+                                  {props} <Icon type="edit"/>
                                 </span>
                             )
                         } else {
@@ -238,7 +244,6 @@ class AppsList extends Component {
                     pagination={pagination}
                     loading={loading}
                     onChange={this.handleTableChange}
-                    bordered
                     expandRowByClick
                     expandedRowRender={(record) => {
                         return (

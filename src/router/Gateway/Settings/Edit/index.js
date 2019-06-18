@@ -301,7 +301,7 @@ class GatewaySettingsEdit extends Component {
                             disabled={!gatewayInfo.actionEnable}
                             gateway={gateway}
                             onChange={(value, onResult)=>{
-                                this.onChangeSetting('event_upload', value).then((result) => {
+                                this.onChangeEventUpload(value).then((result) => {
                                     onResult(result)
                                 })
                             }}
