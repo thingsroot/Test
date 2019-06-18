@@ -388,6 +388,10 @@ class Action extends Component {
                         confirmLoading={setNameConfirmLoading}
                         title="更改实例名"
                         onOk={()=>{
+                            if (nameValue === undefined || nameValue === record.inst_name) {
+                                message.error('实例名未修改！')
+                                return
+                            }
                             this.setState({setNameConfirmLoading: true})
                             http.post('/api/gateways_applications_rename', {
                                 gateway: this.props.match.params.sn,

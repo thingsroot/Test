@@ -96,7 +96,7 @@ class MyTree extends Component {
         })
     }
 
-    componentWillReceiveProps (nextProps) {
+    UNSAFE_componentWillReceiveProps (nextProps) {
         if (this.state.app !== nextProps.app) {
             this.setState({
                 app: nextProps.app,
@@ -586,20 +586,20 @@ class MyTree extends Component {
                 <div>
                     {
                         root.length > 0
-                            ? <Tree
-                                showIcon
-                                // draggable
-                                // blockNode
-                                // onDragEnter={this.onDragEnter}
-                                // onDrop={this.onDrop}
-                                multiple={false}
-                                onExpand={this.onExpand}
-                                expandedKeys={this.state.expandedKeys}
-                                onSelect={this.onSelect}
-                                selectedKeys={selectedKeys}
-                            >
-                                {this.renderTreeNodes(root)}
-                            </Tree> : ''
+                        ? <Tree
+                            showIcon
+                            // draggable
+                            // blockNode
+                            // onDragEnter={this.onDragEnter}
+                            // onDrop={this.onDrop}
+                            multiple={false}
+                            onExpand={this.onExpand}
+                            expandedKeys={this.state.expandedKeys}
+                            onSelect={this.onSelect}
+                            selectedKeys={selectedKeys}
+                          >
+                            {this.renderTreeNodes(root)}
+                        </Tree> : ''
                     }
                 </div>
                 <Modal

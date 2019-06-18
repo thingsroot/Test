@@ -447,7 +447,8 @@ class MyCode extends Component {
                 </div>
                 <div className="myCode">
                     {
-                        this.state.editorContent !== '' ? <AceEditor
+                        this.state.editorContent !== ''
+                        ? <AceEditor
                             id="editor"
                             ref="editor"
                             mode={this.state.mode}
@@ -469,7 +470,7 @@ class MyCode extends Component {
                                 showLineNumbers: true,
                                 tabSize: 4
                             }}
-                        />
+                          />
                         : ''
                     }
                 </div>
