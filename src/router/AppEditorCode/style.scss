@@ -1,5 +1,4 @@
 .appEditorCode{
-  margin-top: -20px;
   .iconGroup{
     width: 100%;
     height: 40px;
@@ -19,9 +18,9 @@
     position: relative;
   }
   .fileTree{
-    width: 240px;
+    width: 260px;
     position: absolute;
-    left: -24px;
+    left: 0;
     top: 0;
     bottom: 0;
     overflow-y: auto;
@@ -29,9 +28,9 @@
   .codeEditor{
     position: absolute;
     top: 0;
-    right: -24px;
+    right: 0;
     bottom: 0;
-    left: 214px;
+    left: 234px;
   }
   .myCode{
     height: 100%;

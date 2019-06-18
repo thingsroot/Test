@@ -49,12 +49,7 @@ class MyCode extends Component {
             showReleaseModal: false,
             newVersion: '',
             comment: '',
-            codeEditorAllList: [
-                'one',
-                'two',
-                'three',
-                'four'
-            ]
+            deskHeight: document.body.clientHeight * 0.7
         }
     }
     componentDidMount () {
@@ -72,7 +67,7 @@ class MyCode extends Component {
             this.loadVersionList()
         })
         document.addEventListener('keydown', this.onKeyDown);
-        window.addEventListener('resize', this.resize);
+        window.addEventListener('resize', this.handleSize);
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (this.state.app !== nextProps.app ||
@@ -101,10 +96,7 @@ class MyCode extends Component {
             clearTimeout(this.timer)
         }
         document.removeEventListener('keydown', this.onKeyDown)
-    }
-
-    resize = ()=>{
-        this.refs.editor.resize()
+        window.removeEventListener('resize', this.handleSize);
     }
 
     onKeyDown = (e)=>{
@@ -116,6 +108,12 @@ class MyCode extends Component {
                 this.saveFile()
             }
         }
+    }
+
+    handleSize = () => {
+        this.setState({
+            deskHeight: document.body.clientHeight * 0.7
+        });
     }
 
     getMode () {
@@ -450,6 +448,8 @@ class MyCode extends Component {
                 <div className="myCode">
                     {
                         this.state.editorContent !== '' ? <AceEditor
+                            id="editor"
+                            ref="editor"
                             mode={this.state.mode}
                             readOnly={this.state.readOnly}
                             theme="monokai"
@@ -461,7 +461,7 @@ class MyCode extends Component {
                             highlightActiveLine
                             enableSnippets
                             value={this.state.editorContent}
-                            style={{width: '100%', height: '70vh'}}
+                            style={{width: '100%', height: this.state.deskHeight}}
                             setOptions={{
                                 enableBasicAutocompletion: false,
                                 enableLiveAutocompletion: true,

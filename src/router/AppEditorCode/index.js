@@ -171,7 +171,10 @@ class AppEditorCode extends Component {
             {
                 gateway !== undefined ? <GatewayStatus gateway={gateway}/> : ''
             }
-            <div className="appEditorCode">
+            <div
+                className="appEditorCode"
+                style={{marginTop: gateway !== undefined ? '0' : '-20px'}}
+            >
                 <div className="main">
                     <FileTree
                         app={app}
