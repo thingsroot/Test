@@ -182,7 +182,7 @@ class AppConfig extends Component {
 
     refreshTemplateList = () => {
         this.setState({appTemplateList: []})
-        let app = this.state.app_info.name
+        let app = this.state.app_info ? this.state.app_info.name : undefined
         if (app === undefined) {
             return
         }
