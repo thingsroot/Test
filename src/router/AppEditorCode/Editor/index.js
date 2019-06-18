@@ -49,7 +49,7 @@ class MyCode extends Component {
             showReleaseModal: false,
             newVersion: '',
             comment: '',
-            deskHeight: document.body.clientHeight * 0.7
+            deskHeight: document.body.clientHeight * 0.8
         }
     }
     componentDidMount () {
@@ -112,7 +112,7 @@ class MyCode extends Component {
 
     handleSize = () => {
         this.setState({
-            deskHeight: document.body.clientHeight * 0.7
+            deskHeight: document.body.clientHeight * 0.8
         });
     }
 
@@ -461,7 +461,7 @@ class MyCode extends Component {
                             highlightActiveLine
                             enableSnippets
                             value={this.state.editorContent}
-                            style={{width: '100%', height: this.state.deskHeight}}
+                            style={{width: '100%', height: this.state.deskHeight, minHeight: 600}}
                             setOptions={{
                                 enableBasicAutocompletion: false,
                                 enableLiveAutocompletion: true,
