@@ -27,6 +27,10 @@ export function isAuthenticated () {
 export function authenticateClear () {
     let cookie = new Cookie(LOGIN_COOKIE_NAME)
     cookie.remove()
+    let sid = new Cookie('sid')
+    sid.remove()
+    let user_id = new Cookie('user_id')
+    user_id.remove()
 }
 
 export function authenticateSuccess (token) {
