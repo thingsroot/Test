@@ -149,12 +149,12 @@ class ContentMain extends Component {
                     title={'平台消息'}
                 />
                 <PrivateRoute
-                    path="/gatewayevents/:limitTime"
+                    path="/gatewayevents/:limitTime?"
                     component={DeviceEvents}
                     title={'设备消息'}
                 />
                 <PrivateRoute
-                    path="/gatewayevent/:gateway/:limitTime"
+                    path="/gatewayevent/:gateway/:limitTime?"
                     component={DeviceEvents}
                     title={'设备消息'}
                 />
