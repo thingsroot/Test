@@ -222,6 +222,42 @@ class GatewaySettings extends Component {
         })
         this.fetchCharts()
     }
+    onGatewayUpgrade () {
+        const { gatewayInfo } = this.props.store;
+        const { freeioe_latest_version, skynet_latest_version } = this.state;
+        this.setState({upgrading: true})
+        const data = gatewayInfo.data && gatewayInfo.data.skynet_version < skynet_latest_version
+        ? {
+            name: gatewayInfo.sn,
+            skynet_version: skynet_latest_version,
+            version: freeioe_latest_version,
+            no_ack: 1,
+            id: `sys_upgrade/${gatewayInfo.sn}/${new Date() * 1}`
+        }
+        : {
+            name: gatewayInfo.sn,
+            version: freeioe_latest_version,
+            no_ack: 1,
+            id: `sys_upgrade/${gatewayInfo.sn}/${new Date() * 1}`
+        }
+        http.post('/api/gateways_upgrade', data).then(res=>{
+            if (res.ok) {
+                this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 30000,  (result)=> {
+                    if (result.ok){
+                        this.setState({showUpgrade: false})
+                    } else {
+                        this.setState({upgrading: false})
+                    }
+                })
+            } else {
+                message.error('网关固件升级失败！ 错误:' + res.error)
+                this.setState({upgrading: false})
+            }
+        }).catch((err)=>{
+            message.error('网关固件升级失败！ 错误:' + err)
+            this.setState({upgrading: false})
+        })
+    }
     render () {
         const { gatewayInfo } = this.props.store;
         const { upgrading, showUpgrade, title, showEdit, freeioe_version_list, skynet_version_list,
@@ -333,38 +369,7 @@ class GatewaySettings extends Component {
                         version_data={freeioe_version_list}
                         skynet_version_data={skynet_version_list}
                         onUpgrade={()=>{
-                            this.setState({upgrading: true})
-                            const data = gatewayInfo.data && gatewayInfo.data.skynet_version < skynet_latest_version
-                            ? {
-                                name: gatewayInfo.sn,
-                                skynet_version: skynet_latest_version,
-                                version: freeioe_latest_version,
-                                no_ack: 1,
-                                id: `sys_upgrade/${gatewayInfo.sn}/${new Date() * 1}`
-                            }
-                            : {
-                                name: gatewayInfo.sn,
-                                version: freeioe_latest_version,
-                                no_ack: 1,
-                                id: `sys_upgrade/${gatewayInfo.sn}/${new Date() * 1}`
-                            }
-                            http.post('/api/gateways_upgrade', data).then(res=>{
-                                if (res.ok) {
-                                    this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 10000,  (result)=> {
-                                        if (result.ok){
-                                            this.setState({showUpgrade: false})
-                                        } else {
-                                            this.setState({upgrading: false})
-                                        }
-                                    })
-                                } else {
-                                    message.error('网关固件升级失败！ 错误:' + res.error)
-                                    this.setState({upgrading: false})
-                                }
-                            }).catch((err)=>{
-                                message.error('网关固件升级失败！ 错误:' + err)
-                                this.setState({upgrading: false})
-                            })
+                            this.onGatewayUpgrade()
                         }}
                     />
                 </div>
