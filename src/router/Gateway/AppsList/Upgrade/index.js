@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import http from '../../../../utils/Server';
-import { Icon, Card } from 'antd';
+import { Icon, Timeline, Divider } from 'antd';
 import './style.scss';
 import { inject, observer } from 'mobx-react';
 let  timer;
@@ -38,6 +38,8 @@ class AppUpgrade extends Component {
     }
     render () {
         const {newdata, title, version, loading} = this.state;
+        const {gatewayInfo} = this.props.store
+        let enable_beta = gatewayInfo.data.enable_beta
         return (
             <div
                 style={{overflow: 'hidden', position: 'relative', height: 500}}
@@ -47,36 +49,36 @@ class AppUpgrade extends Component {
                 >
                     <div>
                         <div className="title">
-                                    <p>应用升级</p>
-                                    <div>
-                                        <div className="Icon">
-                                            <Icon type="setting" />
-                                        </div>
-                                        <div>
-                                            <h3>{title}</h3>
-                                            <p>v{this.props.version} -> v{version}</p>
-                                            <span>可升级到最新版</span>
-                                        </div>
-                                    </div>
+                            <div>
+                                <div className="Icon">
+                                    <Icon type="setting" />
+                                </div>
+                                <div>
+                                    <h3>{title}</h3>
+                                    <p>v{this.props.version} -> v{version}</p>
+                                    <span>可升级到最新版</span>
+                                </div>
+                            </div>
                         </div>
-                        <h1>{title}版本信息</h1>
+                        <Divider/>
                         <div ref="version">
+                            <Timeline>
                             {
                                 newdata && newdata.length > 0 && newdata.map((v, i)=>{
                                     return (
-                                        <Card
-                                            title={`应用名称：${v.app_name}`}
+                                        v.beta === 0 || enable_beta
+                                        ? <Timeline.Item color={v.beta === 0 ? 'green' : 'red'}
                                             key={i}
-                                            style={{marginTop: 10, lineHeight: '30px'}}
                                             loading={loading}
-                                        >
-                                            <p>版本号：{v.version}</p>
-                                            <p>更新时间：{v.modified.split('.')[0]}</p>
-                                            <p dangerouslySetInnerHTML={{ __html: '更新内容: ' + v.comment.replace(/\n/g, '<br />') }}></p>
-                                        </Card>
+                                          >
+                                            <p>{v.modified.split('.')[0]}</p>
+                                            <p>V{v.version}</p>
+                                            <p dangerouslySetInnerHTML={{ __html: v.comment.replace(/\n/g, '<br />') }}></p>
+                                        </Timeline.Item> : null
                                     )
                                 })
                             }
+                            </Timeline>
                         </div>
                     </div>
                 </div>

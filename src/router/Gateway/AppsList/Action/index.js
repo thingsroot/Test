@@ -280,7 +280,7 @@ class Action extends Component {
                         disabled={!record.data}
                         onClick={()=>{
                             if (record.data){
-                            show_app_config(record.inst_name, record.conf, record.data.data)
+                            show_app_config(record.inst_name, record.conf, record.data)
                             }
                         }}
                     >

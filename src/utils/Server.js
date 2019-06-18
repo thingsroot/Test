@@ -2,11 +2,15 @@
 import axios from 'axios';
 import { _getCookie, isAuthenticated } from './Session';
 
+isAuthenticated;
+
 // 创建axios默认请求
 // axios.defaults.baseURL = 'http://iot.symgrid.com';
 // 配置超时时间
 axios.defaults.timeout = 100000;
+
 // 配置请求拦截
+/*
 axios.interceptors.request.use((config) => {
   // config.headers.common['auto_token'] = _getCookie('auto_token');
   // config.headers.common['full_name'] = _getCookie('full_name');
@@ -16,21 +20,22 @@ axios.interceptors.request.use((config) => {
   // config.headers.common['user_image'] = _getCookie('user_image');
   return config;
 });
+*/
 
 // 添加响应拦截器
-axios.interceptors.response.use(
-  function (response) {
+// axios.interceptors.response.use(
+//   function (response) {
 
-    if (!isAuthenticated() || response.data.error && response.data.error === 'auth_code_missing'){
-      window.location.href = '/login'
-    }
-    return response;
-  },
-  function (error) {
-    // 对响应错误做点什么
-    return Promise.reject(error);
-  }
-);
+//     if (!isAuthenticated() || response.data.error && response.data.error === 'auth_code_missing'){
+//       window.location.href = '/login'
+//     }
+//     return response;
+//   },
+//   function (error) {
+//     // 对响应错误做点什么
+//     return Promise.reject(error);
+//   }
+// );
 /**
  * get请求
  * @method get
