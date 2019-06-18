@@ -3,8 +3,11 @@ import { Icon, message, Menu, Button, Dropdown } from 'antd';
 import { Link, withRouter} from 'react-router-dom';
 import { _getCookie, isAuthenticated, authenticateClear } from '../../utils/Session';
 import http  from '../../utils/Server';
+import { inject, observer } from 'mobx-react';
 
 @withRouter
+@inject('store')
+@observer
 class HeaderBar extends PureComponent {
     UNSAFE_componentWillReceiveProps () {
         if (!isAuthenticated()) {
@@ -31,11 +34,14 @@ class HeaderBar extends PureComponent {
                     <Button type="danger"
                         block
                         onClick={()=>{
-                            authenticateClear()
+                            authenticateClear();
+                            this.props.store.session.setUserId('Guest');
+                            this.props.store.session.setSid('Guest');
+                            this.props.store.session.setCSRFToken('');
                             http.post('/api/user_logout').then(res=>{
                                 res;
                                 message.success('退出成功,即将跳转至登录页', 1.5).then(()=>{
-                                    location.href = '/login'
+                                    location.href = '/'
                                 })
                             }).catch(err=>{
                                 err;
