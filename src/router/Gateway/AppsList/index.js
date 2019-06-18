@@ -236,7 +236,7 @@ class AppsList extends Component {
         return (
             <div>
                 <div className={show_app_config ? 'hide' : 'show'}>
-                    {console.log(data)}
+                    {/*console.log(data)*/}
                 <Table
                     rowKey="sn"
                     columns={this.state.columns}

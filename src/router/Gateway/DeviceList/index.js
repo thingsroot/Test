@@ -159,7 +159,10 @@ class DevicesList extends Component {
                         data && data.length > 0 ? data : []
                     }
                     loading={loading}
-                    rowKey="meta.sn"
+                    rowKey={(record, index) => {
+                        index;
+                        return record.meta.sn
+                    }}
                     rowClassName={(record, index) => {
                         let className = 'light-row';
                         if (index % 2 === 0) {
