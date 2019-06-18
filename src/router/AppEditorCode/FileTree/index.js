@@ -266,6 +266,7 @@ class MyTree extends Component {
             newNodeName: ''
         })
     };
+
     onAddNewFolder = ()=>{
         const {app, newInputValue} = this.state
         if (newInputValue === '') {
@@ -651,7 +652,7 @@ class MyTree extends Component {
                     onOk={this.onAddNewFolder}
                     onCancel={()=> {
                         this.setState({
-                            isAddFolderShow: false
+                            showNewFolderModal: false
                         })
                     }}
                     okText="确认"
