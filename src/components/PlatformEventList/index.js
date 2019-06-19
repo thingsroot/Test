@@ -610,56 +610,55 @@ class PlatformEvents extends Component {
         return (
             <div className="platformEvents">
                 <div className="searchBox flex">
-                    <div style={{minWidth: 250}}>
+                    <div style={{minWidth: 160}}>
                         <Button onClick={()=>{
                             this.confMessage(selectedRowKeys)
                         }}
-                        >确认消息</Button>
-                        <span style={{padding: '0 3px'}} />
+                        >确认</Button>
+                        <span style={{padding: '0 1px'}} />
                         <Button onClick={()=>{
                             this.confAllMessage()
                         }}
-                        >确认所有消息</Button>
+                        >确认所有</Button>
                     </div>
                     <div
                         className="flex"
-                        style={{
-                            minWidth: 810
-                        }}
                     >
+                        <span>类型：</span>
                         <Select
                             value={this.state.filterType}
-                            style={{ width: 180 }}
+                            style={{ width: 120 }}
                             onChange={this.onTypeChange}
                         >
-                            <Option value="">消息类型：全部</Option>
-                            <Option value="Action">消息类型：设备操作</Option>
-                            <Option value="Status">消息类型：设备消息</Option>
+                            <Option value="">全部</Option>
+                            <Option value="Action">设备操作</Option>
+                            <Option value="Status">设备消息</Option>
                         </Select>
-                        <span style={{padding: '0 3px'}} />
+                        <span style={{padding: '0 1px'}} />
                         <Select
                             value={`${this.state.limitLength}`}
-                            style={{ width: 140 }}
+                            style={{ width: 100 }}
                             onChange={this.onTotalLengthChange}
                         >
-                            <Option value="100">记录数：100</Option>
-                            <Option value="300">记录数：300</Option>
-                            <Option value="500">记录数：500</Option>
-                            <Option value="1000">记录数：1000</Option>
+                            <Option value="100">100</Option>
+                            <Option value="300">300</Option>
+                            <Option value="500">500</Option>
+                            <Option value="1000">1000</Option>
                         </Select>
-                        <span style={{padding: '0 3px'}} />
+                        <span style={{padding: '0 1px'}} />
                         <Select
                             value={`${this.state.limitTime}`}
-                            style={{ width: 140 }}
+                            style={{ width: 100 }}
                             onChange={this.onTotalTimeChange}
                         >
-                            <Option value="1">时间：1小时</Option>
-                            <Option value="6">时间：6小时</Option>
-                            <Option value="24">时间：24小时</Option>
-                            <Option value="72">时间：72小时</Option>
-                            <Option value="168">时间：一周</Option>
+                            <Option value="1">1小时</Option>
+                            <Option value="6">6小时</Option>
+                            <Option value="12">12小时</Option>
+                            <Option value="24">24小时</Option>
+                            <Option value="72">72小时</Option>
+                            <Option value="168">一周</Option>
                         </Select>
-                        <span style={{padding: '0 3px'}} />
+                        <span style={{padding: '0 1px'}} />
                         <InputGroup
                             compact
                         >

@@ -503,69 +503,72 @@ class DeviceEventList extends Component {
         return (
             <div className="deviceEventList">
                 <div className="searchBox flex">
-                    <div style={{minWidth: 280}}>
+                    <div style={{minWidth: 160}}>
                         <Button onClick={()=>{
                             this.confMessage(selectedRowKeys)
                         }}
-                        >确认消息</Button>
-                        <span style={{padding: '0 3px'}} />
+                        >确认</Button>
+                        <span style={{padding: '0 1px'}} />
                         <Button onClick={()=>{
                             this.confAllMessage()
                         }}
-                        >确认所有消息</Button>
+                        >确认所有</Button>
                     </div>
 
                     <div
                         className="flex"
                     >
+                        <span>类型:</span>
                         <Select
                             value={this.state.filterType}
-                            style={{ width: 150 }}
+                            style={{ width: 100 }}
                             onChange={this.onTypeChange}
                         >
-                            <Option value="">消息类型：全部</Option>
-                            <Option value="COMM">消息类型：通讯</Option>
-                            <Option value="DATA">消息类型：数据</Option>
-                            <Option value="APP">消息类型：应用</Option>
-                            <Option value="SYS">消息类型：系统</Option>
-                            <Option value="DEV">消息类型：设备</Option>
+                            <Option value="">全部</Option>
+                            <Option value="COMM">通讯</Option>
+                            <Option value="DATA">数据</Option>
+                            <Option value="APP">应用</Option>
+                            <Option value="SYS">系统</Option>
+                            <Option value="DEV">设备</Option>
                         </Select>
                         <span style={{padding: '0 3px'}} />
+                        <span>等级:</span>
                         <Select
                             value={`${this.state.filterLevel}`}
-                            style={{ width: 130 }}
+                            style={{ width: 80 }}
                             onChange={this.onLevelChange}
                         >
-                            <Option value="">等级：全部</Option>
-                            <Option value="1">等级：常规</Option>
-                            <Option value="2">等级：错误</Option>
-                            <Option value="3">等级：警告</Option>
-                            <Option value="99">等级：致命</Option>
+                            <Option value="">全部</Option>
+                            <Option value="1">常规</Option>
+                            <Option value="2">错误</Option>
+                            <Option value="3">警告</Option>
+                            <Option value="99">致命</Option>
                         </Select>
-                        <span style={{padding: '0 3px'}} />
+                        <span style={{padding: '0 1px'}} />
                         <Select
                             value={`${this.state.limitLength}`}
-                            style={{ width: 140 }}
+                            style={{ width: 80 }}
                             onChange={this.onTotalLengthChange}
                         >
-                            <Option value="100">记录数：100</Option>
-                            <Option value="300">记录数：300</Option>
-                            <Option value="500">记录数：500</Option>
-                            <Option value="1000">记录数：1000</Option>
+                            <Option value="100">100</Option>
+                            <Option value="300">300</Option>
+                            <Option value="500">500</Option>
+                            <Option value="1000">1000</Option>
                         </Select>
-                        <span style={{padding: '0 3px'}} />
+                        <span style={{padding: '0 1px'}} />
                         <Select
                             value={`${this.state.limitTime}`}
-                            style={{ width: 140 }}
+                            style={{ width: 100 }}
                             onChange={this.onTotalTimeChange}
                         >
-                            <Option value="1">时间：1小时</Option>
-                            <Option value="6">时间：6小时</Option>
-                            <Option value="24">时间：24小时</Option>
-                            <Option value="72">时间：72小时</Option>
-                            <Option value="168">时间：一周</Option>
+                            <Option value="1">1小时</Option>
+                            <Option value="6">6小时</Option>
+                            <Option value="12">12小时</Option>
+                            <Option value="24">24小时</Option>
+                            <Option value="72">三天</Option>
+                            <Option value="168">一周</Option>
                         </Select>
-                        <span style={{padding: '0 3px'}} />
+                        <span style={{padding: '0 1px'}} />
                         <InputGroup compact>
                             <Select
                                 defaultValue=""
