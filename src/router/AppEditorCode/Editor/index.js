@@ -4,7 +4,7 @@ import { observer, inject } from 'mobx-react';
 import AceEditor from 'react-ace';
 import 'brace/ext/language_tools';
 import 'brace/ext/searchbox';
-import {Icon, Input, message, Modal, Select} from 'antd';
+import {Icon, Input, message, Modal, Select, Divider, Tooltip} from 'antd';
 import http from '../../../utils/Server';
 import 'brace/mode/javascript';//
 import 'brace/mode/html';//
@@ -386,36 +386,51 @@ class MyCode extends Component {
             <div className="codeEditor">
                 <div className="iconGroup">
                     <p style={{width: 'auto', position: 'resolute'}}>
-                        {
-                            gateway !== undefined ? (
+                        <Divider type="vertical" />
+                        <Tooltip title="保存修改代码" >
                             <Icon
-                                type="cloud-upload"
-                                style={{color: this.state.applyEnable && actionEnable ? '#333' : '#ccc'}}
-                                onClick={this.uploadToGateway}
-                            /> ) : null
-                        }
-                        <Icon
-                            type="tag"
-                            onClick={this.showReleaseModal}
-                        />
-                        <Icon
-                            type="sync"
-                            onClick={this.showModal}
-                        />
+                                type="save"
+                                disabled
+                                style={{color: this.state.changed ? '#333' : '#ccc'}}
+                                onClick={this.saveFile}
+                            />
+                        </Tooltip>
+                        <span style={{padding: '0 2px'}} />
                         <Icon
                             type="zoom-in"
                             onClick={this.zoomOut}
                         />
+                        <span style={{padding: '0 2px'}} />
                         <Icon
                             type="zoom-out"
                             onClick={this.zoomIn}
                         />
-                        <Icon
-                            type="save"
-                            disabled
-                            style={{color: this.state.changed ? '#333' : '#ccc'}}
-                            onClick={this.saveFile}
-                        />
+                        <Divider type="vertical" />
+                        <Tooltip title="打包发布新版本" >
+                            <Icon
+                                type="tag"
+                                onClick={this.showReleaseModal}
+                            />
+                        </Tooltip>
+                        <span style={{padding: '0 2px'}} />
+                        <Tooltip title="回滚代码" >
+                            <Icon
+                                type="retweet"
+                                onClick={this.showModal}
+                            />
+                        </Tooltip>
+                        <Divider type="vertical" />
+                        {
+                            gateway !== undefined ? (
+
+                            <Tooltip title="安装当前代码到网关" >
+                                <Icon
+                                    style={{color: this.state.applyEnable && actionEnable ? '#333' : '#ccc'}}
+                                    type="check-square"
+                                    onClick={this.uploadToGateway}
+                                />
+                            </Tooltip> ) : null
+                        }
                         {/*<Icon*/}
                         {/*type="undo"*/}
                         {/*onClick={this.undo}*/}
@@ -429,14 +444,7 @@ class MyCode extends Component {
                             <span>{this.state.changed ? '已修改' : '未修改'}</span>
                         </span>
                         <Icon
-                            style={{position: 'absolute', right: 60, top: 10}}
-                            type="cloud-upload"
-                            onClick={()=>{
-                                console.log('1')
-                            }}
-                        />
-                        <Icon
-                            style={{position: 'absolute', right: 30, top: 10}}
+                            style={{position: 'absolute', right: 0, top: 10}}
                             type="rollback"
                             onClick={()=>{
                                 this.props.history.go(-1)

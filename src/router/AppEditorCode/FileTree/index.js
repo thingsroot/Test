@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {observable, action} from 'mobx'
 import { withRouter } from 'react-router-dom';
-import { Tree, Icon, Modal, message, Input } from 'antd';
+import { Tree, Icon, Modal, message, Input, Tooltip } from 'antd';
 import { observer, inject } from 'mobx-react';
 import http from '../../../utils/Server';
 
@@ -565,22 +565,33 @@ class MyTree extends Component {
             <div className="fileTree">
                 <div className="iconGroup">
                     <p style={{width: '220px'}}>
-                        <Icon
-                            type="file-add"
-                            onClick={this.onShowNewFile}
-                        />
-                        <Icon
-                            type="folder-add"
-                            onClick={this.onShowNewFolder}
-                        />
-                        <Icon
-                            type="edit"
-                            onClick={this.onShowEditName}
-                        />
-                        <Icon
-                            type="delete"
-                            onClick={this.deleteFileShow}
-                        />
+                        <Tooltip title="新建文件" >
+                            <Icon
+                                type="file-add"
+                                onClick={this.onShowNewFile}
+                            />
+                        </Tooltip>
+                        <span style={{padding: '0 2px'}} />
+                        <Tooltip title="新建文件夹" >
+                            <Icon
+                                type="folder-add"
+                                onClick={this.onShowNewFolder}
+                            />
+                        </Tooltip>
+                        <span style={{padding: '0 2px'}} />
+                        <Tooltip title="更改文件(夹)名称" >
+                            <Icon
+                                type="edit"
+                                onClick={this.onShowEditName}
+                            />
+                        </Tooltip>
+                        <span style={{padding: '0 2px'}} />
+                        <Tooltip title="删除文件(夹)名称" >
+                            <Icon
+                                type="delete"
+                                onClick={this.deleteFileShow}
+                            />
+                        </Tooltip>
                     </p>
                 </div>
                 <div>
