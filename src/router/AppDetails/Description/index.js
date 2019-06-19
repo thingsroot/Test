@@ -11,10 +11,10 @@ const none = {
 
 @inject('store')
 @observer
-class AppDesc extends Component {
+class AppDescription extends Component {
     render () {
         return (
-            <div className="appDesc">
+            <div className="appDescription">
                 <div
                     style={this.props.source !== '' ? block : none}
                 >
@@ -33,4 +33,4 @@ class AppDesc extends Component {
     }
 }
 
-export default AppDesc;
+export default AppDescription;
