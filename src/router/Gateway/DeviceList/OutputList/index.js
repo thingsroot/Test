@@ -5,21 +5,25 @@ import http from '../../../../utils/Server';
 import { Table, Button, Modal, Input, message } from 'antd';
 import './style.scss';
 
-function fix2number (n) {
-    return [0, n].join('').slice(-2);
-}
-function formatTime (time, format) {
-    if (format === undefined) {
-        return time;
+function formatTime (date, fmt) {
+    var o = {
+        'M+': date.getMonth() + 1,     //月份
+        'd+': date.getDate(),     //日
+        'h+': date.getHours(),     //小时
+        'm+': date.getMinutes(),     //分
+        's+': date.getSeconds(),     //秒
+        'q+': Math.floor((date.getMonth() + 3) / 3), //季度
+        'S': date.getMilliseconds()    //毫秒
     }
-    format = format.replace(/Y/i, time.getFullYear());
-    format = format.replace(/m/i, fix2number(time.getMonth() + 1));
-    format = format.replace(/d/i, fix2number(time.getDate()));
-    format = format.replace(/H/i, fix2number(time.getHours()));
-    format = format.replace(/i/i, fix2number(time.getMinutes()));
-    format = format.replace(/s/i, fix2number(time.getSeconds()));
-    format = format.replace(/ms/i, time.getMilliseconds());
-    return format;
+    if (/(y+)/.test(fmt)) {
+        fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+    }
+    for (var k in o) {
+        if (new RegExp('(' + k + ')').test(fmt)) {
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)));
+        }
+    }
+    return fmt;
 }
 
 @withRouter
@@ -96,14 +100,14 @@ class OutputList extends Component {
         let output_record = record;
         http.post('/api/gateways_dev_outputs', params).then(res=>{
             if (res.ok){
-                output_record.action_tm = formatTime(new Date(), 'h:i:s')
+                output_record.action_tm = formatTime(new Date(), 'hh:mm:ss S')
                 this.props.store.action.pushAction(res.data, '设备指令执行', '', params, 10000, (result, data)=>{
                     if (result) {
                         output_record.result = '下置成功'
-                        output_record.result_tm = formatTime(new Date(data.timestamp * 1000), 'h:i:s')
+                        output_record.result_tm = formatTime(new Date(data.timestamp * 1000), 'hh:mm:ss S')
                     } else {
                         output_record.result = data.message
-                        output_record.result_tm = formatTime(new Date(data.timestamp * 1000), 'h:i:s')
+                        output_record.result_tm = formatTime(new Date(data.timestamp * 1000), 'hh:mm:ss S')
                     }
                 })
             } else {
