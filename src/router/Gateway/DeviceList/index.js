@@ -173,7 +173,6 @@ class DevicesList extends Component {
                     expandedRowRender={Collapses}
                     expandRowByClick
                 />
-
                 {
                     gatewayInfo.data.data_upload
                     ? null
@@ -200,6 +199,10 @@ class DevicesList extends Component {
                         </Button>
                     </Tooltip>
                 }
+                <div className="gatewayTips">
+                    <div>{'数据上送周期: ' + gatewayInfo.data.data_upload_period + ' 毫秒'}</div>
+                    <div>{'全量数据上送周期: ' + gatewayInfo.data.data_upload_cov_ttl + ' 秒'}</div>
+                </div>
             </div>
         );
     }
