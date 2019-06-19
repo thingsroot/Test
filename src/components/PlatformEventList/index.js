@@ -529,7 +529,7 @@ class PlatformEvents extends Component {
         const { filterColumn, allData, filterType, filterText } = this.state
         let newAllData = []
         allData.map( (v) => {
-            if (filterType !== '' && v.event_type !== filterType) {
+            if (filterType !== '' && v.operation !== filterType) {
                 return
             }
             newAllData.push(v)

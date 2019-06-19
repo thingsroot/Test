@@ -524,11 +524,11 @@ class DeviceEventList extends Component {
                             onChange={this.onTypeChange}
                         >
                             <Option value="">消息类型：全部</Option>
-                            <Option value="通讯">消息类型：通讯</Option>
-                            <Option value="数据">消息类型：数据</Option>
-                            <Option value="应用">消息类型：应用</Option>
-                            <Option value="系统">消息类型：系统</Option>
-                            <Option value="设备">消息类型：设备</Option>
+                            <Option value="COMM">消息类型：通讯</Option>
+                            <Option value="DATA">消息类型：数据</Option>
+                            <Option value="APP">消息类型：应用</Option>
+                            <Option value="SYS">消息类型：系统</Option>
+                            <Option value="DEV">消息类型：设备</Option>
                         </Select>
                         <span style={{padding: '0 3px'}} />
                         <Select
