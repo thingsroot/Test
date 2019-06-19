@@ -51,16 +51,16 @@ class ContentMain extends Component {
        timer = setInterval(() => {
             let action_store = this.props.store.action;
             const { actions } = this.props.store.action;
-            doUpdate(actions, function (action, status, message){
-                action_store.setActionStatus(action.id, status, message)
+            doUpdate(actions, function (action, status, data){
+                action_store.setActionStatus(action.id, status, data.message)
                 if (status === 'done') {
-                    openNotification(action.title + '成功', message)
+                    openNotification(action.title + '成功', data.message)
                 }
                 if (status === 'failed') {
-                    openNotification(action.title + '失败', message)
+                    openNotification(action.title + '失败', data.message)
                 }
                 if (status === 'timeout') {
-                    openNotification(action.title + '超时', message)
+                    openNotification(action.title + '超时', data.message)
                 }
             })
         }, 1000);

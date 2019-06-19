@@ -4,10 +4,10 @@ export function exec_result (id) {
     return new Promise((resolve, reject) => {
         http.get('/api/gateways_exec_result?id=' + id).then(res=>{
             if (res.data  && res.data.result === true){
-                return resolve([true, res.data.message])
+                return resolve([true, res.data])
             }
             if (res.data && res.data.result === false){
-                return resolve([false, res.data.message])
+                return resolve([false, res.data])
             } else {
                 return reject('Running')
             }
@@ -25,15 +25,15 @@ export function doUpdate (actions, cb) {
         }
         if (now > action.last + 1000){
             action.last = now + 3000
-            exec_result(action.id).then( ([result, msg]) => {
-                console.log(result, msg)
+            exec_result(action.id).then( ([result, data]) => {
+                console.log(result, data)
                 if (result) {
-                    cb(action, 'done', msg)
+                    cb(action, 'done', data)
                 } else {
-                    cb(action, 'failed', msg)
+                    cb(action, 'failed', data)
                 }
                 if (action.finish_action !== undefined) {
-                    action.finish_action(result)
+                    action.finish_action(result, data)
                 }
             }).catch( err=> {
                 console.log(err)
@@ -41,7 +41,15 @@ export function doUpdate (actions, cb) {
         }
         if (now > action.start + action.timeout) {
             cb(action, 'timeout', 'Action timeout')
-            action.finish_action(false)
+            let now = new Date()
+            let data = {
+                id: action.id,
+                result: false,
+                timestamp: now.UTC() / 1000,
+                timestamp_str: now.toLocaleTimeString(),
+                message: 'Action timeout'
+            }
+            action.finish_action(false, data)
             return
         }
     })

@@ -5,6 +5,23 @@ import http from '../../../../utils/Server';
 import { Table, Button, Modal, Input, message } from 'antd';
 import './style.scss';
 
+function fix2number (n) {
+    return [0, n].join('').slice(-2);
+}
+function formatTime (time, format) {
+    if (format === undefined) {
+        return time;
+    }
+    format = format.replace(/Y/i, time.getFullYear());
+    format = format.replace(/m/i, fix2number(time.getMonth() + 1));
+    format = format.replace(/d/i, fix2number(time.getDate()));
+    format = format.replace(/H/i, fix2number(time.getHours()));
+    format = format.replace(/i/i, fix2number(time.getMinutes()));
+    format = format.replace(/s/i, fix2number(time.getSeconds()));
+    format = format.replace(/ms/i, time.getMilliseconds());
+    return format;
+}
+
 @withRouter
 @inject('store')
 @observer
@@ -28,11 +45,14 @@ class OutputList extends Component {
             title: '单位',
             dataIndex: 'unit'
         }, {
-            title: '数值',
-            dataIndex: 'pv'
+            title: '下置反馈',
+            dataIndex: 'result'
         }, {
-            title: '时间',
-            dataIndex: 'tm'
+            title: '反馈时间',
+            dataIndex: 'result_tm'
+        }, {
+            title: '触发时间',
+            dataIndex: 'action_tm'
         }, {
             title: '操作',
             width: '150px',
@@ -73,9 +93,19 @@ class OutputList extends Component {
             value: value,
             id: id
         }
+        let output_record = record;
         http.post('/api/gateways_dev_outputs', params).then(res=>{
             if (res.ok){
-                this.props.store.action.pushAction(res.data, '设备指令执行', '', params, 10000)
+                output_record.action_tm = formatTime(new Date(), 'h:i:s')
+                this.props.store.action.pushAction(res.data, '设备指令执行', '', params, 10000, (result, data)=>{
+                    if (result) {
+                        output_record.result = '下置成功'
+                        output_record.result_tm = formatTime(new Date(data.timestamp * 1000), 'h:i:s')
+                    } else {
+                        output_record.result = data.message
+                        output_record.result_tm = formatTime(new Date(data.timestamp * 1000), 'h:i:s')
+                    }
+                })
             } else {
                 message.error(res.error)
             }
