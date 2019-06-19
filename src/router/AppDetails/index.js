@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Icon, Tabs } from 'antd';
+import { Icon, Tabs, message } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import VersionList from './VersionList';
@@ -60,6 +60,11 @@ class AppDetails extends Component {
     getDetails = ()=>{
         const {app} = this.state;
         http.get('/api/applications_read?app=' + app).then(res=>{
+            if (!res.ok) {
+                message.error('无法获取应用信息')
+                this.props.history.push('/myapps')
+                return
+            }
             this.setState({
                 app_info: res.data.data,
                 versionList: res.data.versionList,

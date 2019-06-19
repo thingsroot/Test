@@ -64,11 +64,13 @@ class MyTemplateDetails extends PureComponent {
                 this.setState({conf_info: res.data})
                 this.getVersionList()
             } else {
-                message.error(res.error)
+                message.error('无法获取配置信息。错误:' + res.error)
+                this.props.history.push('/')
             }
         }).catch((err)=>{
             err;
             message.error('读取模板信息失败')
+            this.props.history.push('/')
         })
     }
 
