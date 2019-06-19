@@ -10,16 +10,38 @@
         padding: 10px 0;
     }
     .online{
-        display: inline-block;
-        padding: 2px 30px;
-        background:#00a65a;
-        color:#fff;
+        color:#3c763d;
+        b{
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: #3c763d;
+            border-radius: 50%;
+            position: relative;
+        }
+        
     }
     .offline{
-        display: inline-block;
-        padding: 2px 30px;
-        background:#f39c12;
-        color:#fff;
+        color:#f39c12;
+        b{
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #f39c12 ;
+            border-radius: 50%;
+            position: relative;
+        }
+    }
+    .notline{
+        color:#eee;
+        b{
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #eee ;
+            border-radius: 50%;
+            position: relative;
+        }
     }
     .positon{
             width: 14px;

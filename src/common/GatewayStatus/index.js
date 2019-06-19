@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
+import { Icon, Tooltip } from 'antd';
 import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
@@ -59,12 +60,42 @@ class Status extends Component {
         });
     }
     render () {
-        const { device_status, dev_name, description } = this.props.store.gatewayInfo;
+        const { device_status, dev_name, description, data } = this.props.store.gatewayInfo;
         return (
             <div className="GatesStatusWrap">
                 <div>
-                    <div className="status"></div>
-                    &nbsp; <span className={device_status === 'ONLINE' ? 'online' : 'offline'}>{device_status ? device_status : 'OFFLINE'}</span>
+                    <Tooltip title="在线状态" >
+                        {/* <span className={device_status === 'ONLINE' ? 'online' : 'offline'}><b></b></span>
+                        <span style={{padding: '0 5px'}} /> */}
+                        <Icon
+                            style={{fontSize: 22, color: device_status === 'ONLINE' ? '#3c763d' : '#f39c12'}}
+                            type={device_status === 'ONLINE' ? 'link' : 'disconnect'}
+                        />
+                    </Tooltip>
+                    {
+                        device_status === 'ONLINE' ? (
+                            <span>
+                                <span style={{padding: '0 10px'}} />
+                                <Tooltip title="数据上传" >
+                                    <Icon
+                                        style={{fontSize: 22, color: data.data_upload ? '#3c763d' : '#f39c12'}}
+                                        type={data.data_upload  ? 'cloud-upload' : 'cloud'}
+                                    />
+                                </Tooltip>
+                                <span style={{padding: '0 5px'}} />
+                                {
+                                    data.enable_beta
+                                    ? <Tooltip title="调试模式" >
+                                        <Icon
+                                            style={{fontSize: 22, color: '#f39c12'}}
+                                            type="warning"
+                                        />
+                                    </Tooltip>  : null
+                                }
+                            </span>
+                        ) : null
+                    }
+                    
                 </div>
                 <div>
                     <div className="positon"><span></span></div>
