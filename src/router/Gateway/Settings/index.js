@@ -265,7 +265,7 @@ class GatewaySettings extends Component {
         return (
             <div className="settings">
                 <div className={!showUpgrade && !showEdit ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
-                    <div style={{ background: '#ECECEC', padding: '30px' }}
+                    <div style={{ background: '#f0f2f5', padding: '20px' }}
                         className="linkstatus"
                     >
                         <div className="setbutton">
@@ -318,6 +318,7 @@ class GatewaySettings extends Component {
                             <p><b>数据上传:</b>{gatewayInfo.data && gatewayInfo.data.data_upload ? '开启' : '关闭'}</p>
                             <p><b>统计上传:</b>{gatewayInfo.data && gatewayInfo.data.stat_upload ? '开启' : '关闭'}</p>
                             <p><b>日志上传:</b>{gatewayInfo.data && gatewayInfo.data.event_upload}</p>
+                            <p style={{height: '30px'}}> </p>
                             </Card>
                         </div>
                     </div>
@@ -328,15 +329,16 @@ class GatewaySettings extends Component {
                                 style={{height: 280, width: '100%', minWidth: 300}}
                                 id="CPU"
                                 ref="cpu"
-                            ></div>
+                            > </div>
                         </Card>
+                        <p style={{height: '20px'}}> </p>
                         <Card className="border">
                             <p>内存负载</p>
                             <div
                                 style={{height: 280, width: '100%', minWidth: 300}}
                                 id="memory"
                                 ref="mem"
-                            ></div>
+                            > </div>
                         </Card>
                     </div>
                  </div>

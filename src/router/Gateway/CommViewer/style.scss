@@ -1,20 +1,16 @@
 .commView{
-    .opwrap{
-        top:10px;
-    }
     .searwrap{
-        position: absolute;
-        right:0;
-        top:0px;
         display: flex;
-        width: 300px;
+        justify-content: space-between;
+        align-items: center;
+        width: 600px;
     }
     .tableHeaders{
         display: flex;
         width: 100%;
         justify-content: space-around;
         >div{
-            border: 1px solid #ccc;
+            border-bottom: 1px solid #e8e8e8;
             padding: 10px;
         }
         >div:nth-child(1){

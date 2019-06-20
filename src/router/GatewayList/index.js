@@ -39,7 +39,7 @@ class MyGates extends Component {
                 sorter: (a, b) => a.dev_name.length - b.dev_name.length,
                 render: (props, record)=>{
                     return (
-                        <div>
+                        <div style={{lineHeight: '45px'}}>
                             {record.owner_type !== 'Cloud Company Group'
                                 ? <Tag
                                     color="lime"

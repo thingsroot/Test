@@ -9,28 +9,33 @@ import PropTypes from 'prop-types';
 const columns = [{
         title: '名称',
         dataIndex: 'meta.inst',
-        key: 'meta.inst'
+        key: 'meta.inst',
+        className: 'cursor'
         // sorter: true
     }, {
         title: '描述',
         dataIndex: 'meta.description',
-        key: 'meta.description'
+        key: 'meta.description',
+        className: 'cursor'
         // sorter: true
     }, {
         title: 'I/O/C',
         dataIndex: 'meta.ioc',
-        key: 'meta.ioc'
+        key: 'meta.ioc',
+        className: 'cursor'
         // sorter: true
     }, {
         title: '设备SN',
         key: 'meta.sn',
         dataIndex: 'meta.sn',
-        width: '30%'
+        width: '30%',
+        className: 'cursor'
         // sorter: true
     }, {
         title: '所属实例',
         key: 'meta.app_inst',
-        dataIndex: 'meta.app_inst'
+        dataIndex: 'meta.app_inst',
+        className: 'cursor'
         // sorter: true
         }
     //   , {
@@ -62,6 +67,7 @@ class DevicesList extends Component {
         data: [],
         loading: true,
         uploadOneShort: false,
+        sign: false,
         gateway: this.props.gateway
     }
     componentDidMount (){
@@ -111,7 +117,10 @@ class DevicesList extends Component {
             } else {
                 message.error(res.error)
             }
-            this.setState({loading: false})
+            this.setState({
+                loading: false,
+                sign: false
+            })
         })
     }
     setData (devices) {
@@ -153,6 +162,50 @@ class DevicesList extends Component {
         const { gatewayInfo } = this.props.store;
         return (
             <div>
+                <div className="toolbar">
+                    <p>
+                        {'数据上送周期: ' + gatewayInfo.data.data_upload_period + ' 毫秒'}
+                        {'全量数据上送周期: ' + gatewayInfo.data.data_upload_cov_ttl + ' 秒'}
+                    </p>
+                    <p>
+                        <Tooltip
+                            placement="topLeft"
+                            title="手动刷新列表"
+                        >
+                            <Icon
+                                style={{fontSize: 20, margin: '0 15px'}}
+                                type="redo"
+                                onClick={()=>{
+                                    this.setState({
+                                        loading: true,
+                                        sign: true
+                                    });
+                                    this.getData()
+                                }}
+                            />
+                        </Tooltip>
+                        <Button
+                            type={this.state.uploadOneShort ? 'default' : 'primary'}
+                            onClick={()=>{
+                                this.setState({uploadOneShort: !this.state.uploadOneShort}, ()=>{
+                                    if (!this.state.uploadOneShort){
+                                        clearInterval(this.one_short_timer);
+                                        this.enableDataUploadOneShort(0)
+                                    } else {
+                                        this.one_short_timer = setInterval(()=>{
+                                            this.enableDataUploadOneShort(60)
+                                        }, 55000)
+                                    }
+                                })
+                            }}
+                        >
+                            <Icon
+                                type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
+                                theme="filled"
+                            />{this.state.uploadOneShort ? '停止上传' : '开启上传'}
+                        </Button>
+                    </p>
+                </div>
                 <Table
                     columns={columns}
                     dataSource={
@@ -179,30 +232,9 @@ class DevicesList extends Component {
                     : <Tooltip placement="topLeft"
                         title="开启网关数据临时上传"
                       >
-                        <Button
-                            onClick={()=>{
-                                this.setState({uploadOneShort: !this.state.uploadOneShort}, ()=>{
-                                    if (!this.state.uploadOneShort){
-                                        clearInterval(this.one_short_timer)
-                                        this.enableDataUploadOneShort(0)
-                                    } else {
-                                        this.one_short_timer = setInterval(()=>{
-                                            this.enableDataUploadOneShort(60)
-                                        }, 55000)
-                                    }
-                                })
-                            }}
-                        >
-                            <Icon type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
-                                theme="filled"
-                            />{this.state.uploadOneShort ? '停止上传' : '开启上传'}
-                        </Button>
                     </Tooltip>
                 }
-                <div className="gatewayTips">
-                    <div>{'数据上送周期: ' + gatewayInfo.data.data_upload_period + ' 毫秒'}</div>
-                    <div>{'全量数据上送周期: ' + gatewayInfo.data.data_upload_cov_ttl + ' 秒'}</div>
-                </div>
+
             </div>
         );
     }

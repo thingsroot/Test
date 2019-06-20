@@ -36,11 +36,13 @@ class AppsList extends Component {
             show_app_config: false,
             gateway_sn: '',
             url: window.location.pathname,
+            sign: false,
             columns: [{
                 title: '',
                 dataIndex: 'data.icon_image',
                 key: 'img',
                 width: '100px',
+                className: 'cursor',
                 render: (record)=>{
                     if (record) {
                         return (
@@ -64,11 +66,13 @@ class AppsList extends Component {
                 title: '实例名',
                 dataIndex: 'inst_name',
                 sorter: (a, b) => a.inst_name.length - b.inst_name.length,
-                width: '20%'
+                width: '20%',
+                className: 'cursor'
             }, {
                 title: '版本',
                 dataIndex: 'version',
                 key: 'version',
+                className: 'cursor',
                 render: (props, record)=>{
                     if (record.data){
                         if (record.latestVersion > props) {
@@ -95,10 +99,12 @@ class AppsList extends Component {
             }, {
                 title: '设备数',
                 dataIndex: 'devs_len',
-                key: 'devs_len'
+                key: 'devs_len',
+                className: 'cursor'
             }, {
                 title: '状态',
                 dataIndex: 'status',
+                className: 'cursor',
                 render: record=>{
                     if (record === 'running'){
                         return (
@@ -112,7 +118,8 @@ class AppsList extends Component {
                 }
             }, {
               title: '启动时间',
-              dataIndex: 'running'
+              dataIndex: 'running',
+              className: 'cursor'
             }
           ]
         }
@@ -173,7 +180,10 @@ class AppsList extends Component {
             } else {
                 message.error(res.error)
             }
-            this.setState({loading: false})
+            this.setState({
+                loading: false,
+                sign: false
+            })
         })
     }
     setData = (apps)=> {
@@ -237,6 +247,46 @@ class AppsList extends Component {
             <div>
                 <div className={show_app_config ? 'hide' : 'show'}>
                     {/*console.log(data)*/}
+                    <div className="toolbar">
+                        <span> </span>
+                        <div>
+                            <Tooltip
+                                placement="topLeft"
+                                title="手动刷新列表"
+                            >
+                                <Icon
+                                    style={{fontSize: 20, margin: '0 15px'}}
+                                    type="redo"
+                                    onClick={()=>{
+                                        this.setState({
+                                            loading: true,
+                                            sign: true
+                                        });
+                                        this.fetch()
+                                    }}
+                                />
+                            </Tooltip>
+                            <Tooltip
+                                placement="topLeft"
+                                title="请求网关上送其最新的应用列表数据"
+                            >
+                                <Button
+                                    type="primary"
+                                    disabled={!this.state.forceRefreshEnable}
+                                    onClick={()=>{
+                                        this.setState({forceRefreshEnable: false})
+                                        this.forceRefreshAppList()
+                                        setTimeout(()=>{
+                                            this.setState({forceRefreshEnable: true})
+                                        }, 5000)
+                                    }}
+                                >
+                                    <Icon type="sync"/>请求网关应用列表
+                                </Button>
+                            </Tooltip>
+
+                        </div>
+                    </div>
                 <Table
                     rowKey="sn"
                     columns={this.state.columns}
@@ -256,22 +306,7 @@ class AppsList extends Component {
                         )
                     }}
                 />
-                <Tooltip placement="topLeft"
-                    title="请求网关上送其最新的应用列表数据"
-                >
-                    <Button
-                        disabled={!this.state.forceRefreshEnable}
-                        onClick={()=>{
-                            this.setState({forceRefreshEnable: false})
-                            this.forceRefreshAppList()
-                            setTimeout(()=>{
-                                this.setState({forceRefreshEnable: true})
-                            }, 5000)
-                        }}
-                    >
-                        <Icon type="sync"/>请求网关应用列表
-                    </Button>
-                </Tooltip>
+
                 </div>
                 <div
                     className={show_app_config ? 'show' : 'hide'}

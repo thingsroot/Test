@@ -1,14 +1,28 @@
 .GatesStatusWrap{
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 50px;
-    border: 1px solid #eee;
-    border-top: 3px solid #3c8dbc;
+    padding: 5px 0;
+    border: 1px solid #e8e8e8;
+    border-top: 3px solid #ccc;
     border-radius: 5px;
     font-weight: 500;
+    overflow: hidden;
+    .status{
+        text-align: center;
+    }
+    .gateDesc{
+        width: 70%;
+        height: 50px;
+        display: flex;
+        align-items: center;
+    }
+    .install{
+        width: 180px;
+        text-align: right;
+    }
     >div{
         padding: 10px 0;
+        float: left;
     }
+
     .online{
         color:#3c763d;
         b{
@@ -19,7 +33,6 @@
             border-radius: 50%;
             position: relative;
         }
-        
     }
     .offline{
         color:#f39c12;

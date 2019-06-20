@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon, Tooltip } from 'antd';
+import { Icon, Tooltip, Button } from 'antd';
 import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
@@ -63,7 +63,10 @@ class Status extends Component {
         const { device_status, dev_name, description, data } = this.props.store.gatewayInfo;
         return (
             <div className="GatesStatusWrap">
-                <div>
+                <div
+                    className="status"
+                    style={{width: '200px', marginRight: '20px'}}
+                >
                     <Tooltip title="在线状态" >
                         {/* <span className={device_status === 'ONLINE' ? 'online' : 'offline'}><b></b></span>
                         <span style={{padding: '0 5px'}} /> */}
@@ -75,7 +78,7 @@ class Status extends Component {
                     {
                         device_status === 'ONLINE' ? (
                             <span>
-                                <span style={{padding: '0 10px'}} />
+                                <span style={{padding: '0 5px'}} />
                                 <Tooltip title="数据上传" >
                                     <Icon
                                         style={{fontSize: 22, color: data.data_upload ? '#3c763d' : '#f39c12'}}
@@ -95,33 +98,40 @@ class Status extends Component {
                             </span>
                         ) : null
                     }
-                    
                 </div>
-                <div>
-                    <div className="positon"><span></span></div>
-                    &nbsp;名称: {dev_name ? dev_name : ''}
+                <div className="gateDesc">
+                    <div>
+                        <div className="positon"><span></span></div>
+                        &nbsp;名称: {dev_name ? dev_name : ''}
+                    </div>
+                    <span style={{padding: '0 50px'}} />
+                    <div>
+                        <div className="positon"><span></span></div>
+                        &nbsp;描述: {description ? description : ''}
+                    </div>
+                    <span style={{padding: '0 50px'}} />
+                    <div>
+                        <div className="positon"><span></span></div>
+                        &nbsp;序号: {this.state.gateway}
+                    </div>
                 </div>
-                <div>
-                    <div className="positon"><span></span></div>
-                    &nbsp;描述: {description ? description : ''}
-                </div>
-                <div>
-                    <div className="positon"><span></span></div>
-                    &nbsp;序号: {this.state.gateway}
-                </div>
+                <div className="install">
                     {
                         this.props.location.pathname.indexOf('/gateway/') !== -1
-                        ? <div
-                            onClick={()=>{
-                                localStorage.setItem('url', this.props.location.pathname)
-                            }}
-                          >
-                            <Link to={`/appsinstall/${this.state.gateway}`}>
-                                安装新应用
-                            </Link>
-                        </div>
-                        : ''
+                            ? <div
+                                onClick={()=>{
+                                    localStorage.setItem('url', this.props.location.pathname)
+                                }}
+                            >
+                                <Button type="primary">
+                                    <Link to={`/appsinstall/${this.state.gateway}`}>
+                                        安装新应用
+                                    </Link>
+                                </Button>
+                            </div>
+                            : ''
                     }
+                </div>
             </div>
         );
     }
