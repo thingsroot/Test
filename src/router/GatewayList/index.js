@@ -130,7 +130,7 @@ class MyGates extends Component {
                                 </Menu.Item>
                                 <Menu.Item key="2">
                                     <Link to={{
-                                        pathname: `/gateway/${record.sn}/onlinerecord`,
+                                        pathname: `/gateway/${record.sn}/onlinerecords`,
                                         state: record
                                     }}
                                         style={{color: 'rgba(0, 0, 0, 0.65)'}}
