@@ -20,7 +20,8 @@ class CommViewer extends Component {
         this.state = {
             type: '',
             title: '',
-            gateway: ''
+            gateway: '',
+            filterText: ''
         }
     }
     componentDidMount (){
@@ -39,6 +40,7 @@ class CommViewer extends Component {
         this.setState({ gateway: this.props.gateway })
         const { mqtt } = this.props;
         mqtt.comm_channel.setShow(true)
+        this.setState({filterText: mqtt.comm_channel.filter})
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
         if (nextProps.gateway !== this.props.gateway){
@@ -75,6 +77,7 @@ class CommViewer extends Component {
     }
     filter = (e)=>{
         let text = e.target.value;
+        this.setState({filterText: text})
         const value = text.toLowerCase();
 
         if (this.search_timer){
@@ -152,6 +155,7 @@ class CommViewer extends Component {
                     <span style={{padding: '0 5px'}} />
                     <Search
                         placeholder="输入搜索内容"
+                        value={this.state.filterText}
                         onChange={this.filter}
                         style={{ width: 400 }}
                     />
