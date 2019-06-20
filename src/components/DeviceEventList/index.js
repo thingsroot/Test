@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Table, Input, Select, Button, message, Icon} from 'antd'
+import {Table, Input, Select, Button, message, Icon } from 'antd'
 import './style.scss'
 import http from '../../utils/Server';
 import axios from 'axios';
@@ -594,6 +594,15 @@ class DeviceEventList extends Component {
                         />
                     </div>
                 </div>
+                <div style={{padding: '10px 0'}}>
+                    {'全部消息' + messageCount + '条，列表中未确认消息' + unconfirmed + '条，'}
+                    <span
+                        style={{color: 'blue', cursor: 'pointer'}}
+                        onClick={this.toggleMessage}
+                    >
+                                    {showUnDisposed ? '查看所有' : '查看未确认'}
+                                </span>
+                </div>
                 <Table
                     rowSelection={rowSelection}
                     columns={columns}
@@ -609,19 +618,6 @@ class DeviceEventList extends Component {
                                 data={record}
                                 onConfirm={this.confMessage}
                             />
-                        )
-                    }}
-                    footer={() => {
-                        return (
-                            <div className="none">
-                            {'全部消息' + messageCount + '条，列表中未确认消息' + unconfirmed + '条，'}
-                            <span
-                                style={{color: 'blue', cursor: 'pointer'}}
-                                onClick={this.toggleMessage}
-                            >
-                                {showUnDisposed ? '查看所有' : '查看未确认'}
-                            </span>
-                        </div>
                         )
                     }}
                 />
