@@ -101,20 +101,26 @@ class Status extends Component {
                     }
                 </div>
                 <div className="gateDesc">
-                    <div>
-                        <div className="positon"><span></span></div>
-                        &nbsp;名称: {dev_name ? dev_name : ''}
-                    </div>
+                    <Tooltip title={dev_name ? dev_name : ''}>
+                        <div style={{width: '240px'}}>
+                            <div className="positon"><span></span></div>
+                            &nbsp;名称: {dev_name ? dev_name : ''}
+                        </div>
+                    </Tooltip>
                     <span style={{padding: '0 50px'}} />
-                    <div>
-                        <div className="positon"><span></span></div>
-                        &nbsp;描述: {description ? description : ''}
-                    </div>
+                    <Tooltip title={description ? description : ''}>
+                        <div style={{width: '300px'}}>
+                            <div className="positon"><span></span></div>
+                            &nbsp;描述: {description ? description : ''}
+                        </div>
+                    </Tooltip>
                     <span style={{padding: '0 50px'}} />
-                    <div>
-                        <div className="positon"><span></span></div>
-                        &nbsp;序号: {this.state.gateway}
-                    </div>
+                    <Tooltip title={this.state.gateway}>
+                        <div style={{width: '300px'}}>
+                            <div className="positon"><span></span></div>
+                            &nbsp;序号: {this.state.gateway}
+                        </div>
+                    </Tooltip>
                 </div>
                 {
                     device_status === 'ONLINE'

@@ -246,7 +246,6 @@ class AppsList extends Component {
         return (
             <div>
                 <div className={show_app_config ? 'hide' : 'show'}>
-                    {/*console.log(data)*/}
                     <div className="toolbar">
                         <span> </span>
                         <div>
