@@ -84,6 +84,7 @@ class Status extends Component {
                                         style={{fontSize: 22, color: data.data_upload ? '#3c763d' : '#f39c12'}}
                                         type={data.data_upload  ? 'cloud-upload' : 'cloud'}
                                     />
+                                    {console.log(data.data_upload)}
                                 </Tooltip>
                                 <span style={{padding: '0 5px'}} />
                                 {
@@ -115,23 +116,28 @@ class Status extends Component {
                         &nbsp;序号: {this.state.gateway}
                     </div>
                 </div>
-                <div className="install">
-                    {
-                        this.props.location.pathname.indexOf('/gateway/') !== -1
+                {
+                    device_status === 'ONLINE'
+                    ? <div className="install">
+                        {
+                            this.props.location.pathname.indexOf('/gateway/') !== -1
                             ? <div
                                 onClick={()=>{
                                     localStorage.setItem('url', this.props.location.pathname)
                                 }}
-                            >
-                                <Button type="primary">
-                                    <Link to={`/appsinstall/${this.state.gateway}`}>
+                                >
+                                    <Button type="primary">
+                                        <Link to={`/appsinstall/${this.state.gateway}`}>
                                         安装新应用
                                     </Link>
                                 </Button>
                             </div>
                             : ''
-                    }
-                </div>
+                        }
+                    </div>
+                    : ''
+                }
+
             </div>
         );
     }

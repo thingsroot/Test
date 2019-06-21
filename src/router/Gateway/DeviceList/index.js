@@ -169,26 +169,30 @@ class DevicesList extends Component {
                         {'全量数据上送周期: ' + gatewayInfo.data.data_upload_cov_ttl + ' 秒'}
                     </p>
                     <p>
-                        <Button
-                            type={this.state.uploadOneShort ? 'default' : 'primary'}
-                            onClick={()=>{
-                                this.setState({uploadOneShort: !this.state.uploadOneShort}, ()=>{
-                                    if (!this.state.uploadOneShort){
-                                        clearInterval(this.one_short_timer);
-                                        this.enableDataUploadOneShort(0)
-                                    } else {
-                                        this.one_short_timer = setInterval(()=>{
-                                            this.enableDataUploadOneShort(60)
-                                        }, 55000)
-                                    }
-                                })
-                            }}
-                        >
-                            <Icon
-                                type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
-                                theme="filled"
-                            />{this.state.uploadOneShort ? '停止临时数据上传' : '开启临时数据上传'}
-                        </Button>
+                        {
+                            gatewayInfo.data.data_upload
+                            ? null
+                            : <Button
+                                type={this.state.uploadOneShort ? 'default' : 'primary'}
+                                onClick={()=>{
+                                    this.setState({uploadOneShort: !this.state.uploadOneShort}, ()=>{
+                                        if (!this.state.uploadOneShort){
+                                            clearInterval(this.one_short_timer);
+                                            this.enableDataUploadOneShort(0)
+                                        } else {
+                                            this.one_short_timer = setInterval(()=>{
+                                                this.enableDataUploadOneShort(60)
+                                            }, 55000)
+                                        }
+                                    })
+                                }}
+                            >
+                                    <Icon
+                                        type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
+                                        theme="filled"
+                                    />{this.state.uploadOneShort ? '停止临时数据上传' : '开启临时数据上传'}
+                                </Button>
+                        }
                         <Tooltip
                             placement="topLeft"
                             title="手动刷新列表"
