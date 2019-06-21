@@ -20,8 +20,7 @@ class Password extends PureComponent {
                 const data = {
                     new_password: values.password,
                     logout_all_sessions: 0,
-                    key: getParam('key'),
-                    old_password: ''
+                    key: getParam('key')
                 }
                 http.post('/api/user_update_password', data).then(res=>{
                     if (res.message) {
