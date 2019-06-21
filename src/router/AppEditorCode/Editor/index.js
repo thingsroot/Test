@@ -99,17 +99,6 @@ class MyCode extends Component {
         window.removeEventListener('resize', this.handleSize);
     }
 
-    onKeyDown = (e)=>{
-        if (e.keyCode === 100) {
-            e.preventDefault();
-            if (!this.state.changed) {
-                message.warning('文件未改动')
-            } else {
-                this.saveFile()
-            }
-        }
-    }
-
     handleSize = () => {
         this.setState({
             deskHeight: document.body.clientHeight * 0.8
@@ -469,10 +458,21 @@ class MyCode extends Component {
                             showGutter
                             highlightActiveLine
                             enableSnippets
+                            commands={[{    //命令是键绑定数组。
+                                name: 'saveFile', //键绑定的名称。
+                                bindKey: {win: 'Ctrl-S', mac: 'Command-S'}, //用于命令的组合键。
+                                exec: ()=>{
+                                    if (!this.state.changed) {
+                                        message.warning('文件未改动')
+                                    } else {
+                                        this.saveFile()
+                                    }
+                                }   //重新绑定命令的名称
+                            }]}
                             value={this.state.editorContent}
                             style={{width: '100%', height: this.state.deskHeight, minHeight: 600}}
                             setOptions={{
-                                enableBasicAutocompletion: false,
+                                enableBasicAutocompletion: true,
                                 enableLiveAutocompletion: true,
                                 enableSnippets: false,
                                 showLineNumbers: true,
