@@ -6,9 +6,10 @@ const TabPane = Tabs.TabPane;
 
 function callback (key) {
   this.setState({
-      loading: true
+      loading: true,
+      activeKey: key
   }, ()=>{
-      this.fetch(this.props.match.params.sn, key)
+      this.fetch()
   })
 }
 @withRouter
@@ -20,7 +21,9 @@ class GatewayOnlineRecord extends Component {
             // gate_status: [],
             gate_ipchange: [],
             gate_fault: [],
-            type: 'gate_wanip',
+            loading: true,
+            gateway: undefined,
+            activeKey: 'gate_wanip',
             columns: [{
                 title: '时间',
                 dataIndex: 'timer',
@@ -35,51 +38,42 @@ class GatewayOnlineRecord extends Component {
         this.callback = callback.bind(this)
     }
     componentDidMount () {
-        http.get('/api/gateway_online_record?sn=TRTX011900123456&type=gate_wanip').then(res=>{
-            if (res.ok) {
-                const data = [];
-                res.data && res.data.length > 0 && res.data.map(item=>{
-                    data.push({
-                        timer: item[0],
-                        number: item[1]
-                    })
-                })
-                this.setState({
-                    gate_wanip: data,
-                    loading: false
-                })
-            }
+        this.setState({ loading: true, gateway: this.props.gateway }, ()=>{
+            this.fetch()
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (nextProps.location.pathname !== this.props.location.pathname){
+        if (nextProps.gateway !== this.state.gateway){
             this.setState({
-                loading: true
+                loading: true,
+                gateway: nextProps.gateway
             }, ()=>{
-                this.fetch(nextProps.match.params.sn, this.state.type)
+                this.fetch()
             })
         }
     }
-    fetch = (sn, type) => {
-        http.get('/api/gateway_online_record?sn=' + sn + '&type=' + type).then(res=>{
+    fetch = () => {
+        const {gateway, activeKey} = this.state;
+        if (gateway === undefined || gateway === '') {
+            return
+        }
+        http.get('/api/gateway_online_record?sn=' + gateway + '&type=' + activeKey).then(res=>{
             if (res.ok) {
                 const data = [];
                 res.data && res.data.length > 0 && res.data.map(item=>{
                     data.push({
-                        timer: item[0],
+                        timer: new Date(item[0]),
                         number: item[1]
                     })
                 })
                 this.setState({
-                    [type]: data,
-                    loading: false,
-                    type
+                    [activeKey]: data,
+                    loading: false
                 })
             } else {
                 this.setState({
-                    [type]: [],
-                    loading: false,
-                    type
+                    [activeKey]: [],
+                    loading: false
                 })
             }
         })
