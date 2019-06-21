@@ -122,14 +122,22 @@ class Logviewer extends Component {
                     <div>
                         {
                             mqtt.log_channel.Active
-                                ? <Button
-                                    type="danger"
-                                    onClick={this.stopChannel}
-                                >取消订阅</Button>
-                                : <Button
-                                    type="primary"
-                                    onClick={this.startChannel}
-                                >订阅{this.state.title}</Button>
+                            ? <Button
+                                type="danger"
+                                onClick={
+                                    this.stopChannel
+                                }
+                              >
+                                取消订阅
+                            </Button>
+                            : <Button
+                                type="primary"
+                                onClick={
+                                    this.startChannel
+                                }
+                              >
+                                订阅{this.state.title}
+                            </Button>
                         }
                         <span style={{padding: '0 5px'}} />
                         <Button

@@ -17,27 +17,38 @@ class HeaderBar extends PureComponent {
                 <Menu.Item key="12">
                     <Icon type="setting"/>
                     <span onClick={
-                        ()=>{
-                            window.location.href = '/account'
+                            ()=>{
+                                window.location.href = '/account'
+                            }
                         }
-                    }>个人设置</span>
+                    >
+                        个人设置
+                    </span>
                 </Menu.Item>
                 <Menu.Item key="13">
                     <Icon type="laptop" />
-                    <span onClick={
-                        ()=>{
-                            window.location.href = '/virtualgateways'
+                    <span
+                        onClick={
+                            ()=>{
+                                window.location.href = '/virtualgateways'
+                            }
                         }
-                    }>虚拟网关</span>
+                    >
+                        虚拟网关
+                    </span>
                 </Menu.Item>
 
                 <Menu.Item key="14">
                     <Icon type="key" />
-                    <span onClick={
-                        ()=>{
-                            window.location.href = '/accesskeys'
+                    <span
+                        onClick={
+                            ()=>{
+                                window.location.href = '/accesskeys'
+                            }
                         }
-                    }>Accesskeys</span>
+                    >
+                        Accesskeys
+                    </span>
                 </Menu.Item>
                 <Menu.Divider />
                 <Menu.Item key="15">

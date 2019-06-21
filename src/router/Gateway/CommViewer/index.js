@@ -129,11 +129,11 @@ class CommViewer extends Component {
                                 ? <Button
                                     type="danger"
                                     onClick={this.stopChannel}
-                                >取消订阅</Button>
+                                  >取消订阅</Button>
                                 : <Button
                                     type="primary"
                                     onClick={this.startChannel}
-                                >订阅{this.state.title}</Button>
+                                  >订阅{this.state.title}</Button>
                         }
                         <span style={{padding: '0 5px'}} />
                         <Button

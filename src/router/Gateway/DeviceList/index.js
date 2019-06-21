@@ -174,19 +174,21 @@ class DevicesList extends Component {
                             ? null
                             : <Button
                                 type={this.state.uploadOneShort ? 'default' : 'primary'}
-                                onClick={()=>{
-                                    this.setState({uploadOneShort: !this.state.uploadOneShort}, ()=>{
-                                        if (!this.state.uploadOneShort){
-                                            clearInterval(this.one_short_timer);
-                                            this.enableDataUploadOneShort(0)
-                                        } else {
-                                            this.one_short_timer = setInterval(()=>{
-                                                this.enableDataUploadOneShort(60)
-                                            }, 55000)
-                                        }
-                                    })
-                                }}
-                            >
+                                onClick={
+                                    ()=>{
+                                        this.setState({uploadOneShort: !this.state.uploadOneShort}, ()=>{
+                                            if (!this.state.uploadOneShort){
+                                                clearInterval(this.one_short_timer);
+                                                this.enableDataUploadOneShort(0)
+                                            } else {
+                                                this.one_short_timer = setInterval(()=>{
+                                                    this.enableDataUploadOneShort(60)
+                                                }, 55000)
+                                            }
+                                        })
+                                    }
+                                }
+                              >
                                     <Icon
                                         type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
                                         theme="filled"

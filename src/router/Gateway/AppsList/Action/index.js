@@ -177,7 +177,7 @@ class Action extends Component {
         const {gatewayInfo} = this.props.store
         console.log(gatewayInfo.data.enable_beta)
         if (gatewayInfo.data.enable_beta === 0) {
-            message.error('网关暂时未开启调试模式')
+            message.error('网关未开启调试模式')
             return
         }
         if (record.data){
@@ -213,7 +213,7 @@ class Action extends Component {
         const { record, show_app_config } = this.props;
         const { upgradeLoading, visible, setName, setNameConfirmLoading, nameValue, appdebug } = this.state;
         return (
-            <div style={{marginLeft: '-50px'}}>
+            <div>
                 <div style={{width: '80%', lineHeight: '40px', display: 'flex', justifyContent: 'space-between'}}>
                     <span className="spanStyle">
                         应用ID: {record.data && record.data.name || '本地应用'}
@@ -232,30 +232,34 @@ class Action extends Component {
                     <span className="spanStyle">
                         应用开发者：{record.data && record.data.owner || this.props.store.session.companies}
                     </span>
+                </div>
+                <div style={{width: '80%', lineHeight: '40px', display: 'flex', justifyContent: 'space-between'}}>
                     {
                         record.data && record.data.fork_from ? (
-                        <div>
-                            源自应用：{record.data && record.data.fork_from}
-                            <span style={{color: 'blue', padding: '0 5px'}} >
+                            <div>
+                                源自应用：{record.data && record.data.fork_from}
+                                <span style={{color: 'blue', padding: '0 5px'}} >
                                 <Link to={`/appdetails/${record.data.name}`}>
                                     查看详情
                                 </Link>
                             </span>
-                            <span style={{color: 'orange', padding: '0 5px'}}
-                                onClick={()=>{
-                                    message.info('功能开发中.....')
-                                }}
-                            >
+                                <span style={{color: 'orange', padding: '0 5px'}}
+                                    onClick={
+                                        ()=>{
+                                            message.info('功能开发中.....')
+                                        }
+                                    }
+                                >
                                 使用源应用替换 <Icon type="rollback"/>
                             </span>
-                        </div>
+                            </div>
                         ) : null
                     }
                     {
                         record.data && record.data.fork_from ? (
-                        <div>
-                            源自版本：{record.data && record.data.fork_version}
-                        </div>
+                            <div>
+                                源自版本：{record.data && record.data.fork_version}
+                            </div>
                         ) : null
                     }
                 </div>
