@@ -60,7 +60,8 @@ class Password extends PureComponent {
                     <Form.Item>
                         {getFieldDecorator('password', {
                             rules: [{ required: true, message: '请输入密码!' }, {
-                                pattern: /^[\w]{6,12}$/, message: '密码格式6-12数字和字母组合'
+                                pattern: /^(?![a-zA-z]+$)(?!\d+$)(?![!@_#$%^&*]+$)[a-zA-Z\d!_@#$%^&*]{6,12}$/,
+                                message: '长度最低6位，密码须包含字母，数字或特殊字符'
                             }]
                         })(
                             <Input prefix={

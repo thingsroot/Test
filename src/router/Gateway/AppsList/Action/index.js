@@ -175,7 +175,8 @@ class Action extends Component {
     }
     onDebug = (record) =>{
         const {gatewayInfo} = this.props.store
-        if (gatewayInfo.data.enable_beta === false) {
+        console.log(gatewayInfo.data.enable_beta)
+        if (gatewayInfo.data.enable_beta === 0) {
             message.error('网关暂时未开启调试模式')
             return
         }
