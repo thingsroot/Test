@@ -123,7 +123,7 @@ class CommViewer extends Component {
                 className="commView"
             >
                 <div className="toolbar">
-                    <span style={{padding: '0 10px'}} >当前报文数量：{mqtt.comm_channel.Data.length} / {mqtt.comm_channel.AllData.length}</span>
+                    <span>当前报文数量：{mqtt.comm_channel.Data.length} / {mqtt.comm_channel.AllData.length}</span>
                     <div className="searwrap">
                         {
                             mqtt.comm_channel.Active

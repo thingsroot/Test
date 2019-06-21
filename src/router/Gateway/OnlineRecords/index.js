@@ -88,6 +88,7 @@ class GatewayOnlineRecord extends Component {
                 style={{marginTop: 20}}
             >
                 <Tabs
+                    style={{marginTop: -19}}
                     onChange={this.callback}
                     type="card"
                 >

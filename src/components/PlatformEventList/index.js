@@ -615,7 +615,7 @@ class PlatformEvents extends Component {
                             this.confMessage(selectedRowKeys)
                         }}
                         >确认</Button>
-                        <span style={{padding: '0 1px'}} />
+                        <span style={{padding: '0 5px'}} />
                         <Button onClick={()=>{
                             this.confAllMessage()
                         }}

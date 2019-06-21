@@ -273,8 +273,8 @@ class AppsList extends Component {
                                 title="手动刷新列表"
                             >
                                 <Icon
-                                    style={{fontSize: 20, margin: '0 0 0 15px'}}
-                                    type="redo"
+                                    style={{fontSize: 18, margin: '0 0 0 15px'}}
+                                    type="sync"
                                     onClick={()=>{
                                         this.setState({
                                             loading: true,

@@ -187,15 +187,15 @@ class DevicesList extends Component {
                             <Icon
                                 type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
                                 theme="filled"
-                            />{this.state.uploadOneShort ? '停止网关上传数据' : '开启网关上传数据'}
+                            />{this.state.uploadOneShort ? '停止临时数据上传' : '开启临时数据上传'}
                         </Button>
                         <Tooltip
                             placement="topLeft"
                             title="手动刷新列表"
                         >
                             <Icon
-                                style={{fontSize: 20, margin: '0 0 0 15px'}}
-                                type="redo"
+                                style={{fontSize: 18, margin: '0 0 0 15px'}}
+                                type="sync"
                                 onClick={()=>{
                                     this.setState({
                                         loading: true,
