@@ -208,9 +208,9 @@ class Action extends Component {
         const { record, show_app_config } = this.props;
         const { upgradeLoading, visible, setName, setNameConfirmLoading, nameValue, appdebug } = this.state;
         return (
-            <div style={{position: 'relative', paddingBottom: 50}}>
-                <div style={{lineHeight: '30px', paddingLeft: 20}}>
-                    <div>
+            <div style={{marginLeft: '-50px'}}>
+                <div style={{lineHeight: '40px'}}>
+                    <span className="spanStyle">
                         应用ID: {record.data && record.data.name || '本地应用'}
                         {
                             record.data && record.data.name
@@ -220,13 +220,13 @@ class Action extends Component {
                                 </Link>
                             </span> : null
                         }
-                    </div>
-                    <div>
+                    </span>
+                    <span className="spanStyle">
                         应用名称: {record.data && record.data.app_name || '本地应用'}
-                    </div>
-                    <div>
+                    </span>
+                    <span className="spanStyle">
                         应用开发者：{record.data && record.data.owner || this.props.store.session.companies}
-                    </div>
+                    </span>
                     {
                         record.data && record.data.fork_from ? (
                         <div>
@@ -254,9 +254,9 @@ class Action extends Component {
                         ) : null
                     }
                 </div>
-                <div style={{display: 'flex', justifyContent: 'space-around', marginTop: 20, minWidth: 840, position: 'absolute', right: 20, bottom: 15}}>
+                <div style={{display: 'flex', marginTop: 20, width: '100%', minWidth: 840}}>
                     <div style={{paddingTop: 5}}>
-                        <span>开机自启:</span>
+                        <span className="spanStyle">开机自启:</span>
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <Switch checkedChildren=" ON"
                             unCheckedChildren="OFF"
@@ -267,7 +267,7 @@ class Action extends Component {
                             }}
                         />
                     </div>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <span style={{margin: '0 5px'}}></span>
                     <Button
                         disabled={this.state.running_action || !actionEnable}
                         onClick={()=>{
@@ -276,6 +276,7 @@ class Action extends Component {
                     >
                         更改名称
                     </Button>
+                    <span style={{margin: '0 5px'}}></span>
                     <Button
                         disabled={!record.data}
                         onClick={()=>{
@@ -286,12 +287,14 @@ class Action extends Component {
                     >
                         应用配置
                     </Button>
+                    <span style={{margin: '0 5px'}}></span>
                     <Button
                         onClick={this.onDebug.bind(this, record)}
                         disabled={this.state.running_action || !actionEnable || !(record.data && record.data.name)}
                     >
                         应用调试
                     </Button>
+                    <span style={{margin: '0 5px'}}></span>
                     <Button
                         disabled={record.latestVersion === undefined || record.latestVersion <= record.version || this.state.running_action || !actionEnable}
                         onClick={()=>{
@@ -300,6 +303,7 @@ class Action extends Component {
                     >
                         更新版本
                     </Button>
+                    <span style={{margin: '0 5px'}}></span>
                     <Button
                         onClick={()=>{
                             this.appSwitch('start')
@@ -308,6 +312,7 @@ class Action extends Component {
                     >
                         启动应用
                     </Button>
+                    <span style={{margin: '0 5px'}}></span>
                     <Button
                         disabled={this.state.running_action || !actionEnable}
                         onClick={()=>{
@@ -316,6 +321,7 @@ class Action extends Component {
                     >
                         关闭应用
                     </Button>
+                    <span style={{margin: '0 5px'}}></span>
                     <Button
                         disabled={this.state.running_action || !actionEnable}
                         onClick={()=>{
@@ -324,6 +330,7 @@ class Action extends Component {
                     >
                         重启应用
                     </Button>
+                    <span style={{margin: '0 5px'}}></span>
                     <Popconfirm
                         disabled={this.state.running_action || !actionEnable}
                         title="确定要卸载此应用吗?"

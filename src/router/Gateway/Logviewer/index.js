@@ -118,43 +118,49 @@ class Logviewer extends Component {
         gateway;
         return (
             <div style={{position: 'relative'}}>
-                <div className="opwrap">
-                    {
-                        mqtt.log_channel.Active
-                        ? <Button type="danger"
-                            onClick={this.stopChannel}
-                          >取消订阅</Button>
-                        : <Button type="primary"
-                            onClick={this.startChannel}
-                          >订阅{this.state.title}</Button>
-                    }
-                    <span style={{padding: '0 5px'}} />
-                    <Button type="danger"
-                        onClick={()=>{
-                            mqtt.log_channel.clearData()
-                        }}
-                    >清除</Button>
-                    <span style={{padding: '0 10px'}} >当前报文数量：{mqtt.log_channel.Data.length} / {mqtt.log_channel.AllData.length}</span>
-                </div>
-                <div className="searwrap">
-                    <Select
-                        labelInValue
-                        defaultValue={{ key: 'all' }}
-                        style={{ width: 200 }}
-                        onChange={this.handleChange}
-                    >
-                        <Option value="all">全部</Option>
-                        <Option value="content">内容</Option>
-                        <Option value="level">等级</Option>
-                        <Option value="id">应用示例名</Option>
-                    </Select>
-                    <span style={{padding: '0 5px'}} />
-                    <Search
-                        placeholder="输入搜索内容"
-                        value={this.state.filterText}
-                        onChange={this.filter}
-                        style={{ width: 400 }}
-                    />
+                <div className="toolbar">
+                    <div>
+                        <span style={{padding: '0 10px'}} >当前报文数量：{mqtt.log_channel.Data.length} / {mqtt.log_channel.AllData.length}</span>
+                    </div>
+                    <div className="searwrap">
+                        {
+                            mqtt.log_channel.Active
+                                ? <Button
+                                    type="danger"
+                                    onClick={this.stopChannel}
+                                >取消订阅</Button>
+                                : <Button
+                                    type="primary"
+                                    onClick={this.startChannel}
+                                >订阅{this.state.title}</Button>
+                        }
+                        <span style={{padding: '0 5px'}} />
+                        <Button
+                            type="danger"
+                            onClick={()=>{
+                                mqtt.log_channel.clearData()
+                            }}
+                        >清除</Button>
+                        <span style={{padding: '0 5px'}} />
+                        <Select
+                            labelInValue
+                            defaultValue={{ key: 'all' }}
+                            style={{ width: 140 }}
+                            onChange={this.handleChange}
+                        >
+                            <Option value="all">全部</Option>
+                            <Option value="content">内容</Option>
+                            <Option value="level">等级</Option>
+                            <Option value="id">应用示例名</Option>
+                        </Select>
+                        <span style={{padding: '0 5px'}} />
+                        <Search
+                            placeholder="输入搜索内容"
+                            value={this.state.filterText}
+                            onChange={this.filter}
+                            style={{ display: 'inline-block', width: 300 }}
+                        />
+                    </div>
                 </div>
                 {
                     this.state.maxNum
@@ -173,10 +179,10 @@ class Logviewer extends Component {
                 >
                     <div style={{width: '100%'}}>
                         <div className="tableHeaders">
-                            <div>时间</div>
-                            <div>等级</div>
-                            <div>应用实例名</div>
-                            <div>内容</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>时间</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>等级</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>应用实例名</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>内容</div>
                         </div>
                             <div
                                 className="tableContent"

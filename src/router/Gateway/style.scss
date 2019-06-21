@@ -21,7 +21,6 @@
 
 .mygateslist{
     height: 100%;
-    border-top: 3px solid #eee;
     flex:1;
     margin-top: 15px;
     margin-left: 20px;
@@ -48,4 +47,15 @@
 }
 .gateslistactive{
     border-left: 3px solid #ccc;
+}
+
+.toolbar{
+    display: flex;
+    justify-content: space-between;
+    height: 30px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+.cursor{
+    cursor: pointer;
 }

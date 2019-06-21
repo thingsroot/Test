@@ -122,44 +122,49 @@ class CommViewer extends Component {
                 style={{position: 'relative'}}
                 className="commView"
             >
-                <div className="opwrap">
-                    {
-                        mqtt.comm_channel.Active
-                        ? <Button type="danger"
-                            onClick={this.stopChannel}
-                          >取消订阅</Button>
-                        : <Button type="primary"
-                            onClick={this.startChannel}
-                          >订阅{this.state.title}</Button>
-                    }
-                    <span style={{padding: '0 5px'}} />
-                    <Button type="danger"
-                        onClick={()=>{
-                            mqtt.comm_channel.clearData()
-                        }}
-                    >清除</Button>
+                <div className="toolbar">
                     <span style={{padding: '0 10px'}} >当前报文数量：{mqtt.comm_channel.Data.length} / {mqtt.comm_channel.AllData.length}</span>
+                    <div className="searwrap">
+                        {
+                            mqtt.comm_channel.Active
+                                ? <Button
+                                    type="danger"
+                                    onClick={this.stopChannel}
+                                >取消订阅</Button>
+                                : <Button
+                                    type="primary"
+                                    onClick={this.startChannel}
+                                >订阅{this.state.title}</Button>
+                        }
+                        <span style={{padding: '0 5px'}} />
+                        <Button
+                            type="danger"
+                            onClick={()=>{
+                                mqtt.comm_channel.clearData()
+                            }}
+                        >清除</Button>
+                        <span style={{padding: '0 5px'}} />
+                        <Select
+                            labelInValue
+                            defaultValue={{ key: 'all' }}
+                            style={{ width: 140 }}
+                            onChange={this.handleChange}
+                        >
+                            <Option value="all">全部</Option>
+                            <Option value="content">内容</Option>
+                            <Option value="direction">方向</Option>
+                            <Option value="id">设备序列号</Option>
+                        </Select>
+                        <span style={{padding: '0 5px'}} />
+                        <Search
+                            placeholder="输入搜索内容"
+                            value={this.state.filterText}
+                            onChange={this.filter}
+                            style={{ width: 300 }}
+                        />
+                    </div>
                 </div>
-                <div className="searwrap">
-                    <Select
-                        labelInValue
-                        defaultValue={{ key: 'all' }}
-                        style={{ width: 200 }}
-                        onChange={this.handleChange}
-                    >
-                        <Option value="all">全部</Option>
-                        <Option value="content">内容</Option>
-                        <Option value="direction">方向</Option>
-                        <Option value="id">设备序列号</Option>
-                    </Select>
-                    <span style={{padding: '0 5px'}} />
-                    <Search
-                        placeholder="输入搜索内容"
-                        value={this.state.filterText}
-                        onChange={this.filter}
-                        style={{ width: 400 }}
-                    />
-                </div>
+
                 {
                     this.state.maxNum
                     ? <Alert
@@ -176,10 +181,10 @@ class CommViewer extends Component {
                 >
                     <div style={{width: '100%'}}>
                         <div className="tableHeaders">
-                            <div>时间</div>
-                            <div>设备序列号</div>
-                            <div>方向</div>
-                            <div>报文</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>时间</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>设备序列号</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>方向</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>报文</div>
                         </div>
                             <div
                                 className="tableContent"
