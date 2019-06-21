@@ -16,7 +16,7 @@ class LeftNav extends Component {
         commnum: 0,
         list: [
             {
-                icon: 'profile',
+                icon: 'gold',
                 text: '设备列表',
                 href: '/devices'
             }, {
@@ -24,7 +24,7 @@ class LeftNav extends Component {
                 text: '应用列表',
                 href: '/apps'
             }, {
-                icon: 'database',
+                icon: 'setting',
                 text: '网关设置',
                 href: '/settings'
             }
@@ -139,7 +139,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 7 ? 'active' : ''}
-                                >{this.state.commnum !== 0 ? <div className="logcount count">{this.state.commnum}</div> : ''}<Icon type="select"/>&nbsp;&nbsp;网关报文</li>
+                                >{this.state.commnum !== 0 ? <div className="logcount count">{this.state.commnum}</div> : ''}<Icon type="bars"/>&nbsp;&nbsp;网关报文</li>
                             </Link>
                             <Link
                                 to={`${url}/platformevents`}
@@ -149,7 +149,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 8 ? 'active' : ''}
-                                ><Icon type="desktop"/>&nbsp;&nbsp;平台事件</li>
+                                ><Icon type="bell"/>&nbsp;&nbsp;平台事件</li>
                             </Link>
                             <Link
                                 to={`${url}/events`}
@@ -169,7 +169,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 5 ? 'active' : ''}
-                                ><Icon type="reconciliation"/>&nbsp;&nbsp;在线记录</li>
+                                ><Icon type="exception"/>&nbsp;&nbsp;在线记录</li>
                             </Link>
                         </ul>
                 </div>

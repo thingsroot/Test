@@ -120,9 +120,6 @@ class Logviewer extends Component {
             <div style={{position: 'relative'}}>
                 <div className="toolbar">
                     <div>
-                        <span>当前日志数量：{mqtt.log_channel.Data.length} / {mqtt.log_channel.AllData.length}</span>
-                    </div>
-                    <div className="searwrap">
                         {
                             mqtt.log_channel.Active
                                 ? <Button
@@ -142,6 +139,10 @@ class Logviewer extends Component {
                             }}
                         >清除</Button>
                         <span style={{padding: '0 5px'}} />
+                        <span>当前日志数量：{mqtt.log_channel.Data.length} / {mqtt.log_channel.AllData.length}</span>
+                    </div>
+                    <div className="searwrap">
+
                         <Select
                             labelInValue
                             defaultValue={{ key: 'all' }}

@@ -1,23 +1,22 @@
 .GatesStatusWrap{
-    padding: 5px 0;
-    border-radius: 5px;
+    margin-top: -10px;
     font-weight: 500;
+    line-height: 40px;
     overflow: hidden;
+    position: relative;
     .status{
         text-align: center;
     }
     .gateDesc{
         width: 70%;
-        height: 30px;
         display: flex;
         align-items: center;
     }
     .install{
-        width: 180px;
-        text-align: right;
+        position: absolute;
+        right: 33px;
     }
     >div{
-        padding: 10px 0;
         float: left;
     }
 

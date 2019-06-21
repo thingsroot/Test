@@ -318,7 +318,7 @@ class GatewaySettings extends Component {
                             <p><b>数据上传:</b>{gatewayInfo.data && gatewayInfo.data.data_upload ? '开启' : '关闭'}</p>
                             <p><b>统计上传:</b>{gatewayInfo.data && gatewayInfo.data.stat_upload ? '开启' : '关闭'}</p>
                             <p><b>日志上传:</b>{gatewayInfo.data && gatewayInfo.data.event_upload}</p>
-                            <p style={{height: '30px'}}> </p>
+                            <div style={{height: '25px'}}> </div>
                             </Card>
                         </div>
                     </div>

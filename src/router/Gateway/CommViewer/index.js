@@ -123,8 +123,7 @@ class CommViewer extends Component {
                 className="commView"
             >
                 <div className="toolbar">
-                    <span>当前报文数量：{mqtt.comm_channel.Data.length} / {mqtt.comm_channel.AllData.length}</span>
-                    <div className="searwrap">
+                    <div>
                         {
                             mqtt.comm_channel.Active
                                 ? <Button
@@ -144,6 +143,9 @@ class CommViewer extends Component {
                             }}
                         >清除</Button>
                         <span style={{padding: '0 5px'}} />
+                        <span>当前报文数量：{mqtt.comm_channel.Data.length} / {mqtt.comm_channel.AllData.length}</span>
+                    </div>
+                    <div className="searwrap">
                         <Select
                             labelInValue
                             defaultValue={{ key: 'all' }}

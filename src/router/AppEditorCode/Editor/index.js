@@ -100,7 +100,7 @@ class MyCode extends Component {
     }
 
     onKeyDown = (e)=>{
-        if (e.keyCode === 83) {
+        if (e.keyCode === 100) {
             e.preventDefault();
             if (!this.state.changed) {
                 message.warning('文件未改动')
