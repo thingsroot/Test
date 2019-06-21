@@ -600,7 +600,7 @@ class DeviceEventList extends Component {
                     showIcon
                     message={
                         <span>
-                            全部消息<b>{messageCount}</b>条，列表中无未确认消息<b>{unconfirmed}</b>条，
+                            全部消息<b>{messageCount}</b>条，列表中未确认消息<b>{unconfirmed}</b>条，
                             <span
                                 style={{color: 'blue', cursor: 'pointer'}}
                                 onClick={this.toggleMessage}

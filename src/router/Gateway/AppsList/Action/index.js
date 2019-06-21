@@ -174,9 +174,12 @@ class Action extends Component {
         })
     }
     onDebug = (record) =>{
-        console.log(record)
+        const {gatewayInfo} = this.props.store
+        if (gatewayInfo.data.enable_beta === false) {
+            message.error('网关暂时未开启调试模式')
+            return
+        }
         if (record.data){
-            const {gatewayInfo} = this.props.store
             let user_id = this.props.store.session.user_id
             let app = record.data.name
             let app_name = record.data.app_name
@@ -210,7 +213,7 @@ class Action extends Component {
         const { upgradeLoading, visible, setName, setNameConfirmLoading, nameValue, appdebug } = this.state;
         return (
             <div style={{marginLeft: '-50px'}}>
-                <div style={{lineHeight: '40px'}}>
+                <div style={{width: '80%', lineHeight: '40px', display: 'flex', justifyContent: 'space-between'}}>
                     <span className="spanStyle">
                         应用ID: {record.data && record.data.name || '本地应用'}
                         {
@@ -255,7 +258,7 @@ class Action extends Component {
                         ) : null
                     }
                 </div>
-                <div style={{display: 'flex', marginTop: 20, width: '100%', minWidth: 840}}>
+                <div style={{display: 'flex', marginTop: 10, width: '100%', minWidth: 840}}>
                     <div style={{paddingTop: 5}}>
                         <span className="spanStyle">开机自启:</span>
                         &nbsp;&nbsp;&nbsp;&nbsp;
