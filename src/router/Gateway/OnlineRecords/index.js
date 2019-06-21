@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import http from '../../../utils/Server';
+import { formatTime } from '../../../utils/time';
 import { Table, Tabs  } from 'antd';
 import { withRouter} from 'react-router-dom';
 const TabPane = Tabs.TabPane;
@@ -26,9 +27,10 @@ class GatewayOnlineRecord extends Component {
             activeKey: 'gate_wanip',
             columns: [{
                 title: '时间',
-                dataIndex: 'timer',
-                key: 'timer',
-                width: 300
+                dataIndex: 'time',
+                key: 'time',
+                width: 300,
+                sorter: (a, b) => a.timestamp && b.timestamp && a.timestamp - b.timestamp
             }, {
                 title: '数值',
                 dataIndex: 'number',
@@ -62,7 +64,8 @@ class GatewayOnlineRecord extends Component {
                 const data = [];
                 res.data && res.data.length > 0 && res.data.map(item=>{
                     data.push({
-                        timer: new Date(item[0]),
+                        time: formatTime(new Date(item[0]), 'yyyy-MM-dd hh:mm:ss S'),
+                        timestamp: new Date(item[0]),
                         number: item[1]
                     })
                 })
@@ -95,7 +98,7 @@ class GatewayOnlineRecord extends Component {
                         <Table
                             columns={columns}
                             loading={loading}
-                            rowKey="timer"
+                            rowKey="time"
                             dataSource={gate_wanip}
                         />
                     </TabPane>
@@ -106,7 +109,7 @@ class GatewayOnlineRecord extends Component {
                         <Table
                             columns={columns}
                             loading={loading}
-                            rowKey="timer"
+                            rowKey="time"
                             dataSource={gate_fault}
                         />
                     </TabPane>
@@ -117,7 +120,7 @@ class GatewayOnlineRecord extends Component {
                         <Table
                             columns={columns}
                             loading={loading}
-                            rowKey="timer"
+                            rowKey="time"
                             dataSource={gate_ipchange}
                         />
                     </TabPane>

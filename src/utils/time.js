@@ -1,5 +1,5 @@
 /**************************************时间格式化处理************************************/
-function dateFtt (fmt, date) {
+export function formatTime (date, fmt) {
     var o = {
         'M+': date.getMonth() + 1,     //月份
         'd+': date.getDate(),     //日
@@ -21,5 +21,5 @@ function dateFtt (fmt, date) {
 }
 
 export function getLocalTime (nS) {
-    return dateFtt('yyyy-MM-dd hh:mm:ss S', new Date(nS * 1000));
+    return formatTime( new Date(nS * 1000), 'yyyy-MM-dd hh:mm:ss S');
 }
