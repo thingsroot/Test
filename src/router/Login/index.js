@@ -36,7 +36,7 @@ class Login extends PureComponent {
                         <img src=""
                             alt=""
                         />
-                        <span>冬笋物联网</span>
+                        <span>冬笋云</span>
                     </p>
                 </div>
                 <div className="main">
