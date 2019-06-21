@@ -125,13 +125,13 @@ class Siders extends PureComponent {
                     </Menu.Item>
                     <Menu.Item key="4">
                         <Link to="/platformevents">
-                            <Icon type="bell" style={{fontSize: '18px'}} />
+                            <Icon type="message" />
                             <span>平台事件</span>
                         </Link>
                     </Menu.Item>
                     <Menu.Item key="5">
                         <Link to="/gatewayevents">
-                            <Icon type="message" />
+                            <Icon type="sound" />
                             <span>设备事件</span>
                         </Link>
                     </Menu.Item>
