@@ -252,22 +252,6 @@ class AppsList extends Component {
                         <div>
                             <Tooltip
                                 placement="topLeft"
-                                title="手动刷新列表"
-                            >
-                                <Icon
-                                    style={{fontSize: 20, margin: '0 15px'}}
-                                    type="redo"
-                                    onClick={()=>{
-                                        this.setState({
-                                            loading: true,
-                                            sign: true
-                                        });
-                                        this.fetch()
-                                    }}
-                                />
-                            </Tooltip>
-                            <Tooltip
-                                placement="topLeft"
                                 title="请求网关上送其最新的应用列表数据"
                             >
                                 <Button
@@ -284,7 +268,22 @@ class AppsList extends Component {
                                     <Icon type="sync"/>请求网关应用列表
                                 </Button>
                             </Tooltip>
-
+                            <Tooltip
+                                placement="topLeft"
+                                title="手动刷新列表"
+                            >
+                                <Icon
+                                    style={{fontSize: 20, margin: '0 0 0 15px'}}
+                                    type="redo"
+                                    onClick={()=>{
+                                        this.setState({
+                                            loading: true,
+                                            sign: true
+                                        });
+                                        this.fetch()
+                                    }}
+                                />
+                            </Tooltip>
                         </div>
                     </div>
                 <Table

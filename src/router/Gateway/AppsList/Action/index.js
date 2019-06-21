@@ -174,6 +174,7 @@ class Action extends Component {
         })
     }
     onDebug = (record) =>{
+        console.log(record)
         if (record.data){
             const {gatewayInfo} = this.props.store
             let user_id = this.props.store.session.user_id
@@ -181,7 +182,7 @@ class Action extends Component {
             let app_name = record.data.app_name
             let app_inst = record.inst_name
             if (record.data.owner === user_id){
-                this.props.history.push(`/appeditorcode/${app}/${app_name}/${gatewayInfo.sn}/${app_inst}`);
+                window.open(`/appeditorcode/${app}/${app_name}/${gatewayInfo.sn}/${app_inst}`, '_blank');
                 this.setState({appdebug: false})
             } else {
                 let url = `/api/applications_forks_list?name=${app}&version=${record.version}&owner=${user_id}`
@@ -189,7 +190,7 @@ class Action extends Component {
                     if (result.ok){
                         if (result.data && result.data.length > 0){
                             let forked_app = result.data[0]
-                            this.props.history.push(`/appeditorcode/${forked_app.name}/${forked_app.app_name}/${gatewayInfo.sn}/${app_inst}`);
+                            window.open(`/appeditorcode/${forked_app.name}/${forked_app.app_name}/${gatewayInfo.sn}/${app_inst}`, '_blank');
                             this.setState({appdebug: false})
                         } else {
                             this.setState({appdebug: true})

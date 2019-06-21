@@ -165,25 +165,10 @@ class DevicesList extends Component {
                 <div className="toolbar">
                     <p>
                         {'数据上送周期: ' + gatewayInfo.data.data_upload_period + ' 毫秒'}
+                        <span style={{padding: '0 5px'}}></span>
                         {'全量数据上送周期: ' + gatewayInfo.data.data_upload_cov_ttl + ' 秒'}
                     </p>
                     <p>
-                        <Tooltip
-                            placement="topLeft"
-                            title="手动刷新列表"
-                        >
-                            <Icon
-                                style={{fontSize: 20, margin: '0 15px'}}
-                                type="redo"
-                                onClick={()=>{
-                                    this.setState({
-                                        loading: true,
-                                        sign: true
-                                    });
-                                    this.getData()
-                                }}
-                            />
-                        </Tooltip>
                         <Button
                             type={this.state.uploadOneShort ? 'default' : 'primary'}
                             onClick={()=>{
@@ -202,8 +187,24 @@ class DevicesList extends Component {
                             <Icon
                                 type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
                                 theme="filled"
-                            />{this.state.uploadOneShort ? '停止上传' : '开启上传'}
+                            />{this.state.uploadOneShort ? '停止网关上传数据' : '开启网关上传数据'}
                         </Button>
+                        <Tooltip
+                            placement="topLeft"
+                            title="手动刷新列表"
+                        >
+                            <Icon
+                                style={{fontSize: 20, margin: '0 0 0 15px'}}
+                                type="redo"
+                                onClick={()=>{
+                                    this.setState({
+                                        loading: true,
+                                        sign: true
+                                    });
+                                    this.getData()
+                                }}
+                            />
+                        </Tooltip>
                     </p>
                 </div>
                 <Table

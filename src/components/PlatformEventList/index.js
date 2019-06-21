@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Input, Select, Button, message, Icon } from 'antd'
+import {Table, Input, Select, Button, message, Icon, Alert } from 'antd'
 import SonTable from './SonTable';
 import './style.scss'
 import http from '../../utils/Server';
@@ -679,7 +679,7 @@ class PlatformEvents extends Component {
                             />
                         </InputGroup>
                         <Icon
-                            style={{fontSize: '18px', lineHeight: '35px', padding: '0 10px'}}
+                            style={{fontSize: '18px', lineHeight: '35px', padding: '5px 0 0 10px'}}
                             type="sync"
                             spin={this.state.sync}
                             onClick={this.refresh}
@@ -687,15 +687,22 @@ class PlatformEvents extends Component {
                     </div>
 
                 </div>
-                <div  style={{padding: '10px 0'}}>
-                    {'全部消息' + messageCount + '条，列表中未确认消息' + unconfirmed + '条，'}
-                    <span
-                        style={{color: 'blue', cursor: 'pointer'}}
-                        onClick={this.toggleMessage}
-                    >
-                                    {showUnDisposed ? '查看所有' : '查看未确认'}
-                                </span>
-                </div>
+                <Alert
+                    style={{marginBottom: 5}}
+                    type="info"
+                    showIcon
+                    message={
+                        <span>
+                            全部消息<b>{messageCount}</b>条，列表中无未确认消息<b>{unconfirmed}</b>条，
+                            <span
+                                style={{color: 'blue', cursor: 'pointer'}}
+                                onClick={this.toggleMessage}
+                            >
+                                {showUnDisposed ? '查看所有' : '查看未确认'}
+                            </span>
+                        </span>
+                    }
+                />
                 <Table
                     rowSelection={rowSelection}
                     columns={columns}

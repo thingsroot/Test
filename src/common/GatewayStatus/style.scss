@@ -1,7 +1,5 @@
 .GatesStatusWrap{
     padding: 5px 0;
-    border: 1px solid #e8e8e8;
-    border-top: 3px solid #ccc;
     border-radius: 5px;
     font-weight: 500;
     overflow: hidden;
@@ -10,7 +8,7 @@
     }
     .gateDesc{
         width: 70%;
-        height: 50px;
+        height: 30px;
         display: flex;
         align-items: center;
     }

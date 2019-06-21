@@ -120,7 +120,7 @@ class Logviewer extends Component {
             <div style={{position: 'relative'}}>
                 <div className="toolbar">
                     <div>
-                        <span style={{padding: '0 10px'}} >当前报文数量：{mqtt.log_channel.Data.length} / {mqtt.log_channel.AllData.length}</span>
+                        <span style={{padding: '0 10px'}} >当前日志数量：{mqtt.log_channel.Data.length} / {mqtt.log_channel.AllData.length}</span>
                     </div>
                     <div className="searwrap">
                         {
