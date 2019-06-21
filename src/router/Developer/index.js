@@ -131,7 +131,7 @@ class Developer extends Component {
                                     <div className="appImg">
                                         <Link to={`/appdetails/${v.name}`}>
                                             <img
-                                                src={`http://cloud.thingsroot.com${v.icon_image}`}
+                                                src={`http://ioe.thingsroot.com${v.icon_image}`}
                                                 alt=""
                                             />
                                         </Link>
@@ -164,7 +164,7 @@ class Developer extends Component {
                                     <div className="appImg">
                                         <Link to={`/appdetails/${v.name}`}>
                                             <img
-                                                src={`http://cloud.thingsroot.com${v.icon_image}`}
+                                                src={`http://ioe.thingsroot.com${v.icon_image}`}
                                                 alt=""
                                             />
                                         </Link>
@@ -193,7 +193,7 @@ class Developer extends Component {
                 {/*                    <div className="appImg">*/}
                 {/*                        <Link to={`/myAppDetails/${v.name}`}>*/}
                 {/*                            <img*/}
-                {/*                                src={`http://cloud.thingsroot.com${v.icon_image}`}*/}
+                {/*                                src={`http://ioe.thingsroot.com${v.icon_image}`}*/}
                 {/*                                alt=""*/}
                 {/*                            />*/}
                 {/*                        </Link>*/}
