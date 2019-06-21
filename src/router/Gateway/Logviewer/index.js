@@ -43,7 +43,7 @@ class Logviewer extends Component {
         this.setState({filterText: mqtt.log_channel.filter})
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
-        if (nextProps.gateway !== this.props.gateway){
+        if (nextProps.gateway !== this.state.gateway){
             this.stopChannel()
             this.setState({
                 gateway: nextProps.gateway

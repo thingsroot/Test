@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import http from '../../../utils/Server';
+import { formatTime } from '../../../utils/time';
 import { Table, Tabs  } from 'antd';
 import { withRouter} from 'react-router-dom';
 const TabPane = Tabs.TabPane;
 
 function callback (key) {
   this.setState({
-      loading: true
+      loading: true,
+      activeKey: key
   }, ()=>{
-      this.fetch(this.props.match.params.sn, key)
+      this.fetch()
   })
 }
 @withRouter
@@ -20,12 +22,15 @@ class GatewayOnlineRecord extends Component {
             // gate_status: [],
             gate_ipchange: [],
             gate_fault: [],
-            type: 'gate_wanip',
+            loading: true,
+            gateway: undefined,
+            activeKey: 'gate_wanip',
             columns: [{
                 title: '时间',
-                dataIndex: 'timer',
-                key: 'timer',
-                width: 300
+                dataIndex: 'time',
+                key: 'time',
+                width: 300,
+                sorter: (a, b) => a.timestamp && b.timestamp && a.timestamp - b.timestamp
             }, {
                 title: '数值',
                 dataIndex: 'number',
@@ -35,51 +40,43 @@ class GatewayOnlineRecord extends Component {
         this.callback = callback.bind(this)
     }
     componentDidMount () {
-        http.get('/api/gateway_online_record?sn=TRTX011900123456&type=gate_wanip').then(res=>{
-            if (res.ok) {
-                const data = [];
-                res.data && res.data.length > 0 && res.data.map(item=>{
-                    data.push({
-                        timer: item[0],
-                        number: item[1]
-                    })
-                })
-                this.setState({
-                    gate_wanip: data,
-                    loading: false
-                })
-            }
+        this.setState({ loading: true, gateway: this.props.gateway }, ()=>{
+            this.fetch()
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        if (nextProps.location.pathname !== this.props.location.pathname){
+        if (nextProps.gateway !== this.state.gateway){
             this.setState({
-                loading: true
+                loading: true,
+                gateway: nextProps.gateway
             }, ()=>{
-                this.fetch(nextProps.match.params.sn, this.state.type)
+                this.fetch()
             })
         }
     }
-    fetch = (sn, type) => {
-        http.get('/api/gateway_online_record?sn=' + sn + '&type=' + type).then(res=>{
+    fetch = () => {
+        const {gateway, activeKey} = this.state;
+        if (gateway === undefined || gateway === '') {
+            return
+        }
+        http.get('/api/gateway_online_record?sn=' + gateway + '&type=' + activeKey).then(res=>{
             if (res.ok) {
                 const data = [];
                 res.data && res.data.length > 0 && res.data.map(item=>{
                     data.push({
-                        timer: item[0],
+                        time: formatTime(new Date(item[0]), 'yyyy-MM-dd hh:mm:ss S'),
+                        timestamp: new Date(item[0]),
                         number: item[1]
                     })
                 })
                 this.setState({
-                    [type]: data,
-                    loading: false,
-                    type
+                    [activeKey]: data,
+                    loading: false
                 })
             } else {
                 this.setState({
-                    [type]: [],
-                    loading: false,
-                    type
+                    [activeKey]: [],
+                    loading: false
                 })
             }
         })
@@ -101,7 +98,7 @@ class GatewayOnlineRecord extends Component {
                         <Table
                             columns={columns}
                             loading={loading}
-                            rowKey="timer"
+                            rowKey="time"
                             dataSource={gate_wanip}
                         />
                     </TabPane>
@@ -112,7 +109,7 @@ class GatewayOnlineRecord extends Component {
                         <Table
                             columns={columns}
                             loading={loading}
-                            rowKey="timer"
+                            rowKey="time"
                             dataSource={gate_fault}
                         />
                     </TabPane>
@@ -123,7 +120,7 @@ class GatewayOnlineRecord extends Component {
                         <Table
                             columns={columns}
                             loading={loading}
-                            rowKey="timer"
+                            rowKey="time"
                             dataSource={gate_ipchange}
                         />
                     </TabPane>

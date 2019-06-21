@@ -84,7 +84,7 @@ class DevicesList extends Component {
             }, 3000)
 
             if (!gatewayInfo.data.data_upload) {
-                message.info('网关未开启数据上送，如需查看数据请手工开启临时数据上传!')
+                //message.info('网关未开启数据上送，如需查看数据请手工开启临时数据上传!')
             }
         })
     }
@@ -227,14 +227,6 @@ class DevicesList extends Component {
                     expandedRowRender={Collapses}
                     expandRowByClick
                 />
-                {
-                    gatewayInfo.data.data_upload
-                    ? null
-                    : <Tooltip placement="topLeft"
-                        title="开启网关数据临时上传"
-                      >
-                    </Tooltip>
-                }
 
             </div>
         );
