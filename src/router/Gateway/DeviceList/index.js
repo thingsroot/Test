@@ -165,15 +165,36 @@ class DevicesList extends Component {
                 <div className="toolbar">
                     <p>
                         {'数据上送周期: ' + gatewayInfo.data.data_upload_period + ' 毫秒'}
+                        <span style={{padding: '0 5px'}}></span>
                         {'全量数据上送周期: ' + gatewayInfo.data.data_upload_cov_ttl + ' 秒'}
                     </p>
                     <p>
+                        <Button
+                            type={this.state.uploadOneShort ? 'default' : 'primary'}
+                            onClick={()=>{
+                                this.setState({uploadOneShort: !this.state.uploadOneShort}, ()=>{
+                                    if (!this.state.uploadOneShort){
+                                        clearInterval(this.one_short_timer);
+                                        this.enableDataUploadOneShort(0)
+                                    } else {
+                                        this.one_short_timer = setInterval(()=>{
+                                            this.enableDataUploadOneShort(60)
+                                        }, 55000)
+                                    }
+                                })
+                            }}
+                        >
+                            <Icon
+                                type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
+                                theme="filled"
+                            />{this.state.uploadOneShort ? '停止网关上传数据' : '开启网关上传数据'}
+                        </Button>
                         <Tooltip
                             placement="topLeft"
                             title="手动刷新列表"
                         >
                             <Icon
-                                style={{fontSize: 20, margin: '0 15px'}}
+                                style={{fontSize: 20, margin: '0 0 0 15px'}}
                                 type="redo"
                                 onClick={()=>{
                                     this.setState({
@@ -184,34 +205,6 @@ class DevicesList extends Component {
                                 }}
                             />
                         </Tooltip>
-                        {
-                            gatewayInfo.data.data_upload
-                            ? null
-                            : <Tooltip placement="topLeft"
-                                title="开启网关数据临时上传"
-                              >
-                                <Button
-                                    type={this.state.uploadOneShort ? 'default' : 'primary'}
-                                    onClick={()=>{
-                                        this.setState({uploadOneShort: !this.state.uploadOneShort}, ()=>{
-                                            if (!this.state.uploadOneShort){
-                                                clearInterval(this.one_short_timer);
-                                                this.enableDataUploadOneShort(0)
-                                            } else {
-                                                this.one_short_timer = setInterval(()=>{
-                                                    this.enableDataUploadOneShort(60)
-                                                }, 55000)
-                                            }
-                                        })
-                                    }}
-                                >
-                                    <Icon
-                                        type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
-                                        theme="filled"
-                                    />{this.state.uploadOneShort ? '停止上传' : '开启上传'}
-                                </Button>
-                            </Tooltip>
-                        }
                     </p>
                 </div>
                 <Table
