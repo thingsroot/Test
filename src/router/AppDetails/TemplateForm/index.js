@@ -73,6 +73,7 @@ const TemplateForm = Form.create({ name: 'template_form' })(
                     title="新建模板"
                     okText="确定"
                     cancelText="取消"
+                    maskClosable={false}
                     onCancel={onCancel}
                     onOk={this.onCreate}
                 >

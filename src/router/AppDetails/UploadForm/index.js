@@ -95,6 +95,7 @@ const CollectionCreateForm = Form.create()(
                     title="上传新版本"
                     okText="确定"
                     cancelText="取消"
+                    maskClosable={false}
                     onCancel={onCancel}
                     onOk={this.handleCreate}
                 >
