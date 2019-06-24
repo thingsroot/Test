@@ -45,7 +45,7 @@ export function doUpdate (actions, cb) {
             let data = {
                 id: action.id,
                 result: false,
-                timestamp: now.UTC() / 1000,
+                timestamp: now.getTime() / 1000,
                 timestamp_str: now.toLocaleTimeString(),
                 message: 'Action timeout'
             }
