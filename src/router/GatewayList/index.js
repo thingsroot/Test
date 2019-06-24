@@ -420,6 +420,7 @@ class MyGates extends Component {
                     visible={this.state.visible}
                     okText="确定"
                     cancelText="取消"
+                    maskClosable={false}
                     onOk={()=>{
                         this.handleOk('create')
                     }}
