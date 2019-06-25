@@ -68,7 +68,8 @@ class AppEditorCode extends Component {
             console.log(latestVersion);
             this.setState({latestVersion: latestVersion})
             if (latestVersion === undefined || latestVersion === 0){
-                this.info('版本提示', '暂时还没有版本，请先上传!');
+                this.info('版本提示', '应用还没有发布任何版本!');
+                this.initWorkspace()
                 return
             }
 
@@ -101,6 +102,23 @@ class AppEditorCode extends Component {
                 });
                 this.setState({ versionList: data })
             });
+    }
+    initWorkspace () {
+        const {app} = this.state
+        //初始化工作区域到最新版本
+        http.get('/apis/api/method/app_center.editor.editor_init?app=' + app)
+        .then(res=>{
+            let version = res.message;
+            this.setState({version: version}, ()=>{
+                message.success('工作区成功初始化成功，编辑器加载中请稍候')
+                this.setState({app: ''}) // Force the fileTree reload
+                setTimeout(() => {
+                    this.setState({app: app}, ()=>{
+                        this.loadWorkspace()
+                    })
+                }, 2000);
+            })
+        })
     }
     resetWorkspace (version) {
         const {app} = this.state
