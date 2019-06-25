@@ -47,7 +47,7 @@ const AllColumns = [
         )
     }, {
         title: '消息类型',
-        dataIndex: 'operation',
+        dataIndex: 'operation_str',
         width: '10%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
@@ -77,7 +77,7 @@ const NoSNColumns = [
         )
     }, {
         title: '消息类型',
-        dataIndex: 'operation',
+        dataIndex: 'operation_str',
         width: '10%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
@@ -458,11 +458,20 @@ class PlatformEvents extends Component {
                     }
                     let obj = JSON.parse(v.message);
                     let sub = obj ? this.generateTitle(v, obj) : 'UNKNOWN TITLE'
+                    let op = ''
+                    if (v.operation === 'Owner') {
+                        op = '设备维护'
+                    } else if (v.operation === 'Action') {
+                        op = '设备操作'
+                    } else if (v.operation === 'Status') {
+                        op = '设备状态'
+                    }
                     data.push({
                         title: sub,
                         device: v.device,
                         creation: v.creation.split('.')[0],
                         operation: v.operation,
+                        operation_str: op,
                         disposed: v.disposed,
                         name: v.name,
                         status: v.status,
@@ -631,8 +640,9 @@ class PlatformEvents extends Component {
                             onChange={this.onTypeChange}
                         >
                             <Option value="">全部</Option>
+                            <Option value="Owner">设备维护</Option>
                             <Option value="Action">设备操作</Option>
-                            <Option value="Status">设备消息</Option>
+                            <Option value="Status">设备状态</Option>
                         </Select>
                         <span style={{padding: '0 1px'}} />
                         <Select
