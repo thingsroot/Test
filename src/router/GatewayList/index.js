@@ -90,7 +90,7 @@ class MyGates extends Component {
                 }, {
                 title: '操作',
                 key: 'action',
-                width: '245px',
+                width: '240px',
                 render: (text, record, props) => {
                     props;
                   return (
