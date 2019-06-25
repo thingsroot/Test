@@ -46,6 +46,9 @@ class AppEdit extends Component {
     }
     prettyJson (str) {
         try {
+            if (str === undefined || str.length === 0){
+                return ''
+            }
             let data = JSON.parse(str)
             return JSON.stringify(data, null, 4)
         } catch (err) {
@@ -55,6 +58,9 @@ class AppEdit extends Component {
     }
     strimJsonStr (str) {
         try {
+            if (str === undefined || str.length === 0){
+                return ''
+            }
             let data = JSON.parse(str)
             return JSON.stringify(data)
         } catch (err) {
