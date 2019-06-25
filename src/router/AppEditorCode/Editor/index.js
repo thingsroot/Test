@@ -188,6 +188,9 @@ class MyCode extends Component {
         if (this.state.fileType === 'file') {
             let app = this.state.app;
             let filePath = this.state.filePath;
+            if (app === '' || filePath === '') {
+                return
+            }
             http.get('/apis/api/method/app_center.editor.editor?app=' + app + '&operation=get_content&id=' + filePath)
                 .then(res=>{
                     if (this.state.app !== app || this.state.filePath !== filePath) {

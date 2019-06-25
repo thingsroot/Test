@@ -113,9 +113,7 @@ class AppEditorCode extends Component {
                 message.success('工作区成功初始化成功，编辑器加载中请稍候')
                 this.setState({app: ''}) // Force the fileTree reload
                 setTimeout(() => {
-                    this.setState({app: app}, ()=>{
-                        this.loadWorkspace()
-                    })
+                    this.setState({app: app})
                 }, 2000);
             })
         })
@@ -131,9 +129,7 @@ class AppEditorCode extends Component {
             message.success(`工作区成功初始化至版本：${version}，编辑器加载中请稍候`)
             this.setState({app: ''}) // Force the fileTree reload
             setTimeout(() => {
-                this.setState({app: app}, ()=>{
-                    this.loadWorkspace()
-                })
+                this.setState({app: app})
             }, 2000);
         })
     }
