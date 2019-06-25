@@ -181,6 +181,7 @@ class DevicesList extends Component {
                                                 clearInterval(this.one_short_timer);
                                                 this.enableDataUploadOneShort(0)
                                             } else {
+                                                this.enableDataUploadOneShort(60)
                                                 this.one_short_timer = setInterval(()=>{
                                                     this.enableDataUploadOneShort(60)
                                                 }, 55000)
