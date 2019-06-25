@@ -45,14 +45,14 @@ const AllColumns = [
         )
     }, {
         title: '事件类型',
-        dataIndex: 'operation',
+        dataIndex: 'event_type_str',
         width: '10%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
         title: '事件等级',
-        dataIndex: 'event_level',
+        dataIndex: 'event_level_str',
         width: '10%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
@@ -81,14 +81,14 @@ const NoSNColumns = [
         )
     }, {
         title: '事件类型',
-        dataIndex: 'operation',
+        dataIndex: 'event_type_str',
         width: '10%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
         title: '事件等级',
-        dataIndex: 'event_level',
+        dataIndex: 'event_level_str',
         width: '10%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
@@ -327,13 +327,7 @@ class DeviceEventList extends Component {
                     if (v.disposed === 0) {
                         unconfirmed++
                     }
-                    let type = '';
                     let level = '';
-                    if (v.event_type === 'EVENT') {
-                        type = '设备'
-                    } else {
-                        type = v.event_type
-                    }
                     if (v.event_level === 1) {
                         level = '常规'
                     } else if (v.event_level === 2) {
@@ -343,17 +337,30 @@ class DeviceEventList extends Component {
                     } else if (v.event_level >= 10) {
                         level = '致命'
                     }
+                    let type = '';
+                    if (v.event_type === 'COMM') {
+                        type = '通讯'
+                    } else if (v.event_type === 'DATA') {
+                        type = '数据'
+                    } else if (v.event_type === 'SYS') {
+                        type = '系统'
+                    } else if (v.event_type === 'DEV') {
+                        type = '设备'
+                    } else {
+                        type = '未知'
+                    }
                     data.push({
                         title: v.event_info,
                         device: v.event_source,
                         creation: v.creation.split('.')[0],
-                        operation: type,
                         disposed: v.disposed,
                         disposed_by: v.disposed_by,
                         name: v.name,
                         data: v.event_data,
-                        event_level: level,
-                        event_type: type,
+                        event_level: v.event_level,
+                        event_level_str: level,
+                        event_type: v.event_type,
+                        event_type_str: type,
                         event_time: v.creation.split('.')[0]
                     });
                 });
@@ -417,7 +424,7 @@ class DeviceEventList extends Component {
             if (filterType !== '' && v.event_type !== filterType) {
                 return
             }
-            if (filterLevel !== '' && v.event_level !== filterLevel ) {
+            if (filterLevel !== '' && v.event_level !== parseInt(filterLevel) ) {
                 return
             }
             newAllData.push(v)
@@ -534,7 +541,7 @@ class DeviceEventList extends Component {
                         <span style={{padding: '0 3px'}} />
                         <span>等级:</span>
                         <Select
-                            value={`${this.state.filterLevel}`}
+                            value={this.state.filterLevel}
                             style={{ width: 80 }}
                             onChange={this.onLevelChange}
                         >
