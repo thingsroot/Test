@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import http from '../../utils/Server';
-import { Table, Divider, Tabs, Button, Popconfirm, message, Modal, Input, Icon, Menu, Dropdown, Select, Tag } from 'antd';
+import { Table, Tabs, Button, Popconfirm, message, Modal, Input, Icon, Menu, Dropdown, Select, Tag } from 'antd';
 import './style.scss';
 import { inject, observer } from 'mobx-react';
 import { Link } from 'react-router-dom';
@@ -102,7 +102,7 @@ class MyGates extends Component {
                         >
                             <Button key="1">设备</Button>
                         </Link>
-                        <Divider type="vertical" />
+                        <span style={{padding: '0 1px'}} />
                         <Link to={{
                             pathname: `/gateway/${record.sn}/apps`,
                             state: record
@@ -110,7 +110,7 @@ class MyGates extends Component {
                         >
                             <Button key="2">应用</Button>
                         </Link>
-                        <Divider type="vertical" />
+                        <span style={{padding: '0 1px'}} />
                         <Dropdown
                             disabled={record.disabled}
                             overlay={(
