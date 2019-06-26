@@ -13,6 +13,9 @@ const createDefaultValue = (type, default_value, values) => {
     if (type === 'string') {
         return values === undefined ? '' : values[0]
     }
+    if (type === 'text') {
+        return values === undefined ? '' : values[0]
+    }
     if (type === 'dropdown') {
         return values === undefined ? '' : values[0]
     }
@@ -22,7 +25,7 @@ const createDefaultValue = (type, default_value, values) => {
     if (type === 'table') {
         return values === undefined ? [] : values
     }
-    if (type === 'section') {
+    if (type === 'section' || type === 'fake_section') {
         return values === undefined ? {} : values
     }
     if (type === 'serial') {
@@ -248,7 +251,7 @@ export class ConfigStore {
     get Value (){
         let value = {}
         this.sections.map( (section, index) => {
-            if (index === 0 || section.type === 'section' || section.type === 'templates') {
+            if (index === 0 || section.type === 'fake_section') {
                 let val = section.Value
                 for (let [k, v] of Object.entries(val)) {
                     value[k] = v
@@ -264,7 +267,7 @@ export class ConfigStore {
     @action setValue (value){
         let val = value ? value : {}
         this.sections.map( (section, index) => {
-            if (index === 0 || section.type === 'section' || section.type === 'templates') {
+            if (index === 0 || section.type === 'fake_section') {
                 section.setValue(val)
             } else {
                 section.setValue(val[section.name])
