@@ -12,6 +12,32 @@ class HeaderBar extends PureComponent {
         }
     }
     render () {
+        const menu1 = (
+            <Menu>
+                <Menu.Item key="16">
+                    <Icon type="read" />
+                    <span onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/app_api_book/', '_blank')
+                        }
+                    }
+                    >
+                        应用开发手册
+                    </span>
+                </Menu.Item>
+                <Menu.Item key="16">
+                    <Icon type="read" />
+                    <span onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/quick_start/', '_blank')
+                        }
+                    }
+                    >
+                        快速指南
+                    </span>
+                </Menu.Item>
+            </Menu>
+        )
         const menu = (
             <Menu style={{width: 160, padding: 20}}>
                 <Menu.Item key="12">
@@ -74,11 +100,18 @@ class HeaderBar extends PureComponent {
         );
         return (
             <div className="headerUser">
+                <Dropdown overlay={menu1}>
+                    <span
+                        className="ant-dropdown-link"
+                        style={{padding: '10px', cursor: 'pointer'}}
+                    >
+                        <Icon type="question-circle" />
+                    </span>
+                </Dropdown>
                 <Dropdown overlay={menu}>
                     <span
                         className="ant-dropdown-link"
-                        href="#"
-                        style={{display: 'block', padding: '0 10px', cursor: 'pointer'}}
+                        style={{padding: '10px', cursor: 'pointer'}}
                     >
                         <Icon type="user"/>
                         {
@@ -86,6 +119,7 @@ class HeaderBar extends PureComponent {
                         }
                     </span>
                 </Dropdown>
+
             </div>
         );
     }
