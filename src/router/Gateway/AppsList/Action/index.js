@@ -214,7 +214,7 @@ class Action extends Component {
         const { upgradeLoading, visible, setName, setNameConfirmLoading, nameValue, appdebug } = this.state;
         return (
             <div>
-                <div style={{width: '80%', lineHeight: '40px', display: 'flex', justifyContent: 'space-between'}}>
+                <div style={{width: '80%', lineHeight: '30px'}}>
                     <span className="spanStyle">
                         应用ID: {record.data && record.data.name || '本地应用'}
                         {
@@ -232,34 +232,34 @@ class Action extends Component {
                     <span className="spanStyle">
                         应用开发者：{record.data && record.data.owner || this.props.store.session.companies}
                     </span>
-                </div>
-                <div style={{width: '80%', lineHeight: '40px', display: 'flex', justifyContent: 'space-between'}}>
+                    <br/>
                     {
                         record.data && record.data.fork_from ? (
-                            <div>
+                            <span>
                                 源自应用：{record.data && record.data.fork_from}
                                 <span style={{color: 'blue', padding: '0 5px'}} >
-                                <Link to={`/appdetails/${record.data.name}`}>
-                                    查看详情
-                                </Link>
-                            </span>
-                                <span style={{color: 'orange', padding: '0 5px'}}
+                                    <Link to={`/appdetails/${record.data.name}`}>
+                                        查看详情
+                                    </Link>
+                                </span>
+                                <span
+                                    style={{color: 'orange', padding: '0 5px'}}
                                     onClick={
                                         ()=>{
                                             message.info('功能开发中.....')
                                         }
                                     }
                                 >
-                                使用源应用替换 <Icon type="rollback"/>
+                                    使用源应用替换 <Icon type="rollback"/>
+                                </span>
                             </span>
-                            </div>
                         ) : null
                     }
                     {
                         record.data && record.data.fork_from ? (
-                            <div>
+                            <span>
                                 源自版本：{record.data && record.data.fork_version}
-                            </div>
+                            </span>
                         ) : null
                     }
                 </div>
@@ -276,7 +276,7 @@ class Action extends Component {
                             }}
                         />
                     </div>
-                    <span style={{margin: '0 5px'}}></span>
+                    <span style={{margin: '0 5px'}}> </span>
                     <Button
                         disabled={this.state.running_action || !actionEnable}
                         onClick={()=>{
@@ -285,7 +285,7 @@ class Action extends Component {
                     >
                         更改名称
                     </Button>
-                    <span style={{margin: '0 5px'}}></span>
+                    <span style={{margin: '0 5px'}}> </span>
                     <Button
                         disabled={!record.data}
                         onClick={()=>{
@@ -296,14 +296,14 @@ class Action extends Component {
                     >
                         应用配置
                     </Button>
-                    <span style={{margin: '0 5px'}}></span>
+                    <span style={{margin: '0 5px'}}> </span>
                     <Button
                         onClick={this.onDebug.bind(this, record)}
                         disabled={this.state.running_action || !actionEnable || !(record.data && record.data.name)}
                     >
                         应用调试
                     </Button>
-                    <span style={{margin: '0 5px'}}></span>
+                    <span style={{margin: '0 5px'}}> </span>
                     <Button
                         disabled={record.latestVersion === undefined || record.latestVersion <= record.version || this.state.running_action || !actionEnable}
                         onClick={()=>{
@@ -312,7 +312,7 @@ class Action extends Component {
                     >
                         更新版本
                     </Button>
-                    <span style={{margin: '0 5px'}}></span>
+                    <span style={{margin: '0 5px'}}> </span>
                     <Button
                         onClick={()=>{
                             this.appSwitch('start')
@@ -321,7 +321,7 @@ class Action extends Component {
                     >
                         启动应用
                     </Button>
-                    <span style={{margin: '0 5px'}}></span>
+                    <span style={{margin: '0 5px'}}> </span>
                     <Button
                         disabled={this.state.running_action || !actionEnable}
                         onClick={()=>{
@@ -330,7 +330,7 @@ class Action extends Component {
                     >
                         关闭应用
                     </Button>
-                    <span style={{margin: '0 5px'}}></span>
+                    <span style={{margin: '0 5px'}}> </span>
                     <Button
                         disabled={this.state.running_action || !actionEnable}
                         onClick={()=>{
