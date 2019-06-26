@@ -46,7 +46,7 @@ class AppEdit extends Component {
     }
     prettyJson (str) {
         try {
-            if (str === undefined || str.length === 0){
+            if (str === null || str === undefined || str.length === 0){
                 return ''
             }
             let data = JSON.parse(str)
@@ -75,6 +75,7 @@ class AppEdit extends Component {
                 message.error('获取应用信息失败:' + res.error)
                 return
             }
+            console.log(res.data.conf_template)
             this.setState({
                 app_info: res.data,
                 description: res.data.description,

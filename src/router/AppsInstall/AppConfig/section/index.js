@@ -95,7 +95,7 @@ class AppConfigSection extends Component {
             >
                             <span
                                 className="spanStyle"
-                            >{config.desc}</span>
+                            >{config.desc}：</span>
                 <Checkbox
                     checked={config.value}
                     onChange={

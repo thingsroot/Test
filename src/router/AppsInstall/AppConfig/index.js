@@ -464,7 +464,6 @@ class AppConfig extends Component {
                             this.setState({ app_inst: value })
                         }}
                     />
-                    {console.log('configValueType:', typeof this.state.configValue)}
                     {
                         activeKey === 'json'
                         ? <AceEditor

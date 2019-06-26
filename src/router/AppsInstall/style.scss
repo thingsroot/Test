@@ -132,7 +132,8 @@ pre{
     }
     .spanStyle{
         display: inline-block;
-        width: 100px;
+        min-width: 150px;
+        text-align: right;
         font-weight: 600;
     }
     .sectionName{

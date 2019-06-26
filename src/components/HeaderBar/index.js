@@ -100,7 +100,10 @@ class HeaderBar extends PureComponent {
         );
         return (
             <div className="headerUser">
-                <Dropdown overlay={menu1}>
+                <Dropdown
+                    overlay={menu1}
+                    placement="bottomLeft"
+                >
                     <span
                         className="ant-dropdown-link"
                         style={{padding: '10px', cursor: 'pointer'}}
@@ -108,7 +111,11 @@ class HeaderBar extends PureComponent {
                         <Icon type="question-circle" />
                     </span>
                 </Dropdown>
-                <Dropdown overlay={menu}>
+                <Dropdown
+                    overlay={menu}
+                    placement="bottomLeft"
+                    style={{marginRight: 20}}
+                >
                     <span
                         className="ant-dropdown-link"
                         style={{padding: '10px', cursor: 'pointer'}}
