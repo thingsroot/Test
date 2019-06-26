@@ -53,47 +53,102 @@ const tcp_client_childs = [
         'default': true
     }
 ];
-const serial_childs = [
-    {
-        'name': 'port',
-        'desc': '端口',
-        'type': 'dropdown',
-        'values': ['ttymcx0', 'ttymcx1']
-    },
-    {
-        'name': 'baudrate',
-        'desc': '波特率',
-        'type': 'dropdown',
-        'values': [4800, 9600, 115200, 19200],
-        'defualt': 9600
-    },
-    {
-        'name': 'stop_bits',
-        'desc': '停止位',
-        'type': 'dropdown',
-        'values': [1, 2]
-    },
-    {
-        'name': 'data_bits',
-        'desc': '数据位',
-        'type': 'dropdown',
-        'values': [7, 8],
-        'default': 7
-    },
-    {
-        'name': 'flow_control',
-        'desc': '流控',
-        'type': 'dropdown',
-        'values': ['ON', 'OFF'],
-        'default': 'OFF'
-    },
-    {
-        'name': 'parity',
-        'desc': '校验',
-        'type': 'dropdown',
-        'values': ['None', 'Even', 'Odd']
+
+function get_serial_childs (sn) {
+    let tty_list = []
+    if (/2-30002.+/.test(sn)) {
+        // Q102
+        tty_list = ['/dev/ttymxc0', '/dev/ttymcx1']
+    } else if (/2-30102.+/.test(sn)) {
+        // Q204
+        tty_list = ['/dev/ttymxc0', '/dev/ttymcx1', '/dev/ttymcx2', '/dev/ttymcx3']
+    } else if (/TRTX01.+/.test(sn)) {
+        // TLink X1
+        tty_list = ['/dev/ttyS1', '/dev/ttyS2']
+    } else {
+        return [
+            {
+                'name': 'port',
+                'desc': '端口',
+                'type': 'string'
+            },
+            {
+                'name': 'baudrate',
+                'desc': '波特率',
+                'type': 'dropdown',
+                'values': [4800, 9600, 115200, 19200],
+                'default': 9600
+            },
+            {
+                'name': 'stop_bits',
+                'desc': '停止位',
+                'type': 'dropdown',
+                'values': [1, 2]
+            },
+            {
+                'name': 'data_bits',
+                'desc': '数据位',
+                'type': 'dropdown',
+                'values': [7, 8],
+                'default': 8
+            },
+            {
+                'name': 'flow_control',
+                'desc': '流控',
+                'type': 'dropdown',
+                'values': ['ON', 'OFF'],
+                'default': 'OFF'
+            },
+            {
+                'name': 'parity',
+                'desc': '校验',
+                'type': 'dropdown',
+                'values': ['None', 'Even', 'Odd']
+            }
+        ];
     }
-];
+    return [
+        {
+            'name': 'port',
+            'desc': '端口',
+            'type': 'dropdown',
+            'values': tty_list
+        },
+        {
+            'name': 'baudrate',
+            'desc': '波特率',
+            'type': 'dropdown',
+            'values': [4800, 9600, 115200, 19200],
+            'default': 9600
+        },
+        {
+            'name': 'stop_bits',
+            'desc': '停止位',
+            'type': 'dropdown',
+            'values': [1, 2]
+        },
+        {
+            'name': 'data_bits',
+            'desc': '数据位',
+            'type': 'dropdown',
+            'values': [7, 8],
+            'default': 8
+        },
+        {
+            'name': 'flow_control',
+            'desc': '流控',
+            'type': 'dropdown',
+            'values': ['ON', 'OFF'],
+            'default': 'OFF'
+        },
+        {
+            'name': 'parity',
+            'desc': '校验',
+            'type': 'dropdown',
+            'values': ['None', 'Even', 'Odd']
+        }
+    ];
+}
 const templates_childs = [
     {
         'name': 'id',
@@ -140,6 +195,7 @@ class AppConfig extends Component {
     componentDidMount () {
         //this.refreshTemplateList()
         this.setState({
+            gateway_sn: this.props.gateway_sn,
             app_inst: this.props.app_inst,
             app_info: this.props.app_info,
             pre_configuration: this.props.pre_configuration
@@ -157,10 +213,11 @@ class AppConfig extends Component {
     UNSAFE_componentWillReceiveProps (nextProps){
         let org_app_name = this.state.app_info ? this.state.app_info.name : ''
         let new_app_name = nextProps.app_info ? nextProps.app_info.name : ''
-        if (org_app_name === new_app_name && this.state.pre_configuration === nextProps.pre_configuration) {
+        if (this.state.gateway_sn === nextProps.gateway_sn && org_app_name === new_app_name && this.state.pre_configuration === nextProps.pre_configuration) {
             return
         }
         this.setState({
+            gateway_sn: this.props.gateway_sn,
             app_inst: nextProps.app_inst,
             app_info: nextProps.app_info,
             pre_configuration: nextProps.pre_configuration
@@ -307,7 +364,7 @@ class AppConfig extends Component {
                     cur_section = v
                     sections.push(v);
                 } else if (v.type === 'serial') {
-                    v.child = serial_childs
+                    v.child = get_serial_childs(this.props.gateway_sn)
 
                     cur_section = v
                     sections.push(v);
