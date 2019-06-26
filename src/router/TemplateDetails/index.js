@@ -220,7 +220,7 @@ class MyTemplateDetails extends PureComponent {
                         >
                             <CSVLink
                                 data={content}
-                                filename={conf_info.app + '-' + conf_info.name + '-' + show_version}
+                                filename={conf_info.app + '-' + conf_info.name + '-' + show_version + '.csv'}
                             >下载到本地</CSVLink>
                         </Button>
                         <span style={{padding: '10px'}}></span>
