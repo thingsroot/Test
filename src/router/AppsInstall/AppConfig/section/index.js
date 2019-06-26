@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import {inject, observer} from 'mobx-react';
 import {Link} from 'react-router-dom';
 import {Button, Checkbox, Input, Modal, Select, Table, Divider} from 'antd';
-import EditableTable from '../../editorTable';
-import EditableTemplates from '../../editorTemplates';
+import EditableTable from './table';
+import EditableTemplates from './templates';
 const Option = Select.Option;
+const { TextArea } = Input;
 
 const block = {
     display: 'block'
@@ -159,6 +160,29 @@ class AppConfigSection extends Component {
             </div>
         )
     }
+    render_text (key, config) {
+        return (
+            <div
+                id={config.name}
+                key={key}
+                style={config.hide === true ? none : block}
+            >
+                <div style={{lineHeight: '50px'}}>
+                    <span className="spanStyle">{config.desc}：</span>
+                    <TextArea
+                        style={{width: '600px'}}
+                        rows={4}
+                        value={config.value}
+                        ref={config.name}
+                        onChange={()=>{
+                            config.setValue(event.target.value)
+                            this.props.onChange()
+                        }}
+                    />
+                </div>
+            </div>
+        )
+    }
     render_dropdown (key, config) {
         if (config.depends !== undefined) {
             for (let [k, v] of Object.entries(config.depends)) {
@@ -203,16 +227,16 @@ class AppConfigSection extends Component {
     render_table (key, config) {
         let tableColumns = [];
         config.cols && config.cols.length && config.cols.map((col, col_key)=>{
-            let tableReference = col.reference
-            if (tableReference === undefined && col.type === 'template') {
-                tableReference = 'tpls'
+            let columnReference = col.reference
+            if (columnReference === undefined && col.type === 'template') {
+                columnReference = 'tpls'
             }
 
             tableColumns.push({
                 key: col_key,
                 id: col.name,
                 columnType: col.type,
-                columnReference: tableReference,
+                columnReference: columnReference,
                 title: col.desc,
                 dataIndex: col.name,
                 default: col.default,
@@ -400,14 +424,17 @@ class AppConfigSection extends Component {
                         if (v.type === 'string') {
                             return this.render_string(key, v)
                         }
+                        if (v.type === 'text') {
+                            return this.render_text(key, v)
+                        }
                         if (v.type === 'dropdown') {
                             return this.render_dropdown(key, v)
                         }
+                        if (v.type === 'table') {
+                            return this.render_table(key, v)
+                        }
                         if (v.type === 'templates') {
                             return this.render_templates(key, v,  configStore.templates, templatesSource)
-                        }
-                        if (v.type === 'table' || v.type === 'tcp_client' || v.type === 'serial') {
-                            return this.render_table(key, v)
                         }
                     })
                 }

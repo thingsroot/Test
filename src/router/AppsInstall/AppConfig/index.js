@@ -23,10 +23,12 @@ const template_json_type = [
     'boolean',
     'number',
     'string',
+    'text',
     'dropdown',
     'templates',
     'table',
     'section',
+    'fake_section',
     'serial',
     'tcp_client'
 ]
@@ -109,12 +111,12 @@ const templates_childs = [
         'type': 'number'
     }
 ];
-const templates_section = {
-    'name': 'tpls',
-    'desc': '模板选择',
-    'type': 'templates',
-    'child': templates_childs
-}
+// const templates_section = {
+//     'name': 'tpls',
+//     'desc': '模板选择',
+//     'type': 'templates',
+//     'child': templates_childs
+// }
 
 @withRouter
 @inject('store')
@@ -259,9 +261,9 @@ class AppConfig extends Component {
             });
             let sections = [];
             let cur_section = {
-                name: '__basic__app_settings',
+                name: 'base_section__section',
                 desc: '应用配置信息',
-                type: 'section',
+                type: 'fake_section',
                 child: []
             };
             sections.push(cur_section);
@@ -273,29 +275,52 @@ class AppConfig extends Component {
                     errorCode = true;
                     return
                 }
-                let is_section = false;
                 if (v.type === 'templates') {
-                    v.child = [templates_section]
-                    is_section = true
-                }
-                if (v.type === 'section') {
+                    v.child = [templates_childs]
+                    if (cur_section.type === 'section') {
+                        cur_section.child.push(v);
+                    } else {
+                        cur_section = {
+                            name: v.name + '__section',
+                            desc: v.desc,
+                            type: 'fake_section',
+                            child: [v]
+                        }
+                        sections.push(cur_section);
+                    }
+                } else if (v.type === 'table') {
+                    v.cols = v.cols === undefined ? [] : v.cols
+                    if (cur_section.type === 'section') {
+                        cur_section.child.push(v);
+                    } else {
+                        cur_section = {
+                            name: v.name + '__section',
+                            desc: v.desc,
+                            type: 'fake_section',
+                            child: [v]
+                        }
+                        sections.push(cur_section);
+                    }
+                } else if (v.type === 'section' || v.type === 'fake_section') {
                     v.child = v.child === undefined ? [] : v.child
-                    is_section = true
-                }
-                if (v.type === 'serial') {
+
+                    cur_section = v
+                    sections.push(v);
+                } else if (v.type === 'serial') {
                     v.child = serial_childs
-                    is_section = true
-                }
-                if (v.type === 'tcp_client') {
+
+                    cur_section = v
+                    sections.push(v);
+                } else if (v.type === 'tcp_client') {
                     v.child = tcp_client_childs
-                    is_section = true
-                }
-                if (is_section) {
+
+                    cur_section = v
                     sections.push(v);
                 } else {
                     cur_section.child.push(v);
                 }
             });
+            console.log(sections)
 
             this.setState({
                 errorCode: errorCode,
