@@ -14,25 +14,31 @@ class HeaderBar extends PureComponent {
     render () {
         const menu1 = (
             <Menu>
-                <Menu.Item key="16">
-                    <Icon type="monitor" />
-                    <span onClick={
+                <Menu.Item
+                    key="16"
+                    style={{lineHeight: '30px'}}
+                    onClick={
                         ()=>{
                             window.open('http://help.cloud.thingsroot.com/quick_start/', '_blank')
                         }
                     }
-                    >
+                >
+                    <Icon type="monitor" />
+                    <span>
                         快速指南
                     </span>
                 </Menu.Item>
-                <Menu.Item key="16">
-                    <Icon type="read" />
-                    <span onClick={
+                <Menu.Item
+                    key="16"
+                    style={{lineHeight: '30px'}}
+                    onClick={
                         ()=>{
                             window.open('http://help.cloud.thingsroot.com/app_api_book/', '_blank')
                         }
                     }
-                    >
+                >
+                    <Icon type="read" />
+                    <span>
                         应用开发手册
                     </span>
                 </Menu.Item>
@@ -40,60 +46,69 @@ class HeaderBar extends PureComponent {
             </Menu>
         )
         const menu = (
-            <Menu style={{width: 160, padding: 20}}>
-                <Menu.Item key="12">
-                    <Icon type="setting"/>
-                    <span onClick={
-                            ()=>{
-                                window.location.href = '/account'
-                            }
+            <Menu style={{width: 160}}>
+                <Menu.Item
+                    key="12"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.location.href = '/account'
                         }
-                    >
+                    }
+                >
+                    <Icon type="setting"/>
+                    <span>
                         个人设置
                     </span>
                 </Menu.Item>
-                <Menu.Item key="13">
-                    <Icon type="laptop" />
-                    <span
-                        onClick={
-                            ()=>{
-                                window.location.href = '/virtualgateways'
-                            }
+                <Menu.Item
+                    key="13"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.location.href = '/virtualgateways'
                         }
-                    >
+                    }
+                >
+                    <Icon type="laptop" />
+                    <span>
                         虚拟网关
                     </span>
                 </Menu.Item>
 
-                <Menu.Item key="14">
-                    <Icon type="key" />
-                    <span
-                        onClick={
-                            ()=>{
-                                window.location.href = '/accesskeys'
-                            }
+                <Menu.Item
+                    key="14"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.location.href = '/accesskeys'
                         }
-                    >
+                    }
+                >
+                    <Icon type="key" />
+                    <span>
                         Accesskeys
                     </span>
                 </Menu.Item>
                 <Menu.Divider />
-                <Menu.Item key="15">
+                <Menu.Item
+                    key="15"
+                    style={{lineHeight: '30px'}}
+                    onClick={()=>{
+                        authenticateClear();
+                        http.post('/api/user_logout').then(res=>{
+                            res;
+                            message.success('退出成功,即将跳转至登录页', 1.5).then(()=>{
+                                location.href = '/'
+                            })
+                        }).catch(err=>{
+                            err;
+                            message.error('退出失败!!')
+                        });
+                    }}
+                >
                     <Icon type="poweroff" />
-                    <span
-                        onClick={()=>{
-                            authenticateClear();
-                            http.post('/api/user_logout').then(res=>{
-                                res;
-                                message.success('退出成功,即将跳转至登录页', 1.5).then(()=>{
-                                    location.href = '/'
-                                })
-                            }).catch(err=>{
-                                err;
-                                message.error('退出失败!!')
-                            });
-                        }}
-                    >
+                    <span>
                         退出登录
                     </span>
                 </Menu.Item>
@@ -103,7 +118,7 @@ class HeaderBar extends PureComponent {
             <div className="headerUser">
                 <Dropdown
                     overlay={menu1}
-                    placement="bottomLeft"
+                    placement="bottomRight"
                 >
                     <span
                         className="ant-dropdown-link"
@@ -114,7 +129,7 @@ class HeaderBar extends PureComponent {
                 </Dropdown>
                 <Dropdown
                     overlay={menu}
-                    placement="bottomLeft"
+                    placement="bottomRight"
                     style={{marginRight: 20}}
                 >
                     <span

@@ -20,10 +20,10 @@ class Inst extends React.Component {
     };
     instChange = (e)=>{
         let value = e.target.value
-        value = value.replace(/[^A-Za-z0-9_]/, '')
+        value = value.replace(/[^A-Za-z0-9_]/, '');
+        this.props.onChange(value)
         if (this.state.inst_name !== value) {
             this.setState({inst_name: value}, () => {
-                this.props.onChange(value)
                 setTimeout(this.checkInstanceName, 1000)
             })
         }
