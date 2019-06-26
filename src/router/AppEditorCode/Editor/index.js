@@ -33,7 +33,8 @@ class MyCode extends Component {
         super(props);
         this.timer = null;
         this.state = {
-            editorContent: '',
+            editable: false,
+            editorContent: undefined,
             mode: 'lua',
             app: '',
             gateway: undefined,
@@ -59,7 +60,7 @@ class MyCode extends Component {
             app_inst: this.props.app_inst,
             filePath: this.props.filePath,
             fileType: this.props.fileType,
-            editorContent: '',
+            editorContent: undefined,
             changed: false,
             readOnly: true
         }, () => {
@@ -83,7 +84,7 @@ class MyCode extends Component {
                 app_inst: nextProps.app_inst,
                 filePath: nextProps.filePath,
                 fileType: nextProps.fileType,
-                editorContent: '',
+                editorContent: undefined,
                 changed: false,
                 readOnly: true
             }, () => {
@@ -185,18 +186,36 @@ class MyCode extends Component {
     getContent = ()=>{
         this.setState({readOnly: true})
         if (this.state.fileType === 'file') {
-            http.get('/apis/api/method/app_center.editor.editor?app=' + this.state.app + '&operation=get_content&id=' + this.state.filePath)
+            let app = this.state.app;
+            let filePath = this.state.filePath;
+            if (app === '' || filePath === '') {
+                return
+            }
+            http.get('/apis/api/method/app_center.editor.editor?app=' + app + '&operation=get_content&id=' + filePath)
                 .then(res=>{
+                    if (this.state.app !== app || this.state.filePath !== filePath) {
+                        return
+                    }
                     let mode = this.getMode()
                     this.setState({
                         mode: mode,
                         editorContent: res.content,
+                        editable: true,
                         changed: false,
                         readOnly: false
                     }, ()=>{
                         this.autoSave()
                     })
+                }).catch( (err) => {
+                    err;
+                    if (this.state.app !== app || this.state.filePath !== filePath) {
+                        return
+                    }
+                    message.error('文件不可编辑')
+                    this.setState({editorContent: undefined, editable: false})
                 })
+        } else {
+            this.setState({editable: false, changed: false})
         }
     };
     autoSave = ()=>{
@@ -345,7 +364,7 @@ class MyCode extends Component {
 
     //保存文件
     saveFile = ()=>{
-        if (this.state.changed) {
+        if (this.state.editable && this.state.changed) {
             let url = '/apis/api/method/app_center.editor.editor';
             let params = {
                 app: this.state.app,
@@ -444,7 +463,7 @@ class MyCode extends Component {
                 </div>
                 <div className="myCode">
                     {
-                        this.state.editorContent !== ''
+                        this.state.editable
                         ? <AceEditor
                             id="editor"
                             ref="editor"

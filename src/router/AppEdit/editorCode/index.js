@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { split as SplitEditor} from 'react-ace';
 import 'brace/mode/java';
 import 'brace/theme/tomorrow';
-import { message } from 'antd';
 const style = {
     flexGrow: 1,
     display: 'inline-block',
@@ -17,19 +16,6 @@ class EditorCode extends Component {
     onChange = (value)=>{
         this.props.onChange(value[0], value[1]);
     };
-    prettyJson (str) {
-        try {
-            let data = JSON.parse(str)
-            if (!data) {
-                message.error('JSON解析错误')
-                return str
-            }
-            return JSON.stringify(data, null, 4)
-        } catch (err) {
-            // message.error('JSON格式错误')
-            return str
-        }
-    }
 
     render () {
         const { pre_configuration, conf_template } = this.props;
@@ -51,8 +37,8 @@ class EditorCode extends Component {
                         fontSize={18}
                         orientation="beside"
                         value={[
-                            conf_template ? this.prettyJson(conf_template) : '',
-                            pre_configuration ? this.prettyJson(pre_configuration) : ''
+                            conf_template ? conf_template : '',
+                            pre_configuration ? pre_configuration : ''
                         ]}
                         name="UNIQUE_ID_OF_DIV"
                         onChange={this.onChange}

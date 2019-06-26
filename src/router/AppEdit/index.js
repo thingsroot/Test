@@ -44,6 +44,30 @@ class AppEdit extends Component {
             }
         })
     }
+    prettyJson (str) {
+        try {
+            if (str === undefined || str.length === 0){
+                return ''
+            }
+            let data = JSON.parse(str)
+            return JSON.stringify(data, null, 4)
+        } catch (err) {
+            message.error('JSON格式有错误: ' + err)
+            return str
+        }
+    }
+    strimJsonStr (str) {
+        try {
+            if (str === undefined || str.length === 0){
+                return ''
+            }
+            let data = JSON.parse(str)
+            return JSON.stringify(data)
+        } catch (err) {
+            message.error('JSON格式有错误: ' + err)
+            return str
+        }
+    }
 
     getDetails = ()=>{
         http.get('/api/applications_details?name=' + this.state.app).then(res=>{
@@ -54,8 +78,8 @@ class AppEdit extends Component {
             this.setState({
                 app_info: res.data,
                 description: res.data.description,
-                conf_template: res.data.conf_template,
-                pre_configuration: res.data.pre_configuration,
+                conf_template: this.prettyJson(res.data.conf_template),
+                pre_configuration: this.prettyJson(res.data.pre_configuration),
                 imgSrc: 'http://ioe.thingsroot.com' + res.data.icon_image
             })
         })
@@ -75,8 +99,8 @@ class AppEdit extends Component {
                     published: values.published === true ? 1 : 0,
                     license_type: 'Open',
                     description: description,
-                    conf_template: conf_template,
-                    pre_configuration: pre_configuration
+                    conf_template: this.strimJsonStr(conf_template),
+                    pre_configuration: this.strimJsonStr(pre_configuration)
                 };
                 if (conf_template && conf_template !== '') {
                     params['has_conf_template'] = 1
