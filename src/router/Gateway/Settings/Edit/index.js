@@ -116,6 +116,33 @@ class GatewaySettingsEdit extends Component {
         })
     }
 
+    enableStatUpload (value){
+        const { gateway } = this.props;
+        return new Promise((resolve, reject) => {
+            let params = {
+                name: gateway,
+                enable: value,
+                id: `enable_stat/${gateway}/${value}/${new Date() * 1}`
+            }
+            let title = value === 1 ? '开启统计数据上送' : '关闭统计数据上送'
+            http.post('/api/gateways_stat_enable', params).then(res=>{
+                message.success(title + '发送请求成功')
+                if (res.ok) {
+                    this.props.store.action.pushAction(res.data, title, '', params, 5000, (result) => {
+                        resolve(result, 60000)
+                        this.props.store.timer.setGateStatusNoGapTime(10000)
+                    })
+                } else {
+                    resolve(false)
+                    message.error(title + '失败：' + res.error)
+                }
+            }).catch(err=>{
+                reject(err)
+                message.error(title + '发送请求失败：' + err)
+            })
+        })
+    }
+
     enableBeta (value){
         const { gateway } = this.props;
         return new Promise((resolve, reject) => {
@@ -317,7 +344,7 @@ class GatewaySettingsEdit extends Component {
                         disabled={!gatewayInfo.actionEnable}
                         gateway={gateway}
                         onChange={(checked, onResult)=>{
-                            this.onChangeSetting('stat_upload', checked === true ? 1 : 0).then((result) => {
+                            this.enableStatUpload(checked === true ? 1 : 0).then((result) => {
                                 onResult(result)
                             })
                         }}
