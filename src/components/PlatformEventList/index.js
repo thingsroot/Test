@@ -48,7 +48,7 @@ const AllColumns = [
     }, {
         title: '消息类型',
         dataIndex: 'operation_str',
-        width: '10%',
+        width: '15%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
@@ -59,7 +59,7 @@ const NoSNColumns = [
     {
         title: '标题',
         dataIndex: 'title',
-        width: '70%',
+        width: '65%',
         render: (text, record) => (
             <span
                 className="cursor overflow"
@@ -78,7 +78,7 @@ const NoSNColumns = [
     }, {
         title: '消息类型',
         dataIndex: 'operation_str',
-        width: '10%',
+        width: '15%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )

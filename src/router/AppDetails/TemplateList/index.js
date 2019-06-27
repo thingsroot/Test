@@ -24,6 +24,7 @@ class TemplateList extends Component {
             templateList: [],
             showNew: false,
             showCopy: false,
+            defaultActiveKey: 'private',
             copyData: {},
             columns: [
                 {
@@ -259,19 +260,28 @@ class TemplateList extends Component {
             });
     };
 
+    callback = (value)=>{
+        this.setState({
+            defaultActiveKey: value
+        })
+    }
+
     render () {
         const { app } = this.props;
-        const { myList, type, conf, templateList, columns, columns2, showNew, showCopy, copyData } = this.state;
+        const { myList, type, conf, templateList, columns, columns2, showNew, showCopy, copyData, defaultActiveKey } = this.state;
         return (
             <div className="templateList">
-                <Button
-                    type="primary"
-                    onClick={() => {
-                        this.setState({showNew: true})
-                    }}
-                >
-                    新建模板
-                </Button>
+                {
+                    defaultActiveKey === 'private' ? <Button
+                        type="primary"
+                        onClick={() => {
+                            this.setState({showNew: true})
+                        }}
+                      >
+                          新建模板
+                      </Button>
+                    : ''
+                }
                 <TemplateForm
                     type={type}
                     conf={conf}
@@ -312,7 +322,8 @@ class TemplateList extends Component {
                     <p>确认删除此模板？</p>
                 </Modal>
                 <Tabs
-                    defaultActiveKey="private"
+                    defaultActiveKey={defaultActiveKey}
+                    onChange={this.callback}
                 >
                     <TabPane
                         tab="我的"

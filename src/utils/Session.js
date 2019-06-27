@@ -107,8 +107,3 @@ export function isDeveloper () {
 
     return undefined
 }
-
-export function isDeveloperClear () {
-    let cookie = new Cookie('is_developer')
-    cookie.remove()
-}

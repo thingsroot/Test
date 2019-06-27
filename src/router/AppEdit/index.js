@@ -46,7 +46,7 @@ class AppEdit extends Component {
     }
     prettyJson (str) {
         try {
-            if (str === undefined || str.length === 0){
+            if (str === null || str === undefined || str.length === 0){
                 return ''
             }
             let data = JSON.parse(str)
@@ -61,11 +61,11 @@ class AppEdit extends Component {
             if (str === undefined || str.length === 0){
                 return ''
             }
-            let data = JSON.parse(str)
+            let data = JSON.parse(str);
             return JSON.stringify(data)
         } catch (err) {
-            message.error('JSON格式有错误: ' + err)
-            return str
+            message.error('JSON格式有错误: ' + err);
+            return 'error'
         }
     }
 
@@ -75,6 +75,7 @@ class AppEdit extends Component {
                 message.error('获取应用信息失败:' + res.error)
                 return
             }
+            console.log(res.data.conf_template)
             this.setState({
                 app_info: res.data,
                 description: res.data.description,
@@ -107,6 +108,9 @@ class AppEdit extends Component {
                 } else {
                     params['has_conf_template'] = 0
                 }
+                if (params.conf_template === 'error') {
+                    return
+                }
                 if (this.state.is_new) {
                     http.post('/api/applications_create', params).then(res=>{
                         if (res.ok === true) {
@@ -131,7 +135,7 @@ class AppEdit extends Component {
                         }
                     })
                 } else {
-                    params['name'] = this.state.app
+                    params['name'] = this.state.app;
                     http.post('/api/applications_update', params)
                         .then(res=>{
                             if (res.ok === true) {
@@ -145,7 +149,6 @@ class AppEdit extends Component {
                                     data: formData,
                                     success: (res) => {
                                         res;
-                                        console.log(res)
                                         message.success('应用已更新！');
                                         setTimeout(()=>{
                                             this.props.history.go(-1)

@@ -5,17 +5,26 @@ import {
 } from 'antd';
 import http from '../../../utils/Server';
 class Retrieve extends PureComponent {
+    state = {
+        disabled: false
+    };
     handleSubmit = (e) => {
+        this.setState({
+            disabled: true
+        })
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             const data = {
                 email: values.password
-            }
+            };
             if (!err) {
                 http.post('/api/user_reset_password', data).then(res=>{
                     if (res.error) {
                         if (res.error === 'user_not_found') {
                             message.info('用户不存在')
+                            this.setState({
+                                disabled: false
+                            })
                         }
                     }
                     if (res.ok){
@@ -26,6 +35,9 @@ class Retrieve extends PureComponent {
                 }).catch(function (error){
                     if (error){
                         message.info('提交错误')
+                        this.setState({
+                            disabled: false
+                        })
                     }
                 })
             }
@@ -55,12 +67,14 @@ class Retrieve extends PureComponent {
                         )}
                     </Form.Item>
                     <Form.Item>
-                        <Button type="primary"
+                        <Button
+                            type="primary"
                             htmlType="submit"
                             className="login-form-button"
                             style={{width: '100%'}}
+                            disabled={this.state.disabled}
                         >
-                            确定
+                            {this.state.disabled ? '已发送' : '确定'}
                         </Button>
                         <Link to="/login"
                             style={{display: 'inlineBlock', width: '91%', height: '60px', float: 'left'}}
