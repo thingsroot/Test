@@ -5,6 +5,13 @@ import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
 
+const MyIcon = Icon.createFromIconfontCN({
+    scriptUrl: '//at.alicdn.com/t/font_1264846_5k3w4zshzzg.js'
+})
+const MyIcon2 = Icon.createFromIconfontCN({
+    scriptUrl: '//at.alicdn.com/t/font_1264808_ogi3ug21qtd.js'
+})
+
 @withRouter
 @inject('store')
 @observer
@@ -70,9 +77,9 @@ class Status extends Component {
                     <Tooltip title="在线状态" >
                         {/* <span className={device_status === 'ONLINE' ? 'online' : 'offline'}><b></b></span>
                         <span style={{padding: '0 5px'}} /> */}
-                        <Icon
+                        <MyIcon
                             style={{fontSize: 22, color: device_status === 'ONLINE' ? '#3c763d' : '#f39c12'}}
-                            type={device_status === 'ONLINE' ? 'link' : 'disconnect'}
+                            type={device_status === 'ONLINE' ? 'icon-charulianjie' : 'icon-quxiaolianjie'}
                         />
                     </Tooltip>
                     {
@@ -90,9 +97,9 @@ class Status extends Component {
                                 {
                                     data.enable_beta
                                     ? <Tooltip title="调试模式" >
-                                        <Icon
+                                        <MyIcon2
                                             style={{fontSize: 22, color: '#f39c12'}}
-                                            type="warning"
+                                            type="icon-biaoshilei_ceshi"
                                         />
                                     </Tooltip>  : null
                                 }
