@@ -225,6 +225,7 @@ class AppConfigSection extends Component {
         )
     }
     render_table (key, config) {
+        console.log(key, config)
         let tableColumns = [];
         config.cols && config.cols.length && config.cols.map((col, col_key)=>{
             let columnReference = col.reference

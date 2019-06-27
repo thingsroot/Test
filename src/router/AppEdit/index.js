@@ -258,8 +258,8 @@ class AppEdit extends Component {
                                 <Form.Item label="应用ID">
                                     {getFieldDecorator('code_name', {
                                         rules: [{ required: true, message: '不能为空！' }, {
-                                            pattern: /^[0-9a-zA-Z_]{1,}$/,
-                                            message: '应用ID须包含字母，数字或特殊字符！'
+                                            pattern: /^[^\u4e00-\u9fa5]+$/,
+                                            message: '应用ID不含中文！'
                                         }],
                                         initialValue: app_info.code_name ? app_info.code_name : ''
                                     })(

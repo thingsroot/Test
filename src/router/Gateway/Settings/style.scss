@@ -1,20 +1,17 @@
-.linkstatuswrap{
-    width: 100%;
-    .list{
-        height: 50px;
-        line-height: 50px;
-        padding:0 50% 0 20px;
-        display:flex;
-        justify-content: space-between;
-        border-bottom: 1px solid #eee;
-        vertical-align: middle;
-        position: relative;
-        >button{
-            position: absolute;
-            right:50%;
-            top:50%;
-            transform: translate3d(0,-50%,0)
-        }
+.list{
+    height: 50px;
+    line-height: 50px;
+    padding:0 50% 0 20px;
+    display:flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+    position: relative;
+    >button{
+        position: absolute;
+        right:50%;
+        top:50%;
+        transform: translate3d(0,-50%,0)
     }
 }
 .hide{

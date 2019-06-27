@@ -264,7 +264,7 @@ class GatewaySettings extends Component {
             loading, freeioe_latest_version, skynet_latest_version } = this.state;
         return (
             <div className="settings">
-                <div className={!showUpgrade && !showEdit ? 'linkstatuswrap show flex' : 'linkstatuswrap hide'}>
+                <div className={!showUpgrade && !showEdit ? 'show flex' : 'hide'}>
                     <div style={{ background: '#f0f2f5', padding: '20px' }}
                         className="linkstatus"
                     >
