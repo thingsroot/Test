@@ -341,7 +341,7 @@ class AppEdit extends Component {
                         </div>
                     </TabPane>
                 </Tabs>
-
+                <br/>
                 <Button
                     type="primary"
                     htmlType="submit"
@@ -350,6 +350,7 @@ class AppEdit extends Component {
                 >
                     {this.state.is_new ? '创建' : '修改'}
                 </Button>
+                <span style={{padding: '0 5px'}}> </span>
                 <Button
                     onClick={()=>{
                         this.props.history.go(-1)

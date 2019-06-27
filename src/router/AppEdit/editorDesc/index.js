@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import SimpleMDE from 'react-simplemde-editor';
-import 'easymde/dist/easymde.min.css';
+import Editor from 'for-editor'
 
 class EditorDesc extends Component {
 
@@ -10,30 +9,9 @@ class EditorDesc extends Component {
 
     render () {
         return (
-            <SimpleMDE
-                id="your-custom-id"
+            <Editor
+                style={{height: 400}}
                 value={this.props.value}
-                options={{
-                    spellChecker: false,
-                    toolbar: [
-                        'bold',
-                        'italic',
-                        'heading',
-                        '|',
-                        'quote',
-                        'code',
-                        'table',
-                        'horizontal-rule',
-                        'unordered-list',
-                        'ordered-list',
-                        '|',
-                        'link',
-                        'image',
-                        '|',
-                        'preview'
-                    ]
-                }}
-
                 onChange={this.handleChange}
             />
         )

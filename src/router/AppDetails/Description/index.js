@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ReactMarkdown from 'react-markdown'
+import Editor from 'for-editor'
 import {inject, observer} from 'mobx-react';
 
 const block = {
@@ -13,13 +13,17 @@ const none = {
 @observer
 class AppDescription extends Component {
     render () {
+        const preview = true;
         return (
             <div className="appDescription">
                 <div
                     style={this.props.source !== '' ? block : none}
                 >
-                    <ReactMarkdown
-                        source={this.props.source && this.props.source}
+                    <Editor
+                        style={{height: 400}}
+                        preview={preview}
+                        value={this.props.source}
+                        toolbar={false}
                     />
                 </div>
                 <div
