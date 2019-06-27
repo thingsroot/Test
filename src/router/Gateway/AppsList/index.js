@@ -274,7 +274,6 @@ class AppsList extends Component {
                                 title="请求网关上送其最新的应用列表数据"
                             >
                                 <Button
-                                    type="primary"
                                     disabled={!this.state.forceRefreshEnable}
                                     onClick={()=>{
                                         this.setState({forceRefreshEnable: false})

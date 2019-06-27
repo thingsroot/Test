@@ -6,6 +6,8 @@ import { withRouter } from 'react-router-dom';
 import Collapses from './Collapses';
 import PropTypes from 'prop-types';
 
+import './style.scss';
+
 const columns = [{
         title: '名称',
         dataIndex: 'meta.inst',
@@ -163,7 +165,7 @@ class DevicesList extends Component {
         return (
             <div>
                 <div className="toolbar">
-                    <p>
+                    <p style={{color: '#ccc'}}>
                         {'数据上送周期: ' + gatewayInfo.data.data_upload_period + ' 毫秒'}
                         <span style={{padding: '0 5px'}}></span>
                         {'全量数据上送周期: ' + gatewayInfo.data.data_upload_cov_ttl + ' 秒'}
