@@ -65,7 +65,7 @@ class AppEdit extends Component {
             return JSON.stringify(data)
         } catch (err) {
             message.error('JSON格式有错误: ' + err);
-            return 'error'
+            return
         }
     }
 
@@ -94,14 +94,23 @@ class AppEdit extends Component {
                 if (err) {
                     return;
                 }
+                let conf_template_str = this.strimJsonStr(conf_template)
+                if (conf_template_str === undefined) {
+                    return;
+                }
+                let pre_configuration_str = this.strimJsonStr(pre_configuration)
+                if (pre_configuration_str === undefined) {
+                    return;
+                }
+
                 let params = {
                     app_name: values.app_name,
                     code_name: values.code_name,
                     published: values.published === true ? 1 : 0,
                     license_type: 'Open',
                     description: description,
-                    conf_template: this.strimJsonStr(conf_template),
-                    pre_configuration: this.strimJsonStr(pre_configuration)
+                    conf_template: conf_template_str,
+                    pre_configuration: pre_configuration_str
                 };
                 if (conf_template && conf_template !== '') {
                     params['has_conf_template'] = 1

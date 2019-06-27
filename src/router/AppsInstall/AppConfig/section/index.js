@@ -411,7 +411,7 @@ class AppConfigSection extends Component {
         return (
             <div
                 id={configSection.name}
-                style={configSection.hide === true ? none : block}
+                style={configSection.hide === true || configSection.child === undefined || configSection.child.length === 0 ? none : block}
             >
                 <Divider orientation="left">{configSection.desc}</Divider>
                 {

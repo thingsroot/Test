@@ -202,9 +202,9 @@ class Logviewer extends Component {
                                 >
                                     <ReactList
                                         pageSize={1}
-                                        ref="content"
                                         axis="y"
                                         type="simple"
+                                        minSize={mqtt.log_channel.Data.length}
                                         length={mqtt.log_channel.Data.length}
                                         itemRenderer={(key)=>{
                                             return (<div key={key}>
