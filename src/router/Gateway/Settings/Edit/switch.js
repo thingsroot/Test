@@ -44,6 +44,11 @@ class EditSwitch extends Component {
             }
         }
     }
+    onCheckedChangeWithWarning = (value) => {
+        this.props.onWarning(value, (checked) => {
+            this.onCheckedChange(checked)
+        })
+    }
 
     onCheckedChange = (value) => {
         clearTimeout(this.wait_timer)
@@ -78,7 +83,7 @@ class EditSwitch extends Component {
     }
 
     render () {
-        const { checked, onChange, disabled } = this.props;
+        const { checked, onChange, onWarning, disabled } = this.props;
         checked, onChange;
         return (
         <Switch
@@ -86,7 +91,7 @@ class EditSwitch extends Component {
             unCheckedChildren="OFF"
             checked={this.state._checked}
             disabled={disabled || this.state.waiting}
-            onChange={this.onCheckedChange}
+            onChange={onWarning ? this.onCheckedChangeWithWarning : this.onCheckedChange}
         />)
     }
 }

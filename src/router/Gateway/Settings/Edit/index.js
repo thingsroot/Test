@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Card, Button, message } from 'antd';
+import { Card, Button, message, Modal, Icon } from 'antd';
 
 import EditSwitch from './switch'
 import EditInputNumber from './inputNumber'
@@ -142,6 +142,25 @@ class GatewaySettingsEdit extends Component {
             })
         })
     }
+    enableBetaWarning (checked) {
+        return new Promise((resolve, reject) => {
+            if (checked) {
+                Modal.confirm({
+                    icon: <Icon type="warning"></Icon>,
+                    title: '开启开发调试模式会影响设备保修条款',
+                    content: '请阅读具体条款',
+                    onOk () {
+                        resolve(checked)
+                    },
+                    onCancel () {
+                        reject()
+                    }
+                });
+            } else {
+                resolve(checked)
+            }
+        })
+    }
 
     enableBeta (value){
         const { gateway } = this.props;
@@ -151,7 +170,7 @@ class GatewaySettingsEdit extends Component {
                 beta: value,
                 id: `enable_beta/${gateway}/${value}/${new Date() * 1}`
             }
-            let title = value === 1 ? '开启开发模式' : '关闭开发模式'
+            let title = value === 1 ? '开启开发调试模式' : '关闭开发调试模式'
             http.post('/api/gateways_beta_enable', params).then(res=>{
                 message.success(title + '发送请求成功')
                 if (res.ok) {
@@ -263,7 +282,12 @@ class GatewaySettingsEdit extends Component {
                         disabled={!gatewayInfo.actionEnable}
                         gateway={gateway}
                         onChange={(checked, onResult)=>{
-                            this.enableBeta(checked === true ? 1 : 0).then((result) => {
+                            this.enableBeta(checked === true ? 1 : 0).then((checked) => {
+                                onResult(checked)
+                            })
+                        }}
+                        onWarning={(checked, onResult)=>{
+                            this.enableBetaWarning(checked).then((result) => {
                                 onResult(result)
                             })
                         }}
