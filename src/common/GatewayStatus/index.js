@@ -132,11 +132,11 @@ class Status extends Component {
                                     localStorage.setItem('url', this.props.location.pathname)
                                 }}
                               >
+                                <Link to={`/appsinstall/${this.state.gateway}`}>
                                     <Button type="primary">
-                                        <Link to={`/appsinstall/${this.state.gateway}`}>
                                         安装新应用
-                                    </Link>
-                                </Button>
+                                    </Button>
+                                </Link>
                             </div>
                             : ''
                         }
