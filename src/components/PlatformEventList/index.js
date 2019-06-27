@@ -690,7 +690,7 @@ class PlatformEvents extends Component {
                         </InputGroup>
                         <Icon
                             style={{fontSize: '18px', lineHeight: '35px', padding: '5px 0 0 10px'}}
-                            type="sync"
+                            type="reload"
                             spin={this.state.sync}
                             onClick={this.refresh}
                         />

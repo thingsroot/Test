@@ -4,9 +4,9 @@ import { Link, withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 // import http from '../../utils/Server';
 import './style.scss';
-const MyIcon = Icon.createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/font_1163855_qf16uefhcsb.js'
-})
+
+import {IconIOT} from '../../utils/iconfont';
+
 @withRouter
 @inject('store')
 @observer
@@ -186,7 +186,7 @@ class LeftNav extends Component {
                               >
                                 <li
                                     className={index === '3' ? 'active' : ''}
-                                ><MyIcon type="icon-tiaoshi"/>&nbsp;&nbsp;远程编程-串口</li></Link>
+                                ><IconIOT type="icon-tiaoshi"/>&nbsp;&nbsp;远程编程-串口</li></Link>
                         : ''
                         }
                         {
@@ -197,7 +197,7 @@ class LeftNav extends Component {
                                     this.setIndex('4')
                                 }}
                               >
-                              <li className={index === '4' ? 'active' : ''}><MyIcon type="icon-tiaoshi"/>&nbsp;&nbsp;VPN通道</li></Link>
+                              <li className={index === '4' ? 'active' : ''}><IconIOT type="icon-tiaoshi"/>&nbsp;&nbsp;VPN通道</li></Link>
                             : ''
                         }
                     </ul>

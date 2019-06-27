@@ -371,7 +371,7 @@ class VPN extends Component {
                                     message.error('启动设备VPN失败:' + err)
                                 })
                             }}
-                        ><Icon type="sync"/></Button>
+                        ><Icon type="reload"/></Button>
                     </div>
                     <div className="VPNlist">
                         <p>传输协议：</p>

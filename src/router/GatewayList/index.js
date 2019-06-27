@@ -373,7 +373,7 @@ class MyGates extends Component {
                             }, 2000)
                         }}
                     >
-                        <Icon type="sync"/>
+                        <Icon type="reload"/>
                     </Button>
                     {
                         <Tabs
