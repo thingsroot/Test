@@ -290,9 +290,11 @@ class GatewayMQTT {
 
     onReceiveCommMsg = (msg) => {
         if (this.comm_channel.Size >= this.max_count) {
-            message.error(`报文数量超过${this.max_count}条，订阅停止!!`)
-            this.unsubscribe('/comm')
-            this.comm_channel.setActive(false)
+            if (this.comm_channel.active) {
+                message.error(`报文数量超过${this.max_count}条，订阅停止!!`)
+                this.unsubscribe('/comm')
+                this.comm_channel.setActive(false)
+            }
         }
         const obj = {
             time: getLocalTime(msg[1]),
@@ -304,9 +306,11 @@ class GatewayMQTT {
     }
     onReceiveLogMsg = (msg) => {
         if (this.log_channel.Size >= this.max_count) {
-            message.error(`日志数量超过${this.max_count}条，订阅停止!!`)
-            this.unsubscribe('/comm')
-            this.log_channel.setActive(false)
+            if (this.log_channel.active) {
+                message.error(`日志数量超过${this.max_count}条，订阅停止!!`)
+                this.unsubscribe('/log')
+                this.log_channel.setActive(false)
+            }
         }
         const obj = {
             time: getLocalTime(msg[1]),
