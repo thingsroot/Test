@@ -83,6 +83,11 @@ export function isAdmin (){
     })
 }
 export function isDeveloper () {
+    let is_developer = _getCookie('is_developer')
+    if (is_developer !== undefined) {
+        return is_developer
+    }
+    // TODO: 怎么处理没有cookie的情况（进行同步http请求??)
     http.get('/api/developers_read?name=' + _getCookie('user_id'))
         .then(res=>{
             if (res.ok && res.data) {
@@ -95,4 +100,11 @@ export function isDeveloper () {
                 _setCookie('is_developer', '0')
             }
         });
+
+    return undefined
+}
+
+export function isDeveloperClear () {
+    let cookie = new Cookie('is_developer')
+    cookie.remove()
 }

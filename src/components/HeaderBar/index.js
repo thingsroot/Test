@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Icon, message, Menu, Dropdown } from 'antd';
 import { withRouter} from 'react-router-dom';
-import { _getCookie, isAuthenticated, authenticateClear } from '../../utils/Session';
+import { _getCookie, isAuthenticated, authenticateClear, isDeveloperClear } from '../../utils/Session';
 import http  from '../../utils/Server';
 
 @withRouter
@@ -82,6 +82,7 @@ class HeaderBar extends PureComponent {
                     <span
                         onClick={()=>{
                             authenticateClear();
+                            isDeveloperClear();
                             http.post('/api/user_logout').then(res=>{
                                 res;
                                 message.success('退出成功,即将跳转至登录页', 1.5).then(()=>{
