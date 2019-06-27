@@ -5,6 +5,8 @@ import { Select, Button, Upload, Icon, Modal, message } from 'antd';
 import { CSVLink } from 'react-csv';
 import http from '../../utils/Server';
 import './style.scss';
+import CopyForm from '../AppDetails/CopyForm'
+
 const Dragger = Upload.Dragger;
 const Option = Select.Option;
 const none = {
@@ -31,6 +33,7 @@ class MyTemplateDetails extends PureComponent {
             csvData: '',  //csv数据
             versionList: [],   //版本号列表
             visible: false,
+            visibleClone: false,
             dataList: [],    //版本信息列表
             file: '',        //文件流
             previewData: '',  //预览数据原型
@@ -103,6 +106,10 @@ class MyTemplateDetails extends PureComponent {
                 this.setState({
                     content: v.data,
                     csvData: results.data
+                }, ()=>{
+                    if (this.state.action === 'clone') {
+                        this.setState({visibleClone: true})
+                    }
                 });
             }
         })
@@ -145,6 +152,11 @@ class MyTemplateDetails extends PureComponent {
             visible: true
         });
     };
+    showCloneModal = () => {
+        this.setState({
+            visibleClone: true
+        })
+    }
 
     handleOk = (e) => {
         e;
@@ -177,6 +189,9 @@ class MyTemplateDetails extends PureComponent {
             visible: false
         });
     };
+    handleCloneSuccess = (conf_info) => {
+        this.props.history.push('/template/' + conf_info.name)
+    }
 
     render () {
         const { conf_info, content, csvData, versionList, previewCsvData, show_version } = this.state;
@@ -213,6 +228,10 @@ class MyTemplateDetails extends PureComponent {
                             style={this.state.conf_info.owner === this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showModal}
                         >上传新版本</Button>
+                        <Button
+                            style={this.state.conf_info.owner !== this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
+                            onClick={this.showCloneModal}
+                        >克隆</Button>
                         <span style={{padding: '10px'}}></span>
                         <Button
                             type="primary"
@@ -339,6 +358,20 @@ class MyTemplateDetails extends PureComponent {
                         </Button>
                     </Upload>
                 </Modal>
+                <CopyForm
+                    type={'复制'}
+                    conf={this.state.conf}
+                    visible={this.state.visibleClone}
+                    onCancel={() => {
+                        this.setState({visibleClone: false})
+                    }}
+                    onOK={() => {
+                        this.setState({visibleClone: false})
+                    }}
+                    onSuccess={this.handleCloneSuccess}
+                    app={this.state.app}
+                    copyData={conf_info}
+                />
             </div>
         );
     }

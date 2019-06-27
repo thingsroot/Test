@@ -93,13 +93,13 @@ const CopyForm = Form.create({ name: 'copy_form' })(
 
         render () {
             const {
-                visible, onCancel, form, copyData
+                type, visible, onCancel, form, copyData
             } = this.props;
             const { getFieldDecorator } = form;
             return (
                 <Modal
                     visible={visible}
-                    title={this.props.type + '模板'}
+                    title={type + '模板'}
                     okText="确定"
                     cancelText="取消"
                     maskClosable={false}
