@@ -83,7 +83,13 @@ class AppsList extends Component {
                         if (record.latestVersion > props) {
                             return (
                                 <span style={{color: 'blue'}}>
-                                  {props} <Icon type="arrow-up"/>
+                                    {props} <Icon type="arrow-up"/>
+                                    {
+                                        record.beta === 1
+                                        ? <MyIcon2 style={{fontSize: 22, color: 'orange'}}
+                                            type="icon-beta1"
+                                          /> : null
+                                    }
                                 </span>
                             )
                         } else if (record.islocal === 1) {
@@ -96,7 +102,7 @@ class AppsList extends Component {
                             return (
                                 <span style={{color: 'orange'}}>
                                     {props}
-                                    <MyIcon2 style={{fontSize: 22, color: '#f39c12'}}
+                                    <MyIcon2 style={{fontSize: 22}}
                                         type="icon-beta1"
                                     />
                                 </span>
