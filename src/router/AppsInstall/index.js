@@ -4,7 +4,7 @@ import {Input, Icon, Button, message, notification, Rate, Modal } from 'antd';  
 import { inject, observer} from 'mobx-react';
 import GatewayStatus from '../../common/GatewayStatus';
 import http from '../../utils/Server';
-import ReactMarkdown from 'react-markdown'
+import Editor from 'for-editor'
 import './style.scss';
 import GatewaysDrawer from '../../common/GatewaysDrawer';
 import AppConfig from './AppConfig'
@@ -234,6 +234,7 @@ class MyGatesAppsInstall extends Component {
     }
 
     render () {
+        const preview = true;
         const { gateway_sn, app_show, install_step, app_inst, app_info, showLinkSelection } = this.state;
         return (<div>
             <GatewayStatus gateway={this.state.gateway_sn}/>
@@ -360,8 +361,10 @@ class MyGatesAppsInstall extends Component {
                                 id="box"
                                 style={{marginTop: 20}}
                             >
-                                <ReactMarkdown
-                                    source={app_info && app_info.description && app_info.description}
+                                <Editor
+                                    preview={preview}
+                                    value={app_info && app_info.description && app_info.description}
+                                    toolbar={false}
                                 />
                             </div>
                         </div>
