@@ -18,6 +18,11 @@ import './style.scss';
 //     }
 //   });
 // };
+
+const MyIcon2 = Icon.createFromIconfontCN({
+    scriptUrl: '//at.alicdn.com/t/font_1264808_ogi3ug21qtd.js'
+})
+
 @withRouter
 @inject('store')
 @observer
@@ -85,6 +90,15 @@ class AppsList extends Component {
                             return (
                                 <span style={{color: 'orange'}}>
                                   {props} <Icon type="edit"/>
+                                </span>
+                            )
+                        } else if (record.beta === 1) {
+                            return (
+                                <span style={{color: 'orange'}}>
+                                    {props}
+                                    <MyIcon2 style={{fontSize: 22, color: '#f39c12'}}
+                                        type="icon-beta1"
+                                    />
                                 </span>
                             )
                         } else {
