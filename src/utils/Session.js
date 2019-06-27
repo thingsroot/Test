@@ -31,10 +31,14 @@ export function authenticateClear () {
     sid.remove()
     let user_id = new Cookie('user_id')
     user_id.remove()
+    let is_developer = new Cookie('is_developer')
+    is_developer.remove()
 }
 
-export function authenticateSuccess (token) {
-    _setCookie(LOGIN_COOKIE_NAME, token)
+export function authenticateSuccess (data) {
+    _setCookie(LOGIN_COOKIE_NAME, data.csrf_token)
+    _setCookie('companies', data.companies[0])
+    _setCookie('is_developer', data.is_developer)
 }
 
 export function refreshToken () {
