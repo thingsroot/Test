@@ -108,6 +108,7 @@ pre{
             }
         }
     }
+
 }
 .appsdetail{
     position: relative;
@@ -141,4 +142,28 @@ pre{
     .display{
         display: flex;
     }
+
+}
+.linkSelectionWeb {
+    .ant-modal-body {
+        padding: 10px 0;
+    }
+}
+.linkSelection{
+    width: 100%;
+    >li{
+        line-height: 40px;
+        padding-left: 20px;
+        cursor: pointer;
+        >i{
+            font-size: 16px;
+            padding: 0 10px;
+            position: relative;
+            top: 1px;
+        }
+    }
+    >li:hover{
+        background-color: rgb(230, 247, 255);
+    }
+
 }

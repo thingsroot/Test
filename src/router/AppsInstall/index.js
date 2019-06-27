@@ -257,6 +257,7 @@ class MyGatesAppsInstall extends Component {
                         title="快捷选择"
                         closable={false}
                         keyboard
+                        wrapClassName={'linkSelectionWeb'}
                         onCancel={()=>{
                             this.setState({install_step: 'view', showLinkSelection: false})
                         }}
@@ -269,33 +270,39 @@ class MyGatesAppsInstall extends Component {
                             // </Button>,
                         ]}
                     >
-                        <Button
-                            shape="round"
-                            icon="download"
-                            onClick={()=>{
-                                this.setState({gateway_list_visible: true, showLinkSelection: false})
-                            }}
-                        >
-                            安装到其他网关
-                        </Button>
-                        <Button
-                            shape="round"
-                            icon="download"
-                            onClick={()=>{
-                                this.setState({install_step: '', showLinkSelection: false})
-                                if (this.state.app_list === undefined || this.state.app_list.length === 0) {
-                                    this.fetchStoreApps()
-                                }
-                            }}
-                        >
-                            继续安装其他应用
-                        </Button>
-                        <Button type="primary"
-                            shape="round"
-                            icon="download"
-                        >
-                            <Link to={`/gateway/${gateway_sn}/apps`}> 查看应用列表 </Link>
-                        </Button>
+                        <ul className="linkSelection">
+                            <li
+                                onClick={()=>{
+                                    this.setState({
+                                        gateway_list_visible: true,
+                                        showLinkSelection: false
+                                    })
+                                }}
+                            >
+                                <Icon type="laptop" />
+                                安装到其他网关
+                            </li>
+                            <li
+                                onClick={()=>{
+                                    this.setState({install_step: '', showLinkSelection: false})
+                                    if (this.state.app_list === undefined || this.state.app_list.length === 0) {
+                                        this.fetchStoreApps()
+                                    }
+                                }}
+                            >
+                                <Icon type="download" />
+                                继续安装其他应用
+                            </li>
+                            <li
+                                onClick={()=>{
+                                    window.location.href = `/gateway/${gateway_sn}/apps`
+                                }}
+                            >
+                                <Icon type="appstore" />
+                                查看应用列表
+                            </li>
+                        </ul>
+
                     </Modal>
                     <div className={install_step === '' ? 'hide appsdetail' : 'show appsdetail'}>
                     <Button
