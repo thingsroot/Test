@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import http from '../../utils/Server';
-import { Table, Tabs, Button, Popconfirm, message, Modal, Input, Icon, Menu, Dropdown, Select, Tag } from 'antd';
+import { Table, Tabs, Button, Popconfirm, message, Input, Icon, Menu, Dropdown, Tag } from 'antd';
 import './style.scss';
 import { inject, observer } from 'mobx-react';
 import { Link } from 'react-router-dom';
+import GatewayForm from './GatewayForm'
+
 const Search = Input.Search;
 const TabPane = Tabs.TabPane;
 let timer;
@@ -21,15 +23,10 @@ class MyGates extends Component {
             filter_text: '',
             loading: true,
             visible: false,
-            confirmLoading: false,
+            visibleEdit: false,
             refreshing: false,
-            sn: '',
-            role: {},
-            name: '',
-            desc: '',
-            setName: false,
+            user_groups: [],
             record: {},
-            index: 2,
             recordVisible: false,
             columns: [
                 {
@@ -146,10 +143,8 @@ class MyGates extends Component {
                                     disabled={record.device_status !== 'ONLINE'}
                                     onClick={()=>{
                                         this.setState({
-                                            record
-                                        }, ()=>{
-                                            this.setState({index: record.owner_type === 'User' ? 2 : 1})
-                                            this.showModal('setName')
+                                            record,
+                                            visibleEdit: true
                                         })
                                     }}
                                 >网关属性</span>
@@ -159,7 +154,7 @@ class MyGates extends Component {
                                     <Popconfirm
                                         title="你确定要删除这个网关吗?"
                                         onConfirm={()=>{
-                                        this.confirm(record)
+                                            this.confirm(record)
                                         }}
                                         okText="确认"
                                         cancelText="取消"
@@ -190,7 +185,7 @@ class MyGates extends Component {
         http.get('/api/user_groups_list').then(res=>{
             if (res.ok && res.data[0]){
                 this.setState({
-                    role: res.data[0]
+                    user_groups: res.data
                 })
             }
         });
@@ -247,80 +242,6 @@ class MyGates extends Component {
         }
     }
 
-    onChanges = (e, type) => {
-        const events = e || event;
-        const value = events.target.value.trim()
-        this.setState({
-            [type]: value,
-            record: {...this.state.record, [type]: value}
-        })
-    }
-    showModal = (name) => {
-        this.setState({
-            [name]: true
-        }, ()=>{
-            if (name === 'visible') {
-                http.get('/api/user_groups_list').then(res=>{
-                    if (res.data && res.data[0]) {
-                        this.setState({role: res.data[0]})
-                    }
-                })
-            }
-        });
-    };
-    handleOk = (type) => {
-        const { sn, name, desc, index} = this.state;
-        const owner_id = index === 1 ? this.state.role.name : this.props.store.session.user_id;
-        const owner_type = index === 1 ? 'Cloud Company Group' : 'User';
-        const data = {
-        'name': sn,
-        'dev_name': name,
-        'description': desc,
-        'owner_type': owner_type,
-        'owner_id': owner_id
-        };
-        this.setState({
-            confirmLoading: true
-        }, ()=>{
-            if (type === 'create'){
-            http.post('/api/gateways_create', data).then(res=>{
-                if (res.ok) {
-                    message.success('绑定成功')
-                    this.refreshDevicesList()
-                } else {
-                    message.error(res.error)
-                }
-            })
-            } else {
-                const {record} = this.state;
-                http.post('/api/gateways_update', {
-                    name: record.sn,
-                    dev_name: record.dev_name,
-                    description: record.description,
-                    owner_type: owner_type,
-                    owner_id: owner_id
-                }).then(res=>{
-                    if (res.ok) {
-                        message.success('更改成功')
-                        this.setState({
-                            setName: false
-                        })
-                    }
-                })
-            }
-        });
-        setTimeout(() => {
-            this.setState({
-                visible: false,
-                confirmLoading: false
-            });
-        }, 2000);
-    }
-    handleCancel = (name) => {
-        this.setState({
-            [name]: false
-        });
-    }
     filterGatewayList = (data, filter_text) => {
         if (filter_text === undefined || filter_text === '' || data === undefined) {
             return data
@@ -368,7 +289,7 @@ class MyGates extends Component {
         this.changeFilter(text)
     }
     render (){
-        let { alldata, onlinedata, offlinedata, confirmLoading } = this.state;
+        let { alldata, onlinedata, offlinedata } = this.state;
         return (
             <div
                 style={{
@@ -378,7 +299,7 @@ class MyGates extends Component {
                 <Button
                     type="primary"
                     onClick={()=>{
-                        this.showModal('visible')
+                        this.setState({visible: true})
                     }}
                     style={{
                         position: 'absolute',
@@ -415,172 +336,31 @@ class MyGates extends Component {
                         style={{ width: 200 }}
                     />
                 </div>
-                <Modal
-                    title="添加网关"
+                <GatewayForm
                     visible={this.state.visible}
-                    okText="确定"
-                    cancelText="取消"
-                    maskClosable={false}
-                    onOk={()=>{
-                        this.handleOk('create')
+                    type={'create'}
+                    user_groups={this.state.user_groups}
+                    onOK={()=>{
+                        this.setState({visible: false})
+                        this.refreshDevicesList()
                     }}
                     onCancel={()=>{
-                        this.handleCancel('visible')
+                        this.setState({visible: false})
                     }}
-                    confirmLoading={confirmLoading}
-                >
-                    <div className="inputs">
-                        <span>序号：</span>
-                        <Input
-                            onChange={(e)=>{
-                                this.onChanges(e, 'sn')
-                            }}
-                            placeholder="必填"
-                        />
-                    </div>
-                    <div className="inputs">
-                        <span>名称：</span>
-                        <Input
-                            onChange={(e)=>{
-                                this.onChanges(e, 'name')
-                            }}
-                            placeholder="必填"
-                        />
-                    </div>
-                    <div className="inputs">
-                        <span>描述：</span>
-                        <Input
-                            onChange={(e)=>{
-                                this.onChanges(e, 'desc')
-                            }}
-                            placeholder="选填"
-                        />
-                    </div>
-                    <div className="inputs">
-                        <span>所属：</span>
-                        <div>
-                            <Button
-                                type={this.state.index === 1 ? 'primary' : ''}
-                                onClick={()=>{
-                                    this.setState({
-                                        index: 1
-                                    })
-                                }}
-                                disabled={this.state.role === {}}
-                            >公司</Button>
-                            <Button
-                                type={this.state.index === 2 ? 'primary' : ''}
-                                disabled={this.state.role === {}}
-                                onClick={()=>{
-                                    this.setState({
-                                        index: 2
-                                    })
-                                }}
-                            >个人</Button>
-                        </div>
-                    </div>
-                    <div className="inputs">
-                        <span>组名：</span>
-                        <Select
-                            style={{width: '100%'}}
-                            disabled
-                        >
-
-                        </Select>
-                    </div>
-                </Modal>
-                <Modal
-                    title="网关属性"
-                    visible={this.state.setName}
-                    onOk={()=>{
-                        this.handleOk('setName')
+                />
+                <GatewayForm
+                    visible={this.state.visibleEdit}
+                    type={'update'}
+                    user_groups={this.state.user_groups}
+                    gatewayInfo={this.state.record}
+                    onOK={()=>{
+                        this.setState({visibleEdit: false})
+                        this.refreshDevicesList()
                     }}
                     onCancel={()=>{
-                        this.handleCancel('setName')
+                        this.setState({visibleEdit: false})
                     }}
-                    confirmLoading={confirmLoading}
-                >
-                    <div className="inputs">
-                        <span>序号：</span>
-                        <Input
-                            value={this.state.record.sn}
-                            disabled
-                            placeholder="必填"
-                        />
-                    </div>
-                    <div className="inputs">
-                        <span>名称：</span>
-                        <Input
-                            value={this.state.record.dev_name}
-                            onChange={(e)=>{
-                                this.onChanges(e, 'dev_name')
-                            }}
-                            placeholder="必填"
-                        />
-                    </div>
-                    <div className="inputs">
-                        <span>描述：</span>
-                        <Input
-                            value={this.state.record.description}
-                            onChange={(e)=>{
-                                this.onChanges(e, 'description')
-                            }}
-                            placeholder="选填"
-                        />
-                    </div>
-                    <div className="inputs">
-                        <span>经度：</span>
-                        <Input
-                            value={this.state.record.longitude}
-                            onChange={(e)=>{
-                                this.onChanges(e, 'longitude')
-                            }}
-                            placeholder="选填"
-                        />
-                    </div>
-                    <div className="inputs">
-                        <span>纬度：</span>
-                        <Input
-                            value={this.state.record.latitude}
-                            onChange={(e)=>{
-                                this.onChanges(e, 'latitude')
-                            }}
-                            placeholder="选填"
-                        />
-                    </div>
-                    <div className="inputs">
-                        <span>所属：</span>
-                        <div>
-                            <Button
-                                type={this.state.index === 1 ? 'primary' : ''}
-                                onClick={()=>{
-                                    this.setState({
-                                        index: 1
-                                    })
-                                }}
-                                disabled={this.state.role === {}}
-                            >公司</Button>
-                            <Button
-                                type={this.state.index === 2 ? 'primary' : ''}
-                                disabled={this.state.role === {}}
-                                onClick={()=>{
-                                    this.setState({
-                                        index: 2
-                                    })
-                                }}
-                            >个人</Button>
-                        </div>
-                    </div>
-                    <div className="inputs">
-                        <span>组名：</span>
-                        <Select
-                            style={{width: '100%'}}
-                            disabled
-                        >
-
-                        </Select>
-                    </div>
-                </Modal>
+                />
                 <div style={{position: 'relative'}}>
                     <Button
                         disabled={this.state.refreshing}
