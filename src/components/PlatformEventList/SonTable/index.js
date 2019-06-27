@@ -1,14 +1,15 @@
 import React from 'react';
+import {Button} from 'antd'
 
 
 class SonTable extends React.Component {
     componentDidMount () {
-        this.timer = setTimeout(()=>{
-            this.confirmMessage()
-        }, 3000)
+        // this.timer = setTimeout(()=>{
+        //     this.confirmMessage()
+        // }, 3000)
     }
     componentWillUnmount () {
-        clearTimeout(this.timer)
+        //clearTimeout(this.timer)
     }
 
     confirmMessage () {
@@ -29,7 +30,18 @@ class SonTable extends React.Component {
                     <li><span>记录类型：</span>{data.operation}</li>
                     <li><span>详情信息：</span>{data.message}</li>
                     {/*<li><span>是否确认消息：</span>{data.dieposed}</li>*/}
-                    <li><span>确认消息用户：</span>{data.disposed_by}</li>
+                    {
+                        data.disposed === 1
+                        ? <li><span>确认消息用户：</span>{data.disposed_by}</li>
+                        : <li><span>
+                            <Button
+                                type="primary"
+                                onClick={()=>{
+                                    this.confirmMessage()
+                                }}
+                            >确认</Button>
+                        </span></li>
+                    }
                 </ul>
             </div>
         )
