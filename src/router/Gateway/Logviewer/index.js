@@ -204,7 +204,7 @@ class Logviewer extends Component {
                                         pageSize={1}
                                         axis="y"
                                         type="simple"
-                                        minSize={mqtt.log_channel.Data.length}
+                                        minSize={1}
                                         length={mqtt.log_channel.Data.length}
                                         itemRenderer={(key)=>{
                                             return (<div key={key}>
