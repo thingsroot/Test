@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Collapse, Icon } from 'antd';
+import { Collapse, Icon, Tooltip } from 'antd';
 import { withRouter } from 'react-router-dom';
 import InputList from '../InputList';
 import DevicesOutputs from '../OutputList';
@@ -10,6 +10,13 @@ const Panel = Collapse.Panel;
 //   }
 @withRouter
 class Collapses extends Component {
+    state = {
+        dataRefresh: false,
+        dataRefreshCB: undefined
+    }
+    RegisterDataRefresh = (onRefresh) => {
+        this.setState({dataRefreshCB: onRefresh})
+    }
     render () {
         return (
             <div>
@@ -22,13 +29,27 @@ class Collapses extends Component {
                         header={
                             <p className="collapseHead">
                                 <span>数据浏览</span>
-                                <Icon
-                                    type="sync"
-                                    onClick={(e)=>{
-                                        e.stopPropagation();
-
-                                    }}
-                                />
+                                <Tooltip
+                                    placement="topLeft"
+                                    title="刷新数据"
+                                >
+                                    <Icon
+                                        type="reload"
+                                        spin={this.state.dataRefresh}
+                                        style={{color: this.state.dataRefreshCB ? 'black' : 'gray'}}
+                                        onClick={(e)=>{
+                                            e.stopPropagation();
+                                            if (this.state.dataRefreshCB) {
+                                                this.setState({dataRefresh: true}, ()=>{
+                                                    this.state.dataRefreshCB()
+                                                    setTimeout(()=>{
+                                                        this.setState({dataRefresh: false})
+                                                    }, 1000)
+                                                })
+                                            }
+                                        }}
+                                    />
+                                </Tooltip>
                             </p>
                         }
                         key="1"
@@ -37,22 +58,12 @@ class Collapses extends Component {
                             inputs={this.props.inputs}
                             sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
+                            regRefresh={this.RegisterDataRefresh}
                         />
                     </Panel>
                     <Panel
                         disabled={this.props.outputs && Object.keys(this.props.outputs).length > 0 ? false : true}
-                        header={
-                            <p className="collapseHead">
-                                <span>数据下置</span>
-                                <Icon
-                                    type="sync"
-                                    onClick={(e)=>{
-                                        e.stopPropagation();
-
-                                    }}
-                                />
-                            </p>
-                        }
+                        header="数据下置"
                         key="2"
                     >
                         <DevicesOutputs
@@ -63,18 +74,7 @@ class Collapses extends Component {
                     </Panel>
                     <Panel
                         disabled={this.props.commands && Object.keys(this.props.commands).length > 0 ? false : true}
-                        header={
-                            <p className="collapseHead">
-                                <span>控制指令</span>
-                                <Icon
-                                    type="sync"
-                                    onClick={(e)=>{
-                                        e.stopPropagation();
-                                        console.log(1)
-                                    }}
-                                />
-                            </p>
-                        }
+                        header="控制指令"
                         key="3"
                     >
                         <DevicesCommands

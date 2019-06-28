@@ -59,8 +59,19 @@ class ExpandedRowRender extends PureComponent {
         this.timer = setInterval(() => {
             this.fetch()
         }, 3000);
+
+        const { regRefresh } = this.props;
+        if (regRefresh) {
+            regRefresh(()=>{
+                this.fetch()
+            })
+        }
     }
     componentWillUnmount (){
+        const { regRefresh } = this.props;
+        if (regRefresh) {
+            regRefresh(undefined)
+        }
         clearInterval(this.timer)
     }
     fetch = ()=>{
