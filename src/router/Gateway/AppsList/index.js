@@ -270,7 +270,7 @@ class AppsList extends Component {
                         <div>
                             <Tooltip
                                 placement="topLeft"
-                                title="请求网关上送其最新的应用列表数据"
+                                title="强制网关上送最新应用数据"
                             >
                                 <Button
                                     disabled={!this.state.forceRefreshEnable}
@@ -282,10 +282,10 @@ class AppsList extends Component {
                                         }, 5000)
                                     }}
                                 >
-                                    <IconIOT type="icon-APIshuchu"/>请求网关应用列表
+                                    <IconIOT type="icon-APIshuchu"/>强制刷新
                                 </Button>
                             </Tooltip>
-                            <Tooltip
+                            {/* <Tooltip
                                 placement="topLeft"
                                 title="手动刷新列表"
                             >
@@ -300,7 +300,7 @@ class AppsList extends Component {
                                         this.fetch()
                                     }}
                                 />
-                            </Tooltip>
+                            </Tooltip> */}
                         </div>
                     </div>
                 <Table

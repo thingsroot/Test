@@ -243,7 +243,7 @@ class DevicesList extends Component {
                         </Tooltip> */}
                         <Tooltip
                             placement="topLeft"
-                            title="请求网关上送周期内数据"
+                            title="强制网关上送最新数据"
                         >
                             <Button
                                 disabled={!this.state.dataFlushEnable}
@@ -255,12 +255,12 @@ class DevicesList extends Component {
                                     }, 1000)
                                 }}
                             >
-                                <IconIOT type="icon-APIshuchu"/>上送周期内数据
+                                <IconIOT type="icon-APIshuchu"/>强制刷新
                             </Button>
                         </Tooltip>
-                        <Tooltip
+                        {/* <Tooltip
                             placement="topLeft"
-                            title="手动刷新列表"
+                            title="刷新设备列表"
                         >
                             <Icon
                                 style={{fontSize: 18, margin: '0 0 0 15px'}}
@@ -273,7 +273,7 @@ class DevicesList extends Component {
                                     this.getData()
                                 }}
                             />
-                        </Tooltip>
+                        </Tooltip> */}
                     </p>
                 </div>
                 <Table
