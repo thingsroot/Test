@@ -8,6 +8,8 @@ import PropTypes from 'prop-types';
 
 import './style.scss';
 
+import {IconIOT} from '../../../utils/iconfont';
+
 const columns = [{
         title: '名称',
         dataIndex: 'meta.inst',
@@ -69,6 +71,8 @@ class DevicesList extends Component {
         data: [],
         loading: true,
         uploadOneShort: false,
+        dataSanpshotEnable: true,
+        dataFlushEnable: true,
         sign: false,
         gateway: this.props.gateway
     }
@@ -159,6 +163,28 @@ class DevicesList extends Component {
             })
         }
     }
+    dataSnapshot () {
+        http.post('/api/gateways_data_snapshot', {name: this.state.gateway}).then(res => {
+            if (res.ok) {
+                message.success('请求网关数据数据快照成功')
+            } else {
+                message.error('请求网关数据数据快照失败:' + res.error)
+            }
+        }).catch( err => {
+            message.error('请求网关数据数据快照失败:' + err)
+        })
+    }
+    dataFlush () {
+        http.post('/api/gateways_data_flush', {name: this.state.gateway}).then(res => {
+            if (res.ok) {
+                message.success('请求网关上送周期内数据成功')
+            } else {
+                message.error('请求网关上送周期内数据失败:' + res.error)
+            }
+        }).catch( err => {
+            message.error('请求网关上送周期内数据失败:' + err)
+        })
+    }
     render () {
         let { data, loading } = this.state;
         const { gatewayInfo } = this.props.store;
@@ -198,13 +224,47 @@ class DevicesList extends Component {
                                     />{this.state.uploadOneShort ? '停止临时数据上传' : '开启临时数据上传'}
                                 </Button>
                         }
+                        {/* <Tooltip
+                            placement="topLeft"
+                            title="请求网关数据快照"
+                        >
+                            <Button
+                                disabled={!this.state.dataSanpshotEnable}
+                                onClick={()=>{
+                                    this.setState({dataSanpshotEnable: false})
+                                    this.dataSnapshot()
+                                    setTimeout(()=>{
+                                        this.setState({dataSanpshotEnable: true})
+                                    }, 1000)
+                                }}
+                            >
+                                <IconIOT type="icon-APIshuchu"/>获取数据快照
+                            </Button>
+                        </Tooltip> */}
+                        <Tooltip
+                            placement="topLeft"
+                            title="请求网关上送周期内数据"
+                        >
+                            <Button
+                                disabled={!this.state.dataFlushEnable}
+                                onClick={()=>{
+                                    this.setState({dataFlushEnable: false})
+                                    this.dataFlush()
+                                    setTimeout(()=>{
+                                        this.setState({dataFlushEnable: true})
+                                    }, 1000)
+                                }}
+                            >
+                                <IconIOT type="icon-APIshuchu"/>上送周期内数据
+                            </Button>
+                        </Tooltip>
                         <Tooltip
                             placement="topLeft"
                             title="手动刷新列表"
                         >
                             <Icon
                                 style={{fontSize: 18, margin: '0 0 0 15px'}}
-                                type="sync"
+                                type="reload"
                                 onClick={()=>{
                                     this.setState({
                                         loading: true,

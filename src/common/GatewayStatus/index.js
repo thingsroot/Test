@@ -5,12 +5,7 @@ import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
 
-const MyIcon = Icon.createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/font_1264846_5k3w4zshzzg.js'
-})
-const MyIcon2 = Icon.createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/font_1264808_ogi3ug21qtd.js'
-})
+import {IconIOT, IconCloud} from '../../utils/iconfont';
 
 @withRouter
 @inject('store')
@@ -77,7 +72,7 @@ class Status extends Component {
                     <Tooltip title="在线状态" >
                         {/* <span className={device_status === 'ONLINE' ? 'online' : 'offline'}><b></b></span>
                         <span style={{padding: '0 5px'}} /> */}
-                        <MyIcon
+                        <IconIOT
                             style={{fontSize: 22, color: device_status === 'ONLINE' ? '#3c763d' : '#f39c12'}}
                             type={device_status === 'ONLINE' ? 'icon-charulianjie' : 'icon-quxiaolianjie'}
                         />
@@ -97,7 +92,7 @@ class Status extends Component {
                                 {
                                     data.enable_beta
                                     ? <Tooltip title="调试模式" >
-                                        <MyIcon2
+                                        <IconCloud
                                             style={{fontSize: 22, color: '#f39c12'}}
                                             type="icon-biaoshilei_ceshi"
                                         />

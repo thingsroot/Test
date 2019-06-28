@@ -282,11 +282,11 @@ class GatewaySettings extends Component {
                                 style={{ width: '100%' }}
                                 loading={loading}
                             >
-                            <p><b>序列号：</b>{gatewayInfo.sn}</p>
-                            <p><b>位置：</b> {gatewayInfo.address} </p>
-                            <p><b>名称：</b>{gatewayInfo.dev_name}</p>
-                            <p><b>描述：</b>{gatewayInfo.description}</p>
-                            <p><b>型号：</b>{gatewayInfo.model ? gatewayInfo.model : 'Q102'}</p>
+                            <p><b>序列号:</b>{gatewayInfo.sn}</p>
+                            <p><b>位置:</b>{gatewayInfo.address} </p>
+                            <p><b>名称:</b>{gatewayInfo.dev_name}</p>
+                            <p><b>描述:</b>{gatewayInfo.description}</p>
+                            <p><b>型号:</b>{gatewayInfo.model ? gatewayInfo.model : 'Q102'}</p>
                             </Card>
                             <Card title="| 配置信息"
                                 bordered={false}

@@ -19,9 +19,8 @@ import './style.scss';
 //   });
 // };
 
-const MyIcon2 = Icon.createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/font_1264808_ogi3ug21qtd.js'
-})
+import {IconIOT, IconCloud} from '../../../utils/iconfont';
+
 
 @withRouter
 @inject('store')
@@ -86,7 +85,7 @@ class AppsList extends Component {
                                     {props} <Icon type="arrow-up"/>
                                     {
                                         record.beta === 1
-                                        ? <MyIcon2 style={{fontSize: 22, color: 'orange'}}
+                                        ? <IconCloud style={{fontSize: 22, color: 'orange'}}
                                             type="icon-beta1"
                                           /> : null
                                     }
@@ -102,7 +101,7 @@ class AppsList extends Component {
                             return (
                                 <span style={{color: 'orange'}}>
                                     {props}
-                                    <MyIcon2 style={{fontSize: 22}}
+                                    <IconCloud style={{fontSize: 22}}
                                         type="icon-beta1"
                                     />
                                 </span>
@@ -283,7 +282,7 @@ class AppsList extends Component {
                                         }, 5000)
                                     }}
                                 >
-                                    <Icon type="sync"/>请求网关应用列表
+                                    <IconIOT type="icon-APIshuchu"/>请求网关应用列表
                                 </Button>
                             </Tooltip>
                             <Tooltip
@@ -292,7 +291,7 @@ class AppsList extends Component {
                             >
                                 <Icon
                                     style={{fontSize: 18, margin: '0 0 0 15px'}}
-                                    type="sync"
+                                    type="reload"
                                     onClick={()=>{
                                         this.setState({
                                             loading: true,

@@ -4,12 +4,10 @@ import { withRouter } from 'react-router-dom';
 import { Tree, Icon, Modal, message, Input, Tooltip } from 'antd';
 import { observer, inject } from 'mobx-react';
 import http from '../../../utils/Server';
+import {IconEditor} from '../../../utils/iconfont';
 
 const confirm = Modal.confirm;
 const { TreeNode } = Tree;
-const MyIcon = Icon.createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/font_1206200_whqt6igvsx.js'// 在 iconfont.cn 上生成
-});
 
 const newNodeItem = (title, isLeaf, type, key, icon) => {
     let item = observable({
@@ -453,7 +451,7 @@ class MyTree extends Component {
                 return (
                     <TreeNode
                         icon={
-                            <MyIcon
+                            <IconEditor
                                 style={{fontSize: 20}}
                                 type={'icon-' + item.icon}
                             />
@@ -470,7 +468,7 @@ class MyTree extends Component {
             return (
                 <TreeNode
                     icon={
-                        <MyIcon
+                        <IconEditor
                             style={{fontSize: 20}}
                             type={item.icon !== 'file file-' ? 'icon-' + item.icon : 'icon-no'}
                         />
