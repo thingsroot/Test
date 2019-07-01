@@ -4,6 +4,7 @@ import {Button, Tabs, message} from 'antd';
 import {withRouter} from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
+import { GetSerialListBySN } from '../../../utils/hardwares';
 import AppConfigSection from './section';
 import AceEditor from 'react-ace';
 import 'brace/mode/json';
@@ -55,17 +56,8 @@ const tcp_client_childs = [
 ];
 
 function get_serial_childs (sn) {
-    let tty_list = []
-    if (/2-30002.+/.test(sn)) {
-        // Q102
-        tty_list = ['/dev/ttymxc0', '/dev/ttymcx1']
-    } else if (/2-30102.+/.test(sn)) {
-        // Q204
-        tty_list = ['/dev/ttymxc0', '/dev/ttymcx1', '/dev/ttymcx2', '/dev/ttymcx3']
-    } else if (/TRTX01.+/.test(sn)) {
-        // TLink X1
-        tty_list = ['/dev/ttyS1', '/dev/ttyS2']
-    } else {
+    let tty_list = GetSerialListBySN(sn)
+    if (tty_list.length > 0) {
         return [
             {
                 'name': 'port',

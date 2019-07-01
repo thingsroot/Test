@@ -1,4 +1,5 @@
 import {observable, action} from 'mobx'
+import { GetInfoBySN } from '../utils/hardwares'
 
 class GatewayData {
     @observable uptime = 0
@@ -91,6 +92,13 @@ class GatewayInfo {
                     //console.log(k, v)
                     this[k] = v
                 }
+            }
+        }
+        let hwinfo = GetInfoBySN(data.sn)
+        for (let [k, v] of Object.entries(hwinfo)) {
+            if (self_keys.findIndex(item => item === k) !== -1) {
+                //console.log(k, v)
+                this[k] = v
             }
         }
 

@@ -296,7 +296,7 @@ class GatewaySettings extends Component {
                             <p><b>CPU:</b>{gatewayInfo.cpu}</p>
                             <p><b>内存:</b>{gatewayInfo.ram}</p>
                             <p><b>存储:</b>{gatewayInfo.rom}</p>
-                            <p><b>操作系统:</b>{gatewayInfo.os}</p>
+                            <p><b>操作系统:</b>{gatewayInfo.data.platform}</p>
                             <p><b>核心软件:</b>{gatewayInfo.data && gatewayInfo.data.skynet_version}{skynet_latest_version > (gatewayInfo.data ? gatewayInfo.data.skynet_version : 0)
                             ? <Link
                                 to="#"
