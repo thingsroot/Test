@@ -66,7 +66,6 @@ class MyTree extends Component {
         super(props);
         this.state = {
             expandedKeys: ['#'],
-            // expendArr: ['#'],
             autoExpandParent: true,
             root: [],
             selectedKeys: ['version'],
@@ -87,7 +86,6 @@ class MyTree extends Component {
         this.setState({
             app: this.props.app,
             appName: this.props.appName,
-            // expandedKeys: [this.props.appName],
             root: []
         }, () => {
             this.loadTree()
@@ -145,25 +143,15 @@ class MyTree extends Component {
 
     findChild = (node, id) => new Promise((resolve => {
         if (node.key === id) {
-            console.log('=================')
-            console.log(node)
             resolve(node)
         }
         node.children.map((v) => {
             let node = this.findChild(v, id);
-
             if (node !== undefined) {
                 resolve(node)
             }
         })
     }))
-
-    // findNode = (id) => {
-    //     this.findChild(this.state.root[0], id).then(node=>{
-    //         data = node;
-    //     })
-    //
-    // };
 
     get SelectedNodeBasePath () {
         if (this.SelectedNodeID === undefined) {
@@ -208,8 +196,6 @@ class MyTree extends Component {
         this.setState({
             showNewFileModal: true,
             newInputValue: ''
-        }, ()=> {
-            console.log(this.state.newNodeFolder)
         })
     };
     onAddNewFile = ()=>{
@@ -220,7 +206,6 @@ class MyTree extends Component {
             });
             return
         }
-        // let new_id = this.SelectedNodeBasePath + newInputValue
         let folder_node = this.SelectedNodeBaseNode
         //请求接口
         let url = '/apis/api/method/app_center.editor.editor';
@@ -231,10 +216,16 @@ class MyTree extends Component {
             id: this.SelectedNodeBasePath,
             text: newInputValue
         };
+        let icon = '';
+        if (newInputValue.indexOf('.') !== -1) {
+            icon = newInputValue.slice(newInputValue.indexOf('.') + 1)
+        } else {
+            icon = 'no'
+        }
         http.post(url, params)
             .then(res=>{
                 if (res.id.indexOf(params.text) !== -1) {
-                    let newItem = newNodeItem( res.text ? res.text : newInputValue, true, 'file', res.id, '' )
+                    let newItem = newNodeItem( res.text ? res.text : newInputValue, true, 'file', res.id, icon )
                     this.setState({
                         showNewFileModal: false
                     });
@@ -446,14 +437,17 @@ class MyTree extends Component {
 
     renderTreeNodes = data =>
         data.map(item => {
+            let icon = item.icon;
+            if (item.title === 'version') {
+                icon =  'txt'
+            }
             if (item.children) {
-
                 return (
                     <TreeNode
                         icon={
                             <IconEditor
                                 style={{fontSize: 20}}
-                                type={'icon-' + item.icon}
+                                type={'icon-' + icon}
                             />
                         }
                         title={item.title}
@@ -470,7 +464,7 @@ class MyTree extends Component {
                     icon={
                         <IconEditor
                             style={{fontSize: 20}}
-                            type={item.icon !== 'file file-' ? 'icon-' + item.icon : 'icon-no'}
+                            type={item.icon !== 'file file-' ? 'icon-' + icon : 'icon-no'}
                         />
                     }
                     title={item.title}
