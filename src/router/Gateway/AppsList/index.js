@@ -269,7 +269,7 @@ class AppsList extends Component {
                         <span> </span>
                         <div>
                             <Tooltip
-                                placement="topLeft"
+                                placement="bottom"
                                 title="强制网关上送最新应用数据"
                             >
                                 <Button

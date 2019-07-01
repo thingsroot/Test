@@ -242,7 +242,7 @@ class DevicesList extends Component {
                             </Button>
                         </Tooltip> */}
                         <Tooltip
-                            placement="topLeft"
+                            placement="bottom"
                             title="强制网关上送最新数据"
                         >
                             <Button
