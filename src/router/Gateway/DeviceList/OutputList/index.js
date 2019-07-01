@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { inject, observer} from 'mobx-react';
 import http from '../../../../utils/Server';
-import { Table, Button, Modal, Input, message } from 'antd';
+import { Table, Button, Modal, Input, message, Tooltip } from 'antd';
 import './style.scss';
 
 function formatTime (date, fmt) {
@@ -41,25 +41,42 @@ class OutputList extends Component {
             width: '100px'
         }, {
             title: '名称',
-            dataIndex: 'name'
+            render: (record)=>{
+                return (
+                    <Tooltip placement="topLeft" title={record.name}>
+                        {record.name}
+                    </Tooltip>
+                )
+            }
         }, {
             title: '描述',
-            dataIndex: 'desc'
-        }, {
-            title: '单位',
-            dataIndex: 'unit'
+            render: (record)=>{
+                return (
+                    <Tooltip placement="topLeft" title={record.desc}>
+                        {record.desc}
+                    </Tooltip>
+                )
+            }
         }, {
             title: '下置反馈',
-            dataIndex: 'result'
+            render: (record)=>{
+                return (
+                    <Tooltip placement="topLeft" title={record.result}>
+                        {record.result}
+                    </Tooltip>
+                )
+            }
         }, {
             title: '反馈时间',
+            width: '130px',
             dataIndex: 'result_tm'
         }, {
             title: '触发时间',
+            width: '130px',
             dataIndex: 'action_tm'
         }, {
             title: '操作',
-            width: '150px',
+            width: '100px',
             render: (record)=>{
                 return (
                     <Button
@@ -143,6 +160,8 @@ class OutputList extends Component {
                 <Modal
                     title="数据下置"
                     visible={visible}
+                    okText="确定"
+                    cancelText="取消"
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                 >
@@ -152,6 +171,7 @@ class OutputList extends Component {
                             value={record.name}
                         />
                     </p>
+                    <br/>
                     <p className="flex">数值：
                         <Input
                             onChange={(value)=>{
