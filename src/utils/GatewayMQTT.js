@@ -350,7 +350,7 @@ class GatewayMQTT {
             return
         }
 
-        this.client = mqtt.connect('ws://ioe.thingsroot.com:8083/mqtt', options)
+        this.client = mqtt.connect('wss://cloud.thingsroot.com:443/mqtt', options)
         this.client.on('connect', ()=>{
             message.success('连接服务器成功')
             this.connected = true
