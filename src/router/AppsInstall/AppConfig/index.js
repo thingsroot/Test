@@ -68,7 +68,7 @@ function get_serial_childs (sn) {
                 'name': 'baudrate',
                 'desc': '波特率',
                 'type': 'dropdown',
-                'values': [4800, 9600, 115200, 19200],
+                'values': [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200],
                 'default': 9600
             },
             {
@@ -110,7 +110,7 @@ function get_serial_childs (sn) {
             'name': 'baudrate',
             'desc': '波特率',
             'type': 'dropdown',
-            'values': [4800, 9600, 115200, 19200],
+            'values': [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200],
             'default': 9600
         },
         {
