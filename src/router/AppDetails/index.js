@@ -103,7 +103,7 @@ class AppDetails extends Component {
                 <div className="details">
                     <div className="appImg">
                         <img
-                            src={`http://ioe.thingsroot.com${app_info.icon_image}`}
+                            src={`/store_assets${app_info.icon_image}`}
                             alt="图片"
                         />
                     </div>

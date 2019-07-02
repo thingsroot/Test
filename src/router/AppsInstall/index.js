@@ -343,7 +343,7 @@ class MyGatesAppsInstall extends Component {
                             <div style={{display: 'flex' }}>
                                 {
                                     app_info.icon_image
-                                    ? <img src={'http://ioe.thingsroot.com/' + app_info.icon_image}
+                                    ? <img src={'/store_assets' + app_info.icon_image}
                                         alt=""
                                         style={{width: 128, height: 128}}
                                       />
@@ -424,7 +424,7 @@ class MyGatesAppsInstall extends Component {
                                                     }
                                                 >
                                                     <img
-                                                        src={`http://ioe.thingsroot.com/${val.icon_image}`}
+                                                        src={`/store_assets${val.icon_image}`}
                                                         alt="logo"
                                                         onClick={()=>{
                                                             this.setState({
