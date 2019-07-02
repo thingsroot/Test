@@ -84,8 +84,8 @@ class Sign extends PureComponent {
                             style={{width: '100%'}}
                         >登录</Button>
                         <Link to="/login/register"
-                            style={{display: 'block', height: '60px'}}
-                        >注册</Link>
+                            style={{display: 'block', height: '60px', float: 'right'}}
+                        >免费注册</Link>
                     </Form.Item>
                 </Form>
             </div>
