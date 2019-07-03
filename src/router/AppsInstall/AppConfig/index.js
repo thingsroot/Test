@@ -57,7 +57,7 @@ const tcp_client_childs = [
 
 function get_serial_childs (sn) {
     let tty_list = GetSerialListBySN(sn)
-    if (tty_list.length > 0) {
+    if (tty_list.length === 0) {
         return [
             {
                 'name': 'port',
