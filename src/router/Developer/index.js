@@ -102,13 +102,12 @@ class Developer extends Component {
             <div className="appList">
 
                 <div className="searchApp">
-                    <Button
-                        type="primary"
-                        style={{margin: '0 20px'}}
-                    >
-                        <Link to={'/appnew'}>创建新应用</Link>
-                    </Button>
-
+                    <Link to={'/appnew'}>
+                        <Button
+                            type="primary"
+                            style={{margin: '0 20px'}}
+                        >创建新应用</Button>
+                    </Link>
                     <Search
                         placeholder="输入应用名称"
                         onChange={this.searchApp}
