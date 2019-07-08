@@ -51,7 +51,7 @@ class AppsList extends Component {
                     if (record) {
                         return (
                             <img
-                                src={record}
+                                src={`/store_assets${record}`}
                                 alt=""
                                 style={{width: 50, height: 50}}
                             />

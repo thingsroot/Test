@@ -83,7 +83,7 @@ module.exports = function(proxy, allowedHost) {
     public: allowedHost,
     proxy: {
       '/apis': {
-        target: 'http://iot.symgrid.com',
+        target: 'http://ioe.thingsroot.com',
         changeOrigin: true,
         secure: false,
         pathRewrite: {
@@ -96,6 +96,14 @@ module.exports = function(proxy, allowedHost) {
         secure: false,
         pathRewrite: {
           '^/api/*': '/'
+        }
+      },
+      '/store_assets/*': {
+        target: 'http://ioe.thingsroot.com',
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: {
+          '^/store_assets/*': '/'
         }
       }
     },

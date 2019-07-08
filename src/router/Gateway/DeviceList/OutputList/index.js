@@ -43,7 +43,9 @@ class OutputList extends Component {
             title: '名称',
             render: (record)=>{
                 return (
-                    <Tooltip placement="topLeft" title={record.name}>
+                    <Tooltip placement="topLeft"
+                        title={record.name}
+                    >
                         {record.name}
                     </Tooltip>
                 )
@@ -52,7 +54,9 @@ class OutputList extends Component {
             title: '描述',
             render: (record)=>{
                 return (
-                    <Tooltip placement="topLeft" title={record.desc}>
+                    <Tooltip placement="topLeft"
+                        title={record.desc}
+                    >
                         {record.desc}
                     </Tooltip>
                 )
@@ -61,7 +65,9 @@ class OutputList extends Component {
             title: '下置反馈',
             render: (record)=>{
                 return (
-                    <Tooltip placement="topLeft" title={record.result}>
+                    <Tooltip placement="topLeft"
+                        title={record.result}
+                    >
                         {record.result}
                     </Tooltip>
                 )

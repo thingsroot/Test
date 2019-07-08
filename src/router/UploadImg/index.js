@@ -37,7 +37,7 @@ class UploadImg extends PureComponent {
         return (
             <div className="clearfix">
                 <Upload
-                    action="http://localhost:3000/assets/app_center/img/"
+                    action="/assets/app_center/img/"
                     listType="picture-card"
                     fileList={fileList}
                     onPreview={this.handlePreview}

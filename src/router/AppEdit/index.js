@@ -37,7 +37,7 @@ class AppEdit extends Component {
         this.setState({
             is_new: this.props.match.params.name !== undefined ? false : true,
             app: this.props.match.params.name,
-            imgSrc: 'http://ioe.thingsroot.com/assets/app_center/img/logo.png'
+            imgSrc: '/assets/app_center/img/logo.png'
         }, () => {
             if (!this.state.is_new) {
                 this.getDetails();
@@ -81,7 +81,7 @@ class AppEdit extends Component {
                 description: res.data.description,
                 conf_template: this.prettyJson(res.data.conf_template),
                 pre_configuration: this.prettyJson(res.data.pre_configuration),
-                imgSrc: 'http://ioe.thingsroot.com' + res.data.icon_image
+                imgSrc: '/store_assets' + res.data.icon_image
             })
         })
     };

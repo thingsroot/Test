@@ -272,7 +272,8 @@ class TemplateList extends Component {
         return (
             <div className="templateList">
                 {
-                    defaultActiveKey === 'private' ? <Button
+                    defaultActiveKey === 'private'
+                    ? <Button
                         type="primary"
                         onClick={() => {
                             this.setState({showNew: true})
