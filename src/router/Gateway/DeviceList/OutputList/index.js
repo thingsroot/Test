@@ -124,7 +124,7 @@ class OutputList extends Component {
         http.post('/api/gateways_dev_outputs', params).then(res=>{
             if (res.ok){
                 output_record.action_tm = formatTime(new Date(), 'hh:mm:ss S')
-                this.props.store.action.pushAction(res.data, '设备指令执行', '', params, 10000, (result, data)=>{
+                this.props.store.action.pushAction(res.data, '设备数据下置执行', '', params, 10000, (result, data)=>{
                     if (result) {
                         output_record.result = '下置成功'
                         output_record.result_tm = formatTime(new Date(data.timestamp * 1000), 'hh:mm:ss S')
