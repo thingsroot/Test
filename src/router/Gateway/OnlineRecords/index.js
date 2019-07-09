@@ -29,6 +29,7 @@ class GatewayOnlineRecord extends Component {
                 title: '时间',
                 dataIndex: 'time',
                 key: 'time',
+                defaultSortOrder: 'descend',
                 width: 300,
                 sorter: (a, b) => a.timestamp && b.timestamp && a.timestamp - b.timestamp
             }, {
