@@ -3,10 +3,10 @@ export function GetSerialListBySN (sn) {
     let tty_list = []
     if (/2-30002.+/.test(sn)) {
         // Q102
-        tty_list = ['/dev/ttymxc0', '/dev/ttymcx1']
+        tty_list = ['/dev/ttymxc0', '/dev/ttymxc1']
     } else if (/2-30102.+/.test(sn)) {
         // Q204
-        tty_list = ['/dev/ttymxc0', '/dev/ttymcx1', '/dev/ttymcx2', '/dev/ttymcx3']
+        tty_list = ['/dev/ttymxc0', '/dev/ttymxc1', '/dev/ttymxc2', '/dev/ttymxc3']
     } else if (/TRTX01.+/.test(sn)) {
         // TLink X1
         tty_list = ['/dev/ttyS1', '/dev/ttyS2']
