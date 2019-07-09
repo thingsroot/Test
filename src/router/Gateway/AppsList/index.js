@@ -142,7 +142,7 @@ class AppsList extends Component {
                 className: 'cursor',
                 render: (props, record)=>{
                     const start = record.start || record.running;
-                    const start_tm = formatTime(new Date(parseInt(start) * 1000), 'yyyy-MM-dd hh:mm:ss')
+                    const start_tm = start ? formatTime(new Date(parseInt(start) * 1000), 'yyyy-MM-dd hh:mm:ss') : null
                     return (
                         <span>{start_tm}</span>
                     )
