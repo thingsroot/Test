@@ -7,6 +7,7 @@ import Action from './Action';
 import app from '../../../assets/images/app.png'
 import AppConfig from '../../AppsInstall/AppConfig';
 import {ConfigStore} from '../../../utils/ConfigUI';
+import {formatTime} from '../../../utils/time';
 import './style.scss';
 // const openNotification = () => {
 //   notification.open({
@@ -136,9 +137,16 @@ class AppsList extends Component {
                     }
                 }
             }, {
-              title: '启动时间',
-              dataIndex: 'running',
-              className: 'cursor'
+                title: '启动时间',
+                dataIndex: 'running',
+                className: 'cursor',
+                render: (props, record)=>{
+                    const start = record.start || record.running;
+                    const start_tm = formatTime(new Date(parseInt(start) * 1000), 'yyyy-MM-dd hh:mm:ss')
+                    return (
+                        <span>{start_tm}</span>
+                    )
+                }
             }
           ]
         }
