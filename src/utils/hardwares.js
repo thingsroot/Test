@@ -18,6 +18,7 @@ export function GetInfoBySN (sn) {
     if (/2-30002.+/.test(sn)) {
         // Q102
         return {
+            model: 'Q102',
             cpu: 'NXP i.MX 6ULL (Arm® Cortex®-A7)',
             ram: '256M',
             rom: '4GB'
@@ -25,6 +26,7 @@ export function GetInfoBySN (sn) {
     } else if (/2-30102.+/.test(sn)) {
         // Q204
         return {
+            model: 'Q204',
             cpu: 'NXP i.MX 6UltraLite (Arm® Cortex®-A7)',
             ram: '512M',
             rom: '4GB'
@@ -32,6 +34,7 @@ export function GetInfoBySN (sn) {
     } else if (/TRTX01.+/.test(sn)) {
         // TLink X1
         return {
+            model: 'X1',
             cpu: 'Allwinner H3 (Quad-Core Arm® Cortex®-A7)',
             ram: '256M',
             rom: '4GB'

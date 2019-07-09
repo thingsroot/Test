@@ -283,10 +283,10 @@ class GatewaySettings extends Component {
                                 loading={loading}
                             >
                             <p><b>序列号:</b>{gatewayInfo.sn}</p>
-                            <p><b>位置:</b>{gatewayInfo.address} </p>
+                            <p><b>型号:</b>{gatewayInfo.model}</p>
                             <p><b>名称:</b>{gatewayInfo.dev_name}</p>
                             <p><b>描述:</b>{gatewayInfo.description}</p>
-                            <p><b>型号:</b>{gatewayInfo.model ? gatewayInfo.model : 'Q102'}</p>
+                            <p><b>位置:</b>{gatewayInfo.address} </p>
                             </Card>
                             <Card title="| 配置信息"
                                 bordered={false}
@@ -317,7 +317,7 @@ class GatewaySettings extends Component {
                             <p><b>调试模式:</b>{gatewayInfo.data && gatewayInfo.data.enable_beta === 1 ? '开启' : '关闭'}</p>
                             <p><b>数据上传:</b>{gatewayInfo.data && gatewayInfo.data.data_upload ? '开启' : '关闭'}</p>
                             <p><b>统计上传:</b>{gatewayInfo.data && gatewayInfo.data.stat_upload ? '开启' : '关闭'}</p>
-                            <p><b>日志上传:</b>{gatewayInfo.data && gatewayInfo.data.event_upload}</p>
+                            <p><b>事件上传:</b>{gatewayInfo.data && gatewayInfo.data.event_upload}</p>
                             <div style={{height: '25px'}}> </div>
                             </Card>
                         </div>
