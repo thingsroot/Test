@@ -65,6 +65,7 @@ class GatewayInfo {
     @observable install_apps = [] // Instance name list from realtime-data for running
     @observable ioe_network = false
     @observable ioe_frpc = false
+    @observable model = ''
     @observable cpu = ''
     @observable ram = ''
     @observable rom = ''

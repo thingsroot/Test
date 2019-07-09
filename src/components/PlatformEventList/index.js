@@ -554,7 +554,7 @@ class PlatformEvents extends Component {
                 } else {
                     if (v.title.toLowerCase().indexOf(text) !== -1 ||
                         v.device.toLowerCase().indexOf(text) !== -1 ||
-                        v.data.toLowerCase().indexOf(text) !== -1) {
+                        v.message.toLowerCase().indexOf(text) !== -1) {
                         newData.push(v)
                     }
                 }

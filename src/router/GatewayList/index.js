@@ -37,14 +37,9 @@ class MyGates extends Component {
                 render: (props, record)=>{
                     return (
                         <div style={{lineHeight: '45px'}}>
-                            {record.owner_type !== 'Cloud Company Group'
-                                ? <Tag
-                                    color="lime"
-                                  >个人</Tag>
-                                : <Tag
-                                    color="cyan"
-                                  >公司</Tag>
-                            }
+                            {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >公司</Tag> : null}
+                            {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >个人</Tag> : null}
+                            {record.is_shared ? <Tag color="orange" >共享</Tag> : null}
                             {record.dev_name}
                         </div>
                     )

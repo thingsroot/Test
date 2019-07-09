@@ -125,15 +125,16 @@ class Dashboard extends PureComponent {
                         formatter: '{a} <br/>{b} : {c} ({d}%)'
                     },
                     legend: {
-                        data: ['Q102', '其他']
+                        data: ['Q102', 'Q204', '其他']
                     },
                     series: [{
                         name: '设备类型',
                         type: 'pie',
                         radius: '55%',
-                        color: ['#3CB2EF', '#FFD85C'],
+                        color: ['#3CB2EF', '#50a3ba', '#FFD85C'],
                         data: [
                             {value: this.state.pieData['Q102'], name: 'Q102'},
+                            {value: this.state.pieData['Q204'], name: 'Q204'},
                             {value: this.state.pieData['VBOX'], name: '其他'}
                         ]
                     }]
