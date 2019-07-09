@@ -4,11 +4,7 @@ import  'echarts/lib/chart/line';
 import  'echarts/lib/chart/pie';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/tooltip';
-import {
-    Table,
-    Button,
-    Modal
-} from 'antd';
+import { Table, Button, Modal } from 'antd';
 import { withRouter } from 'react-router-dom';
 import http from '../../../../utils/Server';
 import './style.scss';
@@ -48,8 +44,10 @@ class ExpandedRowRender extends PureComponent {
                 )
                 }
             }
-        ]
+        ],
+        dataBrowsing: ''
     }
+
     componentDidMount (){
         myFaultTypeChart = null;
         if (myFaultTypeChart && myFaultTypeChart.dispose) {
@@ -67,6 +65,34 @@ class ExpandedRowRender extends PureComponent {
             })
         }
     }
+    UNSAFE_componentWillReceiveProps (nextProps){
+        clearInterval(this.timer);
+        if (nextProps.dataBrowsing !== this.state.dataBrowsing){
+            this.setState({
+                dataBrowsing: nextProps.dataBrowsing,
+                flag: true
+            });
+            let data = this.state.data;
+            let newData = [];
+            data && data.length > 0 && data.map((item)=>{
+                if (item.name.indexOf(this.state.dataBrowsing) !== -1 ||
+                    item.desc.indexOf(this.state.dataBrowsing) !== -1 ) {
+                    newData.push(item)
+                }
+            });
+            this.setState({
+                data: newData,
+                flag: false
+            });
+            if (nextProps.dataBrowsing === '') {
+                this.fetch();
+                this.timer = setInterval(() => {
+                    this.fetch()
+                }, 3000);
+            }
+        }
+    }
+
     componentWillUnmount (){
         const { regRefresh } = this.props;
         if (regRefresh) {
