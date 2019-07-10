@@ -231,11 +231,14 @@ class Logviewer extends Component {
                                             </div>)
                                         }}
                                     />
-                                    <div style={{padding: '50px', borderBottom: '1px solid #e8e8e8'}}>
-                                        <Empty
-                                            image={noData}
-                                        />
-                                    </div>
+                                    {
+                                        mqtt.log_channel.Data.length === 0
+                                        ? <div style={{padding: '50px', borderBottom: '1px solid #e8e8e8'}}>
+                                            <Empty
+                                                image={noData}
+                                            />
+                                        </div> : null
+                                    }
                                 </div>
                             </div>
                     </div>
