@@ -271,18 +271,14 @@ class TemplateList extends Component {
         const { myList, type, conf, templateList, columns, columns2, showNew, showCopy, copyData, defaultActiveKey } = this.state;
         return (
             <div className="templateList">
-                {
-                    defaultActiveKey === 'private'
-                    ? <Button
-                        type="primary"
-                        onClick={() => {
-                            this.setState({showNew: true})
-                        }}
-                      >
-                          新建模板
-                      </Button>
-                    : ''
-                }
+                <Button
+                    type="primary"
+                    onClick={() => {
+                        this.setState({showNew: true})
+                    }}
+                >
+                    新建模板
+                </Button>
                 <TemplateForm
                     type={type}
                     conf={conf}
