@@ -180,7 +180,7 @@ class AppDetails extends Component {
                         />
                     </TabPane>
                     <TabPane
-                        tab="  列表"
+                        tab="模板列表"
                         key="templates"
                     >
                         <TemplateList
