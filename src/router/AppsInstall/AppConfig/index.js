@@ -510,7 +510,7 @@ class AppConfig extends Component {
                         }}
                         disabled={disabled}
                     >
-                        提交
+                        保存
                     </Button>
                     <span style={{padding: '0 10px'}}> </span>
                     <Button
@@ -521,7 +521,7 @@ class AppConfig extends Component {
                         }}
                         disabled={disabled}
                     >
-                        提交&关闭
+                        保存&关闭
                     </Button>
                     <span style={{padding: '0 10px'}}> </span>
                     <Button
@@ -581,7 +581,7 @@ class AppConfig extends Component {
                         }}
                         disabled={disabled}
                     >
-                        提交
+                        保存
                     </Button>
                     <span style={{padding: '0 10px'}}> </span>
                     <Button
@@ -592,7 +592,7 @@ class AppConfig extends Component {
                         }}
                         disabled={disabled}
                     >
-                        提交&关闭
+                        保存&关闭
                     </Button>
                     <span style={{padding: '0 10px'}}> </span>
                     <Button
