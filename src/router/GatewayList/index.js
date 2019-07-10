@@ -39,7 +39,7 @@ class MyGates extends Component {
                         <div style={{lineHeight: '45px'}}>
                             {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >公司</Tag> : null}
                             {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >个人</Tag> : null}
-                            {record.is_shared ? <Tag color="orange" >共享</Tag> : null}
+                            {record.is_shared ? <Tag color="orange" >分享</Tag> : null}
                             {record.dev_name}
                         </div>
                     )
