@@ -93,6 +93,7 @@ class Collapses extends Component {
                                 <Input
                                     style={{marginLeft: '50%', maxWidth: '300px'}}
                                     type="text"
+                                    allowClear
                                     placeholder="搜索名称、描述"
                                     onClick={(e)=>{
                                         e.stopPropagation();
@@ -145,6 +146,7 @@ class Collapses extends Component {
                                     ? <Input
                                         style={{marginLeft: '50%', maxWidth: '300px'}}
                                         type="text"
+                                        allowClear
                                         placeholder="搜索名称、描述"
                                         onClick={(e)=>{
                                             e.stopPropagation();
@@ -177,6 +179,7 @@ class Collapses extends Component {
                                     ? <Input
                                         style={{marginLeft: '50%', maxWidth: '300px'}}
                                         type="text"
+                                        allowClear
                                         placeholder="搜索名称、描述"
                                         onClick={(e)=>{
                                             e.stopPropagation();
