@@ -28,8 +28,13 @@
             padding: 10px;
         }
     }
-
-
+    .ant-empty-image {
+        height: 40px;
+    }
+    .ant-empty-description{
+        color: rgba(0, 0, 0, 0.45);
+    }
+    
 .tableHeaders{
     display: flex;
     width: 100%;

@@ -41,7 +41,7 @@ const columns = [{
         dataIndex: 'meta.app_inst',
         className: 'cursor'
         // sorter: true
-        }
+    }
     //   , {
     //   title: 'Action',
     //   key: 'action',

@@ -35,6 +35,8 @@ class OutputList extends Component {
         visible: false,
         record: {},
         value: '',
+        dataDown: '',
+        flag: false,
         columns: [{
             title: '类型',
             dataIndex: 'vt',
@@ -98,6 +100,34 @@ class OutputList extends Component {
     componentDidMount (){
         this.setState({data: this.props.outputs})
     }
+
+    UNSAFE_componentWillReceiveProps (nextProps){
+        if (nextProps.dataDown !== this.state.dataDown){
+            this.setState({
+                dataDown: nextProps.dataDown,
+                flag: true
+            });
+            let data = this.state.data;
+            let newData = [];
+            data && data.length > 0 && data.map((item)=>{
+                if (item.name.indexOf(this.state.dataDown) !== -1 ||
+                    item.desc.indexOf(this.state.dataDown) !== -1 ) {
+                    newData.push(item)
+                }
+            });
+            this.setState({
+                data: newData,
+                flag: false
+            })
+            if (nextProps.dataDown === '') {
+                this.setState({
+                    data: this.props.outputs,
+                    flag: false
+                })
+            }
+        }
+    }
+
     showModal = (record) => {
         this.setState({
             record: record,
@@ -153,6 +183,7 @@ class OutputList extends Component {
                 <Table
                     bordered
                     rowKey="name"
+                    loading={this.state.flag}
                     rowClassName={(record, index) => {
                         let className = 'light-row';
                         if (index % 2 === 0) {

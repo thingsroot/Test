@@ -5,18 +5,31 @@ import InputList from '../InputList';
 import DevicesOutputs from '../OutputList';
 import DevicesCommands from '../CommandList';
 const Panel = Collapse.Panel;
-// function callback (key) {
-//     console.log(key);
-//   }
+
+
 @withRouter
 class Collapses extends Component {
     state = {
         dataRefresh: false,
-        dataRefreshCB: undefined
-    }
+        dataRefreshCB: undefined,
+        controlInst: '',
+        dataDown: '',
+        dataBrowsing: ''
+    };
     RegisterDataRefresh = (onRefresh) => {
-        this.setState({dataRefreshCB: onRefresh})
-    }
+        this.setState({
+            dataRefreshCB: onRefresh
+        })
+    };
+
+    getSearchText = (e, type)=>{
+        let text = e.target.value;
+        setTimeout(()=>{
+            this.setState({
+                [type]: text
+            })
+        }, 1000)
+    };
     render () {
         return (
             <div>
@@ -29,6 +42,17 @@ class Collapses extends Component {
                         header={
                             <p className="collapseHead">
                                 <span>数据浏览</span>
+                                <input
+                                    style={{marginLeft: '50%'}}
+                                    type="text"
+                                    placeholder="搜索名称、描述"
+                                    onClick={(e)=>{
+                                        e.stopPropagation();
+                                    }}
+                                    onChange={(e)=>{
+                                        this.getSearchText(e, 'dataBrowsing')
+                                    }}
+                                />
                                 <Tooltip
                                     placement="topLeft"
                                     title="刷新数据"
@@ -59,28 +83,71 @@ class Collapses extends Component {
                             sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
                             regRefresh={this.RegisterDataRefresh}
+                            dataBrowsing={this.state.dataBrowsing}
                         />
                     </Panel>
                     <Panel
                         disabled={this.props.outputs && Object.keys(this.props.outputs).length > 0 ? false : true}
-                        header="数据下置"
+                        header={
+                            <p className="collapseHead">
+                                <span>数据下置</span>
+                                {
+                                    this.props.outputs && Object.keys(this.props.outputs).length > 0
+                                    ? <input
+                                        style={{marginLeft: '50%'}}
+                                        type="text"
+                                        placeholder="搜索名称、描述"
+                                        onClick={(e)=>{
+                                            e.stopPropagation();
+                                        }}
+                                        onChange={(e)=>{
+                                            this.getSearchText(e, 'dataDown')
+                                        }}
+                                    />
+                                    : ''
+                                }
+                                <span style={{padding: '0 30px'}}> </span>
+                            </p>
+                        }
                         key="2"
                     >
                         <DevicesOutputs
                             outputs={this.props.outputs}
                             sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
+                            dataDown={this.state.dataDown}
                         />
                     </Panel>
                     <Panel
                         disabled={this.props.commands && Object.keys(this.props.commands).length > 0 ? false : true}
-                        header="控制指令"
+                        header={
+                            <p className="collapseHead">
+                                <span>控制指令</span>
+                                {
+                                    this.props.commands && Object.keys(this.props.commands).length > 0
+                                    ? <input
+                                        style={{marginLeft: '50%'}}
+                                        type="text"
+                                        placeholder="搜索名称、描述"
+                                        onClick={(e)=>{
+                                            e.stopPropagation();
+                                        }}
+                                        onChange={(e)=>{
+                                            this.getSearchText(e, 'controlInst')
+                                        }}
+                                    />
+                                    : ''
+                                }
+                                <span style={{padding: '0 30px'}}> </span>
+                            </p>
+                        }
                         key="3"
                     >
                         <DevicesCommands
                             commands={this.props.commands}
                             sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
+                            controlInst={this.state.controlInst}
                         />
                     </Panel>
                 </Collapse>
