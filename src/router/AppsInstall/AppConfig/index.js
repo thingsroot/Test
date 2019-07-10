@@ -14,7 +14,7 @@ import './style.scss';
 const TabPane = Tabs.TabPane;
 
 const block = {
-    display: 'block'
+    display: 'inline-block'
 };
 const none = {
     display: 'none'
@@ -185,7 +185,6 @@ class AppConfig extends Component {
     }
 
     componentDidMount () {
-        //this.refreshTemplateList()
         this.setState({
             gateway_sn: this.props.gateway_sn,
             app_inst: this.props.app_inst,
@@ -397,21 +396,30 @@ class AppConfig extends Component {
         }
     };
 
-    onSubmit = ()=>{
+    onSubmit = (type)=>{
         const {app_inst, app_info, uiEnabled, configValue} = this.state;
         const {configStore} = this.props;
+        let visible = false;
+        if (type === 'save') {
+            visible = true
+        }
         if (uiEnabled) {
-            this.props.onSubmit(app_inst, app_info, configStore.Value);
+            this.props.onSubmit(app_inst, app_info, configStore.Value, visible);
         } else {
-            let value = undefined
+            let value = undefined;
             try {
                 value = JSON.parse(configValue)
             } catch (err) {
                 message.error('数据格式不正确:' + err)
             }
             if (value !== undefined) {
-                this.props.onSubmit(app_inst, app_info, value)
+                this.props.onSubmit(app_inst, app_info, value, visible)
             }
+        }
+        if (type === 'saveClose') {
+            setTimeout(()=>{
+                window.location.href = `/gateway/${this.state.gateway_sn}/apps`
+            }, 2500)
         }
     };
 
@@ -493,12 +501,38 @@ class AppConfig extends Component {
                         >此应用不支持可视化编辑 请使用文本编辑</p>
                     </div>
                     <br/>
+                    <br/>
                     <Button
                         type="primary"
                         style={errorCode === true || configStore.sections.length === 0 ? none : block}
-                        onClick={this.onSubmit}
+                        onClick={()=>{
+                            this.onSubmit('save')
+                        }}
                         disabled={disabled}
-                    >提交</Button>
+                    >
+                        提交
+                    </Button>
+                    <span style={{padding: '0 10px'}}> </span>
+                    <Button
+                        type="primary"
+                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
+                        onClick={()=>{
+                            this.onSubmit('saveClose')
+                        }}
+                        disabled={disabled}
+                    >
+                        提交&关闭
+                    </Button>
+                    <span style={{padding: '0 10px'}}> </span>
+                    <Button
+                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
+                        onClick={()=>{
+                            window.location.href = `/gateway/${gateway_sn}/apps`
+                        }}
+                        disabled={disabled}
+                    >
+                        关闭
+                    </Button>
                 </TabPane>
                 <TabPane
                     tab="文本编辑(JSON)"
@@ -538,13 +572,38 @@ class AppConfig extends Component {
                             }}
                           /> : ''
                     }
-
                     <br/>
                     <Button
                         type="primary"
+                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
+                        onClick={()=>{
+                            this.onSubmit('save')
+                        }}
                         disabled={disabled}
-                        onClick={this.onSubmit}
-                    >提交</Button>
+                    >
+                        提交
+                    </Button>
+                    <span style={{padding: '0 10px'}}> </span>
+                    <Button
+                        type="primary"
+                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
+                        onClick={()=>{
+                            this.onSubmit('saveClose')
+                        }}
+                        disabled={disabled}
+                    >
+                        提交&关闭
+                    </Button>
+                    <span style={{padding: '0 10px'}}> </span>
+                    <Button
+                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
+                        onClick={()=>{
+                            window.location.href = `/gateway/${gateway_sn}/apps`
+                        }}
+                        disabled={disabled}
+                    >
+                        关闭
+                    </Button>
                 </TabPane>
             </Tabs>
         );

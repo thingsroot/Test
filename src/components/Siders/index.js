@@ -131,7 +131,7 @@ class Siders extends PureComponent {
                     </Menu.Item>
                     <Menu.Item key="5">
                         <Link to="/gatewayevents">
-                            <Icon type="message" />
+                            <Icon type="notification" />
                             <span>设备事件</span>
                         </Link>
                     </Menu.Item>

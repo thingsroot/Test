@@ -111,7 +111,7 @@ class MyGatesAppsInstall extends Component {
     };
 
     //获取版本
-    installLatestVersion = (app, sn, inst_name, configuration)=>{
+    installLatestVersion = (app, sn, inst_name, configuration, visible)=>{
         let url = ''
         const {gatewayInfo} = this.props.store
         let enable_beta = gatewayInfo.data.enable_beta
@@ -138,7 +138,7 @@ class MyGatesAppsInstall extends Component {
                     conf: configuration,
                     id: 'app_install/' + sn + '/' + inst_name + '/' + app + '/' + this.rand(10000, 99999)
                 };
-                this.appInstall(params, sn)
+                this.appInstall(params, sn, visible)
             } else {
                 message.error('应用暂时没有版本，无法安装！');
                 this.setState({ installing: false })
@@ -151,7 +151,7 @@ class MyGatesAppsInstall extends Component {
     };
 
     //安装应用
-    appInstall = (params, sn)=>{
+    appInstall = (params, sn, visible)=>{
         http.post('/api/gateways_applications_install', params).then(res=>{
             openNotification('提交任务成功', '网关' + sn + '安装' + params.inst + '应用.')
             if (res.ok === true) {
@@ -161,7 +161,7 @@ class MyGatesAppsInstall extends Component {
                 }
                 this.props.store.action.pushAction(res.data, '网关' + sn + '安装应用' + params.inst, '', info, 30000,  (result)=> {
                     if (result) {
-                        this.setState({ showLinkSelection: true, installing: false })
+                        this.setState({ showLinkSelection: visible, installing: false })
                     } else {
                         this.setState({ installing: false });
                     }
@@ -199,7 +199,7 @@ class MyGatesAppsInstall extends Component {
         });
     });
 
-    onInstallSubmit = (inst_name, app_info, configuration)=>{
+    onInstallSubmit = (inst_name, app_info, configuration, visible)=>{
         if (inst_name === '' || inst_name === undefined) {
             message.error('实例名不能为空！');
             return;
@@ -209,7 +209,7 @@ class MyGatesAppsInstall extends Component {
             });
             //判断实例名是否存在
             this.checkInstanceName(this.state.gateway_sn, inst_name).then(()=>{
-                this.installLatestVersion(app_info.name, this.state.gateway_sn, inst_name, configuration)
+                this.installLatestVersion(app_info.name, this.state.gateway_sn, inst_name, configuration, visible)
             }).catch(err=>{
                 message.error(err)
                 this.setState({ installing: false });
@@ -237,7 +237,7 @@ class MyGatesAppsInstall extends Component {
         const preview = true;
         const { gateway_sn, app_show, install_step, app_inst, app_info, showLinkSelection } = this.state;
         return (<div>
-            <GatewayStatus gateway={this.state.gateway_sn}/>
+            <GatewayStatus gateway={gateway_sn}/>
                 <div className="AppInstall">
                     <Button
                         type="primary"
@@ -247,7 +247,7 @@ class MyGatesAppsInstall extends Component {
                         <Icon type="swap"/><br />
                     </Button>
                     <GatewaysDrawer
-                        gateway={this.state.gateway_sn}
+                        gateway={gateway_sn}
                         onClose={this.onClose}
                         onChange={this.onChangeGateway}
                         visible={this.state.gateway_list_visible}

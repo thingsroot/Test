@@ -159,7 +159,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 9 ? 'active' : ''}
-                                ><Icon type="message"/>&nbsp;&nbsp;设备事件</li>
+                                ><Icon type="notification"/>&nbsp;&nbsp;设备事件</li>
                             </Link>
                             <Link
                                 to={`${url}/onlinerecords`}

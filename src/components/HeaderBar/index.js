@@ -127,6 +127,18 @@ class HeaderBar extends PureComponent {
                         <Icon type="question-circle" />
                     </span>
                 </Dropdown>
+                <span style={{padding: '0 5px'}}> </span>
+                <a onClick={()=>{
+                    window.open('https://freeioe.org/', '_blank')
+                }}>
+                    <Icon
+                        style={{padding: '0 4px', fontWeight: 800}}
+                        type="message"
+                    />
+
+                    讨论
+                </a>
+                <span style={{padding: '0 5px'}}> </span>
                 <Dropdown
                     overlay={menu}
                     placement="bottomRight"
@@ -142,7 +154,6 @@ class HeaderBar extends PureComponent {
                         }
                     </span>
                 </Dropdown>
-
             </div>
         );
     }
