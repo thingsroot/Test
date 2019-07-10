@@ -31,7 +31,8 @@ const template_json_type = [
     'section',
     'fake_section',
     'serial',
-    'tcp_client'
+    'tcp_client',
+    'tcp_server'
 ]
 
 const tcp_client_childs = [
@@ -46,6 +47,27 @@ const tcp_client_childs = [
         'desc': '端口',
         'type': 'number',
         'default': 502
+    },
+    {
+        'name': 'nodelay',
+        'desc': 'Nodelay',
+        'type': 'boolean',
+        'default': true
+    }
+];
+
+const tcp_server_childs = [
+    {
+        'name': 'host',
+        'desc': '绑定地址',
+        'type': 'string',
+        'default': '0.0.0.0'
+    },
+    {
+        'name': 'port',
+        'desc': '端口',
+        'type': 'number',
+        'default': 4000
     },
     {
         'name': 'nodelay',
@@ -361,6 +383,11 @@ class AppConfig extends Component {
                     sections.push(v);
                 } else if (v.type === 'tcp_client') {
                     v.child = tcp_client_childs
+
+                    cur_section = v
+                    sections.push(v);
+                } else if (v.type === 'tcp_server') {
+                    v.child = tcp_server_childs
 
                     cur_section = v
                     sections.push(v);
