@@ -39,6 +39,8 @@ class AppsList extends Component {
             edit_app_info: {},
             edit_app_inst: '',
             show_app_config: false,
+            close_after_submit: false,
+            apply_app_config: false,
             gateway_sn: '',
             url: window.location.pathname,
             sign: false,
@@ -169,6 +171,9 @@ class AppsList extends Component {
         if (nextProps.gateway !== this.state.gateway_sn){
             this.setState({
                 loading: true,
+                show_app_config: false,
+                apply_app_config: false,
+                close_after_submit: false,
                 gateway_sn: nextProps.gateway
             }, ()=>{
                 this.fetch();
@@ -222,7 +227,7 @@ class AppsList extends Component {
     }
 
     onSubmitAppConfig = (app_inst, app_info, configuration)=>{
-        app_info, configuration;
+        app_inst, app_info, configuration;
         let gateway_sn = this.state.gateway_sn
         const { edit_app_inst } = this.state;
         if (edit_app_inst !== app_inst) {
@@ -235,17 +240,24 @@ class AppsList extends Component {
             conf: configuration,
             id: `/gateways/${gateway_sn}/config/${edit_app_inst}/${new Date() * 1}`
         };
+        this.setState({apply_app_config: true})
         http.post('/api/gateways_applications_conf', data).then(res=>{
             if (res.ok) {
-            message.success('应用配置请求发送成功')
-            this.props.store.action.pushAction(res.data, '更改应用' + edit_app_inst + '配置',  '网关:' + gateway_sn, data, 10000,  ()=> {
-                this.setState({show_app_config: true})
-            })
+                message.success('应用配置请求发送成功')
+                this.props.store.action.pushAction(res.data, '更改应用' + edit_app_inst + '配置',  '网关:' + gateway_sn, data, 10000,  (result)=> {
+                    if (result && edit_app_inst === app_inst && this.state.close_after_submit) {
+                        this.setState({show_app_config: false, apply_app_config: false})
+                    } else {
+                        this.setState({apply_app_config: false})
+                    }
+                })
             } else {
-            message.error('应用配置请求发送失败' + res.error)
+                message.error('应用配置请求发送失败' + res.error)
+                this.setState({apply_app_config: false})
             }
         }).catch(err => {
             message.error('应用配置请求发送失败' + err)
+            this.setState({apply_app_config: false})
         })
     };
     showAppConfig = (app_inst, app_conf, app_info) => {
@@ -253,7 +265,8 @@ class AppsList extends Component {
             edit_app_info: app_info,
             edit_app_inst: app_inst,
             edit_app_conf: app_conf,
-            show_app_config: true
+            show_app_config: true,
+            close_after_submit: false
         })
     }
     forceRefreshAppList = () => {
@@ -339,7 +352,7 @@ class AppsList extends Component {
                 <Button
                     style={{position: 'absolute', right: 10, top: 5, zIndex: 999}}
                     onClick={()=>{
-                        this.setState({show_app_config: false})
+                        this.setState({close_after_submit: false, show_app_config: false})
                     }}
                 >
                     X
@@ -350,9 +363,16 @@ class AppsList extends Component {
                     app_info={edit_app_info}
                     app_inst={edit_app_inst}
                     inst_editable={false}
+                    update_config
                     pre_configuration={edit_app_conf}
-                    disabled={!this.props.store.gatewayInfo.actionEnable}
+                    disabled={!this.props.store.gatewayInfo.actionEnable || this.state.apply_app_config}
                     onSubmit={this.onSubmitAppConfig}
+                    onCancel={()=>{
+                        this.setState({close_after_submit: false, show_app_config: false})
+                    }}
+                    closeOnSubmit={()=>{
+                        this.setState({close_after_submit: true})
+                    }}
                 />
                 </div>
             </div>

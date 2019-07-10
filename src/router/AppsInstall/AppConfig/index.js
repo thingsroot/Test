@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Inst from '../Inst';
-import {Button, Tabs, message} from 'antd';
+import {Button, Tabs, message, Divider} from 'antd';
 import {withRouter} from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
@@ -396,15 +396,11 @@ class AppConfig extends Component {
         }
     };
 
-    onSubmit = (type)=>{
+    onSubmit = ()=>{
         const {app_inst, app_info, uiEnabled, configValue} = this.state;
         const {configStore} = this.props;
-        let visible = false;
-        if (type === 'save') {
-            visible = true
-        }
         if (uiEnabled) {
-            this.props.onSubmit(app_inst, app_info, configStore.Value, visible);
+            this.props.onSubmit(app_inst, app_info, configStore.Value);
         } else {
             let value = undefined;
             try {
@@ -413,15 +409,13 @@ class AppConfig extends Component {
                 message.error('数据格式不正确:' + err)
             }
             if (value !== undefined) {
-                this.props.onSubmit(app_inst, app_info, value, visible)
+                this.props.onSubmit(app_inst, app_info, value)
             }
         }
-        if (type === 'saveClose') {
-            setTimeout(()=>{
-                window.location.href = `/gateway/${this.state.gateway_sn}/apps`
-            }, 2500)
-        }
     };
+    onCancel = () =>{
+        this.props.onCancel()
+    }
 
     onTabActiveChange (key){
         this.setState({activeKey: key})
@@ -444,168 +438,152 @@ class AppConfig extends Component {
 
     render () {
         const { activeKey, errorCode, app_inst } = this.state;
-        const { configStore, gateway_sn, app_info, inst_editable, disabled, pre_configuration } = this.props;
+        const { configStore, gateway_sn, app_info, inst_editable, update_config, disabled, pre_configuration, closeOnSubmit } = this.props;
         app_info, pre_configuration;
         return (
-            <Tabs
-                activeKey={activeKey}
-                onChange={(key)=> {
-                    this.onTabActiveChange(key)
-                }}
-                type="card"
-            >
-                <TabPane
-                    tab="可视化编辑"
-                    key="ui"
+            <div className="appConfig">
+                <Tabs
+                    activeKey={activeKey}
+                    onChange={(key)=> {
+                        this.onTabActiveChange(key)
+                    }}
+                    type="card"
                 >
-                    <Inst
-                        name={name}
-                        inst_name={app_inst ? app_inst : ''}
-                        editable={inst_editable}
-                        gateway_sn={gateway_sn}
-                        onChange={(value) =>{
-                            this.setState({ app_inst: value })
-                        }}
-                    />
-                    <div
-                        ref="content"
-                        style={errorCode === false ? block : none}
+                    <TabPane
+                        tab="可视化编辑"
+                        key="ui"
                     >
-                    {
-                        configStore.sections && configStore.sections.length > 0 && configStore.sections.map((v, key) => {
-                            return (
-                                <AppConfigSection
-                                    key={key}
-                                    app_info={this.state.app_info}
-                                    configStore={configStore}
-                                    configSection={v}
-                                    templatesSource={this.state.appTemplateList}
-                                    refreshTemplateList={this.refreshTemplateList}
-                                    onChange={()=>{
-                                        this.onConfigChange()
-                                    }}
-                                />
-                            )
-                        })
-                    }
-                    </div>
-                    <div
-                        style={errorCode === false ? none : block}
-                        className="message"
-                    >
-                        数据错误，请使用文本编辑修正错误！
-                    </div>
-                    <div style={configStore.sections && configStore.sections.length > 0 ? none : block}>
-                        <p
+                        <Inst
+                            name={name}
+                            inst_name={app_inst ? app_inst : ''}
+                            editable={inst_editable}
+                            gateway_sn={gateway_sn}
+                            onChange={(value) =>{
+                                this.setState({ app_inst: value })
+                            }}
+                        />
+                        <div
+                            ref="content"
+                            style={errorCode === false ? block : none}
+                        >
+                        {
+                            configStore.sections && configStore.sections.length > 0 && configStore.sections.map((v, key) => {
+                                return (
+                                    <AppConfigSection
+                                        key={key}
+                                        app_info={this.state.app_info}
+                                        configStore={configStore}
+                                        configSection={v}
+                                        templatesSource={this.state.appTemplateList}
+                                        refreshTemplateList={this.refreshTemplateList}
+                                        onChange={()=>{
+                                            this.onConfigChange()
+                                        }}
+                                    />
+                                )
+                            })
+                        }
+                        </div>
+                        <div
+                            style={errorCode === false ? none : block}
                             className="message"
-                        >此应用不支持可视化编辑 请使用文本编辑</p>
+                        >
+                            数据错误，请使用文本编辑修正错误！
+                        </div>
+                        <div style={configStore.sections && configStore.sections.length > 0 ? none : block}>
+                            <p
+                                className="message"
+                            >此应用不支持可视化编辑 请使用文本编辑</p>
+                        </div> 
+                    </TabPane>
+                    <TabPane
+                        tab="文本编辑(JSON)"
+                        key="json"
+                    >
+                        <Inst
+                            name={name}
+                            inst_name={app_inst}
+                            editable={inst_editable}
+                            gateway_sn={gateway_sn}
+                            onChange={(value) =>{
+                                this.setState({ app_inst: value })
+                            }}
+                        />
+                        {
+                            activeKey === 'json'
+                            ? <AceEditor
+                                placeholder="Placeholder Text"
+                                mode="json"
+                                theme="monokai"
+                                name="config_json_editor"
+                                onChange={(value) => {
+                                    this.onJsonChange(value)
+                                }}
+                                fontSize={14}
+                                showPrintMargin
+                                showGutter
+                                highlightActiveLine
+                                value={this.state.configValue}
+                                style={{width: '100%'}}
+                                setOptions={{
+                                    enableBasicAutocompletion: false,
+                                    enableLiveAutocompletion: false,
+                                    enableSnippets: false,
+                                    showLineNumbers: true,
+                                    tabSize: 2
+                                }}
+                              /> : ''
+                        }
+                    </TabPane>
+                </Tabs>
+                <Divider/>
+                {
+                    update_config
+                    ? <div>
+                        <Button
+                            type="primary"
+                            onClick={()=>{
+                                this.onSubmit()
+                            }}
+                            disabled={disabled}
+                        > 保存 </Button>
+                        <span style={{padding: '0 10px'}}> </span>
+                        <Button
+                            type="primary"
+                            onClick={()=>{
+                                if (closeOnSubmit) {
+                                    closeOnSubmit(true)
+                                }
+                                this.onSubmit()
+                            }}
+                            disabled={disabled}
+                        > 保存&返回 </Button>
+                        <span style={{padding: '0 10px'}}> </span>
+                        <Button
+                            onClick={()=>{
+                                this.onCancel()
+                            }}
+                            disabled={disabled}
+                        > 取消 </Button>
                     </div>
-                    <br/>
-                    <br/>
-                    <Button
-                        type="primary"
-                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
-                        onClick={()=>{
-                            this.onSubmit('save')
-                        }}
-                        disabled={disabled}
-                    >
-                        保存
-                    </Button>
-                    <span style={{padding: '0 10px'}}> </span>
-                    <Button
-                        type="primary"
-                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
-                        onClick={()=>{
-                            this.onSubmit('saveClose')
-                        }}
-                        disabled={disabled}
-                    >
-                        保存&关闭
-                    </Button>
-                    <span style={{padding: '0 10px'}}> </span>
-                    <Button
-                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
-                        onClick={()=>{
-                            window.location.href = `/gateway/${gateway_sn}/apps`
-                        }}
-                        disabled={disabled}
-                    >
-                        关闭
-                    </Button>
-                </TabPane>
-                <TabPane
-                    tab="文本编辑(JSON)"
-                    key="json"
-                >
-                    <Inst
-                        name={name}
-                        inst_name={app_inst}
-                        editable={inst_editable}
-                        gateway_sn={gateway_sn}
-                        onChange={(value) =>{
-                            this.setState({ app_inst: value })
-                        }}
-                    />
-                    {
-                        activeKey === 'json'
-                        ? <AceEditor
-                            placeholder="Placeholder Text"
-                            mode="json"
-                            theme="monokai"
-                            name="config_json_editor"
-                            onChange={(value) => {
-                                this.onJsonChange(value)
+                    : <div>
+                        <Button
+                            type="primary"
+                            onClick={()=>{
+                                this.onSubmit()
                             }}
-                            fontSize={14}
-                            showPrintMargin
-                            showGutter
-                            highlightActiveLine
-                            value={this.state.configValue}
-                            style={{width: '100%'}}
-                            setOptions={{
-                                enableBasicAutocompletion: false,
-                                enableLiveAutocompletion: false,
-                                enableSnippets: false,
-                                showLineNumbers: true,
-                                tabSize: 2
+                            disabled={disabled}
+                        > 安装 </Button>
+                        <span style={{padding: '0 10px'}}> </span>
+                        <Button
+                            onClick={()=>{
+                                this.onCancel()
                             }}
-                          /> : ''
-                    }
-                    <br/>
-                    <Button
-                        type="primary"
-                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
-                        onClick={()=>{
-                            this.onSubmit('save')
-                        }}
-                        disabled={disabled}
-                    >
-                        保存
-                    </Button>
-                    <span style={{padding: '0 10px'}}> </span>
-                    <Button
-                        type="primary"
-                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
-                        onClick={()=>{
-                            this.onSubmit('saveClose')
-                        }}
-                        disabled={disabled}
-                    >
-                        保存&关闭
-                    </Button>
-                    <span style={{padding: '0 10px'}}> </span>
-                    <Button
-                        style={errorCode === true || configStore.sections.length === 0 ? none : block}
-                        onClick={()=>{
-                            window.location.href = `/gateway/${gateway_sn}/apps`
-                        }}
-                        disabled={disabled}
-                    >
-                        关闭
-                    </Button>
-                </TabPane>
-            </Tabs>
+                            disabled={disabled}
+                        > 取消 </Button>
+                    </div>
+                }
+            </div>
         );
     }
 }
