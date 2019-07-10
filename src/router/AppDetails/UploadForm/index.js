@@ -15,6 +15,14 @@ const CollectionCreateForm = Form.create()(
         handleCreate = () => {
             const { fileList } = this.state;
             const formData = new FormData();
+            if (fileList.length > 1) {
+                message.error('不能上传多个文件')
+                return
+            }
+            if (fileList.length === 0) {
+                message.error('请选择要上传的文件')
+                return
+            }
             fileList.forEach((file) => {
                 formData.append('app_file', file);
             });
@@ -70,6 +78,7 @@ const CollectionCreateForm = Form.create()(
                 callback();
             };
             const props = {
+                multiple: false,
                 action: '/api/api/v1/applications.versions.create',
                 onRemove: (file) => {
                     this.setState((state) => {

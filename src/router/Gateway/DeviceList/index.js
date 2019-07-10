@@ -29,7 +29,7 @@ const columns = [{
         className: 'cursor'
         // sorter: true
     }, {
-        title: '设备SN',
+        title: '设备序列号',
         key: 'meta.sn',
         dataIndex: 'meta.sn',
         width: '30%',
