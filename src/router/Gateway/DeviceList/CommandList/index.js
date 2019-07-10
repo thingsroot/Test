@@ -98,40 +98,29 @@ class CommandList extends Component {
                     >发送</Button>
                 )
             }
-        }],
-        controlInst: '',
-        flag: false
+        }]
     }
     componentDidMount (){
         this.setState({data: this.props.commands})
+
+        const { regFilterChangeCB } = this.props;
+        if (regFilterChangeCB) {
+            regFilterChangeCB(()=>{
+                this.applyFilter()
+            })
+        }
     }
 
-    UNSAFE_componentWillReceiveProps (nextProps){
-        if (nextProps.controlInst !== this.state.controlInst){
-            this.setState({
-                controlInst: nextProps.controlInst,
-                flag: true
-            });
-            let data = this.state.data;
-            let newData = [];
-            data && data.length > 0 && data.map((item, key)=>{
-                key
-                if (item.name.indexOf(this.state.controlInst) !== -1 ||
-                    item.desc.indexOf(this.state.controlInst) !== -1 ) {
-                    newData.push(item)
-                }
-            });
-            this.setState({
-                data: newData,
-                flag: false
-            })
-            if (nextProps.controlInst === '') {
-                this.setState({
-                    data: this.props.commands,
-                    flag: false
-                })
+    applyFilter = ()=>{
+        const { filterText, commands } = this.props;
+        let newData = [];
+        commands && commands.length > 0 && commands.map((item)=>{
+            if (item.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1 ||
+                (item.desc && item.desc.toLowerCase().indexOf(filterText.toLowerCase()) !== -1) ) {
+                newData.push(item)
             }
-        }
+        });
+        this.setState({data: newData})
     }
 
     showModal = (record) => {
@@ -192,7 +181,6 @@ class CommandList extends Component {
                 <Table
                     bordered
                     rowKey="name"
-                    loading={this.state.flag}
                     rowClassName={(record, index) => {
                         let className = 'light-row';
                         if (index % 2 === 0) {

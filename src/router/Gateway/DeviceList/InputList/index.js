@@ -12,7 +12,9 @@ let myFaultTypeChart;
 
 class ExpandedRowRender extends PureComponent {
     state = {
+        allData: [],
         data: [],
+        inputsMap: {},
         flag: true,
         visible: false,
         barData: [],
@@ -44,8 +46,7 @@ class ExpandedRowRender extends PureComponent {
                 )
                 }
             }
-        ],
-        dataBrowsing: ''
+        ]
     }
 
     componentDidMount (){
@@ -53,43 +54,27 @@ class ExpandedRowRender extends PureComponent {
         if (myFaultTypeChart && myFaultTypeChart.dispose) {
             myFaultTypeChart.dispose();
         }
+        const { inputs } = this.props;
+        const { inputsMap } = this.state;
+
+        inputs && inputs.length > 0 && inputs.map( (item) => {
+            inputsMap[item.name] = item;
+        })
         this.fetch()
         this.timer = setInterval(() => {
             this.fetch()
         }, 3000);
 
-        const { regRefresh } = this.props;
+        const { regRefresh, regFilterChangeCB } = this.props;
         if (regRefresh) {
             regRefresh(()=>{
                 this.fetch()
             })
         }
-    }
-    UNSAFE_componentWillReceiveProps (nextProps){
-        clearInterval(this.timer);
-        if (nextProps.dataBrowsing !== this.state.dataBrowsing){
-            this.setState({
-                dataBrowsing: nextProps.dataBrowsing,
-                flag: true
-            });
-            let data = this.state.data;
-            let newData = [];
-            data && data.length > 0 && data.map((item)=>{
-                if (item.name.indexOf(this.state.dataBrowsing) !== -1 ||
-                    item.desc.indexOf(this.state.dataBrowsing) !== -1 ) {
-                    newData.push(item)
-                }
-            });
-            this.setState({
-                data: newData,
-                flag: false
-            });
-            if (nextProps.dataBrowsing === '') {
-                this.fetch();
-                this.timer = setInterval(() => {
-                    this.fetch()
-                }, 3000);
-            }
+        if (regFilterChangeCB) {
+            regFilterChangeCB(()=>{
+                this.applyFilter()
+            })
         }
     }
 
@@ -100,21 +85,41 @@ class ExpandedRowRender extends PureComponent {
         }
         clearInterval(this.timer)
     }
+    applyFilter = ()=>{
+        const { filterText } = this.props;
+        const { allData } = this.state;
+        let newData = [];
+        allData && allData.length > 0 && allData.map((item)=>{
+            if (item.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1 ||
+                (item.desc && item.desc.toLowerCase().indexOf(filterText.toLowerCase()) !== -1) ) {
+                newData.push(item)
+            }
+        });
+        this.setState({data: newData})
+    }
     fetch = ()=>{
-        const { sn, vsn, inputs } = this.props;
+        const { sn, vsn, inputs, filterText } = this.props;
         inputs;
         http.get('/api/gateway_devf_data?gateway=' + sn + '&name=' + vsn).then(res=>{
-            let data = res.data;
-            data && data.length > 0 && data.map((item, ind)=>{
+            let allData = res.data;
+            let newData = [];
+            const { inputsMap } = this.state;
+            allData && allData.length > 0 && allData.map((item, ind)=>{
                 item.sn = sn;
                 item.vsn = vsn;
                 item.key = ind;
+                item.desc = item.desc || inputsMap[item.name].desc;
                 if (item.vt === null){
                     item.vt = 'float';
                 }
+                if (item.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1 ||
+                    (item.desc && item.desc.toLowerCase().indexOf(filterText.toLowerCase()) !== -1) ) {
+                    newData.push(item)
+                }
             })
             this.setState({
-                data,
+                allData: allData,
+                data: newData,
                 flag: false
             })
         })

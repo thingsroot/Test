@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Collapse, Icon, Tooltip } from 'antd';
+import { Collapse, Icon, Tooltip, Input } from 'antd';
 import { withRouter } from 'react-router-dom';
 import InputList from '../InputList';
 import DevicesOutputs from '../OutputList';
@@ -12,23 +12,71 @@ class Collapses extends Component {
     state = {
         dataRefresh: false,
         dataRefreshCB: undefined,
-        controlInst: '',
-        dataDown: '',
-        dataBrowsing: ''
+        inputFilterCB: undefined,
+        inputFilter: '',
+        outputFilterCB: undefined,
+        outputFilter: '',
+        commandFilterCB: undefined,
+        commandFilter: ''
     };
     RegisterDataRefresh = (onRefresh) => {
         this.setState({
             dataRefreshCB: onRefresh
         })
     };
-
-    getSearchText = (e, type)=>{
+    RegisterInputFilterChangeCB = (onChange) => {
+        this.setState({
+            inputFilterCB: onChange
+        })
+    };
+    changeInputFilter = (e)=>{
         let text = e.target.value;
-        setTimeout(()=>{
+        clearTimeout(this.inputFilterTimer)
+        this.inputFilterTimer = setTimeout(()=>{
             this.setState({
-                [type]: text
+                inputFilter: text
+            }, ()=>{
+                if (this.state.inputFilterCB) {
+                    this.state.inputFilterCB()
+                }
             })
-        }, 1000)
+        }, 200)
+    };
+    RegisterOutputFilterChangeCB = (onChange) => {
+        this.setState({
+            outputFilterCB: onChange
+        })
+    };
+    changeOutputFilter = (e)=>{
+        let text = e.target.value;
+        clearTimeout(this.outputFilterTimer)
+        this.outputFilterTimer = setTimeout(()=>{
+            this.setState({
+                outputFilter: text
+            }, ()=>{
+                if (this.state.outputFilterCB) {
+                    this.state.outputFilterCB()
+                }
+            })
+        }, 200)
+    };
+    RegisterCommandFilterChangeCB = (onChange) => {
+        this.setState({
+            commandFilterCB: onChange
+        })
+    };
+    changeCommandFilter = (e)=>{
+        let text = e.target.value;
+        clearTimeout(this.commandFilterTimer)
+        this.commandFilterTimer = setTimeout(()=>{
+            this.setState({
+                commandFilter: text
+            }, ()=>{
+                if (this.state.commandFilterCB) {
+                    this.state.commandFilterCB()
+                }
+            })
+        }, 200)
     };
     render () {
         return (
@@ -42,15 +90,15 @@ class Collapses extends Component {
                         header={
                             <p className="collapseHead">
                                 <span>数据浏览</span>
-                                <input
-                                    style={{marginLeft: '50%'}}
+                                <Input
+                                    style={{marginLeft: '50%', maxWidth: '300px'}}
                                     type="text"
                                     placeholder="搜索名称、描述"
                                     onClick={(e)=>{
                                         e.stopPropagation();
                                     }}
                                     onChange={(e)=>{
-                                        this.getSearchText(e, 'dataBrowsing')
+                                        this.changeInputFilter(e)
                                     }}
                                 />
                                 <Tooltip
@@ -83,7 +131,8 @@ class Collapses extends Component {
                             sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
                             regRefresh={this.RegisterDataRefresh}
-                            dataBrowsing={this.state.dataBrowsing}
+                            filterText={this.state.inputFilter}
+                            regFilterChangeCB={this.RegisterInputFilterChangeCB}
                         />
                     </Panel>
                     <Panel
@@ -93,18 +142,17 @@ class Collapses extends Component {
                                 <span>数据下置</span>
                                 {
                                     this.props.outputs && Object.keys(this.props.outputs).length > 0
-                                    ? <input
-                                        style={{marginLeft: '50%'}}
+                                    ? <Input
+                                        style={{marginLeft: '50%', maxWidth: '300px'}}
                                         type="text"
                                         placeholder="搜索名称、描述"
                                         onClick={(e)=>{
                                             e.stopPropagation();
                                         }}
                                         onChange={(e)=>{
-                                            this.getSearchText(e, 'dataDown')
+                                            this.changeOutputFilter(e)
                                         }}
-                                    />
-                                    : ''
+                                      /> : null
                                 }
                                 <span style={{padding: '0 30px'}}> </span>
                             </p>
@@ -115,7 +163,8 @@ class Collapses extends Component {
                             outputs={this.props.outputs}
                             sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
-                            dataDown={this.state.dataDown}
+                            filterText={this.state.outputFilter}
+                            regFilterChangeCB={this.RegisterInputFilterChangeCB}
                         />
                     </Panel>
                     <Panel
@@ -125,18 +174,17 @@ class Collapses extends Component {
                                 <span>控制指令</span>
                                 {
                                     this.props.commands && Object.keys(this.props.commands).length > 0
-                                    ? <input
-                                        style={{marginLeft: '50%'}}
+                                    ? <Input
+                                        style={{marginLeft: '50%', maxWidth: '300px'}}
                                         type="text"
                                         placeholder="搜索名称、描述"
                                         onClick={(e)=>{
                                             e.stopPropagation();
                                         }}
                                         onChange={(e)=>{
-                                            this.getSearchText(e, 'controlInst')
+                                            this.changeCommandFilter(e)
                                         }}
-                                    />
-                                    : ''
+                                      /> : null
                                 }
                                 <span style={{padding: '0 30px'}}> </span>
                             </p>
@@ -147,7 +195,8 @@ class Collapses extends Component {
                             commands={this.props.commands}
                             sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
-                            controlInst={this.state.controlInst}
+                            filterText={this.state.commandFilter}
+                            regFilterChangeCB={this.RegisterCommandFilterChangeCB}
                         />
                     </Panel>
                 </Collapse>
