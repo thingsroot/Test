@@ -68,7 +68,8 @@ const newMessageChannel = (topic) => {
                 return (item.id && item.id.toLowerCase().indexOf(text) !== -1) ||
                     (item.content && item.content.toLowerCase().indexOf(text) !== -1) ||
                     (item.direction && item.direction.toLowerCase().indexOf(text) !== -1) ||
-                    (item.level && item.level.toLowerCase().indexOf(text) !== -1)
+                    (item.level && item.level.toLowerCase().indexOf(text) !== -1) ||
+                    (item.inst && item.inst.toLowerCase().indexOf(text) !== -1)
             } else {
                 return true
             }
@@ -83,7 +84,8 @@ const newMessageChannel = (topic) => {
                     this.data = this.allData.filter(item=> (item.id && item.id.toLowerCase().indexOf(text) !== -1) ||
                         (item.content && item.content.toLowerCase().indexOf(text) !== -1) ||
                         (item.direction && item.direction.toLowerCase().indexOf(text) !== -1) ||
-                        (item.level && item.level.toLowerCase().indexOf(text) !== -1)
+                        (item.level && item.level.toLowerCase().indexOf(text) !== -1) ||
+                        (item.inst && item.inst.toLowerCase().indexOf(text) !== -1)
                     );
                 }
             } else {
@@ -145,6 +147,10 @@ const newMessageChannel = (topic) => {
     return item;
 }
 
+const log_content_regex = new RegExp(/^\[(\w+)\]:\s+::(\w+)::\s+(.+)$/);
+const log_content_regex_2 = new RegExp(/^\[(\w+)\]:\s+(.+)$/);
+
+
 class GatewayMQTT {
     _sid = new Cookie('sid');
     _user_id = new Cookie('user_id');
@@ -175,7 +181,7 @@ class GatewayMQTT {
                             if(i > 0 && i % 8 == 0)
                                 out += "\r\n";*/
         }
-        return out;
+        return out.toUpperCase();
     }
     base64DecodeChars = new Array(
       -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -276,7 +282,7 @@ class GatewayMQTT {
             time: getLocalTime(msg[1]),
             direction: msg[0].split('/')[1],
             id: msg[0].split('/')[0],
-            content: this.CharToHex(this.base64decode(msg[2]))
+            content: this.base64decode(msg[2])
         }
         this.comm_channel.pushData(obj)
     }
@@ -288,13 +294,37 @@ class GatewayMQTT {
                 this.log_channel.setActive(false)
             }
         }
-        const obj = {
-            time: getLocalTime(msg[1]),
-            level: msg[0],
-            id: msg[2].split(']:')[0] + ']',
-            content: msg[2].split(']:')[1]
+
+        const groups = log_content_regex.exec(msg[2])
+        if (groups) {
+            const obj = {
+                time: getLocalTime(msg[1]),
+                level: msg[0].toUpperCase(),
+                id: groups[1],
+                inst: groups[2],
+                content: groups[3]
+            }
+            this.log_channel.pushData(obj)
+        } else {
+            const groups = log_content_regex_2.exec(msg[2])
+            if (groups) {
+                const obj = {
+                    time: getLocalTime(msg[1]),
+                    level: msg[0].toUpperCase(),
+                    id: groups[1],
+                    inst: 'N/A',
+                    content: groups[2]
+                }
+                this.log_channel.pushData(obj)
+            }
         }
-        this.log_channel.pushData(obj)
+        // const obj = {
+        //     time: getLocalTime(msg[1]),
+        //     level: msg[0].toUpperCase(),
+        //     id: msg[2].split(']:')[0] + ']',
+        //     content: msg[2].split(']:')[1]
+        // }
+        // this.log_channel.pushData(obj)
     }
     unsubscribe (topic) {
         const topic_real = this.gateway + topic;

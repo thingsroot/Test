@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter} from 'react-router-dom';
-import {Button, Alert, Input, Select, Empty } from 'antd';
+import {Button, Alert, Input, Select, Empty, Switch } from 'antd';
 import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
 import './style.scss';
@@ -33,7 +33,8 @@ class CommViewer extends Component {
             type: '',
             title: '',
             gateway: '',
-            filterText: ''
+            filterText: '',
+            hexPrint: true
         }
     }
     componentDidMount (){
@@ -156,9 +157,21 @@ class CommViewer extends Component {
                             }}
                         >清除</Button>
                         <span style={{padding: '0 5px'}} />
-                        <span>当前报文数量：{mqtt.comm_channel.Data.length} / {mqtt.comm_channel.AllData.length}</span>
+                        <span>当前数量：{mqtt.comm_channel.Data.length} </span>
+                        <span style={{padding: '0 5px'}} />
+                        <span>总数： {mqtt.comm_channel.AllData.length}</span>
                     </div>
                     <div className="searwrap">
+                        <span>HEX：</span>
+                        <Switch
+                            checkedChildren="ON&nbsp;"
+                            unCheckedChildren="OFF"
+                            checked={this.state.hexPrint}
+                            onChange={()=>{
+                                this.setState({hexPrint: !this.state.hexPrint})
+                            }}
+                        />
+                        <span style={{padding: '0 5px'}} />
                         <Select
                             labelInValue
                             defaultValue={{ key: 'all' }}
@@ -220,7 +233,7 @@ class CommViewer extends Component {
                                                     <div>{mqtt.comm_channel.Data[key].time}</div>
                                                     <div>{mqtt.comm_channel.Data[key].id}</div>
                                                     <div>{mqtt.comm_channel.Data[key].direction}</div>
-                                                    <div>{mqtt.comm_channel.Data[key].content}</div>
+                                                    <div>{this.state.hexPrint ? mqtt.CharToHex(mqtt.comm_channel.Data[key].content) : mqtt.comm_channel.Data[key].content}</div>
                                                 </div>
                                             </div>)
                                         }}

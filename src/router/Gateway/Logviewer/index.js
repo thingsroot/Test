@@ -161,7 +161,9 @@ class Logviewer extends Component {
                             }}
                         >清除</Button>
                         <span style={{padding: '0 5px'}} />
-                        <span>当前日志数量：{mqtt.log_channel.Data.length} / {mqtt.log_channel.AllData.length}</span>
+                        <span>当前数量：{mqtt.log_channel.Data.length} </span>
+                        <span style={{padding: '0 5px'}} />
+                        <span>总数： {mqtt.log_channel.AllData.length}</span>
                     </div>
                     <div className="searwrap">
 
@@ -174,7 +176,8 @@ class Logviewer extends Component {
                             <Option value="all">全部</Option>
                             <Option value="content">内容</Option>
                             <Option value="level">等级</Option>
-                            <Option value="id">应用示例名</Option>
+                            <Option value="id">进程ID</Option>
+                            <Option value="inst">进程名称</Option>
                         </Select>
                         <span style={{padding: '0 5px'}} />
                         <Search
@@ -204,7 +207,8 @@ class Logviewer extends Component {
                         <div className="tableHeaders">
                             <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>时间</div>
                             <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>等级</div>
-                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>应用实例名</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>进程ID</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>进程名称</div>
                             <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>内容</div>
                         </div>
                             <div
@@ -226,6 +230,7 @@ class Logviewer extends Component {
                                                     <div>{mqtt.log_channel.Data[key].time}</div>
                                                     <div>{mqtt.log_channel.Data[key].level}</div>
                                                     <div>{mqtt.log_channel.Data[key].id}</div>
+                                                    <div>{mqtt.log_channel.Data[key].inst}</div>
                                                     <div>{mqtt.log_channel.Data[key].content}</div>
                                                 </div>
                                             </div>)
