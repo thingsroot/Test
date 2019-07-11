@@ -34,6 +34,9 @@ const createDefaultValue = (type, default_value, values) => {
     if (type === 'tcp_client') {
         return values === undefined ? {} : values
     }
+    if (type === 'tcp_server') {
+        return values === undefined ? {} : values
+    }
 }
 
 const newConfigItem = (name, desc, type, default_value, depends, values, cols) => {
