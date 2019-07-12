@@ -136,7 +136,9 @@ class Status extends Component {
                               >
                                 <Link to={`/appsinstall/${this.state.gateway}`}>
                                     <Button type="primary">
-                                        安装新应用
+                                        <Icon type="appstore"
+                                            theme="filled"
+                                        />安装新应用
                                     </Button>
                                 </Link>
                             </div>
