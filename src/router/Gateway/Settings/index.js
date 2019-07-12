@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Card, Button, message, Icon } from 'antd';
+import { Card, Button, message, Icon, Tag } from 'antd';
 import { inject, observer} from 'mobx-react';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
 import axios from 'axios';
 import echarts from 'echarts/lib/echarts';
@@ -333,23 +333,32 @@ class GatewaySettings extends Component {
                             <p><b>内存:</b>{gatewayInfo.ram}</p>
                             <p><b>存储:</b>{gatewayInfo.rom}</p>
                             <p><b>操作系统:</b>{gatewayInfo.data.platform}</p>
-                            <p><b>核心软件:</b>{gatewayInfo.data && gatewayInfo.data.skynet_version}{skynet_latest_version > (gatewayInfo.data ? gatewayInfo.data.skynet_version : 0)
-                            ? <Link
-                                to="#"
-                                style={{marginLeft: 200}}
-                                onClick={()=>{
-                                    this.setState({showUpgrade: true})
-                                }}
-                              >发现新版本></Link> : ''}</p>
-                            <p><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}{freeioe_latest_version >  (gatewayInfo.data ? gatewayInfo.data.version : 0)
-                            ? <Link
-                                to="#"
-                                style={{marginLeft: 200}}
-                                onClick={()=>{
-                                    this.setState({showUpgrade: true})
-                                }}
-                              >发现新版本></Link> : ''}</p>
-                            {/* <p><b>公网IP:</b>{gatewayInfo.public_ip}</p> */}
+                            <p><b>核心软件:</b>{gatewayInfo.data && gatewayInfo.data.skynet_version}
+                            {
+                                skynet_upgradable
+                                ? <Tag color="red"
+                                    style={{marginLeft: 15}}
+                                    onClick={()=>{
+                                        this.setState({showUpgrade: true})
+                                    }}
+                                  >发现新版本</Tag>
+                                : <Tag color="cyan"
+                                    style={{marginLeft: 15}}
+                                  >已是最新版</Tag> 
+                            }</p>
+                            <p><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}
+                            {
+                                freeioe_upgradable
+                                ? <Tag color="red"
+                                    style={{marginLeft: 15}}
+                                    onClick={()=>{
+                                        this.setState({showUpgrade: true})
+                                    }}
+                                  >发现新版本</Tag>
+                                : <Tag color="cyan"
+                                    style={{marginLeft: 15}}
+                                  >已是最新版</Tag>
+                            }</p>
                             <p><b>调试模式:</b>{gatewayInfo.data && gatewayInfo.data.enable_beta === 1 ? '开启' : '关闭'}</p>
                             <p><b>数据上传:</b>{gatewayInfo.data && gatewayInfo.data.data_upload ? '开启' : '关闭'}</p>
                             <p><b>统计上传:</b>{gatewayInfo.data && gatewayInfo.data.stat_upload ? '开启' : '关闭'}</p>
