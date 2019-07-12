@@ -200,11 +200,11 @@ class AppConfigSection extends Component {
                     <Select
                         value={config.value}
                         style={{width: 300}}
-                        onChange={()=>{
+                        onChange={(value)=>{
                             config.depends && config.depends.length > 0 && config.depends.map( (dep, dep_key) => {
-                                this.props.configStore.setHide(dep, dep_key === event.target.innerText)
+                                this.props.configStore.setHide(dep, dep_key === value)
                             })
-                            config.setValue(event.target.innerText)
+                            config.setValue(value)
                             if (config.depends !== undefined) {
                                 for (let [k, v] of Object.entries(config.depends)) {
                                     this.props.configStore.setHide(v, k !== config.value)
@@ -213,7 +213,9 @@ class AppConfigSection extends Component {
                             this.props.onChange()
                         }}
                     >
-                        {config.values && config.values.length > 0 && config.values.map(w => <Option key={w}>{w}</Option>)}
+                        {config.values && config.values.length > 0 && config.values.map(w => {
+                            return (<Option key={typeof(w) !== 'object' ? w : w.value}>{typeof(w) !== 'object' ? w : w.name}</Option>)
+                        } )}
                     </Select>
                     <Input
                         type="hidden"
@@ -241,6 +243,8 @@ class AppConfigSection extends Component {
                 title: col.desc,
                 dataIndex: col.name,
                 default: col.default,
+                values: col.values,
+                depends: col.depends,
                 editable: true
             });
         });

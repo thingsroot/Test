@@ -30,6 +30,7 @@ class EditableCell extends React.Component {
             return (
             <Input ref={node => (this.input = node)}
                 type="number"
+                value={this.props.value}
                 onPressEnter={this.save}
                 onBlur={this.save}
             />)
@@ -39,6 +40,7 @@ class EditableCell extends React.Component {
             <div>
                 <Input ref={node => (this.input = node)}
                     type="hidden"
+                    value={this.props.value}
                     onChange={this.save}
                 />
                 <Select
@@ -60,9 +62,36 @@ class EditableCell extends React.Component {
                 </Select>
             </div>)
         }
+        if (columnType === 'dropdown') {
+            return (
+            <div>
+                <Input ref={node => (this.input = node)}
+                    type="hidden"
+                    onChange={this.save}
+                />
+                <Select
+                    value={this.props.value}
+                    style={{width: '95%'}}
+                >
+                    {this.props.values.map((item)=>{
+                        return (
+                            <Select.Option
+                                key={typeof(item) !== 'object' ? item : item.value}
+                                onClick={(e) => {
+                                    this.selectSave(e, dataIndex)
+                                }}
+                            >
+                                {typeof(item) !== 'object' ? item : item.name}
+                            </Select.Option>
+                        )
+                    })}
+                </Select>
+            </div>)
+        }
         return (
         <Input ref={node => (this.input = node)}
             onPressEnter={this.save}
+            value={this.props.value}
             onBlur={this.save}
         /> )
     };
@@ -170,6 +199,8 @@ class EditableTable extends React.Component {
                 editable: col.editable,
                 columnType: col.columnType,
                 columnReference: col.columnReference,
+                values: col.values,
+                depends: col.depends,
                 configStore: this.props.configStore
             })
         })
