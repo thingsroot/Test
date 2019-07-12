@@ -313,7 +313,11 @@ class GatewaySettings extends Component {
                             </Button>
                         </div>
                         <div className="border">
-                            <Card title="| 基本信息"
+                            <Card title={
+                                <div>
+                                   | 基本信息 <Icon type="info-circle"/>
+                                </div>
+                                }
                                 bordered={false}
                                 style={{ width: '100%' }}
                                 loading={loading}
@@ -324,7 +328,11 @@ class GatewaySettings extends Component {
                             <p><b>描述:</b>{gatewayInfo.description}</p>
                             <p><b>位置:</b>{gatewayInfo.address} </p>
                             </Card>
-                            <Card title="| 配置信息"
+                            <Card title={
+                                <div>
+                                    | 配置信息 <Icon type="control" />
+                                </div>
+                                }
                                 bordered={false}
                                 style={{ width: '100%' }}
                                 loading={loading}
