@@ -337,23 +337,10 @@ class GatewaySettings extends Component {
                                 style={{ width: '100%' }}
                                 loading={loading}
                             >
-                            <p><b>CPU:</b>{gatewayInfo.cpu}</p>
-                            <p><b>内存:</b>{gatewayInfo.ram}</p>
-                            <p><b>存储:</b>{gatewayInfo.rom}</p>
+                            <p><b>CPU型号:</b>{gatewayInfo.cpu}</p>
+                            <p><b>内存容量:</b>{gatewayInfo.ram}</p>
+                            <p><b>存储容量:</b>{gatewayInfo.rom}</p>
                             <p><b>操作系统:</b>{gatewayInfo.data.platform}</p>
-                            <p><b>核心软件:</b>{gatewayInfo.data && gatewayInfo.data.skynet_version}
-                            {
-                                skynet_upgradable
-                                ? <Tag color="red"
-                                    style={{marginLeft: 15}}
-                                    onClick={()=>{
-                                        this.setState({showUpgrade: true})
-                                    }}
-                                  >发现新版本</Tag>
-                                : <Tag color="cyan"
-                                    style={{marginLeft: 15}}
-                                  >已是最新版</Tag> 
-                            }</p>
                             <p><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}
                             {
                                 freeioe_upgradable
@@ -366,6 +353,19 @@ class GatewaySettings extends Component {
                                 : <Tag color="cyan"
                                     style={{marginLeft: 15}}
                                   >已是最新版</Tag>
+                            }</p>
+                            <p><b>核心软件:</b>{gatewayInfo.data && gatewayInfo.data.skynet_version}
+                            {
+                                skynet_upgradable
+                                ? <Tag color="red"
+                                    style={{marginLeft: 15}}
+                                    onClick={()=>{
+                                        this.setState({showUpgrade: true})
+                                    }}
+                                  >发现新版本</Tag>
+                                : <Tag color="cyan"
+                                    style={{marginLeft: 15}}
+                                  >已是最新版</Tag> 
                             }</p>
                             <p><b>调试模式:</b>{gatewayInfo.data && gatewayInfo.data.enable_beta === 1 ? '开启' : '关闭'}</p>
                             <p><b>数据上传:</b>{gatewayInfo.data && gatewayInfo.data.data_upload ? '开启' : '关闭'}</p>
