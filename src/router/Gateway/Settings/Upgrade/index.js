@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer} from 'mobx-react';
-import { Button, Icon, Timeline, Divider, Tooltip, Switch } from 'antd';
+import { Button, Icon, Timeline, Tooltip, Switch, Card } from 'antd';
 
 
 @inject('store')
@@ -12,13 +12,20 @@ class GatewayUpgrade extends Component {
     render () {
         const { actionEnable, data } = this.props.store.gatewayInfo;
         const { freeioe_latest_version, skynet_latest_version, upgrading, version_data, skynet_version_data } = this.props;
-        const { onCheckUpgrade, onUpgrade } = this.props;
+        const { onCheckUpgrade, onUpgrade, onClose } = this.props;
         let freeioe_upgradable = data.version !== undefined && freeioe_latest_version !== undefined && data.version < freeioe_latest_version;
         let skynet_upgradable = data.skynet_version !== undefined && skynet_latest_version !== undefined && data.skynet_version < skynet_latest_version;
         return (
-            <div>
+            <Card
+                title="固件升级"
+                bordered={false}
+                extra={
+                    <Button
+                        onClick={onClose}
+                    >X</Button>}
+                style={{ width: '100%' }}
+            >
                 <div className="title">
-                    <h2>固件升级</h2>
                     <div>
                         <div className="Icon">
                             <Icon type="setting" />
@@ -91,13 +98,14 @@ class GatewayUpgrade extends Component {
                           /> : null
                     }
                 </div>
-                <Divider/>
-                <div style={{display: 'flex', flexWrap: 'wrap', paddingBottom: '5px'}}>
+                <div style={{display: 'flex', flexWrap: 'wrap', paddingTop: '5px'}}>
                     {
                         freeioe_upgradable
-                        ? <div style={{width: '50%', padding: 10, boxSizing: 'border-box'}}>
-                            <h3>业务软件更新历史</h3>
-                            <Divider/>
+                        ? <Card
+                            title="业务软件更新历史"
+                            bordered={false}
+                            style={{width: '50%'}}
+                          >
                             <Timeline>
                             {
                                 version_data && version_data.length > 0 && version_data.map((v, i)=>{
@@ -113,15 +121,19 @@ class GatewayUpgrade extends Component {
                                 })
                             }
                             </Timeline>
-                        </div> : <div style={{width: '50%', padding: 10, boxSizing: 'border-box'}}></div>
+                        </Card> : <div style={{width: '50%', padding: 10, boxSizing: 'border-box'}}></div>
                     }
                     {
                         skynet_upgradable
-                        ? <div style={{width: '50%', padding: 10}}>
-                            <Tooltip placement="bottom"
-                                title={data.platform}
-                            > <h3>核心软件更新历史</h3> </Tooltip>
-                            <Divider/>
+                        ? <Card
+                            title={
+                                <Tooltip placement="bottom"
+                                    title={data.platform}
+                                >核心软件更新历史</Tooltip>
+                            }
+                            bordered={false}
+                            style={{width: '50%'}}
+                          >
                             <Timeline>
                             {
                                 skynet_version_data && skynet_version_data.length > 0 && skynet_version_data.map((v, i)=>{
@@ -137,10 +149,10 @@ class GatewayUpgrade extends Component {
                                 })
                             }
                             </Timeline>
-                        </div> : null
+                        </Card> : null
                     }
                 </div>
-            </div>
+            </Card>
         )
     }
 }

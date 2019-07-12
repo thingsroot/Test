@@ -365,7 +365,7 @@ class GatewaySettings extends Component {
                                   >发现新版本</Tag>
                                 : <Tag color="cyan"
                                     style={{marginLeft: 15}}
-                                  >已是最新版</Tag> 
+                                  >已是最新版</Tag>
                             }</p>
                             <p><b>调试模式:</b>{gatewayInfo.data && gatewayInfo.data.enable_beta === 1 ? '开启' : '关闭'}</p>
                             <p><b>数据上传:</b>{gatewayInfo.data && gatewayInfo.data.data_upload ? '开启' : '关闭'}</p>
@@ -408,13 +408,6 @@ class GatewaySettings extends Component {
                     />
             </div>
                 <div className={showUpgrade && !showEdit ? 'upgrade show' : 'upgrade hide'}>
-                    <Button
-                        onClick={()=>{
-                            this.setState({showUpgrade: false}, ()=>{
-                                this.fetchUpdate()
-                            })
-                        }}
-                    >X</Button>
                     <Upgrade
                         gatewayInfo={gatewayInfo}
                         upgrading={upgrading}
@@ -427,6 +420,11 @@ class GatewaySettings extends Component {
                         }}
                         onCheckUpgrade={()=>{
                             this.fetchUpdate()
+                        }}
+                        onClose={()=>{
+                            this.setState({showUpgrade: false}, ()=>{
+                                this.fetchUpdate()
+                            })
                         }}
                     />
                 </div>
