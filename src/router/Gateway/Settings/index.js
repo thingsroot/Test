@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Button, message } from 'antd';
+import { Card, Button, message, Icon } from 'antd';
 import { inject, observer} from 'mobx-react';
 import { withRouter, Link } from 'react-router-dom';
 import http from '../../../utils/Server';
@@ -19,7 +19,6 @@ import SettingsEdit from './Edit'
 @observer
 class GatewaySettings extends Component {
     state = {
-        title: '',
         skynet_version_list: [],
         skynet_latest_version: 0,
         freeioe_version_list: [],
@@ -92,7 +91,14 @@ class GatewaySettings extends Component {
     }
     fetchSkynetVersion () {
         const { gatewayInfo } = this.props.store;
-        http.get('/api/applications_versions_list?app=' + gatewayInfo.data.platform + '_skynet&beta=' + (gatewayInfo.data.enable_beta ? 1 : 0)).then(res=>{
+
+        const platform_reg = new RegExp('^([^/]+)/([^/]+)/(.+)$');
+        const new_bin_app_path = platform_reg.exec(gatewayInfo.data.platform)
+        let url = '/api/applications_versions_list?app=' + gatewayInfo.data.platform + '_skynet&beta=' + (gatewayInfo.data.enable_beta ? 1 : 0)
+        if (new_bin_app_path) {
+            url = '/api/applications_versions_list?app=bin/' + gatewayInfo.data.platform + '/skynet&beta=' + (gatewayInfo.data.enable_beta ? 1 : 0)
+        }
+        http.get(url).then(res=>{
             const arr = [];
             res.data && res.data.length > 0 && res.data.map(item=>{
                 if (item.version > gatewayInfo.data.skynet_version){
@@ -109,8 +115,11 @@ class GatewaySettings extends Component {
                 skynet_version_list: arr
             })
         })
-
-        http.get('/api/applications_versions_latest?app=' + gatewayInfo.data.platform + '_skynet&beta=' + (gatewayInfo.data.enable_beta ? 1 : 0)).then(res=>{
+        let url_latest = '/api/applications_versions_latest?app=' + gatewayInfo.data.platform + '_skynet&beta=' + (gatewayInfo.data.enable_beta ? 1 : 0)
+        if (new_bin_app_path) {
+            url_latest = '/api/applications_versions_latest?app=bin/' + gatewayInfo.data.platform + '/skynet&beta=' + (gatewayInfo.data.enable_beta ? 1 : 0)
+        }
+        http.get(url_latest).then(res=>{
             this.setState({
                 skynet_latest_version: res.data
             })
@@ -222,23 +231,24 @@ class GatewaySettings extends Component {
         })
         this.fetchCharts()
     }
-    onGatewayUpgrade () {
+    onGatewayUpgrade (version, skynet_version) {
+        if (version === undefined && skynet_version === undefined) {
+            message.error('错误的升级请求')
+            return
+        }
+
         const { gatewayInfo } = this.props.store;
-        const { freeioe_latest_version, skynet_latest_version } = this.state;
         this.setState({upgrading: true})
-        const data = gatewayInfo.data && gatewayInfo.data.skynet_version < skynet_latest_version
-        ? {
+        const data = {
             name: gatewayInfo.sn,
-            skynet_version: skynet_latest_version,
-            version: freeioe_latest_version,
             no_ack: 1,
             id: `sys_upgrade/${gatewayInfo.sn}/${new Date() * 1}`
         }
-        : {
-            name: gatewayInfo.sn,
-            version: freeioe_latest_version,
-            no_ack: 1,
-            id: `sys_upgrade/${gatewayInfo.sn}/${new Date() * 1}`
+        if (version !== undefined) {
+            data.version = version
+        }
+        if (skynet_version !== undefined) {
+            data.skynet_version = skynet_version
         }
         http.post('/api/gateways_upgrade', data).then(res=>{
             if (res.ok) {
@@ -260,8 +270,13 @@ class GatewaySettings extends Component {
     }
     render () {
         const { gatewayInfo } = this.props.store;
-        const { upgrading, showUpgrade, title, showEdit, freeioe_version_list, skynet_version_list,
+        const { upgrading, showUpgrade, showEdit, freeioe_version_list, skynet_version_list,
             loading, freeioe_latest_version, skynet_latest_version } = this.state;
+
+        let version = gatewayInfo.data.version;
+        let skynet_version = gatewayInfo.data.skynet_version;
+        let freeioe_upgradable = version !== undefined && freeioe_latest_version !== undefined && version < freeioe_latest_version;
+        let skynet_upgradable = skynet_version !== undefined && skynet_latest_version !== undefined && skynet_version < skynet_latest_version;
         return (
             <div className="settings">
                 <div className={!showUpgrade && !showEdit ? 'show flex' : 'hide'}>
@@ -269,12 +284,33 @@ class GatewaySettings extends Component {
                         className="linkstatus"
                     >
                         <div className="setbutton">
+                            {
+                                freeioe_upgradable || skynet_upgradable
+                                ? <Button
+                                    type="primary"
+                                    ghost
+                                    onClick={()=>{
+                                        this.setState({showUpgrade: true})
+                                    }}
+                                  >
+                                    <Icon type="thunderbolt"
+                                        theme="filled"
+                                    />
+                                    升级固件
+                                </Button> : null
+                            }
+                            <span style={{padding: '0 5px'}}> </span>
                             <Button
                                 disabled={!gatewayInfo.actionEnable}
                                 onClick={()=>{
                                     this.setState({showEdit: true})
                                 }}
-                            >高级设置</Button>
+                            >
+                                <Icon type="setting"
+                                    theme="filled"
+                                />
+                                高级设置
+                            </Button>
                         </div>
                         <div className="border">
                             <Card title="| 基本信息"
@@ -302,7 +338,7 @@ class GatewaySettings extends Component {
                                 to="#"
                                 style={{marginLeft: 200}}
                                 onClick={()=>{
-                                    this.setState({showUpgrade: true, title: 'openwrt x86_64_skynet'})
+                                    this.setState({showUpgrade: true})
                                 }}
                               >发现新版本></Link> : ''}</p>
                             <p><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}{freeioe_latest_version >  (gatewayInfo.data ? gatewayInfo.data.version : 0)
@@ -310,7 +346,7 @@ class GatewaySettings extends Component {
                                 to="#"
                                 style={{marginLeft: 200}}
                                 onClick={()=>{
-                                    this.setState({showUpgrade: true, title: 'FreeIOE'})
+                                    this.setState({showUpgrade: true})
                                 }}
                               >发现新版本></Link> : ''}</p>
                             {/* <p><b>公网IP:</b>{gatewayInfo.public_ip}</p> */}
@@ -364,14 +400,16 @@ class GatewaySettings extends Component {
                     >X</Button>
                     <Upgrade
                         gatewayInfo={gatewayInfo}
-                        title={title}
                         upgrading={upgrading}
                         freeioe_latest_version={freeioe_latest_version}
                         skynet_latest_version={skynet_latest_version}
                         version_data={freeioe_version_list}
                         skynet_version_data={skynet_version_list}
-                        onUpgrade={()=>{
-                            this.onGatewayUpgrade()
+                        onUpgrade={(version, skynet_version)=>{
+                            this.onGatewayUpgrade(version, skynet_version)
+                        }}
+                        onCheckUpgrade={()=>{
+                            this.fetchUpdate()
                         }}
                     />
                 </div>
