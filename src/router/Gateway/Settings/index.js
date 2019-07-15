@@ -284,7 +284,7 @@ class GatewaySettings extends Component {
                         className="linkstatus"
                     >
                         <div className="setbutton">
-                            {
+                            {/*
                                 freeioe_upgradable || skynet_upgradable
                                 ? <Button
                                     type="primary"
@@ -298,7 +298,7 @@ class GatewaySettings extends Component {
                                     />
                                     升级固件
                                 </Button> : null
-                            }
+                                */}
                             <span style={{padding: '0 5px'}}> </span>
                             <Button
                                 disabled={!gatewayInfo.actionEnable}
