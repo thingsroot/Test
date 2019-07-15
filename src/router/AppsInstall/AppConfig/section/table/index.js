@@ -289,6 +289,8 @@ class EditableTable extends React.Component {
                     title: col.title,
                     columnType: col.columnType,
                     columnReference: col.columnReference,
+                    values: col.values,
+                    depends: col.depends,
                     configStore: col.configStore,
                     handleSave: this.handleSave
                 })
