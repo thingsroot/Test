@@ -41,7 +41,7 @@ const newMessageChannel = (topic) => {
             this.topic = value;
         },
         pushData (value) {
-            console.log(value)
+            // console.log(value)
             this.allData.push(value)
             if (this.filter === undefined) {
                 this.data.push(value)
@@ -147,8 +147,8 @@ const newMessageChannel = (topic) => {
     return item;
 }
 
-const log_content_regex = new RegExp(/^\[(\w+)\]:\s+::(\w+)::\s+(.+)$/);
-const log_content_regex_2 = new RegExp(/^\[(\w+)\]:\s+(.+)$/);
+const log_content_regex = new RegExp(/^\[(\w+)\]: ::(\w+)::\s+([\s\S]+)$/);
+const log_content_regex_2 = new RegExp(/^\[(\w+)\]:([\s\S]+)$/);
 
 
 class GatewayMQTT {
@@ -287,6 +287,7 @@ class GatewayMQTT {
         this.comm_channel.pushData(obj)
     }
     onReceiveLogMsg = (msg) => {
+        console.log(msg)
         if (this.log_channel.Size >= this.max_count) {
             if (this.log_channel.active) {
                 message.error(`日志数量超过${this.max_count}条，订阅停止!!`)
@@ -314,6 +315,16 @@ class GatewayMQTT {
                     id: groups[1],
                     inst: 'N/A',
                     content: groups[2]
+                }
+                this.log_channel.pushData(obj)
+            } else {
+                console.log('Cannot parse this log!!!!')
+                const obj = {
+                    time: getLocalTime(msg[1]),
+                    level: msg[0].toUpperCase(),
+                    id: 'N/A',
+                    inst: 'N/A',
+                    content: msg[2]
                 }
                 this.log_channel.pushData(obj)
             }
