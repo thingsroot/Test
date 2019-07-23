@@ -130,7 +130,8 @@ class HeaderBar extends PureComponent {
                 <span style={{padding: '0 5px'}}> </span>
                 <a onClick={()=>{
                     window.open('https://freeioe.org/', '_blank')
-                }}>
+                }}
+                >
                     <Icon
                         style={{padding: '0 4px', fontWeight: 800}}
                         type="message"

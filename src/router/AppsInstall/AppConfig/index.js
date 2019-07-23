@@ -521,7 +521,7 @@ class AppConfig extends Component {
                             <p
                                 className="message"
                             >此应用不支持可视化编辑 请使用文本编辑</p>
-                        </div> 
+                        </div>
                     </TabPane>
                     <TabPane
                         tab="文本编辑(JSON)"

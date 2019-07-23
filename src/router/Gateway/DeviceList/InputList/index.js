@@ -24,7 +24,9 @@ class ExpandedRowRender extends PureComponent {
             { title: '描述', dataIndex: 'desc', key: 'desc', render (text) {
                 return (<span title={text}>{text}</span>)
             }},
-            { title: '单位', dataIndex: 'unit', key: 'unit', width: '60px' },
+            { title: '单位', dataIndex: 'unit', key: 'unit', width: '60px', render (text) {
+                return (<span title={text}>{text}</span>)
+            }},
             { title: '数值', dataIndex: 'pv', key: 'pv', render (text) {
                 return (<span title={text}>{text}</span>)
             }},
