@@ -135,7 +135,7 @@ class MyGates extends Component {
                                 </Menu.Item>
                                 <Menu.Item key="1">
                                 <span
-                                    disabled={record.device_status !== 'ONLINE'}
+                                    disabled={record.is_shared}
                                     onClick={()=>{
                                         this.setState({
                                             record,
@@ -155,7 +155,7 @@ class MyGates extends Component {
                                         cancelText="取消"
                                     >
                                         <Button key="3"
-                                            disabled={record.device_status !== 'ONLINE'}
+                                            disabled={record.is_shared}
                                             style={{border: 'none'}}
                                             type="danger"
                                         >删除网关</Button>
