@@ -166,7 +166,7 @@ class Collapses extends Component {
                             sn={this.props.meta.gateway}
                             vsn={this.props.meta.sn}
                             filterText={this.state.outputFilter}
-                            regFilterChangeCB={this.RegisterInputFilterChangeCB}
+                            regFilterChangeCB={this.RegisterOutputFilterChangeCB}
                         />
                     </Panel>
                     <Panel
