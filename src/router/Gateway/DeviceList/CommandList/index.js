@@ -43,7 +43,7 @@ class CommandList extends Component {
         data: [],
         visible: false,
         record: {},
-        value: '',
+        value: '{}',
         columns: [{
             title: '名称',
             render: (record)=>{
@@ -129,19 +129,26 @@ class CommandList extends Component {
             visible: true
         });
     }
-    inputChange = () => {
-        const value = event.target.value
+    inputChange = (e)=>{
+        let value = e.target.value;
         this.setState({value})
     }
     handleOk = () => {
         const { sn, vsn } = this.props;
         const { record, value } = this.state;
         const id = `send_command/${sn}/${vsn}/${record.name}/${new Date() * 1}`
+        let param = undefined;
+        try {
+            param = JSON.parse(value);
+        } catch (e) {
+            message.error('请输入合法的JSON字符串! ' + e)
+            return;
+        }
         let params = {
             gateway: sn,
             name: vsn,
             command: record.name,
-            param: JSON.parse(value),
+            param: param,
             id: id
         };
         let command_record = record;
@@ -208,9 +215,8 @@ class CommandList extends Component {
                     <p className="flex">参数：
                         <TextArea
                             rows={4}
-                            onChange={(value)=>{
-                                this.inputChange(value)
-                            }}
+                            defaultValue={'{\n}'}
+                            onChange={this.inputChange}
                         />
                     </p>
                 </Modal>

@@ -124,8 +124,8 @@ class OutputList extends Component {
             visible: true
         });
     }
-    inputChange = () => {
-        const value = event.target.value
+    inputChange = (e)=>{
+        let value = e.target.value;
         this.setState({value})
     }
     handleOk = () => {
@@ -200,9 +200,7 @@ class OutputList extends Component {
                     <br/>
                     <p className="flex">数值：
                         <Input
-                            onChange={(value)=>{
-                                this.inputChange(value)
-                            }}
+                            onChange={this.inputChange}
                         />
                     </p>
                 </Modal>
