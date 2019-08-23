@@ -25,7 +25,7 @@ class AppCard extends Component {
                         alt="example"
                         src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
                     />
-                }
+                } 
                 actions={[
                     <Icon
                         type="setting"

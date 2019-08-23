@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { Input, Select, Button, Icon, Table, message } from 'antd';
+import { Input, Select, Button, Table } from 'antd';
 import { withRouter } from 'react-router-dom';
+import { inject } from 'mobx-react';
 import http from '../../../utils/Server';
-import { apply_AccessKey } from '../../../utils/Session';
+import ServiceState from '../../../common/ServiceState';
+// import { apply_AccessKey } from '../../../utils/Session';
 import './style.scss';
 const Option = Select.Option;
 const columns = [{
@@ -10,15 +12,25 @@ const columns = [{
     dataIndex: 'name',
     key: 'name'
   }, {
+    title: '描述',
+    dataIndex: 'desc',
+    key: 'desc'
+  }, {
     title: '状态',
     dataIndex: 'status',
     key: 'status'
   }];
+  @inject('store')
   @withRouter
 class VPN extends Component {
     state = {
         flag: true,
+        tap_ip: '192.168.0.' + Math.floor(Math.random() * 256),
         arr: [],
+        bridge_run: '',
+        router_run: '',
+        bridge_config: '',
+        router_config: '',
         status: 'ONLINE',
         agreement: 'tcp',
         model: 'bridge',
@@ -26,365 +38,174 @@ class VPN extends Component {
         auth_code: '',
         ip: 'device ipaddress',
         node: 'hs.symgrid.com',
+        netmask: '255.255.255.0',
         virtualIp: '',
         message: {},
         result: {},
         toggleFlag: true,
-        gateStatus: ' ',
+        gateStatus: '',
         chouldstatus: {}
     }
     componentDidMount (){
         this.getStatus()
-        this.check_gate_isbusy()
-        let auth_code;
-        apply_AccessKey().then(res=>{
-            auth_code = res.data;
-            this.setState({auth_code})
-        });
         this.timer = setInterval(() => {
             this.getStatus()
-            this.check_gate_isbusy()
         }, 5000);
-    }
-    UNSAFE_componentWillReceiveProps (nextProps){
-        if (this.props.location.pathname !== nextProps.location.pathname){
-            this.setState({result: {}})
-        }
+        const { mqtt } = this.props;
+        console.log(mqtt)
+        mqtt.connect(this.props.gateway, 'v1/vnet/#', true)
+
     }
     componentWillUnmount (){
+        this.props.mqtt.disconnect();
         clearInterval(this.timer)
     }
-    onchange = (val)=>{
-        this.setState({node: val})
-    }
-    check_gate_isbusy = () => {
-        const sn = this.props.match.params.sn;
-        fetch('http://127.0.0.1:5000/gate_isbusy', {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                gate_sn: sn,
-                cloud_url: 'http://iot.symgrid.com',
-                auth_code: this.state.auth_code
-            }),
-            headers: {
-                Accept: 'application/json; charset=utf-8',
-                Authorization: 'Bearer 123123123',
-                'Access-Control-Allow-Origin': '*'
+    startVnet = () =>{
+        const {mqtt} = this.props;
+        const data = {
+            id: 'start_vnet/' + new Date() * 1,
+            vnet_cfg: {
+                net_mode: this.state.model,
+                net_protocol: this.state.agreement,
+                gate_sn: this.props.gateway,
+                tap_ip: this.state.tap_ip,
+                tap_netmask: this.state.netmask,
+                dest_ip: this.state.lan_ip,
+                node: this.props.mqtt.vserial_channel.Proxy
+            },
+            frps_cfg: {
+                server_addr: this.props.mqtt.vserial_channel.Proxy
             }
-        }).then(res => {
-            return res.json();
-        }).then(json => {
-            if (json.br_lan_ipv4 !== undefined){
-                this.setState({ip: json.br_lan_ipv4})
-            }
-        }).catch((err) => {
-            if (err){
-                return false;
-            }
-        })
-    }
-    setIp = (e)=>{
-        this.setState({virtualIp: e.target.value})
+        }
+        const postData = {
+            id: 'post_gate/' + new Date() * 1,
+            auth_code: mqtt.auth_code,
+            output: 'vnet_config'
+        }
+        console.log(mqtt)
+        mqtt && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/service_start', JSON.stringify(data))
+        mqtt && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
+        console.log(data)
     }
     getStatus = ()=>{
-        fetch('http://127.0.0.1:5000/act_result', {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-                Accept: 'application/json; charset=utf-8',
-                Authorization: 'Bearer 123123123'
-            }
-        }).then(res => {
+        const { mqtt } = this.props;
+        const data = {
+            id: 'checkenv' + new Date() * 1
+        }
+        console.log(mqtt.vnet_channel)
+        mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/checkenv', JSON.stringify(data))
+        http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vnet').then(res=>{
             if (res.ok){
-                return res.json();
-            } else {
-                return false;
-            }
-        }).then(json => {
-            if (this.state.result !== json){
-                this.setState({result: {...json}}, ()=>{
-                    this.setState()
-                })
-            }
-        }).catch(err => {
-            console.log('请求错误', err);
-        })
-
-        fetch('http://127.0.0.1:5000/gate_alive', {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                auth_code: this.state.auth_code,
-                cloud_url: 'http://iot.symgrid.com',
-                gate_sn: this.props.match.params.sn
-            })
-        }).then(res=>{
-            if (res.ok){
-                return res.json();
-            } else {
-                return false;
-            }
-        }).then(res=>{
-            this.setState({gateStatus: res.message})
-        })
-
-        fetch('http://127.0.0.1:5000/status', {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-                Accept: 'application/json; charset=utf-8',
-                Authorization: 'Bearer 123123123'
-            }
-        }).then(res => {
-            return res.json();
-        }).then(json => {
-            let arr = [];
-            for (var key in json){
-                if (json[key] === 'RUNNING' && this.state.toggleFlag){
-                    this.setState({ toggleFlag: false})
-                }
-                arr.push({
-                    name: key,
-                    status: json[key]
-                })
-            }
-            this.setState({arr})
-            if (this.state.flag === true) {
-                 this.setState({flag: false})
-            }
-            return json;
-        }).catch(err => {
-            if (err){
-                this.setState({flag: true})
-            }
-        })
-
-        fetch('http://127.0.0.1:5000/cloudstatus', {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                'proxy_stcp': `${this.props.match.params.sn}_${this.state.model}`
-            })
-        }).then(res=>{
-            return res.json()
-        }).then(res=>{
-            if (this.state.chouldstatus !== res[`${this.props.match.params.sn}_${this.state.model}`]){
-                this.setState({chouldstatus: res[`${this.props.match.params.sn}_${this.state.model}`]})
-            }
-        })
-    }
-    startVPN (){
-        const {ip, virtualIp, model, port, agreement, status, auth_code, node} = this.state;
-        const { sn } = this.props.match.params;
-        const frpc_item = sn + '_' + model;
-        const vpn_frpc_cfg = {
-            'role': 'visitor',
-            'type': 'stcp',
-            'server_name': frpc_item,
-            'sk': 'password',
-            'bind_addr': '127.0.0.1',
-            'bind_port': port,
-            'use_encryption': 'false',
-            'use_compression': 'true'
-        }
-        const gate_visitor_frpc_cfg = {
-            'type': 'stcp',
-            'sk': 'password',
-            'local_ip': '127.0.0.1',
-            'local_port': port,
-            'use_encryption': 'false',
-            'use_compression': 'true'
-        }
-        let gate_frpc_cfg = {'visitors': {}}
-        gate_frpc_cfg['visitors'][model] = gate_visitor_frpc_cfg;
-
-        const postinfo = {
-            'gate_sn': sn,
-            'cloud_url': 'http://iot.symgrid.com',
-            'auth_code': auth_code,
-            'vpn_cfg': {
-                'net_mode': model,
-                'tap_ip': virtualIp,
-                'tap_netmask': node,
-                'dev_ip': ip
-            },
-            'common': {
-                'admin_addr': '127.0.0.1',
-                'admin_port': '7402',
-                'server_addr': 'iot.symgrid.com',
-                'server_port': '5443',
-                'token': 'BWYJVj2HYhVtdGZL',
-                'protocol': agreement,
-                'login_fail_exit': 'false'
-            },
-
-            'gate_frpc_cfg': gate_frpc_cfg,
-            'local_frp_cfg': {
-                'proxycfg': {
-
-                }
-
-            }
-
-        }
-        postinfo['local_frp_cfg']['proxycfg'][frpc_item] = vpn_frpc_cfg;
-        if (ip === 'device ipaddress'){
-            message.error('未获取到网关IP地址')
-        } else if (status !== 'ONLINE'){
-            message.error('网关未在线')
-        } else if (virtualIp === ''){
-            message.error('请输入网卡IP地址')
-        } else {
-            fetch('http://127.0.0.1:5000/start', {
-                method: 'POST',
-                mode: 'cors',
-                body: JSON.stringify(postinfo),
-                headers: {
-                    Accept: 'application/json; charset=utf-8',
-                    Authorization: 'Bearer 123123123'
-                }
-            }).then(res => {
-                return res.json();
-            }).then(() => {
-                setTimeout(() => {
-                    fetch('http://127.0.0.1:5000/act_result', {
-                        method: 'GET',
-                        mode: 'cors',
-                        headers: {
-                            Accept: 'application/json; charset=utf-8',
-                            Authorization: 'Bearer 123123123'
+                if (res.data && res.data.length > 0) {
+                    res.data.map(item=>{
+                        if (item.name === 'lan_ip') {
+                            this.setState({lan_ip: item.pv})
                         }
-                    }).then(res => {
-                        return res.json();
-                    }).then(json => {
-                        this.setState({result: json})
-                    }).catch(err => {
-                        if (err) {
-                            return false;
+                        if (item.name === 'router_run') {
+                            this.setState({router_run: item.pv})
+                        }
+                        if (item.name === 'bridge_run') {
+                            this.setState({bridge_run: item.pv})
+                        }
+                        if (item.name === 'bridge_config') {
+                            this.setState({bridge_config: item.pv})
+                        }
+                        if (item.name === 'router_config') {
+                            this.setState({router_config: item.pv})
                         }
                     })
-
-                }, 5000);
-            }).catch(err => {
-                console.log('请求错误', err);
-            })
-        }
-    }
-    stopVPN (){
-        fetch('http://127.0.0.1:5000/stop', {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                Authorization: 'Bearer 123123123'
+                }
             }
-        }).then(res => {
-            return res.json();
-        }).then(json => {
-            if (json.message){
-                this.setState({message: '停止成功', toggleFlag: true})
-            }
-        }).catch(err => {
-            err;
         })
     }
+
+    stopVnet () {
+        const {mqtt} = this.props;
+        const {vnet_config} = mqtt.vnet_channel;
+        const data = {
+            id: 'stop_vnet/' + new Date() * 1,
+            vnet_cfg: {
+                dest_ip: vnet_config.dest_ip,
+                gate_sn: vnet_config.gate_sn,
+                net_mode: vnet_config.net_mode,
+                net_protocol: vnet_config.net_protocol,
+                node: vnet_config.node,
+                tap_ip: vnet_config.tap_ip,
+                tap_netmask: vnet_config.tap_netmask
+            }
+        }
+        const postData = {
+            id: 'post_gate/' + new Date() * 1,
+            auth_code: mqtt.auth_code,
+            output: 'vnet_stop'
+        }
+        mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/service_stop', JSON.stringify(data))
+        mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
+        console.log(data)
+    }
     render () {
-        const { flag, result, chouldstatus } = this.state;
+        const { mqtt } = this.props;
+        const { is_running } = this.props.mqtt.vnet_channel;
+        console.log(this.props)
         return (
             <div className="VPN">
+                <div className="vnetVserState">
+                    <ServiceState
+                        mqtt={this.props.mqtt}
+                    />
+                </div>
                 <div className="VPNLeft">
-                    <div className="VPNlist">
-                        <p>中转节点：</p>
-                        <Select
-                            defaultValue="hs.symgrid.com"
-                            disabled={flag}
-                            onChange={this.onchange}
-                        >
-                            <Option value="hs.symgrid.com">上海</Option>
-                            <Option value="iot.symgrid.com">北京1</Option>
-                            <Option value="vpn.symid.com">北京2</Option>
-                        </Select>
-                    </div>
                     <div className="VPNlist">
                         <p>网关状态：</p>
                         <Input
-                            value={this.state.gateStatus ? this.state.gateStatus : ''}
-                            disabled={flag}
+                            value={this.props.store.gatewayInfo.device_status}
                         />
                     </div>
                     <div className="VPNlist">
-                        <p>网关SN：</p>
+                        <p>虚拟网卡IP：</p>
                         <Input
-                            value={this.props.match.params.sn}
-                            disabled
+                            value={this.state.tap_ip}
+                            disabled={is_running}
                         />
                     </div>
                     <div className="VPNlist">
-                        <p>连接模式：</p>
-                        <Button
-                            type="primary"
-                            disabled={flag}
-                        >虚拟网络</Button>
-                    </div>
-                    <div className="VPNlist">
-                        <p>{this.state.model === 'bridge' ? '虚拟网卡IP' : '现场子网地址'}：</p>
-                        <Input
-                            disabled={flag}
-                            onChange={this.setIp}
-                        />
-                    </div>
-                    <div className="VPNlist">
-                        <p>{this.state.model === 'bridge' ? '虚拟网卡netmask' : '现场子网netmask'}：</p>
+                        <p>虚拟网卡netmask：</p>
                         <Select
                             defaultValue="255.255.255.0"
-                            disabled={flag}
+                            disabled={is_running}
+                            onChange={(value)=>{
+                                this.setState({
+                                    netmask: value
+                                })
+                            }}
                         >
                             <Option value="255.255.255.0">255.255.255.0</Option>
                             <Option value="255.255.254.0">255.255.254.0</Option>
                             <Option value="255.255.252.0">255.255.252.0</Option>
-                            <Option value="255.255.252.0">255.255.252.0</Option>
+                            <Option value="255.255.128.0">255.255.128.0</Option>
                             <Option value="255.255.0.0">255.255.0.0</Option>
                         </Select>
                     </div>
                     <div className="VPNlist">
                         <p>网关IP：</p>
                         <Input
-                            value={this.state.ip}
+                            value={this.state.lan_ip}
                             disabled
                             style={{marginRight: 15}}
                         />
-                        <Button
-                            disabled={flag}
-                            onClick={()=>{
-                                let params = {
-                                    gateway: this.props.match.params.sn,
-                                    inst: 'ioe_frpc',
-                                    id: `start${this.props.match.params.sn}/ioe_frpc/${new Date() * 1}`
-                                }
-                                http.post('/api/gateways_applications_start', params).then(res=>{
-                                    if (res.ok && res.data){
-                                        this.props.store.action.pushAction(res.data, '启动设备VPN', '', params, 10000)
-                                    } else {
-                                        message.error('启动设备VPN失败')
-                                    }
-                                }).catch( err => {
-                                    message.error('启动设备VPN失败:' + err)
-                                })
-                            }}
-                        ><Icon type="reload"/></Button>
                     </div>
                     <div className="VPNlist">
                         <p>传输协议：</p>
                         <Button
                             type={this.state.agreement === 'tcp' ? 'primary' : ''}
-                            disabled={flag}
+                            // disabled={flag}
                             onClick={()=>{
                                 this.setState({agreement: 'tcp'})
                             }}
                         >tcp</Button>
                         <Button
                             type={this.state.agreement === 'kcp' ? 'primary' : ''}
-                            disabled={flag}
+                            // disabled={flag}
                             onClick={()=>{
                                 this.setState({agreement: 'kcp'})
                             }}
@@ -394,47 +215,41 @@ class VPN extends Component {
                         <p>网络模式：</p>
                         <Button
                             type={this.state.model === 'bridge' ? 'primary' : ''}
-                            disabled={flag}
+                            // disabled={flag}
                             onClick={()=>{
-                                this.setState({model: 'bridge', port: '665'})
+                                const Num = Math.floor(Math.random() * 256);
+                                this.setState({model: 'bridge', port: '665', tap_ip: '192.168.0.' + Num})
                             }}
                         >桥接模式</Button>
                         <Button
                             type={this.state.model === 'router' ? 'primary' : ''}
-                            disabled={flag}
+                            // disabled={flag}
                             onClick={()=>{
                                 this.setState({model: 'router', port: '666'})
                             }}
                         >路由模式</Button>
                     </div>
                     {
-                        this.state.toggleFlag
+                        !is_running
                         ? <Button
                             className="btn"
                             type="primary"
-                            disabled={flag}
+                            // disabled={flag}
+                            disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0)}
                             style={{fontSize: 24, height: 50}}
                             onClick={()=>{
-                                this.startVPN()
+                                this.startVnet()
                             }}
-                          >启动VPN</Button>
+                          >启动</Button>
                     : <Button
                         className="btn"
                         type="danger"
-                        disabled={flag}
+                        // disabled={flag}
                         style={{fontSize: 24, height: 50}}
                         onClick={()=>{
-                            this.stopVPN()
+                            this.stopVnet()
                         }}
-                      >停止VPN</Button>
-                    }
-                    {
-                        !this.state.toggleFlag ? <div className="successMessage">
-                        <p>平台返回消息：{result.cloud_mes}</p>
-                        <p>网关返回消息：{result.gate_mes}</p>
-                        <p>本地返回消息：{result.services_mes}</p>
-                    </div>
-                    : ''
+                      >停止</Button>
                     }
                 </div>
                 <div className="VPNRight">
@@ -442,57 +257,61 @@ class VPN extends Component {
                         <p>
                             本地运行环境：
                         </p>
-                        <span>{!flag ? '运行环境正常' : ''}</span>
-                    </div>
-                    <div className="VPNlist">
-                        <p>
-                            本地服务状态：
-                        </p>
-                        <span>{!flag ? 'IOE隧道服务运行正常' : <div>无法连接本地服务，请检查freeioe_vpn_Service服务是否启动或者运行环境是否安装，如未安装,
-                            <a
-                                href="http://thingscloud.oss-cn-beijing.aliyuncs.com/download/freeioe_vpn_green.rar"
-                                className="navbar-link"
-                            >点击下载</a></div>}</span>
+                        <span>{mqtt.connected ? '运行环境正常' : '运行环境异常'}</span>
                     </div>
                     <div className="VPNlist">
                         <p>
                             本地连接状态：
                         </p>
-                        <span>{chouldstatus && chouldstatus.cur_conns > 0 ? '已连接' : '未连接'}</span>
-                    </div>
-                    <div className="VPNlist">
-                        <p>
-                            云端隧道名称：
-                        </p>
-                        <span>{chouldstatus && chouldstatus.name}</span>
+                        <span>{is_running ? 'running' : '------'}</span>
                     </div>
                     <div className="VPNlist">
                         <p>
                             云端隧道状态：
                         </p>
-                        <span>{chouldstatus && chouldstatus.status}</span>
+                        <span>{mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.cur_conns && mqtt.vnet_channel.serviceState.cur_conns > 0 ? 'connected' : 'disconnected'}</span>
+                    </div>
+                    <div className="VPNlist">
+                        <p>
+                            网关桥接隧道状态：
+                        </p>
+                        <span>{this.state.bridge_run}</span>
+                    </div>
+                    <div className="VPNlist">
+                        <p>
+                            网关路由隧道状态：
+                        </p>
+                        <span>{this.state.router_run}</span>
                     </div>
                     <div className="VPNlist">
                         <p>
                             本次启动时间：
                         </p>
-                        <span>{chouldstatus && chouldstatus.last_start_time}</span>
+                        <span>{mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.last_start_time ? mqtt.vnet_channel.serviceState.last_start_time : '------'}</span>
                     </div>
                     <div className="VPNlist">
                         <p>
-                            上次消耗流量：
+                            今日流量消耗：
                         </p>
-                        <span>{chouldstatus && chouldstatus.today_traffic_in !== undefined ? Math.round((Number(chouldstatus.today_traffic_in) + Number(chouldstatus.today_traffic_out)) / 1024) + 'KB' : ''}</span>
+                        <span>{
+                            mqtt.vnet_channel.serviceState ? Math.ceil((mqtt.vnet_channel.serviceState.today_traffic_in + mqtt.vnet_channel.serviceState.today_traffic_out) / 1024) + ' KB' : '------'
+                        }</span>
                     </div>
                     <div className="VPNlist">
                         <p>
                             Ping网关IP状态：
                         </p>
-                        <span></span>
+                        <span>{mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.message ? mqtt.vnet_channel.serviceState.message : '------'}</span>
+                    </div>
+                    <div className="VPNlist">
+                        <p>
+                            Ping网关IP延迟：
+                        </p>
+                        <span>{mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.delay ? mqtt.vnet_channel.serviceState.delay : '------'}</span>
                     </div>
                     <Table
                         columns={columns}
-                        dataSource={this.state.arr}
+                        dataSource={this.props.mqtt.vnet_channel.Service}
                         rowKey="name"
                     />
                 </div>

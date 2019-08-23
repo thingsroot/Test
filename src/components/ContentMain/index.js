@@ -4,7 +4,8 @@ import {notification } from 'antd';  //
 import { Switch, withRouter} from 'react-router-dom';
 import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
-
+import { doUpdate } from '../../utils/Action';
+import { refreshToken, isDeveloper } from '../../utils/Session'
 const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
 const Dashboard = LoadableComponent(()=>import('../../router/Dashboard'));
@@ -22,9 +23,6 @@ const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHisto
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
 const TemplateDetails = LoadableComponent(()=>import('../../router/TemplateDetails'));
-
-import { doUpdate } from '../../utils/Action';
-import { refreshToken, isDeveloper } from '../../utils/Session'
 
 let timer;
 const openNotification = (title, message) => {

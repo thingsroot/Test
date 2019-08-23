@@ -4,9 +4,10 @@ import { Link, withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 // import http from '../../utils/Server';
 import './style.scss';
-
 import {IconIOT} from '../../utils/iconfont';
-
+// const IconFont = Icon.createFromIconfontCN({
+//     scriptUrl: '//at.alicdn.com/t/font_1163855_v0zrjr2i1em.js'
+// })
 @withRouter
 @inject('store')
 @observer
@@ -48,9 +49,13 @@ class LeftNav extends Component {
             this.setState({
                 index: 2
             });
-        } else if (pathname.indexOf('/vpn') !== -1){
+        } else if (pathname.indexOf('/vserial') !== -1){
             this.setState({
-                index: '4'
+                index: 3
+            });
+        } else if (pathname.indexOf('/vnet') !== -1){
+            this.setState({
+                index: 4
             });
         } else if (pathname.indexOf('/onlinerecords') !== -1){
             this.setState({
@@ -177,27 +182,27 @@ class LeftNav extends Component {
                     <p className="FeaturesGroup">扩展功能</p>
                     <ul>
                         {
-                            gatewayInfo.ioe_ser2net
+                            gatewayInfo.isVserial
                             ? <Link to={`${url}/vserial`}
-                                key="4"
+                                key="5"
                                 onClick={()=>{
-                                this.setIndex('3')
+                                this.setIndex(3)
                                 }}
                               >
                                 <li
-                                    className={index === '3' ? 'active' : ''}
-                                ><IconIOT type="icon-tiaoshi"/>&nbsp;&nbsp;远程编程-串口</li></Link>
+                                    className={index === 3 ? 'active' : ''}
+                                ><IconIOT type="icon-sliders"/>&nbsp;&nbsp;远程编程-串口</li></Link>
                         : ''
                         }
                         {
-                            gatewayInfo.ioe_frpc
-                            ? <Link to={`${url}/VPN`}
+                            gatewayInfo.isVnet
+                            ? <Link to={`${url}/vnet`}
                                 key="4"
                                 onClick={()=>{
-                                    this.setIndex('4')
+                                    this.setIndex(4)
                                 }}
                               >
-                              <li className={index === '4' ? 'active' : ''}><IconIOT type="icon-tiaoshi"/>&nbsp;&nbsp;VPN通道</li></Link>
+                              <li className={index === 4 ? 'active' : ''}><IconIOT type="icon-sliders-copy"/>&nbsp;&nbsp;远程编程-网络</li></Link>
                             : ''
                         }
                     </ul>

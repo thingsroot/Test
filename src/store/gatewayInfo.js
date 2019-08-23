@@ -65,6 +65,8 @@ class GatewayInfo {
     @observable install_apps = [] // Instance name list from realtime-data for running
     @observable ioe_network = false
     @observable ioe_frpc = false
+    @observable isVserial = false
+    @observable isVnet = false;
     @observable model = ''
     @observable cpu = ''
     @observable ram = ''
@@ -116,7 +118,25 @@ class GatewayInfo {
     }
     @action setApps (value) {
         this.apps = value
-        this.apps_count = Object.keys(value).length
+        this.apps_count = Object.keys(value).length;
+        let vserial = false;
+        let vnet = false;
+        value && value.length > 0 && value.map(item=>{
+            if (item.name === 'APP00000130') {
+                this.isVserial = true;
+                vserial = true;
+            }
+            if (item.name === 'APP00000135') {
+                this.isVnet = true;
+                vnet = true;
+            }
+        })
+        if (!vserial){
+            this.isVserial = vserial;
+        }
+        if (!vnet){
+            this.isVnet = vnet;
+        }
     }
     @action setAppsIsShow (value) {
         this.apps_is_show = value

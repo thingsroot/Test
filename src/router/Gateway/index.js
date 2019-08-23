@@ -47,6 +47,24 @@ class MyGatesDevices extends Component {
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
+        // const pathname = this.props.location.pathname.toLocaleLowerCase()
+        // console.log(pathname.indexOf('vnet'))
+        // if (pathname.indexOf('vserial') === -1 && this.state.ModalFlag){
+        //     this.setState({
+        //         ModalFlag: false
+        //     })
+        // }
+        // if (pathname.indexOf('vnet') === -1 && this.state.ModalFlag){
+        //     this.setState({
+        //         ModalFlag: false
+        //     })
+        // }
+        // if (pathname.indexOf('vserial') !== -1 && !this.state.ModalFlag){
+        //     this.setState({
+        //         ModalFlag: true
+        //     })
+        // }
+
         if (this.props.match.params.sn !== nextProps.match.params.sn &&
             this.state.gateway !== nextProps.match.params.sn){
             this.setState({gateway: nextProps.match.params.sn}, ()=>{
@@ -59,6 +77,16 @@ class MyGatesDevices extends Component {
             })
         }
     }
+    // shouldComponentUpdate () {
+    //     const pathname = this.props.location.pathname.toLocaleLowerCase()
+    //     console.log('222222222222222222222222223333')
+    //     if (pathname.indexOf('vserial') === -1 && this.state.ModalFlag || pathname.indexOf('vnet') === -1 && this.state.ModalFlag){
+    //         this.setState({
+    //             ModalFlag: false
+    //         })
+    //         console.log('2222222222222222222222')
+    //     }
+    // }
     componentWillUnmount (){
         clearInterval(this.timer)
     }
@@ -108,6 +136,8 @@ class MyGatesDevices extends Component {
     // }
     render () {
       const { path } = this.props.match;
+      const { pathname } = this.props.location;
+      const {gatewayInfo} = this.props.store;
         return (
             <div>
                 <GatewayStatus gateway={this.state.gateway}/>
@@ -117,12 +147,16 @@ class MyGatesDevices extends Component {
                             gateway={this.state.gateway}
                             mqtt={this.state.mqtt}
                         />
-                        <Button type="primary"
-                            onClick={this.showDrawer}
-                            className="listbutton"
-                        >
-                            <Icon type="swap"/><br />
-                        </Button>
+                        {
+                            pathname.indexOf('vnet') === -1 && pathname.indexOf('vserial') === -1
+                            ? <Button type="primary"
+                                onClick={this.showDrawer}
+                                className="listbutton"
+                              >
+                                <Icon type="swap"/><br />
+                            </Button>
+                        : ''
+                        }
                     <GatewaysDrawer
                         gateway={this.state.gateway}
                         onClose={this.onClose}
@@ -146,15 +180,19 @@ class MyGatesDevices extends Component {
                             title="我的网关·网关设置"
                             gateway={this.state.gateway}
                         />
-                        <GatewayRoute path={`${path}/vpn`}
+                        <GatewayRoute path={`${path}/vnet`}
                             component={VPN}
-                            title="我的网关·vpn通道"
+                            title="我的网关·远程编程-网络"
                             gateway={this.state.gateway}
+                            mqtt={this.state.mqtt}
+                            gatewayInfo={gatewayInfo}
                         />
                         <GatewayRoute path={`${path}/vserial`}
                             component={Vserial}
                             title="我的网关·虚拟串口"
                             gateway={this.state.gateway}
+                            mqtt={this.state.mqtt}
+                            gatewayInfo={gatewayInfo}
                         />
                         <GatewayRoute path={`${path}/onlinerecords`}
                             component={OnlineRecords}

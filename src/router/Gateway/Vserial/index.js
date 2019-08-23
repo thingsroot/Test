@@ -1,8 +1,9 @@
 import { Button, Select, Table } from 'antd';
-import mqtt from 'mqtt';
 import React, { Component } from 'react';
 import {inject, observer} from 'mobx-react';
-import Logviewer from '../Logviewer';
+import ServiceState from '../../../common/ServiceState';
+// import Logviewer from '../Logviewer';
+import http from '../../../utils/Server';
 import './style.scss';
 const Option = Select.Option;
 const cloums = [
@@ -20,217 +21,339 @@ const cloums = [
         key: 'status'
     }
 ]
-
-const data = [
-    {
-        key: '1',
-        name: 'com1net',
-        desc: '网关串口1映射服务',
-        status: 'stopped'
-    }, {
-        key: '2',
-        name: 'com2net',
-        desc: '网关串口2映射服务',
-        status: 'stopped'
+function Parity (value) {
+    console.log(value)
+    let str = '';
+    switch (value) {
+        case 0 : str = 'N' ;break;
+        case 1 : str = 'O' ;break;
+        case 2 : str = 'E' ;break;
+        default: str = 'undefined'; break;
     }
-]
-function success (){
-    console.log('success')
+    return str;
 }
-
-function error (){
-    console.log('error')
-}
-function makeid () {
-    var text = '';
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (var i = 0; i < 8; i++){
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-}
-// function getLocalTime (nS) {
-//     return new Date(parseInt(nS) * 1000).toLocaleString();
-//  }
-let client;
-
 @inject('store')
 @observer
 class Vserial extends Component {
     state = {
+        gateway: '',
+        mqtt_topic: 'v1/vspax/#',
         SerialPort: 'com1',
         BaudRate: '9600',
         StopBit: '1',
         DataBits: '8',
         Check: 'NONE',
-        flag: true,
+        port: '',
+        flag: false,
         connect_flag: false,
         logFlag: false,
         message: {},
+        stopLoading: false,
+        openLoading: false,
         cloum: [
             {
                 title: '串口参数',
                 dataIndex: 'parame',
-                key: 'parame'
+                key: 'parame',
+                render: (key, item)=>{
+                    if (Object.keys(item).length > 0) {
+                        return (
+                            <span>{item.BaudRate}/{item.DataBits}/{Parity(item.Parity)}/{item.StopBits}</span>
+                        )
+                    }
+                }
             }, {
                 title: '串口状态',
                 dataIndex: 'status',
-                key: 'status'
+                key: 'status',
+                render: (key, item)=>{
+                    if (Object.keys(item).length > 0){
+                        return (
+                            <span>{item.app_path ? '已打开' : '已关闭'}</span>
+                        )
+                    }
+                }
             }, {
                 title: '打开程序',
                 dataIndex: 'open',
-                key: 'open'
+                key: 'open',
+                reder: (key, item)=>{
+                    if (item !== ''){
+                        return (
+                            <span>{item.split('\\')[item.split('\\').length - 1]}</span>
+                        )
+                    }
+                }
             }, {
                 title: '连接地址',
-                dataIndex: 'address',
-                key: 'address'
+                dataIndex: 'host',
+                key: 'host'
             }, {
                 title: '连接状态',
-                dataIndex: 'connectStatus',
-                key: 'connectStatus'
+                dataIndex: 'peer_state',
+                key: 'peer_state'
             }, {
                 title: '串口(收/发)',
-                dataIndex: 'serialPort',
-                key: 'serialPort'
+                dataIndex: 'recv_count',
+                key: 'recv_count',
+                render: (key, item)=>{
+                    if (Object.keys(item).length > 0){
+                        return (
+                            <span>{item.recv_count}/{item.send_count}</span>
+                        )
+                    }
+                }
             }, {
                 title: '网络(收/发)',
-                dataIndex: 'network',
-                key: 'network'
+                dataIndex: 'peer_recv_count',
+                key: 'peer_recv_count',
+                render: (key, item)=>{
+                    if (Object.keys(item).length > 0) {
+                        return (
+                            <span>{item.peer_recv_count}/{item.peer_send_count}</span>
+                        )
+                    }
+                }
             }, {
                 title: '操作',
                 dataIndex: 'action',
                 key: 'action',
-                render: ()=>{
-                    return (
-                        !this.state.logFlag
-                        ? <Button
-                            onClick={()=>{
-                                this.setState({
-                                    logFlag: true
-                                })
-                            }}
-                          >监视</Button>
-                        : <Button
-                            type="danger"
-                            onClick={()=>{
-                                this.setState({
-                                    logFlag: false
-                                })
-                            }}
-                          >停止</Button>
-                    )
+                render: (key, item)=>{
+                    if (Object.keys(item).length > 0) {
+                        return (
+                            !this.state.logFlag
+                            ? <Button
+                                onClick={()=>{
+                                    this.setState({
+                                        logFlag: true
+                                    })
+                                }}
+                              >监视</Button>
+                            : <Button
+                                type="danger"
+                                onClick={()=>{
+                                    this.setState({
+                                        logFlag: false
+                                    })
+                                }}
+                              >停止</Button>
+                        )
+                    }
                 }
             }
         ],
-        data: []
+        data: [],
+        serviceName: []
     }
-    // componentDidMount (){
-
+    componentDidMount () {
+        this.setState({ gateway: this.props.gateway })
+        const { mqtt } = this.props;
+        console.log(mqtt.vserial_channel.PortLength)
+        this.sendAjax()
+        // mqtt.vserial_channel.setShow(true)
+        // this.setState({filterText: mqtt.log_channel.filter})
+        mqtt.connect(this.state.gateway, this.state.mqtt_topic, true)
+        // mqtt.connect(this.state.gateway, 'v1/update/api/servers_list', true)
+        // http.get('/apis/method/iot_ui.iot_api.gate_applist').then(res=>{
+            console.log(mqtt)
+        // })
+        this.t1 = setInterval(() => {
+            console.log(mqtt.vserial_channel.PortLength)
+            mqtt && mqtt.client  && mqtt.client.connected && mqtt.client.publish('v1/vspax/api/list', JSON.stringify({id: 'api/list/' + new Date() * 1}))
+            if (mqtt.vserial_channel.PortLength.length > 0) {
+                this.setState({flag: false, stopLoading: false})
+            }
+            if (mqtt.vserial_channel.PortLength.length === 0){
+                this.setState({flag: true, openLoading: false})
+            }
+        }, 2000);
+        this.t2 = setInterval(() => {
+            this.sendAjax()
+        }, 5000);
+    }
+    componentWillUnmount (){
+        const { mqtt } = this.props;
+        mqtt.disconnect()
+        clearInterval(this.t1)
+        clearInterval(this.t2)
+        // if (mqtt.vserial_channel.Active) {
+        //     mqtt.vserial_channel.setShow(false)
+        // }
+        // if (mqtt.client.connected) {
+        //     mqtt.client.end()
+        // }
+    }
+    // UNSAFE_componentWillReceiveProps (){
+    //     const {PortLength} = this.props.mqtt.vserial_channel
+    //     if (PortLength.length > 0 && this.state.flag) {
+    //         this.setState({flag: false})
+    //     }
+    //     if (PortLength.length === 0){
+    //         this.setState({flag: true})
+    //     }
     // }
-    connect = () =>{
-        const sn = this.props.match.params.sn;
-        const options = {
-        connectTimeout: 4000, // 超时时间
-        // 认证信息
-        clientId: 'webclient-' + makeid(),
-        username: this.props.store.session.user_id,
-        password: this.props.store.session.sid,
-        keepAlive: 6000,
-        timeout: 3,
-        topic: sn + '/log',
-        onSuccess: success,
-        onFailure: error
-  }
-//   const topic = sn + '/log';
-  const topic = 'v1/vspc/#';
-  if (!this.state.connected){
-      client = mqtt.connect('ws://127.0.0.1:7884/mqtt', options)
-        client.on('connect', ()=>{
-            this.setState({
-                connect_flag: true
-            })
-            // this.setState({connected: true})
-            // this.tick()
-            client.subscribe(topic)
-        })
-        client.on('message', (topic, message)=>{
-
-            if (message && message.length > 0){
-                if (this.state.message !== message.toString()){
-                    const newMessage = JSON.parse(message.toString());
-                    const data = [{
-                        parame: '',
-                        status: '已关闭',
-                        open: '',
-                        address: '' + newMessage.host + newMessage.port,
-                        connectStatus: newMessage.peer_state,
-                        serialPort: newMessage.recv_count + '/' + newMessage.send_count,
-                        network: newMessage.peer_recv_count + '/' + newMessage.peer_send_count
-                    }]
-                    this.setState({
-                        message: newMessage,
-                        data: data
-                    })
+    sendAjax = ()=>{
+        http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vserial').then(res=>{
+            if (res.ok && res.data && res.data.length > 0) {
+                let obj = {
+                                name: '-----',
+                                desc: '串口映射服务',
+                                status: ''
+                            }
+                res.data.map((item) =>{
+                    if (item.name === 'com_to_net_run') {
+                        obj.status = item.pv;
+                    }
+                    if (item.name === 'com_to_net_mapport') {
+                        this.setState({port: item.pv.split(':')[1]})
+                    }
+                    if (item.name === 'current_com') {
+                        obj.name = 'ser2net_' + item.pv;
+                    }
+                })
+                if (obj !== this.state.serviceName[0]){
+                    this.setState({serviceName: [obj]})
                 }
             }
-            if (this.state.data && this.state.data.length < 1000){
-                // let data = this.state.data;
-                // const newmessage = JSON.parse(message.toString());
-                // const obj = {
-                // key: new Date() * 1 + Math.random() * 1000,
-                // info: newmessage[0],
-                // time: getLocalTime(newmessage[1]),
-                // id: newmessage[2].split(']:')[0] + ']',
-                // content: newmessage[2].split(']:')[1]
-                // }
-                // data.unshift(obj)
-                // this.setState(data)
-            } else {
-                client.unsubscribe(topic)
-                this.setState({flag: true, maxNum: true})
-            }
-       })
-    } else {
-        client.subscribe(topic)
-        this.setState({flag: false})
+        })
     }
-   return client;
-
-}
+    openVserial = () => {
+        const { mqtt } = this.props;
+        const { SerialPort, BaudRate, DataBits, Check, StopBit } = this.state;
+        console.log(mqtt, this)
+        let params = {
+            gateway: this.props.gateway,
+            name: this.props.gateway + '.freeioe_Vserial',
+            output: 'heartbeat_timeout',
+            value: 60,
+            prop: 'value',
+            id: 'send_output/' + this.props.gateway + '/ ' + this.props.gateway + '/ heartbeat_timeout/60/' + new Date() * 1
+            }
+        const params1 = {
+            gateway: this.props.gateway,
+            name: this.props.gateway + '.freeioe_Vserial',
+            output: 'serial_config',
+            prop: 'value',
+            value: {
+                baudrate: BaudRate,
+                databit: DataBits,
+                parity: Check,
+                serial: SerialPort,
+                server_addr: mqtt.vserial_channel.Proxy,
+                stopbit: StopBit
+            },
+            id: `send_output/${this.props.gateway}/ ${this.props.gateway}.freeioe_Vserial/ serial_config/${new Date() * 1}`
+        }
+        http.post('/api/gateways_dev_outputs', params).then(res=>{
+            console.log(res)
+        })
+        http.post('/api/gateways_dev_outputs', params1).then(res=>{
+            console.log(res)
+        })
+        const data = {
+            id: 'add_local_com' + new Date() * 1,
+            by_name: 1,
+            name: SerialPort.toUpperCase(),
+            peer: {
+                type: 'tcp_client',
+                host: mqtt.vserial_channel.Proxy,
+                port: this.state.port,
+                info: {
+                    sn: this.props.gateway,
+                    com_cfg: {
+                        server_addr: mqtt.vserial_channel.Proxy,
+                        serial: SerialPort,
+                        baudrate: BaudRate,
+                        databit: DataBits,
+                        stopbit: StopBit,
+                        parity: Check
+                    },
+                    serial_driver: 'vspax'
+                }
+            }
+        }
+        console.log(mqtt)
+        mqtt && mqtt.connected &&  mqtt.client.publish('v1/vspax/api/list', JSON.stringify({id: 'vspax/api/list' + new Date() * 1}))
+        mqtt && mqtt.connected &&  mqtt.client.publish('v1/vspax/api/add', JSON.stringify(data))
+    }
+    stopVserial = () => {
+        console.log('open')
+        const { mqtt } = this.props;
+        const {addPortData} = mqtt.vserial_channel;
+        const {SerialPort} = this.state;
+        const params = {
+            gateway: this.props.gateway,
+            name: this.props.gateway + '.freeioe_Vserial',
+            output: 'serial_stop',
+            prop: 'value',
+            value: {
+                serial: SerialPort
+            },
+            id: `send_output/${this.props.gateway}/ ${this.props.gateway}.freeioe_Vserial/ serial_stop/${new Date() * 1}`
+        }
+        http.post('/api/gateways_dev_outputs', params).then(res=>{
+            console.log(res)
+        })
+        const data = {
+            id: 'api/remove/' + new Date() * 1,
+            by_name: 1,
+            name: addPortData[0].name.toUpperCase()
+        }
+        mqtt.connected && mqtt.client.publish('v1/vspax/api/remove', JSON.stringify(data))
+        setTimeout(() => {
+            mqtt.onReceiveaddPortMsg(null)
+        }, 5000);
+        // if (addPortData && addPortData.length > 0) {
+        // }
+    }
     changeStatus = (value, name)=>{
         this.setState({
             [name]: value
         })
     }
     render () {
-        const { SerialPort, flag, logFlag, message } = this.state;
+        const { SerialPort, flag, serviceName, openLoading, stopLoading } = this.state;
+        const { mqtt } = this.props;
+        const {  addPortData } = mqtt.vserial_channel;
         return (
-            <div>
-                <div className="wrapper">
-                    <p>虚拟串口服务关联网关：<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
+            <div className="vserialWrapper">
+                <ServiceState
+                    mqtt={mqtt}
+                    gateway={this.props.gateway}
+                />
+                <div className="vserialPort">
                     <div>
-                        {
-                            flag
-                            ? <Button
-                                onClick={()=>{
-                                    this.setState({
-                                        flag: false
-                                    })
-                                    this.connect();
-                                }}
-                              >开启</Button>
-                            : <Button
-                                type="danger"
-                                onClick={()=>{
-                                    this.setState({
-                                        flag: true,
-                                        data: []
-                                    })
-                                    client.unsubscribe('v1/vspc/#')
-                                }}
-                              >停止</Button>
-                        }
+                        <div className="vserialBtn">
+                            {
+                                console.log(Object.keys(addPortData[0]))
+                            }
+                            {
+                                addPortData[0] && Object.keys(addPortData[0]).length === 0
+                                ? <Button
+                                    type="primary"
+                                    loading={openLoading}
+                                    disabled={!mqtt.connect}
+                                    onClick={()=>{
+                                        this.setState({
+                                            openLoading: true
+                                        }, ()=>{
+                                            this.openVserial()
+                                        })
+                                    }}
+                                  >开启</Button>
+                                    : <Button
+                                        type="danger"
+                                        loading={stopLoading}
+                                        onClick={()=>{
+                                            this.setState({
+                                                stopLoading: true
+                                            }, ()=>{
+                                                this.stopVserial()
+                                            })
+                                        }}
+                                      >停止</Button>
+                            }
+                        </div>
                         <p>网关串口：{SerialPort}</p>
                         <div className="selectWrap">
                             <div className="selectChild">
@@ -317,25 +440,20 @@ class Vserial extends Component {
                         <Table
                             rowKey="serialPort"
                             columns={cloums}
-                            dataSource={data}
+                            dataSource={serviceName}
                             pagination={false}
                         />
                     </div>
                 </div>
                 <div className="wrapper">
-                    <p>本地串口：</p>
+                    <p>本地串口：{addPortData[0].name}</p>
                     <Table
                         columns={this.state.cloum}
-                        dataSource={this.state.data}
+                        dataSource={addPortData}
                         pagination={false}
                         rowKey="connectStatus"
                     />
                 </div>
-                {
-                    logFlag
-                    ? <Logviewer />
-                    : ''
-                }
             </div>
         );
     }

@@ -35,7 +35,13 @@ const newMessageChannel = (topic) => {
         isShow: true,
         newArrive: 0,
         active: false,
-
+        serviceNode: undefined,
+        serviceState: undefined,
+        addPortData: [{}],
+        PortLength: [],
+        proxy: '',
+        is_running: false,
+        vnet_config: {},
         // 动作:
         setTopic (value) {
             this.topic = value;
@@ -113,12 +119,27 @@ const newMessageChannel = (topic) => {
         setActive (value) {
             this.active = value
         },
+        setProxy (value) {
+            this.proxy = value;
+            if (this.proxy && !this.active){
+                this.setActive(true)
+            }
+        },
+        setServiceNode (value){
+            this.serviceNode = value;
+        },
+        setServiceState (value){
+            this.serviceState = value;
+        },
 
         get Data () {
             return this.data
         },
         get AllData () {
             return this.allData
+        },
+        get ServiceState (){
+            return this.serviceState
         },
         get Filter () {
             return this.filter
@@ -134,6 +155,12 @@ const newMessageChannel = (topic) => {
         },
         get Size () {
             return this.allData.length
+        },
+        get Service () {
+            return this.serviceNode
+        },
+        get Proxy (){
+            return this.proxy
         }
     }, {
         setTopic: action,
@@ -161,9 +188,13 @@ class GatewayMQTT {
     @observable flag = true;
     @observable connected = false;
     @observable gateway = '';
+    @observable versionMsg = true;
+    @observable newVersionMsg = {};
+    @observable auth_code = '';
     @observable comm_channel = newMessageChannel('/comm');
     @observable log_channel = newMessageChannel('/log');
-
+    @observable vserial_channel = newMessageChannel('v1/vspax/#');
+    @observable vnet_channel = newMessageChannel('v1/vnet/#');
     CharToHex (str) {
         var out, i, len, c, h;
 
@@ -286,8 +317,40 @@ class GatewayMQTT {
         }
         this.comm_channel.pushData(obj)
     }
+    onReceiveVserialMsg = (msg) => {
+        if (msg && msg.length > 0){
+            this.vserial_channel.setServiceNode(msg)
+        }
+    }
+    onReceiveLocalVersionMsg = (value) =>{
+        this.versionMsg = value;
+    }
+    onReceivePortLength = (data) => {
+        console.log(data)
+        this.vserial_channel.PortLength = data;
+        console.log(this.vserial_channel.PortLength)
+    }
+    onReceiveVserialVersionMsg = (msg)=>{
+        this.vserial_channel.newVersionMsg = msg;
+    }
+    onReceiveaddPortMsg = (msg) => {
+        // console.log(this.vserial_channel.addPortData)
+        // if (msg && this.vserial_channel.addPortData && this.vserial_channel.addPortData.length === 0) {
+        //     this.vserial_channel.addPortData.push(msg)
+        // }
+        // if (msg && this.vserial_channel.addPortData.length === 1 && this.vserial_channel.addPortData[0].name === msg.name && this.vserial_channel.addPortData[0] !== msg){
+        // }
+        // if (msg && this.vserial_channel.addPortData.length === 2 && this.vserial_channel.addPortData[1].name === msg.name && this.vserial_channel.addPortData[1] !== msg){
+        //     this.vserial_channel.addPortData[1] = msg;
+        // }
+        if (msg){
+            this.vserial_channel.addPortData[0] = msg;
+
+        } else {
+            this.vserial_channel.addPortData[0] = {};
+        }
+    }
     onReceiveLogMsg = (msg) => {
-        console.log(msg)
         if (this.log_channel.Size >= this.max_count) {
             if (this.log_channel.active) {
                 message.error(`日志数量超过${this.max_count}条，订阅停止!!`)
@@ -337,6 +400,28 @@ class GatewayMQTT {
         // }
         // this.log_channel.pushData(obj)
     }
+    onReceiverVnetServiceName = (data) => {
+        const arr = [];
+        arr.push({
+            name: 'frpc_Vnet_service',
+            desc: '隧道服务',
+            status: data.frpc_Vnet_service
+        })
+        arr.push({
+            name: 'tinc.tofreeioebridge',
+            desc: '桥接服务',
+            status: data['tinc.tofreeioebridge']
+        })
+        arr.push({
+            name: 'tinc.tofreeioerouter',
+            desc: '路由服务',
+            status: data['tinc.tofreeioerouter']
+        })
+            this.vnet_channel.setServiceNode(arr)
+    }
+    onReceiverVnetServiceState = (data) =>{
+        this.vnet_channel.setServiceState(data)
+    }
     unsubscribe (topic) {
         const topic_real = this.gateway + topic;
         if (this.client && this.connected) {
@@ -347,6 +432,12 @@ class GatewayMQTT {
         }
         if (topic === '/comm') {
             this.comm_channel.setActive(false)
+        }
+        if (topic === 'v1/vspax/#') {
+            this.vserial_channel.setActive(false)
+        }
+        if (topic === 'v1/vnet/#') {
+            this.vnet_channel.setActive(false)
         }
     }
     disconnect (clear_data) {
@@ -359,13 +450,17 @@ class GatewayMQTT {
             this.connected = false;
             this.log_channel.setActive(false)
             this.comm_channel.setActive(false)
+            this.vserial_channel.setActive(false)
+            this.vnet_channel.setActive(false)
         }
         if (clear_data) {
             this.log_channel.clearData()
             this.comm_channel.clearData()
+            this.vserial_channel.clearData()
+            this.vnet_channel.clearData()
         }
     }
-    connect (sn, topic){
+    connect (sn, topic, flag){
         this.gateway = sn;
         this.die_time = 120; // 120 seconds
         const options = {
@@ -388,10 +483,16 @@ class GatewayMQTT {
             if (topic === '/comm') {
                 this.comm_channel.setActive(true)
             }
+            if (topic === 'v1/vspax/#') {
+                this.vserial_channel.setActive(true)
+            }
+            if (topic === 'v1/vnet/#') {
+                this.vnet_channel.setActive(true)
+            }
             return
         }
-
-        this.client = mqtt.connect('wss://cloud.thingsroot.com/ws', options)
+        const url = flag ? 'ws://127.0.0.1:7884/mqtt' : 'wss://cloud.thingsroot.com/ws';
+        this.client = mqtt.connect(url, options)
         this.client.on('connect', ()=>{
             message.success('连接服务器成功')
             this.connected = true
@@ -402,11 +503,24 @@ class GatewayMQTT {
             if (topic === '/comm') {
                 this.comm_channel.setActive(true)
             }
+            if (topic === 'v1/vspax/#') {
+                this.vserial_channel.setActive(true)
+                this.client.subscribe(['v1/update/api/+', 'v1/vspax/#'])
+                this.client.publish('v1/update/api/servers_list', JSON.stringify({'id': 'server_list/' + new Date() * 1}))
+                this.client.publish('v1/update/api/version', JSON.stringify({'id': 'get_new_version/' + new Date() * 1}))
+            }
+            if (topic === 'v1/vnet/#'){
+                this.vserial_channel.setActive(true)
+                this.client.subscribe(['v1/update/api/+', 'v1/vnet/#'])
+                // this.client.publish('v1/update/api/servers_list', JSON.stringify({'id': 'server_list' + new Date() * 1}))
+                // this.client.publish('v1/update/api/version', JSON.stringify({'id': 'get_new_version' + new Date() * 1}))
+            }
             this.startTimer()
         })
 
         this.client.on('message', (msg_topic, msg)=>{
-            //console.log(topic, message)
+            const data = JSON.parse(msg.toString());
+            console.log(data, msg_topic)
             if (msg_topic === this.gateway + '/comm') {
                 const data = JSON.parse(msg.toString());
                 this.onReceiveCommMsg(data)
@@ -414,6 +528,115 @@ class GatewayMQTT {
             if (msg_topic === this.gateway + '/log') {
                 const data = JSON.parse(msg.toString());
                 this.onReceiveLogMsg(data)
+            }
+            if (msg_topic === 'v1/vspax/#') {
+                // const data = JSON.parse(msg.toString());
+                // console.log(data)
+                // this.onReceiveLogMsg(data)
+            }
+            if (msg_topic === 'v1/update/api/servers_list') {
+                // const data = JSON.parse(msg.toString());
+                // this.onReceiveLogMsg(data)
+                // this.setServiceNode(data.data)
+                // console.log(this)
+            }
+            if (msg_topic === 'v1/update/api/RESULT') {
+                const data = JSON.parse(msg.toString());
+                console.log(data, 'ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss')
+                if (data.result && data.data && data.data.length > 0){
+                    this.onReceiveVserialMsg(data.data)
+                }
+                if (data.id.indexOf('get_new_version') !== -1 && data.result){
+                    this.onReceiveVserialVersionMsg(data.data)
+                    if (parseInt(data.data.new_version) === parseInt(data.data.version)){
+                        this.onReceiveLocalVersionMsg(true)
+                    }
+                    if (parseInt(data.data.new_version) > parseInt(data.data.version)){
+                        this.onReceiveLocalVersionMsg(false)
+                    }
+                }
+                // this.onReceiveLogMsg(data)
+            }
+            if (msg_topic === 'v1/vspax/api/RESULT') {
+                const data = JSON.parse(msg.toString())
+                console.log(data)
+                if (data.result && data.id.indexOf('api/list') !== -1){
+                    this.onReceivePortLength(data.data)
+                }
+                if (data.result && data.id.indexOf('remove_local_com') !== -1) {
+                    console.log('removeremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremove')
+                    this.onReceiveaddPortMsg(null)
+                }
+            }
+            if (msg_topic === 'v1/vspax/api/keep_alive') {
+                // const data = JSON.parse(msg.toString());
+                // console.log(data)
+                // this.onReceiveLogMsg(data)
+            }
+            if (msg_topic === 'v1/vspax/api/version') {
+                const data = JSON.parse(msg.toString());
+                if (data.result && data.data.new_version && data.data.version){
+                    if (parseInt(data.data.new_version) === parseInt(data.data.version)){
+                        this.onReceiveLocalVersionMsg(true)
+                    }
+                    if (parseInt(data.data.new_version) > parseInt(data.data.version)){
+                        this.onReceiveLocalVersionMsg(false)
+                    }
+                }
+                // this.onReceiveLogMsg(data)
+            }
+            if (msg_topic.indexOf('v1/vspax/VSPAX_STATUS/') !== -1) {
+                const data = JSON.parse(msg.toString());
+                this.onReceiveaddPortMsg(data)
+                console.log(data)
+            }
+            if (msg_topic === 'v1/vnet/api/RESULT') {
+                const data = JSON.parse(msg.toString());
+                console.log(data)
+                // if (data.id.indexOf('checkenv') !== -1 && data.result) {
+                //     this.onReceiverVnetServiceName(data.data)
+                // }
+            }
+            if (msg_topic === 'v1/vnet/VNET_STATUS/SERVICES'){
+                const data = JSON.parse(msg.toString());
+                console.log(data)
+                this.onReceiverVnetServiceName(data)
+            }
+            if (msg_topic === 'v1/vnet/PROXY_STATUS/CLOUD_PROXY'){
+                // const data = JSON.parse(msg.toString());
+                // console.log(data)
+                console.log(data, 'localolololololololololollllllllllllllllllllllllllllllllllllllllllllllllll')
+                this.onReceiverVnetServiceState(data)
+            }
+            if (msg_topic === 'v1/vnet/PROXY_STATUS/LOCAL_PROXY'){
+                if (data.status) {
+                    this.vnet_channel.serviceState = Object.assign({}, this.vnet_channel.serviceState, {
+                        statuss: data.status
+                    })
+                }
+            }
+            if (msg_topic.indexOf('v1/vnet/VNET_STATUS/CONFIG') !== -1) {
+                const data = JSON.parse(msg.toString());
+                console.log(data)
+                    this.vnet_channel.is_running = data.is_running;
+                    if (data.vnet_cfg) {
+                        this.vnet_channel.vnet_config = data.vnet_cfg;
+                    }
+            }
+            if (msg_topic === 'v1/vnet/api/keep_alive') {
+                if (data.id.indexOf('keep_alive') !== -1) {
+                    if (data.auth_code) {
+                        this.auth_code = data.auth_code;
+                    }
+                }
+            }
+            if (msg_topic.indexOf('v1/vnet/DEST_STATUS') !== -1){
+                const data = JSON.parse(msg.toString());
+                console.log(data)
+                this.vnet_channel.serviceState = Object.assign({}, this.vnet_channel.serviceState, {
+                    delay: data.delay,
+                    message: data.message
+                })
             }
         })
     }

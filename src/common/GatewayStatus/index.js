@@ -86,7 +86,6 @@ class Status extends Component {
                                         style={{fontSize: 22, color: data.data_upload ? '#3c763d' : '#f39c12'}}
                                         type={data.data_upload  ? 'cloud-upload' : 'cloud'}
                                     />
-                                    {console.log(data.data_upload)}
                                 </Tooltip>
                                 <span style={{padding: '0 5px'}} />
                                 {

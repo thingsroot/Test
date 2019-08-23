@@ -1,5 +1,38 @@
 .VPN{
     display: flex;
+    flex-wrap: wrap;
+    h1{
+        text-align: center;
+    }
+    .vnetVserState{
+        width: 100%;
+        border-top: 2px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 40px;
+    }
+    .vserialPort{
+        margin-top: 10px;
+        padding-top: 20px;
+        border-top: 2px solid #ccc;
+        border-radius: 3px;
+    }
+    .flex{
+        display: flex;
+        width: 300px;
+        line-height: 30px;
+        padding: 5px 0;
+        margin-left: 100px;
+        position: relative;
+        >p{
+            width: 100px;
+        }
+        .versionMsg{
+            position: absolute;
+            width: 400px;
+            left: 170px;
+            top: 5px;
+        }
+    }
     .VPNLeft{
         width:40%;
         .VPNlist{
@@ -47,6 +80,9 @@
                 text-align: right;
                 line-height: 2.3;
                 padding-right: 10px;
+            }
+            >span{
+                line-height: 2.3;
             }
             >input{
                 flex:1;
