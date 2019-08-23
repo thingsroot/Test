@@ -57,7 +57,7 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                         } else {
                             if (this.props.copyData.version !== 0) {
                                 let params = {
-                                    name: conf_name,
+                                    conf: conf_name,
                                     version: 1,
                                     comment: 'V1',
                                     data: this.props.copyData.data

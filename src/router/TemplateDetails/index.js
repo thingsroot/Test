@@ -162,7 +162,7 @@ class MyTemplateDetails extends PureComponent {
         e;
         let maxVersion = this.state.maxVersion + 1;
         let params = {
-            name: this.props.match.params.name,
+            conf: this.props.match.params.name,
             version: maxVersion,
             comment: 'V' + maxVersion,
             data: this.state.previewData
