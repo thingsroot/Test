@@ -590,6 +590,7 @@ class GatewayMQTT {
             }
             if (msg_topic === 'v1/vnet/api/keep_alive') {
                 if (data.id.indexOf('keep_alive') !== -1) {
+                    console.log(data)
                     if (data.auth_code) {
                         this.auth_code = data.auth_code;
                     }
