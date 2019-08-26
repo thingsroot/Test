@@ -294,7 +294,7 @@ class VPN extends Component {
                         <p>
                             云端隧道状态：
                         </p>
-                        <span>{mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.cur_conns && mqtt.vnet_channel.serviceState.cur_conns > 0 ? 'connected' : 'disconnected'}</span>
+                        <span>{mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.cur_conns && parseInt(mqtt.vnet_channel.serviceState.cur_conns) > 0 ? 'connected' : 'disconnected'}</span>
                     </div>
                     <div className="VPNlist">
                         <p>

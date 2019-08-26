@@ -574,6 +574,7 @@ class GatewayMQTT {
             }
             if (msg_topic === 'v1/vnet/PROXY_STATUS/CLOUD_PROXY'){
                 this.onReceiverVnetServiceState(data)
+                console.log(data)
             }
             if (msg_topic === 'v1/vnet/PROXY_STATUS/LOCAL_PROXY'){
                 if (data.status) {
