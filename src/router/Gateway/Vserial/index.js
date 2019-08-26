@@ -86,6 +86,7 @@ class Vserial extends Component {
                 dataIndex: 'status',
                 key: 'status',
                 render: (key, item)=>{
+                    console.log(key, item)
                     if (Object.keys(item).length > 0){
                         return (
                             <span>{item.app_path ? '已打开' : '已关闭'}</span>
@@ -94,19 +95,26 @@ class Vserial extends Component {
                 }
             }, {
                 title: '打开程序',
-                dataIndex: 'open',
-                key: 'open',
-                reder: (key, item)=>{
-                    if (item !== ''){
+                dataIndex: 'app_path',
+                key: 'app_path',
+                render: (key, item)=>{
+                    if (item.app_path){
                         return (
-                            <span>{item.split('\\')[item.split('\\').length - 1]}</span>
+                            <span>{item.app_path.split('\\')[item.app_path.split('\\').length - 1]}</span>
                         )
                     }
                 }
             }, {
                 title: '连接地址',
                 dataIndex: 'host',
-                key: 'host'
+                key: 'host',
+                render: (key, item)=>{
+                    if (item.host && item.port) {
+                        return (
+                            <span>{item.host + ':' +  item.port}</span>
+                        )
+                    }
+                }
             }, {
                 title: '连接状态',
                 dataIndex: 'peer_state',
@@ -191,22 +199,7 @@ class Vserial extends Component {
         mqtt.disconnect()
         clearInterval(this.t1)
         clearInterval(this.t2)
-        // if (mqtt.vserial_channel.Active) {
-        //     mqtt.vserial_channel.setShow(false)
-        // }
-        // if (mqtt.client.connected) {
-        //     mqtt.client.end()
-        // }
     }
-    // UNSAFE_componentWillReceiveProps (){
-    //     const {PortLength} = this.props.mqtt.vserial_channel
-    //     if (PortLength.length > 0 && this.state.flag) {
-    //         this.setState({flag: false})
-    //     }
-    //     if (PortLength.length === 0){
-    //         this.setState({flag: true})
-    //     }
-    // }
     sendAjax = ()=>{
         http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vserial').then(res=>{
             if (res.ok && res.data && res.data.length > 0) {
@@ -293,7 +286,6 @@ class Vserial extends Component {
             },
             id: `send_output/${this.props.gateway}/ ${this.props.gateway}.freeioe_Vserial/ serial_config/${new Date() * 1}`
         }
-        
         http.post('/api/gateways_dev_outputs', params1).then(res=>{
             let output_record = {};
             if (res.ok){

@@ -204,7 +204,20 @@ class GatewaySettingsEdit extends Component {
             return this.removeApp('ioe_frpc', '关闭虚拟网络功能')
         }
     }
-
+    enableVSERIAL (enable) {
+        if (enable) {
+            return this.installApp('freeioe_Vserial', 'APP00000130', '开启远程串口功能')
+        } else {
+            return this.removeApp('freeioe_Vserial', '关闭虚拟网络功能')
+        }
+    }
+    enableVNET (enable) {
+        if (enable) {
+            return this.installApp('freeioe_Vnet', 'APP00000135', '开启远程编程网络功能')
+        } else {
+            return this.removeApp('freeioe_Vnet', '关闭虚拟网络功能')
+        }
+    }
 
     onChangeEventUpload = (value) => {
         const { gateway } = this.props;
@@ -399,6 +412,36 @@ class GatewaySettingsEdit extends Component {
                         gateway={gateway}
                         onChange={(checked, onResult)=>{
                             this.enableFRPC(checked).then((result) => {
+                                onResult(result)
+                            })
+                        }}
+                    />
+                </div>
+                <div className="list">
+                    <span>
+                        远程串口编程 [*开启后可使用远程串口编程功能]
+                    </span>
+                    <EditSwitch
+                        checked={gatewayInfo.isVserial}
+                        disabled={!gatewayInfo.actionEnable}
+                        gateway={gateway}
+                        onChange={(checked, onResult)=>{
+                            this.enableVSERIAL(checked).then((result) => {
+                                onResult(result)
+                            })
+                        }}
+                    />
+                </div>
+                <div className="list">
+                    <span>
+                        远程网络编程 [*开启后可使用远程网络编程功能]
+                    </span>
+                    <EditSwitch
+                        checked={gatewayInfo.isVnet}
+                        disabled={!gatewayInfo.actionEnable}
+                        gateway={gateway}
+                        onChange={(checked, onResult)=>{
+                            this.enableVNET(checked).then((result) => {
                                 onResult(result)
                             })
                         }}

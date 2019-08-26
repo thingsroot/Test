@@ -528,7 +528,6 @@ class GatewayMQTT {
                 this.onReceiveLogMsg(data)
             }
             // if (msg_topic === 'v1/update/api/servers_list') {
-        
             //     this.onReceiveLogMsg(data)
             //     this.setServiceNode(data.data)
             //     console.log(this)
