@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Select, Button, Table } from 'antd';
 import { withRouter } from 'react-router-dom';
-import { inject } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import http from '../../../utils/Server';
 import ServiceState from '../../../common/ServiceState';
 // import { apply_AccessKey } from '../../../utils/Session';
@@ -20,13 +20,16 @@ const columns = [{
     dataIndex: 'status',
     key: 'status'
   }];
-  @inject('store')
   @withRouter
+  @inject('store')
+  @observer
 class VPN extends Component {
     state = {
         flag: true,
         tap_ip: '192.168.0.' + Math.floor(Math.random() * 256),
         arr: [],
+        start_loading: false,
+        stop_loading: false,
         bridge_run: '',
         router_run: '',
         bridge_config: '',
@@ -50,9 +53,8 @@ class VPN extends Component {
         this.getStatus()
         this.timer = setInterval(() => {
             this.getStatus()
-        }, 5000);
+        }, 10000);
         const { mqtt } = this.props;
-        console.log(mqtt)
         mqtt.connect(this.props.gateway, 'v1/vnet/#', true)
 
     }
@@ -82,17 +84,17 @@ class VPN extends Component {
             auth_code: mqtt.auth_code,
             output: 'vnet_config'
         }
-        console.log(mqtt)
-        mqtt && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/service_start', JSON.stringify(data))
-        mqtt && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
-        console.log(data)
+        mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/service_start', JSON.stringify(data))
+        mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
     }
     getStatus = ()=>{
         const { mqtt } = this.props;
+        if (mqtt.client) {
+            mqtt.connect(this.props.gateway, 'v1/vnet/#', true)
+        }
         const data = {
             id: 'checkenv' + new Date() * 1
         }
-        console.log(mqtt.vnet_channel)
         mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/checkenv', JSON.stringify(data))
         http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vnet').then(res=>{
             if (res.ok){
@@ -117,6 +119,12 @@ class VPN extends Component {
                 }
             }
         })
+        if (mqtt.client && mqtt.vnet_channel.is_running) {
+            this.setState({stop_loading: false})
+        }
+        if (mqtt.client && !mqtt.vnet_channel.is_running) {
+            this.setState({start_loading: false})
+        }
     }
 
     stopVnet () {
@@ -141,12 +149,11 @@ class VPN extends Component {
         }
         mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/service_stop', JSON.stringify(data))
         mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
-        console.log(data)
     }
     render () {
         const { mqtt } = this.props;
         const { is_running } = this.props.mqtt.vnet_channel;
-        console.log(this.props)
+        const {start_loading, stop_loading} = this.state;
         return (
             <div className="VPN">
                 <div className="vnetVserState">
@@ -234,20 +241,30 @@ class VPN extends Component {
                         ? <Button
                             className="btn"
                             type="primary"
-                            // disabled={flag}
+                            loading={start_loading}
                             disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0)}
                             style={{fontSize: 24, height: 50}}
                             onClick={()=>{
-                                this.startVnet()
+                                this.setState({
+                                    start_loading: true,
+                                    stop_loading: false
+                                }, ()=>{
+                                    this.startVnet()
+                                })
                             }}
                           >启动</Button>
                     : <Button
                         className="btn"
                         type="danger"
-                        // disabled={flag}
+                        loading={stop_loading}
                         style={{fontSize: 24, height: 50}}
                         onClick={()=>{
-                            this.stopVnet()
+                            this.setState({
+                                start_loading: false,
+                                stop_loading: true
+                            }, ()=>{
+                                this.stopVnet()
+                            })
                         }}
                       >停止</Button>
                     }
@@ -294,7 +311,7 @@ class VPN extends Component {
                             今日流量消耗：
                         </p>
                         <span>{
-                            mqtt.vnet_channel.serviceState ? Math.ceil((mqtt.vnet_channel.serviceState.today_traffic_in + mqtt.vnet_channel.serviceState.today_traffic_out) / 1024) + ' KB' : '------'
+                            mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.today_traffic_in && mqtt.vnet_channel.serviceState.today_traffic_out ? Math.ceil((mqtt.vnet_channel.serviceState.today_traffic_in + mqtt.vnet_channel.serviceState.today_traffic_out) / 1024) + ' KB' : '------'
                         }</span>
                     </div>
                     <div className="VPNlist">

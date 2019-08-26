@@ -188,8 +188,9 @@ class GatewayMQTT {
     @observable flag = true;
     @observable connected = false;
     @observable gateway = '';
-    @observable versionMsg = true;
+    @observable versionMsg = false;
     @observable newVersionMsg = {};
+    @observable new_version = 0;
     @observable auth_code = '';
     @observable comm_channel = newMessageChannel('/comm');
     @observable log_channel = newMessageChannel('/log');
@@ -512,41 +513,32 @@ class GatewayMQTT {
             if (topic === 'v1/vnet/#'){
                 this.vserial_channel.setActive(true)
                 this.client.subscribe(['v1/update/api/+', 'v1/vnet/#'])
-                // this.client.publish('v1/update/api/servers_list', JSON.stringify({'id': 'server_list' + new Date() * 1}))
-                // this.client.publish('v1/update/api/version', JSON.stringify({'id': 'get_new_version' + new Date() * 1}))
+                this.client.publish('v1/update/api/version', JSON.stringify({'id': 'get_new_version/' + new Date() * 1}))
+                this.client.publish('v1/update/api/servers_list', JSON.stringify({'id': 'server_list' + new Date() * 1}))
             }
             this.startTimer()
         })
 
         this.client.on('message', (msg_topic, msg)=>{
             const data = JSON.parse(msg.toString());
-            console.log(data, msg_topic)
             if (msg_topic === this.gateway + '/comm') {
-                const data = JSON.parse(msg.toString());
                 this.onReceiveCommMsg(data)
             }
             if (msg_topic === this.gateway + '/log') {
-                const data = JSON.parse(msg.toString());
                 this.onReceiveLogMsg(data)
             }
-            if (msg_topic === 'v1/vspax/#') {
-                // const data = JSON.parse(msg.toString());
-                // console.log(data)
-                // this.onReceiveLogMsg(data)
-            }
-            if (msg_topic === 'v1/update/api/servers_list') {
-                // const data = JSON.parse(msg.toString());
-                // this.onReceiveLogMsg(data)
-                // this.setServiceNode(data.data)
-                // console.log(this)
-            }
+            // if (msg_topic === 'v1/update/api/servers_list') {
+        
+            //     this.onReceiveLogMsg(data)
+            //     this.setServiceNode(data.data)
+            //     console.log(this)
+            // }
             if (msg_topic === 'v1/update/api/RESULT') {
-                const data = JSON.parse(msg.toString());
-                console.log(data, 'ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss')
                 if (data.result && data.data && data.data.length > 0){
                     this.onReceiveVserialMsg(data.data)
                 }
                 if (data.id.indexOf('get_new_version') !== -1 && data.result){
+                    this.new_version = parseInt(data.data.new_version);
                     this.onReceiveVserialVersionMsg(data.data)
                     if (parseInt(data.data.new_version) === parseInt(data.data.version)){
                         this.onReceiveLocalVersionMsg(true)
@@ -555,26 +547,17 @@ class GatewayMQTT {
                         this.onReceiveLocalVersionMsg(false)
                     }
                 }
-                // this.onReceiveLogMsg(data)
             }
             if (msg_topic === 'v1/vspax/api/RESULT') {
-                const data = JSON.parse(msg.toString())
-                console.log(data)
                 if (data.result && data.id.indexOf('api/list') !== -1){
                     this.onReceivePortLength(data.data)
                 }
                 if (data.result && data.id.indexOf('remove_local_com') !== -1) {
-                    console.log('removeremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremoveremove')
                     this.onReceiveaddPortMsg(null)
                 }
             }
-            if (msg_topic === 'v1/vspax/api/keep_alive') {
-                // const data = JSON.parse(msg.toString());
-                // console.log(data)
-                // this.onReceiveLogMsg(data)
-            }
+            // if (msg_topic === 'v1/vspax/api/keep_alive') {}
             if (msg_topic === 'v1/vspax/api/version') {
-                const data = JSON.parse(msg.toString());
                 if (data.result && data.data.new_version && data.data.version){
                     if (parseInt(data.data.new_version) === parseInt(data.data.version)){
                         this.onReceiveLocalVersionMsg(true)
@@ -583,29 +566,14 @@ class GatewayMQTT {
                         this.onReceiveLocalVersionMsg(false)
                     }
                 }
-                // this.onReceiveLogMsg(data)
             }
             if (msg_topic.indexOf('v1/vspax/VSPAX_STATUS/') !== -1) {
-                const data = JSON.parse(msg.toString());
                 this.onReceiveaddPortMsg(data)
-                console.log(data)
-            }
-            if (msg_topic === 'v1/vnet/api/RESULT') {
-                const data = JSON.parse(msg.toString());
-                console.log(data)
-                // if (data.id.indexOf('checkenv') !== -1 && data.result) {
-                //     this.onReceiverVnetServiceName(data.data)
-                // }
             }
             if (msg_topic === 'v1/vnet/VNET_STATUS/SERVICES'){
-                const data = JSON.parse(msg.toString());
-                console.log(data)
                 this.onReceiverVnetServiceName(data)
             }
             if (msg_topic === 'v1/vnet/PROXY_STATUS/CLOUD_PROXY'){
-                // const data = JSON.parse(msg.toString());
-                // console.log(data)
-                console.log(data, 'localolololololololololollllllllllllllllllllllllllllllllllllllllllllllllll')
                 this.onReceiverVnetServiceState(data)
             }
             if (msg_topic === 'v1/vnet/PROXY_STATUS/LOCAL_PROXY'){
@@ -616,8 +584,6 @@ class GatewayMQTT {
                 }
             }
             if (msg_topic.indexOf('v1/vnet/VNET_STATUS/CONFIG') !== -1) {
-                const data = JSON.parse(msg.toString());
-                console.log(data)
                     this.vnet_channel.is_running = data.is_running;
                     if (data.vnet_cfg) {
                         this.vnet_channel.vnet_config = data.vnet_cfg;
@@ -631,8 +597,6 @@ class GatewayMQTT {
                 }
             }
             if (msg_topic.indexOf('v1/vnet/DEST_STATUS') !== -1){
-                const data = JSON.parse(msg.toString());
-                console.log(data)
                 this.vnet_channel.serviceState = Object.assign({}, this.vnet_channel.serviceState, {
                     delay: data.delay,
                     message: data.message

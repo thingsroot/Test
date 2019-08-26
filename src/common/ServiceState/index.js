@@ -129,9 +129,9 @@ class ServiceState extends Component {
                 <p>虚拟串口服务关联网关：<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
                 <div>
                     <div className="flex">
-                        <p>本地服务:</p>
+                        <p>服务版本:</p>
                         <Input
-                            value={mqtt.vserial_channel.Active && mqtt.connected ? '服务正常' : '服务异常'}
+                            value={mqtt.new_version}
                         />
                         <div className="versionMsg">
                                 {
@@ -141,6 +141,7 @@ class ServiceState extends Component {
                                         请升级到最新版本！&nbsp;&nbsp;&nbsp;&nbsp;
                                         <Button
                                             type="primary"
+                                            loading={!mqtt.versionMsg}
                                             onClick={this.upgradeRprogramming}
                                         >升级</Button>
                                     </div>
