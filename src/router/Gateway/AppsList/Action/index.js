@@ -182,7 +182,7 @@ class Action extends Component {
         }
         if (record.data){
             let user_id = this.props.store.session.user_id
-            let app = record.data.name
+            let app = record.data.name.replace(/\//g, '*')
             let app_name = record.data.app_name
             let app_inst = record.inst_name
             if (record.data.owner === user_id){
@@ -378,6 +378,9 @@ class Action extends Component {
                         </Button>
                         ]}
                     >
+                        {
+                            console.log(record.version)
+                        }
                     <GatesAppsUpgrade
                         version={record.version}
                         inst={record.inst_name}
