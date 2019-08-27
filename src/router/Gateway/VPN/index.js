@@ -50,10 +50,18 @@ class VPN extends Component {
         chouldstatus: {}
     }
     componentDidMount (){
+        http.get('/api/user_token_read').then(res=>{
+            this.setState({
+                auth_code: res.data
+            })
+        })
         this.getStatus()
         this.timer = setInterval(() => {
             this.getStatus()
         }, 10000);
+        this.timer1 = setInterval(() => {
+            this.sendKeepAlive()
+        }, 20000);
         const { mqtt } = this.props;
         mqtt.connect(this.props.gateway, 'v1/vnet/#', true)
 
@@ -61,6 +69,7 @@ class VPN extends Component {
     componentWillUnmount (){
         this.props.mqtt.disconnect();
         clearInterval(this.timer)
+        clearInterval(this.timer1)
     }
     startVnet = () =>{
         const {mqtt} = this.props;
@@ -85,16 +94,22 @@ class VPN extends Component {
             output: 'vnet_config'
         }
         mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/service_start', JSON.stringify(data))
-        mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
+        setTimeout(() => {
+            mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
+        }, 3000);
     }
-    getStatus = ()=>{
+    sendKeepAlive = () =>{
+        const { mqtt } = this.props;
         const message = {
             id: 'keep_alive/' + new Date() * 1,
             enable_heartbeat: true,
             heartbeat_timeout: 60,
             gate_sn: this.props.gateway,
-            auth_code: this.props.mqtt.auth_code
+            auth_code: this.state.auth_code
         };
+        mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/keep_alive', JSON.stringify(message))
+    }
+    getStatus = ()=>{
         const { mqtt } = this.props;
         if (mqtt.client) {
             mqtt.connect(this.props.gateway, 'v1/vnet/#', true)
@@ -103,7 +118,6 @@ class VPN extends Component {
             id: 'checkenv' + new Date() * 1
         }
         mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/checkenv', JSON.stringify(data))
-        mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/keep_alive', JSON.stringify(message))
         http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vnet').then(res=>{
             if (res.ok){
                 if (res.data && res.data.length > 0) {
