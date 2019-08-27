@@ -44,7 +44,7 @@ class MyGatesAppsInstall extends Component {
     };
 
     componentDidMount (){
-        let app = this.props.match.params.app ? this.props.match.params.app : ''
+        let app = this.props.match.params.app ? this.props.match.params.app.replace(/\*/g, '/') : ''
         let gateway_sn = this.props.match.params.sn;
         let install_step = this.props.match.params.step ? this.props.match.params.step : ''
         if (this.props.match.params.app !== undefined && install_step === '') {
@@ -71,6 +71,9 @@ class MyGatesAppsInstall extends Component {
             this.setState({
                 app_list: res.data,
                 app_show: res.data
+            })
+            res.data.map(item=>{
+                console.log(item.name)
             })
             if (this.state.app && this.state.install_step === 'view') {
                 let item = res.data.find(item => item.name === this.state.app)

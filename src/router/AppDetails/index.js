@@ -30,20 +30,25 @@ class AppDetails extends Component {
         app: '',
         desc: '',
         groupName: '',
-        newTemplateVisiable: false
+        newTemplateVisiable: false,
+        name: ''
     };
-
+    componentWillMount () {
+            this.setState({
+                name: this.props.match.params.name.replace(/\*/g, '/')
+            })
+    }
     componentDidMount (){
-        this.loadApp()
+        this.loadApp(this.state.name)
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
-            this.loadApp()
+            this.loadApp(this.state.name)
         }
     }
-    loadApp = () => {
+    loadApp = (name) => {
         let user = this.props.store.session.user_id;
-        let app = this.props.match.params.name;
+        let app = name ? name : this.state.name;
         let action = this.props.match.params.action ? this.props.match.params.action : 'description'
         if (action === 'new_template') {
             this.setState( {activeKey: 'templates', newTemplateVisiable: true} )
@@ -58,13 +63,17 @@ class AppDetails extends Component {
         })
     }
     getDetails = ()=>{
-        const {app} = this.state;
-        http.get('/api/applications_read?app=' + app).then(res=>{
+        const {name} = this.state;
+        http.get('/api/applications_read?app=' + name).then(res=>{
+            if (res.data.data.name.indexOf('/') !== -1) {
+                res.data.data.name = res.data.data.name.replace(/\//g, '*')
+            }
             if (!res.ok) {
                 message.error('无法获取应用信息')
                 this.props.history.push('/myapps')
                 return
             }
+
             this.setState({
                 app_info: res.data.data,
                 versionList: res.data.versionList,
@@ -76,8 +85,8 @@ class AppDetails extends Component {
         });
     };
     updateVersionList = ()=> {
-        http.get('/api/versions_list?app=' + this.props.match.params.name).then(res=>{
-            if (res.ok) {
+        http.get('/api/versions_list?app=' + this.state.name).then(res=>{
+            if (res.ok && res.data) {
                 this.setState({
                     versionList: res.data
                 })

@@ -38,6 +38,9 @@ class Developer extends Component {
             let myData = [];
             if (res) {
                 res.data && res.data.length > 0 && res.data.map((item=>{
+                    if (item.name.indexOf('/') !== -1) {
+                        item.name = item.name.replace(/\//g, '*')
+                    }
                     if (item.fork_from !== null) {
                         formData.push(item)
                     } else if (item.owner === user) {
@@ -126,25 +129,27 @@ class Developer extends Component {
                     <ul style={myList.length > 0 ? {} : {height: '40px'}}>
                         {
                             myList && myList.length > 0 && myList.map((v, key)=>{
-                                return <li key={key}>
-                                    <div className="appImg">
-                                        <Link to={`/appdetails/${v.name}`}>
-                                            <img
-                                                src={`/store_assets${v.icon_image}`}
-                                                alt=""
-                                            />
-                                        </Link>
-                                    </div>
-                                    <div className="appInfo">
-                                        <p className="appName">{v.app_name}</p>
-                                        <p className="info">
-                                            <span>生产日期：{v.modified.substr(0, 11)}</span>
-                                            <span>应用分类：{v.category === null ? '----' : v.category}</span><br/>
-                                            <span>通讯协议：{v.protocol === null ? '----' : v.protocol}</span>
-                                            <span>设备厂商：{v.device_supplier === null ? '----' : v.device_supplier}</span>
-                                        </p>
-                                    </div>
-                                </li>
+                                return (
+                                    <li key={key}>
+                                        <div className="appImg">
+                                            <Link to={`/appdetails/${v.name}`}>
+                                                <img
+                                                    src={`/store_assets${v.icon_image}`}
+                                                    alt=""
+                                                />
+                                            </Link>
+                                        </div>
+                                        <div className="appInfo">
+                                            <p className="appName">{v.app_name}</p>
+                                            <p className="info">
+                                                <span>生产日期：{v.modified.substr(0, 11)}</span>
+                                                <span>应用分类：{v.category === null ? '----' : v.category}</span><br/>
+                                                <span>通讯协议：{v.protocol === null ? '----' : v.protocol}</span>
+                                                <span>设备厂商：{v.device_supplier === null ? '----' : v.device_supplier}</span>
+                                            </p>
+                                        </div>
+                                    </li>
+                                )
                             })
                         }
                     </ul>

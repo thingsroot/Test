@@ -30,7 +30,7 @@ class AppEditorCode extends Component {
         }
     }
     componentDidMount () {
-        let app = this.props.match.params.app;
+        let app = this.props.match.params.app.replace(/\*/g, '/');
         let appName = this.props.match.params.name;
         let gateway = this.props.match.params.gateway;
         let app_inst = this.props.match.params.inst;

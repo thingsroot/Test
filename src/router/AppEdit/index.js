@@ -36,7 +36,7 @@ class AppEdit extends Component {
     componentDidMount (){
         this.setState({
             is_new: this.props.match.params.name !== undefined ? false : true,
-            app: this.props.match.params.name,
+            app: this.props.match.params.name.replace(/\*/g, '/'),
             imgSrc: '/assets/app_center/img/logo.png'
         }, () => {
             if (!this.state.is_new) {
