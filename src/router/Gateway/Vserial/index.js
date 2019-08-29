@@ -101,7 +101,6 @@ class Vserial extends Component {
                 dataIndex: 'status',
                 key: 'status',
                 render: (key, item)=>{
-                    console.log(key, item)
                     if (Object.keys(item).length > 0){
                         return (
                             <span>{item.app_path && item.app_path.indexOf('freeioe_Rprogramming') === -1 ? '已打开' : '已关闭'}</span>
@@ -280,7 +279,6 @@ class Vserial extends Component {
         const { BaudRate, DataBits, Check, StopBit } = this.state;
         const { PortLength} = mqtt.vserial_channel;
         let SerialPort = this.state.SerialPort;
-        console.log(PortLength.indexOf(SerialPort.toUpperCase()))
         if (PortLength.indexOf(SerialPort.toUpperCase()) !== -1) {
             SerialPort = 'COM' + (parseInt(SerialPort[SerialPort.length - 1]) + 1)
         }
@@ -516,7 +514,7 @@ class Vserial extends Component {
                             </div>
                         </div>
                         <Table
-                            rowKey="serialPort"
+                            rowKey="name"
                             columns={cloums}
                             dataSource={serviceName}
                             pagination={false}
@@ -529,7 +527,7 @@ class Vserial extends Component {
                         columns={this.state.cloum}
                         dataSource={addPortData}
                         pagination={false}
-                        rowKey="connectStatus"
+                        rowKey="host"
                     />
                 </div>
                 <div>

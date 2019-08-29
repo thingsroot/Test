@@ -11,6 +11,15 @@
             font-size: 16px;
             background-color: #f9f9f9;
         }
+        .FeaturesGroup{
+            position: relative;
+        }
+        .Groupsetting{
+            position: absolute;
+            right: 15px;
+            top:0;
+            cursor: pointer;
+        }
         .active{
             border-left: 2px solid #3c8dbc;
             font-weight: 600;
@@ -44,5 +53,14 @@
                 background:#f9f9f9;
             }
         }
+    }
+}
+
+.ant-modal-body .list{
+    padding: 8px;
+    display: flex;
+    >span{
+        display: block;
+        width: 85%;
     }
 }

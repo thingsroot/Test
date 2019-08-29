@@ -366,9 +366,7 @@ class GatewayMQTT {
         this.vserial_channel.setLogView(obj)
     }
     onReceivePortLength = (data) => {
-        console.log(data)
         this.vserial_channel.PortLength = data;
-        console.log(this.vserial_channel.PortLength)
     }
     onReceiveVserialVersionMsg = (msg)=>{
         this.vserial_channel.newVersionMsg = msg;
@@ -600,7 +598,6 @@ class GatewayMQTT {
             if (msg_topic === 'v1/vspax/api/RESULT') {
                 const data = JSON.parse(msg.toString());
                 if (data.result && data.id.indexOf('api/list') !== -1){
-                    console.log(data)
                     this.onReceivePortLength(data.data)
                 }
                 if (data.result && data.id.indexOf('remove_local_com') !== -1) {
@@ -630,7 +627,6 @@ class GatewayMQTT {
             if (msg_topic === 'v1/vnet/PROXY_STATUS/CLOUD_PROXY'){
                 const data = JSON.parse(msg.toString());
                 this.onReceiverVnetServiceState(data)
-                console.log(data)
             }
             if (msg_topic === 'v1/vnet/PROXY_STATUS/LOCAL_PROXY'){
                 const data = JSON.parse(msg.toString());
