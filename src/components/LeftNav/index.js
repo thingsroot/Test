@@ -106,6 +106,16 @@ class LeftNav extends Component {
         visible: false
     });
     };
+    info () {
+        Modal.info({
+          title: '提示：',
+          content: (
+            <div>
+              <p>该设备为虚拟设备,暂不支持此项功能！请更换设备后重试！</p>
+            </div>
+          )
+        });
+      }
     enableVSERIAL (enable) {
         if (enable) {
             return this.installApp('freeioe_Vserial', 'APP00000130', '开启远程串口功能')
@@ -344,9 +354,16 @@ class LeftNav extends Component {
                             disabled={!gatewayInfo.actionEnable}
                             gateway={gateway}
                             onChange={(checked, onResult)=>{
-                                this.enableVSERIAL(checked).then((result) => {
-                                    onResult(result)
-                                })
+                                const { sn } = this.props.match.params;
+                                if (sn.indexOf('TRTX') === -1 && sn.indexOf('-') === -1) {
+                                    this.handleCancel()
+                                    this.info()
+                                    return false;
+                                } else {
+                                    this.enableVSERIAL(checked).then((result) => {
+                                        onResult(result)
+                                    })
+                                }
                             }}
                         />
                         </div>
@@ -359,9 +376,16 @@ class LeftNav extends Component {
                                 disabled={!gatewayInfo.actionEnable}
                                 gateway={gateway}
                                 onChange={(checked, onResult)=>{
-                                    this.enableVNET(checked).then((result) => {
-                                        onResult(result)
-                                    })
+                                    const { sn } = this.props.match.params;
+                                    if (sn.indexOf('TRTX') === -1 && sn.indexOf('-') === -1) {
+                                        this.handleCancel()
+                                        this.info()
+                                        return false;
+                                    } else {
+                                        this.enableVNET(checked).then((result) => {
+                                            onResult(result)
+                                        })
+                                    }
                                 }}
                             />
                         </div>

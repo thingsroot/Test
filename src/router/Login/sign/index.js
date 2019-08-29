@@ -17,9 +17,9 @@ class Sign extends PureComponent {
                     password: values.password
                 }).then(res=>{
                     if (res.ok) {
-                        //console.log(res.data)
+                        console.log(res.data)
                         authenticateSuccess(res.data)
-                        message.success('登录成功，正在跳转', 1).then(()=>{
+                        message.success('登录成功，正在跳转, 请稍后...', 3).then(()=>{
                             //console.log(_getCookie('user_id'))
                             location.href = '/';
                         })

@@ -36,9 +36,11 @@ export function authenticateClear () {
 }
 
 export function authenticateSuccess (data) {
+    console.log(data)
     _setCookie(LOGIN_COOKIE_NAME, data.csrf_token)
     _setCookie('companies', data.companies[0])
     _setCookie('is_developer', data.is_developer)
+    _setCookie('user_id', data.name)
 }
 
 export function refreshToken () {
