@@ -51,6 +51,9 @@ class Logviewer extends Component {
                 type: '/log'
             })
         }
+        if (this.props.isVserial) {
+            this.props.mqtt.connect(this.props.gateway, 'v1/vspax/VSPAX_STREAM/#', true)
+        }
         this.setState({ gateway: this.props.gateway })
         const { mqtt } = this.props;
         mqtt.log_channel.setShow(true)

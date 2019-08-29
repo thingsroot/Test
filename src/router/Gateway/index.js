@@ -13,7 +13,7 @@ import GatewayMQTT from '../../utils/GatewayMQTT';
 const DeviceList = LoadableComponent(()=>import('./DeviceList'));
 const AppsList = LoadableComponent(()=>import('./AppsList'));
 const Settings = LoadableComponent(()=>import('./Settings'));
-const VPN  = LoadableComponent(()=>import('./VPN'));
+const Vnet  = LoadableComponent(()=>import('./Vnet'));
 const Vserial = LoadableComponent(()=>import('./Vserial'));
 const OnlineRecords = LoadableComponent(()=>import('./OnlineRecords'));
 const Logviewer = LoadableComponent(()=>import('./Logviewer'));
@@ -181,7 +181,7 @@ class MyGatesDevices extends Component {
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path={`${path}/vnet`}
-                            component={VPN}
+                            component={Vnet}
                             title="我的网关·远程编程-网络"
                             gateway={this.state.gateway}
                             mqtt={this.state.mqtt}

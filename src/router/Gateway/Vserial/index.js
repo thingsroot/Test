@@ -1,8 +1,9 @@
-import { Button, Select, Table, message } from 'antd';
+import { Button, Select, Table, message, Modal } from 'antd';
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
 import ServiceState from '../../../common/ServiceState';
-// import Logviewer from '../Logviewer';
+import Logviewer from './Logview';
 import http from '../../../utils/Server';
 import './style.scss';
 const Option = Select.Option;
@@ -21,6 +22,19 @@ const cloums = [
         key: 'status'
     }
 ]
+const { confirm } = Modal;
+function showConfirm (name, path) {
+    confirm({
+      title: '串口关闭警告',
+      content: `当前虚拟串口${name}正在被程序${path}占用，释放程序占用后再关闭串口。`,
+      onOk () {
+        console.log('OK');
+      },
+      onCancel () {
+        console.log('Cancel');
+      }
+    });
+  }
 function Parity (value) {
     let str = '';
     switch (value) {
@@ -51,6 +65,7 @@ function formatTime (date, fmt) {
     }
     return fmt;
 }
+@withRouter
 @inject('store')
 @observer
 class Vserial extends Component {
@@ -89,7 +104,7 @@ class Vserial extends Component {
                     console.log(key, item)
                     if (Object.keys(item).length > 0){
                         return (
-                            <span>{item.app_path ? '已打开' : '已关闭'}</span>
+                            <span>{item.app_path && item.app_path.indexOf('freeioe_Rprogramming') === -1 ? '已打开' : '已关闭'}</span>
                         )
                     }
                 }
@@ -98,7 +113,7 @@ class Vserial extends Component {
                 dataIndex: 'app_path',
                 key: 'app_path',
                 render: (key, item)=>{
-                    if (item.app_path){
+                    if (item.app_path && item.app_path.indexOf('freeioe_Rprogramming') === -1){
                         return (
                             <span>{item.app_path.split('\\')[item.app_path.split('\\').length - 1]}</span>
                         )
@@ -262,7 +277,13 @@ class Vserial extends Component {
     }
     openVserial = () => {
         const { mqtt } = this.props;
-        const { SerialPort, BaudRate, DataBits, Check, StopBit } = this.state;
+        const { BaudRate, DataBits, Check, StopBit } = this.state;
+        const { PortLength} = mqtt.vserial_channel;
+        let SerialPort = this.state.SerialPort;
+        console.log(PortLength.indexOf(SerialPort.toUpperCase()))
+        if (PortLength.indexOf(SerialPort.toUpperCase()) !== -1) {
+            SerialPort = 'COM' + (parseInt(SerialPort[SerialPort.length - 1]) + 1)
+        }
         let params = {
             gateway: this.props.gateway,
             name: this.props.gateway + '.freeioe_Vserial',
@@ -366,7 +387,7 @@ class Vserial extends Component {
         })
     }
     render () {
-        const { SerialPort, serviceName, flag, openLoading, stopLoading } = this.state;
+        const { SerialPort, serviceName, flag, openLoading, stopLoading, logFlag } = this.state;
         const { mqtt } = this.props;
         const {  addPortData } = mqtt.vserial_channel;
         return (
@@ -397,12 +418,16 @@ class Vserial extends Component {
                                         type="danger"
                                         loading={stopLoading}
                                         onClick={()=>{
-                                            this.setState({
-                                                stopLoading: true,
-                                                openLoading: false
-                                            }, ()=>{
-                                                this.stopVserial()
-                                            })
+                                            if (addPortData[0].app_path === '' || addPortData[0].app_path.indexOf('freeioe_Rprogramming') !== -1) {
+                                                this.setState({
+                                                    stopLoading: true,
+                                                    openLoading: false
+                                                }, ()=>{
+                                                    this.stopVserial()
+                                                })
+                                            } else {
+                                                showConfirm(addPortData[0].name, addPortData[0].app_path.split('\\')[addPortData[0].app_path.split('\\').length - 1])
+                                            }
                                         }}
                                       >停止</Button>
                             }
@@ -506,6 +531,17 @@ class Vserial extends Component {
                         pagination={false}
                         rowKey="connectStatus"
                     />
+                </div>
+                <div>
+                    {
+                        logFlag
+                        ? <Logviewer
+                            gateway={this.props.gateway}
+                            mqtt={this.props.mqtt}
+                            isVserial="true"
+                          />
+                        : ''
+                    }
                 </div>
             </div>
         );

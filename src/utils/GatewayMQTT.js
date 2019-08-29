@@ -33,6 +33,8 @@ const newMessageChannel = (topic) => {
         filter: undefined,
         searchType: 'all',
         isShow: true,
+        LogView: [],
+        LogViewFlag: true,
         newArrive: 0,
         active: false,
         serviceNode: undefined,
@@ -106,6 +108,9 @@ const newMessageChannel = (topic) => {
             this.filter = undefined
             this.data = this.allData
         },
+        setVserialLogFlag (value) {
+            this.LogViewFlag = value;
+        },
         setSearchType (value) {
             this.searchType = value
             this.applyFilter()
@@ -119,6 +124,13 @@ const newMessageChannel = (topic) => {
         setActive (value) {
             this.active = value
         },
+        setLogView (value) {
+            if (value) {
+                this.LogView.push(value)
+            } else {
+                this.LogView = [];
+            }
+        },
         setProxy (value) {
             this.proxy = value;
             if (this.proxy && !this.active){
@@ -129,7 +141,7 @@ const newMessageChannel = (topic) => {
             this.serviceNode = value;
         },
         setServiceState (value){
-            this.serviceState = value;
+            this.serviceState = value
         },
 
         get Data () {
@@ -215,6 +227,17 @@ class GatewayMQTT {
         }
         return out.toUpperCase();
     }
+    strToHexCharCode (str) {
+        　　if (str === ''){
+                return '';
+            }
+        　　var hexCharCode = [];
+        // 　　hexCharCode.push('0x');
+        　　for (var i = 0; i < str.length; i++) {
+        　　　　hexCharCode.push((str.charCodeAt(i)).toString(16) + ' ');
+        　　}
+        　　return hexCharCode.join('');
+        }
     base64DecodeChars = new Array(
       -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
       -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -224,7 +247,6 @@ class GatewayMQTT {
       15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1,
       -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
       41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1);
-
     base64decode (str) {
         var c1, c2, c3, c4;
         var i, len, out;
@@ -281,6 +303,13 @@ class GatewayMQTT {
         return out;
     }
 
+    Uint8ArrayToString (fileData){
+        var dataString = '';
+        for (var i = 0; i < fileData.length; i++) {
+        dataString += String.fromCharCode(fileData[i]);
+        }
+        return dataString
+    }
     // Keep the connection for a time (in seconds)
     tick (time) {
         this.die_time = time + 10;
@@ -325,6 +354,16 @@ class GatewayMQTT {
     }
     onReceiveLocalVersionMsg = (value) =>{
         this.versionMsg = value;
+    }
+    onReceiveVserialLogView = (topic, msg) =>{
+        const timestamp = Date.parse(new Date());
+        const obj = {
+            time: new Date(timestamp).toLocaleString('zh', {hour12: false}),
+            type: '串口',
+            arr: topic.split('/')[4],
+            content: msg
+        }
+        this.vserial_channel.setLogView(obj)
     }
     onReceivePortLength = (data) => {
         console.log(data)
@@ -421,7 +460,8 @@ class GatewayMQTT {
             this.vnet_channel.setServiceNode(arr)
     }
     onReceiverVnetServiceState = (data) =>{
-        this.vnet_channel.setServiceState(data)
+        const datas = Object.assign({}, this.vnet_channel.serviceState, data)
+        this.vnet_channel.setServiceState(datas)
     }
     unsubscribe (topic) {
         const topic_real = this.gateway + topic;
@@ -439,6 +479,9 @@ class GatewayMQTT {
         }
         if (topic === 'v1/vnet/#') {
             this.vnet_channel.setActive(false)
+        }
+        if (topic === 'v1/vspax/VSPAX_STREAM/#') {
+            this.client.unsubscribe(topic)
         }
     }
     disconnect (clear_data) {
@@ -520,11 +563,12 @@ class GatewayMQTT {
         })
 
         this.client.on('message', (msg_topic, msg)=>{
-            const data = JSON.parse(msg.toString());
             if (msg_topic === this.gateway + '/comm') {
+                const data = JSON.parse(msg.toString());
                 this.onReceiveCommMsg(data)
             }
             if (msg_topic === this.gateway + '/log') {
+                const data = JSON.parse(msg.toString());
                 this.onReceiveLogMsg(data)
             }
             // if (msg_topic === 'v1/update/api/servers_list') {
@@ -532,7 +576,13 @@ class GatewayMQTT {
             //     this.setServiceNode(data.data)
             //     console.log(this)
             // }
+            if (msg_topic.indexOf('v1/vspax/VSPAX_STREAM') !== -1) {
+                if (this.vserial_channel.LogViewFlag) {
+                    this.onReceiveVserialLogView(msg_topic, msg)
+                }
+            }
             if (msg_topic === 'v1/update/api/RESULT') {
+                const data = JSON.parse(msg.toString());
                 if (data.result && data.data && data.data.length > 0){
                     this.onReceiveVserialMsg(data.data)
                 }
@@ -548,7 +598,9 @@ class GatewayMQTT {
                 }
             }
             if (msg_topic === 'v1/vspax/api/RESULT') {
+                const data = JSON.parse(msg.toString());
                 if (data.result && data.id.indexOf('api/list') !== -1){
+                    console.log(data)
                     this.onReceivePortLength(data.data)
                 }
                 if (data.result && data.id.indexOf('remove_local_com') !== -1) {
@@ -557,6 +609,7 @@ class GatewayMQTT {
             }
             // if (msg_topic === 'v1/vspax/api/keep_alive') {}
             if (msg_topic === 'v1/vspax/api/version') {
+                const data = JSON.parse(msg.toString());
                 if (data.result && data.data.new_version && data.data.version){
                     if (parseInt(data.data.new_version) === parseInt(data.data.version)){
                         this.onReceiveLocalVersionMsg(true)
@@ -567,16 +620,20 @@ class GatewayMQTT {
                 }
             }
             if (msg_topic.indexOf('v1/vspax/VSPAX_STATUS/') !== -1) {
+                const data = JSON.parse(msg.toString());
                 this.onReceiveaddPortMsg(data)
             }
             if (msg_topic === 'v1/vnet/VNET_STATUS/SERVICES'){
+                const data = JSON.parse(msg.toString());
                 this.onReceiverVnetServiceName(data)
             }
             if (msg_topic === 'v1/vnet/PROXY_STATUS/CLOUD_PROXY'){
+                const data = JSON.parse(msg.toString());
                 this.onReceiverVnetServiceState(data)
                 console.log(data)
             }
             if (msg_topic === 'v1/vnet/PROXY_STATUS/LOCAL_PROXY'){
+                const data = JSON.parse(msg.toString());
                 if (data.status) {
                     this.vnet_channel.serviceState = Object.assign({}, this.vnet_channel.serviceState, {
                         statuss: data.status
@@ -584,20 +641,22 @@ class GatewayMQTT {
                 }
             }
             if (msg_topic.indexOf('v1/vnet/VNET_STATUS/CONFIG') !== -1) {
+                const data = JSON.parse(msg.toString());
                     this.vnet_channel.is_running = data.is_running;
                     if (data.vnet_cfg) {
                         this.vnet_channel.vnet_config = data.vnet_cfg;
                     }
             }
             if (msg_topic === 'v1/vnet/api/keep_alive') {
+                const data = JSON.parse(msg.toString());
                 if (data.id.indexOf('keep_alive') !== -1) {
-                    console.log(data)
                     if (data.auth_code) {
                         this.auth_code = data.auth_code;
                     }
                 }
             }
             if (msg_topic.indexOf('v1/vnet/DEST_STATUS') !== -1){
+                const data = JSON.parse(msg.toString());
                 this.vnet_channel.serviceState = Object.assign({}, this.vnet_channel.serviceState, {
                     delay: data.delay,
                     message: data.message

@@ -308,7 +308,9 @@ class VPN extends Component {
                         <p>
                             云端隧道状态：
                         </p>
-                        <span>{mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.cur_conns && parseInt(mqtt.vnet_channel.serviceState.cur_conns) > 0 ? 'connected' : 'disconnected'}</span>
+                        <span>{
+                            is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.cur_conns && parseInt(mqtt.vnet_channel.serviceState.cur_conns) > 0 ? 'connected' : 'disconnected' : '------'
+                            }</span>
                     </div>
                     <div className="VPNlist">
                         <p>
@@ -326,27 +328,29 @@ class VPN extends Component {
                         <p>
                             本次启动时间：
                         </p>
-                        <span>{mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.last_start_time ? mqtt.vnet_channel.serviceState.last_start_time : '------'}</span>
+                        <span>{
+                            is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.last_start_time ? mqtt.vnet_channel.serviceState.last_start_time : '------' : '------'
+                        }</span>
                     </div>
                     <div className="VPNlist">
                         <p>
                             今日流量消耗：
                         </p>
                         <span>{
-                            mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.today_traffic_in && mqtt.vnet_channel.serviceState.today_traffic_out ? Math.ceil((mqtt.vnet_channel.serviceState.today_traffic_in + mqtt.vnet_channel.serviceState.today_traffic_out) / 1024) + ' KB' : '------'
+                            is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.today_traffic_in && mqtt.vnet_channel.serviceState.today_traffic_out ? Math.ceil((mqtt.vnet_channel.serviceState.today_traffic_in + mqtt.vnet_channel.serviceState.today_traffic_out) / 1024) + ' KB' : '0KB' : '------'
                         }</span>
                     </div>
                     <div className="VPNlist">
                         <p>
                             Ping网关IP状态：
                         </p>
-                        <span>{mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.message ? mqtt.vnet_channel.serviceState.message : '------'}</span>
+                        <span>{is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.message ? mqtt.vnet_channel.serviceState.message : '------' : '------'}</span>
                     </div>
                     <div className="VPNlist">
                         <p>
                             Ping网关IP延迟：
                         </p>
-                        <span>{mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.delay ? mqtt.vnet_channel.serviceState.delay : '------'}</span>
+                        <span>{is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.delay ? mqtt.vnet_channel.serviceState.delay : '------' : '------'}</span>
                     </div>
                     <Table
                         columns={columns}

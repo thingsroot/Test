@@ -196,14 +196,6 @@ class GatewaySettingsEdit extends Component {
             return this.removeApp('ioe_network', '关闭虚拟网络功能')
         }
     }
-
-    enableFRPC (enable){
-        if (enable) {
-            return this.installApp('ioe_frpc', 'frpc', '开启虚拟网络功能')
-        } else {
-            return this.removeApp('ioe_frpc', '关闭虚拟网络功能')
-        }
-    }
     enableVSERIAL (enable) {
         if (enable) {
             return this.installApp('freeioe_Vserial', 'APP00000130', '开启远程串口功能')
@@ -397,21 +389,6 @@ class GatewaySettingsEdit extends Component {
                         gateway={gateway}
                         onChange={(checked, onResult)=>{
                             this.enableIOENetwork(checked).then((result) => {
-                                onResult(result)
-                            })
-                        }}
-                    />
-                </div>
-                <div className="list">
-                    <span>
-                        虚拟网络 [*开启后可建立点对点VPN]
-                    </span>
-                    <EditSwitch
-                        checked={gatewayInfo.ioe_frpc}
-                        disabled={!gatewayInfo.actionEnable}
-                        gateway={gateway}
-                        onChange={(checked, onResult)=>{
-                            this.enableFRPC(checked).then((result) => {
                                 onResult(result)
                             })
                         }}
