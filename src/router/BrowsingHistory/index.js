@@ -6,6 +6,26 @@ import axios from 'axios';
 import './style.scss';
 const Option = Select.Option;
 const Search = Input.Search;
+// utc时间转换
+const convertUTCTimeToLocalTime = function (UTCDateString) {
+  if (!UTCDateString){
+    return '-';
+  }
+  function formatFunc (str) {
+    return str > 9 ? str : '0' + str
+  }
+  var date2 = new Date(UTCDateString);
+  var year = date2.getFullYear();
+  var mon = formatFunc(date2.getMonth() + 1);
+  var day = formatFunc(date2.getDate());
+  var hour = date2.getHours();
+  var noon = hour >= 12 ? 'PM' : 'AM';
+  hour = hour >= 12 ? hour - 12 : hour;
+  hour = formatFunc(hour);
+  var min = formatFunc(date2.getMinutes());
+  var dateStr = year + '-' + mon + '-' + day + ' ' + noon + ' ' + hour + ':' + min;
+  return dateStr;
+}
 const columns = [{
     title: '名称',
     dataIndex: 'name',
@@ -35,7 +55,14 @@ const columns = [{
     }
   }, {
     title: '时间',
-    dataIndex: 'time'
+    dataIndex: 'time',
+    render: (time)=>{
+      if (time) {
+        return (
+          <span>{convertUTCTimeToLocalTime(time)}</span>
+        )
+      }
+    }
   }, {
     title: '质量戳',
     dataIndex: 'quality'
