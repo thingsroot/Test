@@ -26,7 +26,7 @@ const columns = [{
 class VPN extends Component {
     state = {
         flag: true,
-        tap_ip: '192.168.0.' + Math.floor(Math.random() * 256),
+        tap_ip: '',
         arr: [],
         start_loading: false,
         stop_loading: false,
@@ -124,6 +124,12 @@ class VPN extends Component {
                     res.data.map(item=>{
                         if (item.name === 'lan_ip') {
                             this.setState({lan_ip: item.pv})
+                            if (!this.state.tap_ip){
+                                const tap_ip = item.pv.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10)
+                                this.setState({
+                                    tap_ip
+                                })
+                            }
                         }
                         if (item.name === 'router_run') {
                             this.setState({router_run: item.pv})
