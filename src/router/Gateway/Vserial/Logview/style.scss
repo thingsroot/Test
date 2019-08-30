@@ -1,34 +1,198 @@
-.vserial_log{
+.vserial_log {
     width: 100%;
-    .tableHeaders{
+
+    .tableHeaders {
         display: flex;
         width: 100%;
         justify-content: space-around;
-        >div{
+
+        > div {
             border-bottom: 1px solid #e8e8e8;
             border-left: 1px solid #e8e8e8;
             padding: 10px;
         }
-        >div:nth-child(1){
+
+        > div:nth-child(1) {
             width: 20%;
             min-width: 180px;
         }
-        >div:nth-child(2){
+
+        > div:nth-child(2) {
             width: 10%;
             min-width: 70px;
         }
-        >div:nth-child(3){
+
+        > div:nth-child(3) {
             width: 10%;
             min-width: 75px;
         }
-        >div:nth-child(4){
+
+        > div:nth-child(4) {
             width: 60%;
             min-width: 100px;
         }
-        >div:nth-child(5){
-            flex:1;
-            word-wrap:break-word;
-            word-break:break-all;
+
+        > div:nth-child(5) {
+            flex: 1;
+            word-wrap: break-word;
+            word-break: break-all;
         }
+    }
+}
+
+.parent-relative {
+    position: relative;
+
+    .child-position {
+        position: absolute;
+        right: 0;
+        top: 0;
+
+        button {
+            margin-left: 5px;
+        }
+    ;
+    }
+}
+
+/* 扩展ant design pro按钮组件颜色 */
+.button-color-gray {
+    background-color: #f0f0f0;
+    border-color: #f0f0f0;
+
+    &:hover, &:focus {
+        background-color: #f0f0f0;
+        border-color: #f0f0f0;
+    }
+
+    &:active, &.active {
+        background-color: #f0f0f0;
+        border-color: #f0f0f0;
+    }
+}
+
+.button-color-dust {
+    background-color: #F5222D;
+    border-color: #F5222D;
+
+    &:hover, &:focus {
+        background-color: #ff4d4f;
+        border-color: #ff4d4f;
+    }
+
+    &:active, &.active {
+        background-color: #cf1322;
+        border-color: #cf1322;
+    }
+}
+
+.button-color-volcano {
+    background-color: #FA541C;
+    border-color: #FA541C;
+
+    &:hover, &:focus {
+        background-color: #ff7a45;
+        border-color: #ff7a45;
+    }
+
+    &:active, &.active {
+        background-color: #d4380d;
+        border-color: #d4380d;
+    }
+}
+
+.button-color-sunset {
+    background-color: #FAAD14;
+    border-color: #FAAD14;
+    color: #fff;
+
+    &:hover, &:focus {
+        background-color: #ffc53d;
+        border-color: #ffc53d;
+        color: #fff;
+    }
+
+    &:active, &.active {
+        background-color: #d48806;
+        border-color: #d48806;
+        color: #fff;
+    }
+}
+
+.button-color-cyan {
+    background-color: #13C2C2;
+    border-color: #13C2C2;
+
+    &:hover, &:focus {
+        background-color: #36cfc9;
+        border-color: #36cfc9;
+    }
+
+    &:active, &.active {
+        background-color: #08979c;
+        border-color: #08979c;
+    }
+}
+
+.button-color-green {
+    background-color: #52C41A;
+    border-color: #52C41A;
+
+    &:hover, &:focus {
+        background-color: #73d13d;
+        border-color: #73d13d;
+    }
+
+    &:active, &.active {
+        background-color: #389e0d;
+        border-color: #389e0d;
+    }
+}
+
+.button-color-daybreak {
+    background-color: #1890FF;
+    border-color: #1890FF;
+    color: #fff;
+
+    &:hover, &:focus {
+        background-color: #096dd9;
+        border-color: #096dd9;
+        color: #fff;
+    }
+
+    &:active, &.active {
+        background-color: #40a9ff;
+        border-color: #40a9ff;
+        color: #fff;
+    }
+}
+
+.button-color-geekblue {
+    background-color: #2F54EB;
+    border-color: #2F54EB;
+
+    &:hover, &:focus {
+        background-color: #1d39c4;
+        border-color: #1d39c4;
+    }
+
+    &:active, &.active {
+        background-color: #597ef7;
+        border-color: #597ef7;
+    }
+}
+
+.button-color-purple {
+    background-color: #722ED1;
+    border-color: #722ED1;
+
+    &:hover, &:focus {
+        background-color: #9254de;
+        border-color: #9254de;
+    }
+
+    &:active, &.active {
+        background-color: #531dab;
+        border-color: #531dab;
     }
 }
