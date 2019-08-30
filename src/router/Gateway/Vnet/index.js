@@ -252,8 +252,8 @@ class VPN extends Component {
                             type={this.state.model === 'bridge' ? 'primary' : ''}
                             // disabled={flag}
                             onClick={()=>{
-                                const Num = Math.floor(Math.random() * 256);
-                                this.setState({model: 'bridge', port: '665', tap_ip: '192.168.0.' + Num})
+                                const Num = this.state.tap_ip.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10)
+                                this.setState({model: 'bridge', port: '665', tap_ip: Num})
                             }}
                         >桥接模式</Button>
                         <Button

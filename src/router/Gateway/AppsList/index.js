@@ -281,7 +281,7 @@ class AppsList extends Component {
         })
     }
     render () {
-        const { loading, gateway_sn, data, pagination } = this.state
+        const { loading, gateway_sn, data } = this.state
         const { show_app_config, edit_app_inst, edit_app_conf, edit_app_info, configStore } = this.state;
         return (
             <div>
@@ -328,7 +328,7 @@ class AppsList extends Component {
                     rowKey="sn"
                     columns={this.state.columns}
                     dataSource={data && data.length > 0 ? data : []}
-                    pagination={pagination}
+                    pagination={false}
                     loading={loading}
                     onChange={this.handleTableChange}
                     expandRowByClick

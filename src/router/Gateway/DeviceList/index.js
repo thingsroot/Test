@@ -295,6 +295,7 @@ class DevicesList extends Component {
                     }}
                     expandedRowRender={Collapses}
                     expandRowByClick
+                    pagination={false}
                 />
 
             </div>
