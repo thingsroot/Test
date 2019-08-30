@@ -27,8 +27,14 @@ class VserialLogView extends Component {
             <div className="vserial_log">
                 <div style={Mt15}></div>
                 <div className="vserial_log_title parent-relative">
-                    <Tabs onChange={callback} type="card">
-                        <TabPane tab="监视报文" key="1">
+                    <Tabs
+                        onChange={callback}
+                        type="card"
+                    >
+                        <TabPane
+                            tab="监视报文"
+                            key="1"
+                        >
                         </TabPane>
                     </Tabs>
                     <div className="child-position">
@@ -57,13 +63,13 @@ class VserialLogView extends Component {
                                     onClick={()=>{
                                         mqtt.vserial_channel.setVserialLogFlag(false)
                                     }}
-                                >暂停</Button>
+                                  >暂停</Button>
                                 : <Button
                                     className="button-color-daybreak"
                                     onClick={()=>{
                                         mqtt.vserial_channel.setVserialLogFlag(true)
                                     }}
-                                >恢复</Button>
+                                  >恢复</Button>
                         }
                     </div>
                 </div>

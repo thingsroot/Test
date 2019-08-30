@@ -33,7 +33,7 @@ class AppDetails extends Component {
         newTemplateVisiable: false,
         name: ''
     };
-    componentWillMount () {
+    UNSAFE_componentWillMount () {
             this.setState({
                 name: this.props.match.params.name.replace(/\*/g, '/')
             })
