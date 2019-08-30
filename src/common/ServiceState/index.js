@@ -50,6 +50,7 @@ class ServiceState extends Component {
     }
     componentWillUnmount (){
         clearInterval(this.t1)
+        this.props.mqtt.vserial_channel.setProxy(null)
         this.props.mqtt.disconnect()
     }
     upgradeApp = () =>{
@@ -117,8 +118,10 @@ class ServiceState extends Component {
         mqtt.client.publish('v1/update/api/update', JSON.stringify(data))
     }
     handleChange = (value)=>{
+        console.log(value)
         const { mqtt } = this.props;
         mqtt.vserial_channel.setProxy(value)
+        console.log(mqtt.vserial_channel.Proxy)
     }
     render () {
         const { mqtt } = this.props;
@@ -191,7 +194,7 @@ class ServiceState extends Component {
                                 onChange={this.handleChange}
                             >
                                 {
-                                    mqtt.vserial_channel.setProxy(serviceNode[0].host)
+                                    !mqtt.vserial_channel.Proxy && mqtt.vserial_channel.setProxy(serviceNode[0].host)
                                 }
                                 {
                                     serviceNode.map((val, ind)=>{
