@@ -26,7 +26,7 @@ const columns = [{
 class VPN extends Component {
     state = {
         flag: true,
-        tap_ip: '',
+        tap_ip: undefined,
         arr: [],
         start_loading: false,
         stop_loading: false,
@@ -124,12 +124,12 @@ class VPN extends Component {
                     res.data.map(item=>{
                         if (item.name === 'lan_ip') {
                             this.setState({lan_ip: item.pv})
-                            if (!this.state.tap_ip){
-                                const tap_ip = item.pv.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10)
-                                this.setState({
-                                    tap_ip
-                                })
-                            }
+                                if (!this.state.tap_ip){
+                                    const tap_ip = item.pv.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10)
+                                    this.setState({
+                                        tap_ip
+                                    })
+                                }
                         }
                         if (item.name === 'router_run') {
                             this.setState({router_run: item.pv})
@@ -181,7 +181,7 @@ class VPN extends Component {
     render () {
         const { mqtt } = this.props;
         const { is_running } = this.props.mqtt.vnet_channel;
-        const {start_loading, stop_loading} = this.state;
+        const {start_loading, stop_loading, model} = this.state;
         return (
             <div className="VPN">
                 <div className="vnetVserState">
@@ -197,14 +197,25 @@ class VPN extends Component {
                         />
                     </div>
                     <div className="VPNlist">
-                        <p>虚拟网卡IP：</p>
+                        <p>
+                            {
+                                model === 'bridge'
+                                ? '虚拟网卡IP:'
+                                : '目标主机网络'
+                            }
+                        </p>
                         <Input
+                            ref="tap_ip"
                             value={this.state.tap_ip}
                             disabled={is_running}
+                            className="shit1"
+                            onChange={(record)=>{
+                                this.setState({tap_ip: record.target.value})
+                            }}
                         />
                     </div>
                     <div className="VPNlist">
-                        <p>虚拟网卡netmask：</p>
+                        <p>子网掩码:</p>
                         <Select
                             defaultValue="255.255.255.0"
                             disabled={is_running}
@@ -252,7 +263,7 @@ class VPN extends Component {
                             type={this.state.model === 'bridge' ? 'primary' : ''}
                             // disabled={flag}
                             onClick={()=>{
-                                const Num = this.state.tap_ip.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10)
+                                const Num = this.state.tap_ip.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10);
                                 this.setState({model: 'bridge', port: '665', tap_ip: Num})
                             }}
                         >桥接模式</Button>
@@ -260,7 +271,8 @@ class VPN extends Component {
                             type={this.state.model === 'router' ? 'primary' : ''}
                             // disabled={flag}
                             onClick={()=>{
-                                this.setState({model: 'router', port: '666'})
+                                const Num = this.state.tap_ip.split('.', 3).join('.') + '.0';
+                                this.setState({model: 'router', port: '666', tap_ip: Num})
                             }}
                         >路由模式</Button>
                     </div>

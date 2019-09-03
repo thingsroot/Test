@@ -202,7 +202,7 @@ class GatewayMQTT {
     @observable gateway = '';
     @observable versionMsg = false;
     @observable newVersionMsg = {};
-    @observable new_version = 0;
+    @observable new_version = undefined;
     @observable auth_code = '';
     @observable comm_channel = newMessageChannel('/comm');
     @observable log_channel = newMessageChannel('/log');

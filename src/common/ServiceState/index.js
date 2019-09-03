@@ -11,7 +11,7 @@ class ServiceState extends Component {
     state = {
         message: {},
         proxy: '',
-        appVersion: '',
+        appVersion: undefined,
         apps: [],
         latestVersion: 0,
         instName: ''
@@ -138,7 +138,8 @@ class ServiceState extends Component {
                         />
                         <div className="versionMsg">
                                 {
-                                    mqtt.vserial_channel.Active && mqtt.versionMsg
+                                    mqtt.new_version
+                                    ? mqtt.vserial_channel.Active && mqtt.versionMsg
                                     ? '已是最新版本！'
                                     : <div>
                                         请升级到最新版本！&nbsp;&nbsp;&nbsp;&nbsp;
@@ -148,6 +149,7 @@ class ServiceState extends Component {
                                             onClick={this.upgradeRprogramming}
                                         >升级</Button>
                                     </div>
+                                    : ''
                                 }
                             </div>
                     </div>
@@ -171,15 +173,17 @@ class ServiceState extends Component {
                         />
                             <div className="versionMsg">
                                 {
-                                    appVersion >= latestVersion
-                                    ? '已是最新版本！'
-                                    : <div>
-                                        请升级到最新版本！&nbsp;&nbsp;&nbsp;&nbsp;
-                                        <Button
-                                            type="primary"
-                                            onClick={this.upgradeApp}
-                                        >升级</Button>
-                                      </div>
+                                    appVersion
+                                    ? appVersion <= latestVersion
+                                    ? <div>
+                                    请升级到最新版本！&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <Button
+                                        type="primary"
+                                        onClick={this.upgradeApp}
+                                    >升级</Button>
+                                  </div>
+                                    : '已是最新版本！'
+                                    : ''
                                 }
                             </div>
                     </div>

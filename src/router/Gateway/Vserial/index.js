@@ -192,6 +192,9 @@ class Vserial extends Component {
         this.sendAjax()
         mqtt.connect(this.state.gateway, this.state.mqtt_topic, true)
         const {addPortData} = mqtt.vserial_channel;
+        this.keep = setInterval(() => {
+            this.keepAlive()
+        }, 50000);
         this.t1 = setInterval(() => {
             mqtt && mqtt.client  && mqtt.client.connected && mqtt.client.publish('v1/vspax/api/list', JSON.stringify({id: 'api/list/' + new Date() * 1}))
             if (addPortData[0] && Object.keys(addPortData[0]).length > 0) {
@@ -213,6 +216,18 @@ class Vserial extends Component {
         mqtt.disconnect()
         clearInterval(this.t1)
         clearInterval(this.t2)
+        clearInterval(this.keep)
+    }
+    keepAlive = () =>{
+        let params = {
+            gateway: this.props.gateway,
+            name: this.props.gateway + '.freeioe_Vserial',
+            output: 'heartbeat_timeout',
+            value: 60,
+            prop: 'value',
+            id: 'send_output/' + this.props.gateway + '/ ' + this.props.gateway + '/ heartbeat_timeout/60/' + new Date() * 1
+            }
+        http.post('/api/gateways_dev_outputs', params)
     }
     sendAjax = ()=>{
         http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vserial').then(res=>{
@@ -309,38 +324,46 @@ class Vserial extends Component {
             let output_record = {};
             if (res.ok){
                 output_record.action_tm = formatTime(new Date(), 'hh:mm:ss S')
-                this.props.store.action.pushAction(res.data, '设备数据下置执行', '', params, 10000, (result, data)=>{
+                this.props.store.action.pushAction(res.data, '设备数据下置执行', '', params1, 10000, (result, data)=>{
                     if (result) {
+                        let output_record1 = {};
                         http.post('/api/gateways_dev_outputs', params).then(respones=>{
                             if (respones.ok){
-                                if (this.state.port > 0) {
-                                    const datas = {
-                                        id: 'add_local_com' + new Date() * 1,
-                                        by_name: 1,
-                                        name: SerialPort.toUpperCase(),
-                                        peer: {
-                                            type: 'tcp_client',
-                                            host: mqtt.vserial_channel.Proxy,
-                                            port: this.state.port,
-                                            info: {
-                                                sn: this.props.gateway,
-                                                com_cfg: {
-                                                    server_addr: mqtt.vserial_channel.Proxy,
-                                                    serial: SerialPort,
-                                                    baudrate: BaudRate,
-                                                    databit: DataBits,
-                                                    stopbit: StopBit,
-                                                    parity: Check
-                                                },
-                                                serial_driver: 'vspax'
-                                            }
-                                        }
-                                    }
-                                    mqtt.client.publish('v1/vspax/api/list', JSON.stringify({id: 'vspax/api/list' + new Date() * 1}))
-                                    mqtt.client.publish('v1/vspax/api/add', JSON.stringify(datas))
-                                } else {
-                                    this.loop()
-                                }
+                                output_record1.action_tm = formatTime(new Date(), 'hh:mm:ss S')
+                                this.props.store.action.pushAction(respones.data, '设备数据下置执行', '', params, 10000)
+                                this.loop()
+                                // if (this.state.port > 0) {
+                                //     const datas = {
+                                //         id: 'add_local_com' + new Date() * 1,
+                                //         by_name: 1,
+                                //         name: SerialPort.toUpperCase(),
+                                //         peer: {
+                                //             type: 'tcp_client',
+                                //             host: mqtt.vserial_channel.Proxy,
+                                //             port: this.state.port,
+                                //             info: {
+                                //                 sn: this.props.gateway,
+                                //                 com_cfg: {
+                                //                     server_addr: mqtt.vserial_channel.Proxy,
+                                //                     serial: SerialPort,
+                                //                     baudrate: BaudRate,
+                                //                     databit: DataBits,
+                                //                     stopbit: StopBit,
+                                //                     parity: Check
+                                //                 },
+                                //                 serial_driver: 'vspax'
+                                //             }
+                                //         }
+                                //     }
+                                //     mqtt.client.publish('v1/vspax/api/list', JSON.stringify({id: 'vspax/api/list' + new Date() * 1}))
+                                //     mqtt.client.publish('v1/vspax/api/add', JSON.stringify(datas))
+                                // } else {
+                                //     output_record1.result = data.message
+                                //     output_record1.result_tm = formatTime(new Date(data.timestamp * 1000), 'hh:mm:ss S')
+                                //     // this.loop()
+                                // }
+                            } else {
+                                this.setState({openLoading: false})
                             }
                         })
                     } else {
@@ -351,6 +374,7 @@ class Vserial extends Component {
                 })
             } else {
                 message.error(res.error)
+                this.setState({openLoading: false})
             }
         })
     }

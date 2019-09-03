@@ -5,7 +5,7 @@ import { Switch, withRouter} from 'react-router-dom';
 import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
 import { doUpdate } from '../../utils/Action';
-import { refreshToken, isDeveloper } from '../../utils/Session'
+import { isDeveloper } from '../../utils/Session'
 const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
 const Dashboard = LoadableComponent(()=>import('../../router/Dashboard'));
@@ -40,7 +40,7 @@ class ContentMain extends Component {
         this.startTimer()
 
         // Make sure we have the csrf_token
-        refreshToken()
+        // refreshToken()
 
         isDeveloper()
     }
