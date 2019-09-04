@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Select, Button, Table } from 'antd';
+import { Input, Select, Button, Table, message } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import http from '../../../utils/Server';
@@ -74,31 +74,50 @@ class VPN extends Component {
         clearInterval(this.timer1)
     }
     startVnet = () =>{
-        const {mqtt} = this.props;
-        const data = {
-            id: 'start_vnet/' + new Date() * 1,
-            vnet_cfg: {
-                net_mode: this.state.model,
-                net_protocol: this.state.agreement,
-                gate_sn: this.props.gateway,
-                tap_ip: this.state.tap_ip,
-                tap_netmask: this.state.netmask,
-                dest_ip: this.state.pingIp,
-                node: this.props.mqtt.vserial_channel.Proxy
-            },
-            frps_cfg: {
-                server_addr: this.props.mqtt.vserial_channel.Proxy
+        if (this.state.auth_code){
+            const {mqtt} = this.props;
+            const data = {
+                id: 'start_vnet/' + new Date() * 1,
+                vnet_cfg: {
+                    net_mode: this.state.model,
+                    net_protocol: this.state.agreement,
+                    gate_sn: this.props.gateway,
+                    tap_ip: this.state.tap_ip,
+                    tap_netmask: this.state.netmask,
+                    dest_ip: this.state.pingIp,
+                    node: this.props.mqtt.vserial_channel.Proxy
+                },
+                frps_cfg: {
+                    server_addr: this.props.mqtt.vserial_channel.Proxy
+                }
             }
+            const postData = {
+                id: 'post_gate/' + new Date() * 1,
+                auth_code: this.state.auth_code,
+                output: 'vnet_config'
+            }
+            mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/service_start', JSON.stringify(data))
+            setTimeout(() => {
+                mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
+            }, 3000);
+        } else {
+            message.warning('您的账户暂无AccessKey,将为您自动创建AccessKey。', 3)
+            http.post('/api/user_token_create').then(res=>{
+                if (res.ok){
+                    this.setState({
+                        auth_code: res.data
+                    }, ()=>{
+                        this.startVnet()
+                    })
+                } else {
+                    this.setState({
+                        start_loading: false,
+                        stop_loading: false
+                    })
+                    message.error('AccessKey创建失败，请重试！')
+                }
+            })
         }
-        const postData = {
-            id: 'post_gate/' + new Date() * 1,
-            auth_code: this.state.auth_code,
-            output: 'vnet_config'
-        }
-        mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/service_start', JSON.stringify(data))
-        setTimeout(() => {
-            mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
-        }, 3000);
     }
     sendKeepAlive = () =>{
         const { mqtt } = this.props;
@@ -176,7 +195,7 @@ class VPN extends Component {
         }
         const postData = {
             id: 'post_gate/' + new Date() * 1,
-            auth_code: mqtt.auth_code,
+            auth_code: this.state.auth_code,
             output: 'vnet_stop'
         }
         mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/service_stop', JSON.stringify(data))
