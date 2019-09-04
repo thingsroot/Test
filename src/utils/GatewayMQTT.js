@@ -600,10 +600,10 @@ class GatewayMQTT {
                     }
                 }
             }
-            // if (msg_topic.indexOf('v1/vspax/VSPAX_STATUS/') !== -1) {
-            //     const data = JSON.parse(msg.toString());
-            //     this.onReceiveaddPortMsg(data)
-            // }
+            if (msg_topic.indexOf('v1/vspax/VSPAX_STATUS/') !== -1) {
+                const data = JSON.parse(msg.toString());
+                this.onReceiveaddPortMsg(data)
+            }
             if (msg_topic === 'v1/vnet/VNET_STATUS/SERVICES'){
                 const data = JSON.parse(msg.toString());
                 this.onReceiverVnetServiceName(data)

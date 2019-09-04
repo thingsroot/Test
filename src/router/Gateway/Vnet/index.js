@@ -92,7 +92,7 @@ class VPN extends Component {
         }
         const postData = {
             id: 'post_gate/' + new Date() * 1,
-            auth_code: mqtt.auth_code,
+            auth_code: this.state.auth_code,
             output: 'vnet_config'
         }
         mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/service_start', JSON.stringify(data))
