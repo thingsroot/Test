@@ -372,15 +372,6 @@ class GatewayMQTT {
         this.vserial_channel.newVersionMsg = msg;
     }
     onReceiveaddPortMsg = (msg) => {
-        // console.log(this.vserial_channel.addPortData)
-        // if (msg && this.vserial_channel.addPortData && this.vserial_channel.addPortData.length === 0) {
-        //     this.vserial_channel.addPortData.push(msg)
-        // }
-        // if (msg && this.vserial_channel.addPortData.length === 1 && this.vserial_channel.addPortData[0].name === msg.name && this.vserial_channel.addPortData[0] !== msg){
-        // }
-        // if (msg && this.vserial_channel.addPortData.length === 2 && this.vserial_channel.addPortData[1].name === msg.name && this.vserial_channel.addPortData[1] !== msg){
-        //     this.vserial_channel.addPortData[1] = msg;
-        // }
         if (msg){
             this.vserial_channel.addPortData[0] = msg;
 
@@ -430,13 +421,6 @@ class GatewayMQTT {
                 this.log_channel.pushData(obj)
             }
         }
-        // const obj = {
-        //     time: getLocalTime(msg[1]),
-        //     level: msg[0].toUpperCase(),
-        //     id: msg[2].split(']:')[0] + ']',
-        //     content: msg[2].split(']:')[1]
-        // }
-        // this.log_channel.pushData(obj)
     }
     onReceiverVnetServiceName = (data) => {
         const arr = [];
@@ -616,10 +600,10 @@ class GatewayMQTT {
                     }
                 }
             }
-            if (msg_topic.indexOf('v1/vspax/VSPAX_STATUS/') !== -1) {
-                const data = JSON.parse(msg.toString());
-                this.onReceiveaddPortMsg(data)
-            }
+            // if (msg_topic.indexOf('v1/vspax/VSPAX_STATUS/') !== -1) {
+            //     const data = JSON.parse(msg.toString());
+            //     this.onReceiveaddPortMsg(data)
+            // }
             if (msg_topic === 'v1/vnet/VNET_STATUS/SERVICES'){
                 const data = JSON.parse(msg.toString());
                 this.onReceiverVnetServiceName(data)

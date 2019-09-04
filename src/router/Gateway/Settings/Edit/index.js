@@ -293,6 +293,21 @@ class GatewaySettingsEdit extends Component {
                 </div>
                 <div className="list">
                     <span>
+                        统计上传 [*开启后统计数据传到当前平台]
+                    </span>
+                    <EditSwitch
+                        checked={gatewayInfo.data && gatewayInfo.data.stat_upload}
+                        disabled={!gatewayInfo.actionEnable}
+                        gateway={gateway}
+                        onChange={(checked, onResult)=>{
+                            this.enableStatUpload(checked === true ? 1 : 0).then((result) => {
+                                onResult(result)
+                            })
+                        }}
+                    />
+                </div>
+                <div className="list">
+                    <span>
                         变化数据上送间隔（ms） [*程序会重启]
                     </span>
                     <div style={{position: 'relative'}}>
@@ -341,21 +356,6 @@ class GatewaySettingsEdit extends Component {
                             }}
                         />
                     </div>
-                </div>
-                <div className="list">
-                    <span>
-                        统计上传 [*开启后统计数据传到当前平台]
-                    </span>
-                    <EditSwitch
-                        checked={gatewayInfo.data && gatewayInfo.data.stat_upload}
-                        disabled={!gatewayInfo.actionEnable}
-                        gateway={gateway}
-                        onChange={(checked, onResult)=>{
-                            this.enableStatUpload(checked === true ? 1 : 0).then((result) => {
-                                onResult(result)
-                            })
-                        }}
-                    />
                 </div>
                 <div className="list">
                     <span>

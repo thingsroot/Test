@@ -47,7 +47,9 @@ class VPN extends Component {
         result: {},
         toggleFlag: true,
         gateStatus: '',
-        chouldstatus: {}
+        chouldstatus: {},
+        isShow: false,
+        pingIP: ''
     }
     componentDidMount (){
         http.get('/api/user_token_read').then(res=>{
@@ -81,7 +83,7 @@ class VPN extends Component {
                 gate_sn: this.props.gateway,
                 tap_ip: this.state.tap_ip,
                 tap_netmask: this.state.netmask,
-                dest_ip: this.state.lan_ip,
+                dest_ip: this.state.pingIp,
                 node: this.props.mqtt.vserial_channel.Proxy
             },
             frps_cfg: {
@@ -123,7 +125,9 @@ class VPN extends Component {
                 if (res.data && res.data.length > 0) {
                     res.data.map(item=>{
                         if (item.name === 'lan_ip') {
-                            this.setState({lan_ip: item.pv})
+                            this.setState({lan_ip: item.pv, pingIP: item.pv}, ()=>{
+                                console.log(this.state.pingIP, '-----', this.state.lan_ip)
+                            })
                                 if (!this.state.tap_ip){
                                     const tap_ip = item.pv.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10)
                                     this.setState({
@@ -181,7 +185,7 @@ class VPN extends Component {
     render () {
         const { mqtt } = this.props;
         const { is_running } = this.props.mqtt.vnet_channel;
-        const {start_loading, stop_loading, model} = this.state;
+        const {start_loading, stop_loading, model, isShow} = this.state;
         return (
             <div className="VPN">
                 <div className="vnetVserState">
@@ -241,17 +245,32 @@ class VPN extends Component {
                         />
                     </div>
                     <div className="VPNlist">
+                        <p>Ping目标IP：</p>
+                        <Input
+                            value={this.state.pingIP}
+                            style={{marginRight: 15}}
+                            disabled={is_running}
+                            onChange={(record)=>{
+                                this.setState({
+                                    pingIP: record.target.value
+                                })
+                            }}
+                        />
+                    </div>
+
+
+                    <div className="VPNlist">
                         <p>传输协议：</p>
                         <Button
                             type={this.state.agreement === 'tcp' ? 'primary' : ''}
-                            // disabled={flag}
+                            disabled={is_running}
                             onClick={()=>{
                                 this.setState({agreement: 'tcp'})
                             }}
                         >tcp</Button>
                         <Button
                             type={this.state.agreement === 'kcp' ? 'primary' : ''}
-                            // disabled={flag}
+                            disabled={is_running}
                             onClick={()=>{
                                 this.setState({agreement: 'kcp'})
                             }}
@@ -261,7 +280,7 @@ class VPN extends Component {
                         <p>网络模式：</p>
                         <Button
                             type={this.state.model === 'bridge' ? 'primary' : ''}
-                            // disabled={flag}
+                            disabled={is_running}
                             onClick={()=>{
                                 const Num = this.state.tap_ip.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10);
                                 this.setState({model: 'bridge', port: '665', tap_ip: Num})
@@ -269,7 +288,7 @@ class VPN extends Component {
                         >桥接模式</Button>
                         <Button
                             type={this.state.model === 'router' ? 'primary' : ''}
-                            // disabled={flag}
+                            disabled={is_running}
                             onClick={()=>{
                                 const Num = this.state.tap_ip.split('.', 3).join('.') + '.0';
                                 this.setState({model: 'router', port: '666', tap_ip: Num})
@@ -321,6 +340,30 @@ class VPN extends Component {
                             本地连接状态：
                         </p>
                         <span>{is_running ? 'running' : '------'}</span>
+                        <div
+                            className="statusDetail"
+                            style={{cursor: 'pointer', color: '#ccc'}}
+                            onMouseOver={()=>{
+                                this.setState({isShow: true})
+                            }}
+                            onMouseOut={()=>{
+                                this.setState({isShow: false})
+                            }}
+                        >详情</div>
+                        <div
+                            className="isShow"
+                        >
+                            {
+                                isShow
+                                ? <Table
+                                    columns={columns}
+                                    dataSource={this.props.mqtt.vnet_channel.Service}
+                                    rowKey="name"
+                                    pagination={false}
+                                  />
+                                : ''
+                            }
+                        </div>
                     </div>
                     <div className="VPNlist">
                         <p>
@@ -330,18 +373,21 @@ class VPN extends Component {
                             is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.cur_conns && parseInt(mqtt.vnet_channel.serviceState.cur_conns) > 0 ? 'connected' : 'disconnected' : '------'
                             }</span>
                     </div>
-                    <div className="VPNlist">
-                        <p>
-                            网关桥接隧道状态：
-                        </p>
-                        <span>{this.state.bridge_run}</span>
-                    </div>
-                    <div className="VPNlist">
-                        <p>
+                    {
+                        model === 'bridge'
+                        ? <div className="VPNlist">
+                            <p>
+                                网关桥接隧道状态：
+                            </p>
+                            <span>{this.state.bridge_run}</span>
+                        </div>
+                        : <div className="VPNlist">
+                            <p>
                             网关路由隧道状态：
                         </p>
                         <span>{this.state.router_run}</span>
-                    </div>
+                        </div>
+                    }
                     <div className="VPNlist">
                         <p>
                             本次启动时间：
@@ -360,21 +406,16 @@ class VPN extends Component {
                     </div>
                     <div className="VPNlist">
                         <p>
-                            Ping网关IP状态：
+                            Ping目标IP状态：
                         </p>
                         <span>{is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.message ? mqtt.vnet_channel.serviceState.message : '------' : '------'}</span>
                     </div>
                     <div className="VPNlist">
                         <p>
-                            Ping网关IP延迟：
+                            Ping目标IP延迟：
                         </p>
                         <span>{is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.delay ? mqtt.vnet_channel.serviceState.delay : '------' : '------'}</span>
                     </div>
-                    <Table
-                        columns={columns}
-                        dataSource={this.props.mqtt.vnet_channel.Service}
-                        rowKey="name"
-                    />
                 </div>
             </div>
         );

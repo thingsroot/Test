@@ -23,16 +23,14 @@ class Password extends PureComponent {
                     key: getParam('key')
                 }
                 http.post('/api/user_update_password', data).then(res=>{
-                    if (res.message) {
-                        if (res.home_page === '/desk' && res.message === '/desk') {
+                    if (res.ok) {
                             message.success(res.full_name + '重置密码成功' + '2秒后返回控制台', 2).then(()=>{
                                 this.props.history.push('/');
                             })
-                        } else {
-                            message.error(res.message + '5秒后返回登录页', 5).then(()=>{
-                                this.props.history.push('/login');
-                            })
-                        }
+                    } else {
+                        message.error('重置密码失败，错误信息：' + res.exception + '， 5秒后返回登录页', 5).then(()=>{
+                            this.props.history.push('/login');
+                        })
                     }
                 })
             }

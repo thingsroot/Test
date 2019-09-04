@@ -190,6 +190,8 @@ class Vserial extends Component {
         this.setState({ gateway: this.props.gateway })
         const { mqtt } = this.props;
         this.sendAjax()
+        this.keepAlive()
+        mqtt.vnet_channel.is_running = false;
         mqtt.connect(this.state.gateway, this.state.mqtt_topic, true)
         const {addPortData} = mqtt.vserial_channel;
         this.keep = setInterval(() => {
@@ -228,6 +230,13 @@ class Vserial extends Component {
             id: 'send_output/' + this.props.gateway + '/ ' + this.props.gateway + '/ heartbeat_timeout/60/' + new Date() * 1
             }
         http.post('/api/gateways_dev_outputs', params)
+        const id = 'keep_alive/' + Date.parse(new Date());
+        const message = {
+            id: id,
+            enable_heartbeat: true,
+            heartbeat_timeout: 60
+        };
+        this.props.mqtt.connected && this.props.mqtt.client.publish('v1/vspax/api/keep_alive', JSON.stringify(message))
     }
     sendAjax = ()=>{
         http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vserial').then(res=>{

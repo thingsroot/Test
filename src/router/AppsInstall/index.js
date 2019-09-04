@@ -244,7 +244,7 @@ class MyGatesAppsInstall extends Component {
 
     render () {
         const preview = true;
-        const { gateway_sn, app_show, install_step, app_inst, app_info, showLinkSelection } = this.state;
+        const { gateway_sn, app_show, install_step, app_inst, app_info, inst_editable, showLinkSelection } = this.state;
         return (<div>
             <GatewayStatus gateway={gateway_sn}/>
                 <div className="AppInstall">
@@ -380,6 +380,9 @@ class MyGatesAppsInstall extends Component {
                             </div>
                         </div>
                         <div className={install_step !== 'install' ? 'installapp hide' : 'installapp show'}>
+                            {
+                                console.log(inst_editable)
+                            }
                             <AppConfig
                                 gateway_sn={gateway_sn}
                                 configStore={this.state.configStore}

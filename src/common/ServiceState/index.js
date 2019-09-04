@@ -14,19 +14,33 @@ class ServiceState extends Component {
         appVersion: undefined,
         apps: [],
         latestVersion: 0,
-        instName: ''
+        instName: '',
+        settimer: false
     }
     componentDidMount (){
         const { mqtt } = this.props;
         this.t1 = setInterval(() => {
-            mqtt && mqtt.client  && mqtt.connected && mqtt.client.publish('v1/vspax/api/list', JSON.stringify({id: 'api/list/' + new Date() * 1}))
+            mqtt && mqtt.client && mqtt.connected && mqtt.client.publish('v1/update/api/version', JSON.stringify({'id': 'get_new_version/' + new Date() * 1}))
+            mqtt && mqtt.client && mqtt.connected && mqtt.client.publish('v1/vspax/api/list', JSON.stringify({id: 'api/list/' + new Date() * 1}))
             if (mqtt.vserial_channel.PortLength.length > 0) {
                 this.setState({flag: false, stopLoading: false})
             }
             if (mqtt.vserial_channel.PortLength.length === 0){
                 this.setState({flag: true, openLoading: false})
             }
-        }, 2000);
+        }, 5000);
+        this.alive = setInterval(() => {
+            if (mqtt.client && mqtt.client.connected && this.state.settimer) {
+                this.setState({
+                    settimer: false
+                })
+            }
+            if (mqtt.client && !mqtt.client.connected && !this.state.settimer) {
+                this.setState({
+                    settimer: true
+                })
+            }
+        }, 3000);
         this.getVersionLatest()
     }
     UNSAFE_componentWillReceiveProps (nextprops){
@@ -50,6 +64,7 @@ class ServiceState extends Component {
     }
     componentWillUnmount (){
         clearInterval(this.t1)
+        clearInterval(this.alive)
         this.props.mqtt.vserial_channel.setProxy(null)
         this.props.mqtt.disconnect()
     }
@@ -62,20 +77,25 @@ class ServiceState extends Component {
         if (pathname.indexOf('vnet') !== -1) {
             app = 'APP00000135'
         }
-        const data = {
-            app: app,
-            inst: this.state.instName,
-            gateway: this.props.gateway,
-            version: this.state.latestVersion,
-            id: `vserial/upgrade/${this.props.gateway}/${new Date() * 1}`
-        }
-        http.post('/api/gateways_applications_upgrade', data).then(res=>{
-            if (res.ok) {
-                this.props.store.action.pushAction(res.data, '应用升级', '', data, 10000)
-            } else {
-                message.error(res.error)
+        if (this.state.instName) {
+            const data = {
+                app: app,
+                inst: this.state.instName,
+                gateway: this.props.gateway,
+                version: this.state.latestVersion,
+                id: `vserial/upgrade/${this.props.gateway}/${new Date() * 1}`
             }
-        })
+            http.post('/api/gateways_applications_upgrade', data).then(res=>{
+                if (res.ok) {
+                    this.props.store.action.pushAction(res.data, '应用升级', '', data, 10000)
+                } else {
+                    message.error(res.error)
+                }
+            })
+            return false;
+        } else {
+                this.getVersionLatest()
+        }
     }
     getVersionLatest = () => {
         const pathname = this.props.location.pathname.toLowerCase();
@@ -93,17 +113,25 @@ class ServiceState extends Component {
                 })
             }
         })
-        http.get('/api/gateways_app_list?gateway=' + this.props.gateway).then(res=>{
-            if (res.ok){
-                if (res.data && res.data.length > 0){
-                    res.data.map((item)=>{
-                        if (item.name === 'APP00000130'){
-                            this.setState({instName: item.inst_name})
-                        }
-                    })
+        if (!this.state.instName) {
+            http.get('/api/gateways_app_list?gateway=' + this.props.gateway).then(res=>{
+                if (res.ok){
+                    if (res.data && res.data.length > 0){
+                        res.data.map((item)=>{
+                            if (item.name === 'APP00000130'){
+                                this.setState({instName: item.inst_name})
+                            }
+                        })
+                    }
                 }
-            }
-        })
+            })
+            return false;
+        } else {
+            setTimeout(() => {
+                console.log('1111111111')
+                this.getVersionLatest()
+            }, 2000);
+        }
     }
     upgradeRprogramming = () =>{
         const { mqtt } = this.props;
@@ -154,10 +182,10 @@ class ServiceState extends Component {
                             </div>
                     </div>
                     {
-                            !mqtt.vserial_channel.Active
+                            this.state.settimer
                             ? <div className="prompt">
-                                未能连接到远程编程服务，请确认freeioe_Rprogramming是否安装并运行。下载<a href="http://thingscloud.oss-cn-beijing.aliyuncs.com/freeioe_Rprogramming/freeioe_Rprogramming.zip">freeioe_Rprogramming</a>
-                              </div>
+                            未能连接到远程编程服务，请确认freeioe_Rprogramming是否安装并运行。下载<a href="http://thingscloud.oss-cn-beijing.aliyuncs.com/freeioe_Rprogramming/freeioe_Rprogramming.zip">freeioe_Rprogramming</a>
+                          </div>
                             :  ''
                         }
                     <div className="flex">
@@ -174,7 +202,7 @@ class ServiceState extends Component {
                             <div className="versionMsg">
                                 {
                                     appVersion
-                                    ? appVersion <= latestVersion
+                                    ? appVersion < latestVersion
                                     ? <div>
                                     请升级到最新版本！&nbsp;&nbsp;&nbsp;&nbsp;
                                     <Button
@@ -196,6 +224,7 @@ class ServiceState extends Component {
                                 defaultValue={serviceNode && serviceNode.length > 0 && serviceNode[0].host}
                                 style={{ width: 230 }}
                                 onChange={this.handleChange}
+                                disabled={this.props.mqtt.vnet_channel.is_running}
                             >
                                 {
                                     !mqtt.vserial_channel.Proxy && mqtt.vserial_channel.setProxy(serviceNode[0].host)

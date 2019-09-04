@@ -5,7 +5,7 @@ import { inject, observer } from 'mobx-react';
 import EditSwitch from '../../router/Gateway/Settings/Edit/switch';
 import http from '../../utils/Server';
 import './style.scss';
-import {IconIOT} from '../../utils/iconfont';
+// import {IconIOT} from '../../utils/iconfont';
 // const IconFont = Icon.createFromIconfontCN({
 //     scriptUrl: '//at.alicdn.com/t/font_1163855_v0zrjr2i1em.js'
 // })
@@ -306,7 +306,7 @@ class LeftNav extends Component {
                               >
                                 <li
                                     className={index === 3 ? 'active' : ''}
-                                ><IconIOT type="icon-sliders"/>&nbsp;&nbsp;远程编程-串口</li></Link>
+                                ><Icon type="control" />&nbsp;&nbsp;远程编程-串口</li></Link>
                         : ''
                         }
                         {
@@ -317,9 +317,20 @@ class LeftNav extends Component {
                                     this.setIndex(4)
                                 }}
                               >
-                              <li className={index === 4 ? 'active' : ''}><IconIOT type="icon-sliders-copy"/>&nbsp;&nbsp;远程编程-网络</li></Link>
+                              <li className={index === 4 ? 'active' : ''}><Icon type="compass" />&nbsp;&nbsp;远程编程-网络</li></Link>
                             : ''
                         }
+                        {/* {
+                            gatewayInfo.isNtworkConf
+                            ? <Link to={`${url}/vnet`}
+                                key="4"
+                                onClick={()=>{
+                                    this.setIndex(4)
+                                }}
+                              >
+                              <li className={index === 4 ? 'active' : ''}><Icon type="switcher" />&nbsp;&nbsp;远程编程-网络</li></Link>
+                            : ''
+                        } */}
                     </ul>
                 </div>
                 <Modal

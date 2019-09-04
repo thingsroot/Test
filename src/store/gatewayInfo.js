@@ -121,12 +121,13 @@ class GatewayInfo {
         this.apps_count = Object.keys(value).length;
         let vserial = false;
         let vnet = false;
+        console.log(value)
         value && value.length > 0 && value.map(item=>{
-            if (item.name === 'APP00000130') {
+            if (item.name === 'APP00000130' && item.status === 'running') {
                 this.isVserial = true;
                 vserial = true;
             }
-            if (item.name === 'APP00000135') {
+            if (item.name === 'APP00000135' && item.status === 'running') {
                 this.isVnet = true;
                 vnet = true;
             }

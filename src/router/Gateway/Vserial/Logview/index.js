@@ -96,7 +96,7 @@ class VserialLogView extends Component {
                                     <div>{mqtt.vserial_channel.LogView[key].arr}</div>
                                     <div>
                                         {
-                                            ToHexFlag
+                                            !ToHexFlag
                                                 ? mqtt.base64decode(mqtt.Uint8ArrayToString(mqtt.vserial_channel.LogView[key].content))
                                                 : mqtt.strToHexCharCode(mqtt.base64decode(mqtt.Uint8ArrayToString(mqtt.vserial_channel.LogView[key].content)))
                                         }
