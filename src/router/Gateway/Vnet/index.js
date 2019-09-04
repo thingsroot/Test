@@ -84,7 +84,7 @@ class VPN extends Component {
                     gate_sn: this.props.gateway,
                     tap_ip: this.state.tap_ip,
                     tap_netmask: this.state.netmask,
-                    dest_ip: this.state.pingIp,
+                    dest_ip: this.state.pingIP,
                     node: this.props.mqtt.vserial_channel.Proxy
                 },
                 frps_cfg: {
