@@ -155,9 +155,13 @@ class ServiceState extends Component {
         const { mqtt } = this.props;
         const { message, appVersion, latestVersion} = this.state;
         const { addPortData, serviceNode } = mqtt.vserial_channel;
+        const { pathname } = this.props.location;
+        const gateway = pathname.indexOf('vserial') !== -1
+        ? addPortData[0].info && addPortData[0].info.sn ? addPortData[0].info.sn : '------'
+        : mqtt.vnet_channel.vnet_config && mqtt.vnet_channel.is_running ? mqtt.vnet_channel.vnet_config.gate_sn : '------';
         return (
             <div className="VserviceStateWrapper">
-                <p>虚拟串口服务关联网关：<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
+                <p>远程编程服务关联网关：<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
                 <div>
                     <div className="flex">
                         <p>服务版本:</p>
@@ -191,7 +195,7 @@ class ServiceState extends Component {
                     <div className="flex">
                         <p>关联网关:</p>
                         <Input
-                            value={addPortData[0].info && addPortData[0].info.sn ? addPortData[0].info.sn : '-----'}
+                            value={gateway}
                         />
                     </div>
                     <div className="flex">

@@ -7,7 +7,7 @@ import GatewayRoute from '../../components/GatewayRoute';
 import './style.scss';
 import http from '../../utils/Server';
 import { inject, observer } from 'mobx-react';
-import { Button, Icon, message } from 'antd';
+import { Button, Icon, message, Modal } from 'antd';
 import GatewayMQTT from '../../utils/GatewayMQTT';
 
 const DeviceList = LoadableComponent(()=>import('./DeviceList'));
@@ -35,7 +35,8 @@ class MyGatesDevices extends Component {
             gateway: '',
             visible: false,
             url: window.location.pathname,
-            mqtt: new GatewayMQTT()
+            mqtt: new GatewayMQTT(),
+            warning: true
         }
     }
     componentDidMount (){
@@ -90,6 +91,19 @@ class MyGatesDevices extends Component {
     componentWillUnmount (){
         clearInterval(this.timer)
     }
+    warning = () => {
+        this.setState({
+            warning: false
+        })
+        const $this = this;
+            Modal.warning({
+                title: '应用不存在或未运行',
+                content: '该设备应用不存在或未运行，如未安装应用请安装应用，如已安装应用请检测应用是否启动...',
+                onOk (){
+                  $this.props.history.push('/gateway/' + $this.props.match.params.sn + '/apps')
+                }
+              })
+      }
     fetch = () => {
         //console.log(new Date())
         const {gateway} = this.state;
@@ -101,6 +115,21 @@ class MyGatesDevices extends Component {
             http.get('/api/gateways_app_list?gateway=' + gateway).then(res=>{
                 if (res.ok) {
                     gatewayInfo.setApps(res.data);
+                    const { pathname } = this.props.location;
+                    res.data && res.data.length > 0 && res.data.map(item=>{
+                        if (item.name === 'APP00000130' && item.status !== 'running' && pathname.indexOf('vserial') !== -1) {
+                            console.log('error')
+                            if (this.state.warning) {
+                                this.warning()
+                            }
+                        }
+                        if (item.name === 'APP00000135' && item.status !== 'running' && pathname.indexOf('vnet') !== -1) {
+                            console.log('error')
+                            if (this.state.warning) {
+                                this.warning()
+                            }
+                        }
+                    })
                 } else {
                     message.error(res.error)
                 }
