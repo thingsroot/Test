@@ -34,9 +34,10 @@ class AppEdit extends Component {
         pre_configuration: ''
     };
     componentDidMount (){
+        const app = this.props.match.params.name && this.props.match.params.name.indexOf('*') !== -1 ? this.props.match.params.name.replace(/\*/g, '/') : this.props.match.params.name
         this.setState({
             is_new: this.props.match.params.name !== undefined ? false : true,
-            app: this.props.match.params.name.replace(/\*/g, '/'),
+            app,
             imgSrc: '/assets/app_center/img/logo.png'
         }, () => {
             if (!this.state.is_new) {

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Input, Select, Button, Table, message } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
+import {_getCookie} from '../../../utils/Session';
 import http from '../../../utils/Server';
 import ServiceState from '../../../common/ServiceState';
 // import { apply_AccessKey } from '../../../utils/Session';
@@ -10,15 +11,20 @@ const Option = Select.Option;
 const columns = [{
     title: '服务名称',
     dataIndex: 'name',
-    key: 'name'
-  }, {
-    title: '描述',
-    dataIndex: 'desc',
-    key: 'desc'
-  }, {
+    key: 'name',
+    width: '150px'
+  },
+//   {
+//     title: '描述',
+//     dataIndex: 'desc',
+//     key: 'desc',
+//     width: '80px'
+//   },
+  {
     title: '状态',
     dataIndex: 'status',
-    key: 'status'
+    key: 'status',
+    width: '140px'
   }];
   @withRouter
   @inject('store')
@@ -83,8 +89,9 @@ class VPN extends Component {
                     net_protocol: this.state.agreement,
                     gate_sn: this.props.gateway,
                     tap_ip: this.state.tap_ip,
+                    user_id: _getCookie('user_id'),
                     tap_netmask: this.state.netmask,
-                    dest_ip: this.state.pingIp,
+                    dest_ip: this.state.pingIP,
                     node: this.props.mqtt.vserial_channel.Proxy
                 },
                 frps_cfg: {
@@ -144,9 +151,11 @@ class VPN extends Component {
                 if (res.data && res.data.length > 0) {
                     res.data.map(item=>{
                         if (item.name === 'lan_ip') {
-                            this.setState({lan_ip: item.pv, pingIP: item.pv}, ()=>{
-                                console.log(this.state.pingIP, '-----', this.state.lan_ip)
-                            })
+                            if (!this.state.pingIP) {
+                                this.setState({lan_ip: item.pv, pingIP: item.pv})
+                            } else {
+                                this.setState({lan_ip: item.pv})
+                            }
                                 if (!this.state.tap_ip){
                                     const tap_ip = item.pv.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10)
                                     this.setState({
@@ -375,6 +384,7 @@ class VPN extends Component {
                             {
                                 isShow
                                 ? <Table
+                                    size="small"
                                     columns={columns}
                                     dataSource={this.props.mqtt.vnet_channel.Service}
                                     rowKey="name"
