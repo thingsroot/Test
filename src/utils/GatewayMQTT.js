@@ -227,6 +227,14 @@ class GatewayMQTT {
         }
         return out.toUpperCase();
     }
+    strToASCIICharcode (str) {
+        const arr = [];
+        for (let i = 0; i < str.length; i++) {
+            const obj = str[i].charCodeAt();
+            arr.push(obj)
+        }
+        return arr.join(' ')
+    }
     strToHexCharCode (str) {
         　　if (str === ''){
                 return '';
@@ -234,7 +242,11 @@ class GatewayMQTT {
         　　var hexCharCode = [];
         // 　　hexCharCode.push('0x');
         　　for (var i = 0; i < str.length; i++) {
-        　　　　hexCharCode.push((str.charCodeAt(i)).toString(16) + ' ');
+                let obj = (str.charCodeAt(i)).toString(16) + ' ';
+                if (obj.length <= 2) {
+                    obj = '0' + obj;
+                }
+        　　　　hexCharCode.push(obj.toUpperCase());
         　　}
         　　return hexCharCode.join('');
         }

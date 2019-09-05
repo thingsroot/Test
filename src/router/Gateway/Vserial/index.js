@@ -1,4 +1,4 @@
-import { Button, Select, Table, message, Modal } from 'antd';
+import { Button, Select, Table, message, Modal, Tooltip } from 'antd';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
@@ -89,6 +89,7 @@ class Vserial extends Component {
                 title: '串口参数',
                 dataIndex: 'parame',
                 key: 'parame',
+                width: '100px',
                 render: (key, item)=>{
                     if (Object.keys(item).length > 0) {
                         return (
@@ -100,6 +101,7 @@ class Vserial extends Component {
                 title: '串口状态',
                 dataIndex: 'status',
                 key: 'status',
+                width: '100px',
                 render: (key, item)=>{
                     if (Object.keys(item).length > 0){
                         return (
@@ -111,10 +113,24 @@ class Vserial extends Component {
                 title: '打开程序',
                 dataIndex: 'app_path',
                 key: 'app_path',
+                onCell: () => {
+                    return {
+                      style: {
+                        maxWidth: 150,
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                        cursor: 'pointer'
+                      }
+                    }
+                  },
                 render: (key, item)=>{
                     if (item.app_path && item.app_path.indexOf('freeioe_Rprogramming') === -1){
                         return (
-                            <span>{item.app_path.split('\\')[item.app_path.split('\\').length - 1]}</span>
+                            <Tooltip
+                                placement="topLeft"
+                                title={item.app_path.split('\\')[item.app_path.split('\\').length - 1]}
+                            >{item.app_path.split('\\')[item.app_path.split('\\').length - 1]}</Tooltip>
                         )
                     }
                 }
@@ -122,10 +138,24 @@ class Vserial extends Component {
                 title: '连接地址',
                 dataIndex: 'host',
                 key: 'host',
+                onCell: () => {
+                    return {
+                      style: {
+                        maxWidth: 150,
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                        cursor: 'pointer'
+                      }
+                    }
+                  },
                 render: (key, item)=>{
                     if (item.host && item.port) {
                         return (
-                            <span>{item.host + ':' +  item.port}</span>
+                            <Tooltip
+                                placement="topLeft"
+                                title={item.host + ':' +  item.port}
+                            >{item.host + ':' +  item.port}</Tooltip>
                         )
                     }
                 }
@@ -137,6 +167,7 @@ class Vserial extends Component {
                 title: '串口(收/发)',
                 dataIndex: 'recv_count',
                 key: 'recv_count',
+                width: '150px',
                 render: (key, item)=>{
                     if (Object.keys(item).length > 0){
                         return (
@@ -148,6 +179,7 @@ class Vserial extends Component {
                 title: '网络(收/发)',
                 dataIndex: 'peer_recv_count',
                 key: 'peer_recv_count',
+                width: '150px',
                 render: (key, item)=>{
                     if (Object.keys(item).length > 0) {
                         return (
@@ -159,6 +191,7 @@ class Vserial extends Component {
                 title: '操作',
                 dataIndex: 'action',
                 key: 'action',
+                width: '100px',
                 render: (key, item)=>{
                     if (Object.keys(item).length > 0) {
                         return (
@@ -452,8 +485,10 @@ class Vserial extends Component {
                                             if (addPortData[0].app_path === '' || addPortData[0].app_path.indexOf('freeioe_Rprogramming') !== -1) {
                                                 this.setState({
                                                     stopLoading: true,
-                                                    openLoading: false
+                                                    openLoading: false,
+                                                    logFlag: false
                                                 }, ()=>{
+                                                    mqtt.vserial_channel.setLogView(null)
                                                     this.stopVserial()
                                                 })
                                             } else {
