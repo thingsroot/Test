@@ -83,7 +83,7 @@ class ServiceState extends Component {
                 inst: this.state.instName,
                 gateway: this.props.gateway,
                 version: this.state.latestVersion,
-                id: `vserial/upgrade/${this.props.gateway}/${new Date() * 1}`
+                id: `vserial/upgrade/${this.props.match.params.sn}/${new Date() * 1}`
             }
             http.post('/api/gateways_applications_upgrade', data).then(res=>{
                 if (res.ok) {
@@ -114,11 +114,14 @@ class ServiceState extends Component {
             }
         })
         if (!this.state.instName) {
-            http.get('/api/gateways_app_list?gateway=' + this.props.gateway).then(res=>{
+            http.get('/api/gateways_app_list?gateway=' + this.props.match.params.sn).then(res=>{
                 if (res.ok){
                     if (res.data && res.data.length > 0){
                         res.data.map((item)=>{
-                            if (item.name === 'APP00000130'){
+                            if (item.name === 'APP00000130' && this.props.location.pathname.indexOf('vserial') !== -1){
+                                this.setState({instName: item.inst_name})
+                            }
+                            if (item.name === 'APP00000135' && this.props.location.pathname.indexOf('vnet') !== -1){
                                 this.setState({instName: item.inst_name})
                             }
                         })

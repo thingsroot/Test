@@ -219,6 +219,7 @@ class VPN extends Component {
                 <div className="vnetVserState">
                     <ServiceState
                         mqtt={this.props.mqtt}
+                        gateway={this.props.match.params.sn}
                     />
                 </div>
                 <div className="VPNLeft">
