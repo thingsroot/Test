@@ -6,7 +6,7 @@ import ServiceState from '../../../common/ServiceState';
 import Logviewer from './Logview';
 import http from '../../../utils/Server';
 import './style.scss';
-import {_getCookie} from "../../../utils/Session";
+import {_getCookie} from '../../../utils/Session';
 const Option = Select.Option;
 const cloums = [
     {
