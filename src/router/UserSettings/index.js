@@ -94,7 +94,7 @@ class UserSettings extends PureComponent {
                 </div>
                 <div>
                     <p><span>|</span>联系信息</p>
-                    <p><span>手机号：</span><span>{info.phone}</span></p>
+                    <p><span>手机号：</span><span>{info.mobile_no}</span></p>
                     <p><span>邮箱：</span><span>{info.name}</span></p>
                 </div>
                 <div>
