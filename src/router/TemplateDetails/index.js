@@ -273,7 +273,7 @@ class MyTemplateDetails extends PureComponent {
                                                             key={key}
                                                             style={{width: '100px', padding: '10px', whiteSpace: 'nowrap'}}
                                                         >
-                                                        {w}
+                                                    {w}
                                                     </td>
                                                     )
                                                 })
@@ -371,6 +371,7 @@ class MyTemplateDetails extends PureComponent {
                     onSuccess={this.handleCloneSuccess}
                     app={this.state.app}
                     copyData={conf_info}
+                    csvData={csvData}
                 />
             </div>
         );

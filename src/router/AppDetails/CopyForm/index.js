@@ -32,7 +32,7 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                     return;
                 }
                 let params = {
-                    name: this.props.conf,
+                    name: this.props.conf ? this.props.conf : 'undefined',
                     app: this.props.app,
                     conf_name: values.conf_name,
                     description: values.description,
@@ -51,16 +51,18 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                 if (this.props.type === '复制') {
                     http.post('/api/configurations_create', params).then(res=>{
                         let conf_info = res.data;
-                        conf_name = res.data.name;
                         if (res.ok === false) {
                             message.error('复制模板信息失败！');
                         } else {
+                            conf_name = res.data.name;
                             if (this.props.copyData.version !== 0) {
+                                const data = this.props.csvData ? this.props.csvData.join('\n') : this.props.copyData
+
                                 let params = {
                                     conf: conf_name,
                                     version: 1,
                                     comment: 'V1',
-                                    data: this.props.copyData.data
+                                    data: data
                                 };
                                 http.post('/api/configurations_versions_create', params)
                                     .then(res=>{

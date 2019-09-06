@@ -119,7 +119,7 @@ class ContentMain extends Component {
                     title={'代码编辑'}
                 />
                 <PrivateRoute
-                    path="/template/:app/:name/:version?/:action?"
+                    path="/template/:app/:name?/:version?/:action?"
                     component={TemplateDetails}
                     title={'模板详情'}
                 />

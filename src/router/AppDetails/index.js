@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Icon, Tabs, message } from 'antd';
+import { Icon, Tabs, message, Button, Modal } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import VersionList from './VersionList';
@@ -31,7 +31,10 @@ class AppDetails extends Component {
         desc: '',
         groupName: '',
         newTemplateVisiable: false,
-        name: ''
+        name: '',
+        ModalText: '确认删除此应用？',
+        visible: false,
+        confirmLoading: false
     };
     UNSAFE_componentWillMount () {
             this.setState({
@@ -84,6 +87,40 @@ class AppDetails extends Component {
             sessionStorage.setItem('app_name', res.data.data.app_name);
         });
     };
+    showModal = () => {
+        this.setState({
+          visible: true
+        });
+      };
+      handleOk = () => {
+        this.setState({
+          ModalText: '删除应用中,请稍后...',
+          confirmLoading: true
+        });
+        if (this.props.match.params.name) {
+            const data = {
+                name: this.props.match.params.name
+            }
+            http.post('/api/my_applications_remove', data).then(res=>{
+                this.setState({
+                    confirmLoading: false,
+                    visible: false
+                }, ()=>{
+                    if (res.ok){
+                        message.success('删除应用成功！')
+                        this.props.history.go(-1)
+                    } else {
+                        message.error('删除应用失败，错误信息：' + res.error + ',请重试！')
+                    }
+                })
+            })
+        }
+      }
+      handleCancel = () => {
+        this.setState({
+          visible: false
+        });
+      };
     updateVersionList = ()=> {
         http.get('/api/versions_list?app=' + this.state.name).then(res=>{
             if (res.ok && res.data) {
@@ -97,7 +134,7 @@ class AppDetails extends Component {
         this.setState({activeKey: key})
     };
     render () {
-        let { app, app_info, time, user, desc } = this.state;
+        let { app, app_info, time, user, desc, visible, confirmLoading, ModalText } = this.state;
         return (
             <div className="myAppDetails">
                 <div className="header">
@@ -163,6 +200,26 @@ class AppDetails extends Component {
                             <Icon type="share-alt" />
                             分支
                         </Link>
+                        <Button
+                            type="danger"
+                            onClick={this.showModal}
+                            size="default"
+                            style={{height: 36, marginLeft: 15}}
+                        >
+                            <Icon type="info-circle" />
+                            <span>删除</span>
+                        </Button>
+                        <Modal
+                            title={<span><Icon type="info-circle" /> 提示信息</span>}
+                            visible={visible}
+                            onOk={this.handleOk}
+                            confirmLoading={confirmLoading}
+                            onCancel={this.handleCancel}
+                            cancelText="取消"
+                            okText="确定"
+                        >
+                            <p>{ModalText}</p>
+                        </Modal>
                     </div>
                 </div>
                 <Tabs

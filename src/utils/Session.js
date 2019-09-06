@@ -43,19 +43,19 @@ export function authenticateSuccess (data) {
     _setCookie('user_id', data.name)
 }
 
-// export function refreshToken () {
-//     if (!isAuthenticated()) {
-//         return
-//     }
-//     let csrf_token = _getCookie(LOGIN_COOKIE_NAME)
-//     if (csrf_token === undefined || csrf_token === '') {
-//         http.get('/api/user_csrf_token').then(res => {
-//             if (res.ok) {
-//                 authenticateSuccess(res.data)
-//             }
-//         })
-//     }
-// }
+export function refreshToken () {
+    if (!isAuthenticated()) {
+        return
+    }
+    let csrf_token = _getCookie(LOGIN_COOKIE_NAME)
+    if (csrf_token === undefined || csrf_token === '') {
+        http.get('/api/user_csrf_token').then(res => {
+            if (res.ok) {
+                authenticateSuccess(res.data)
+            }
+        })
+    }
+}
 
 export function getParam (name) {
     //构造一个含有目标参数的正则表达式对象

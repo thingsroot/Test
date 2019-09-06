@@ -102,7 +102,7 @@ class TemplateList extends Component {
                             <a
                                 style={{cursor: 'pointer'}}
                                 className="mybutton"
-                                onClick={(record)=>{
+                                onClick={()=>{
                                     this.deleteTemplate(record.name)
                                 }}
                             >删除</a>
@@ -251,7 +251,7 @@ class TemplateList extends Component {
                 if (res.ok === false) {
                     message.error('删除失败，请联系管理员！')
                 } else {
-                    message.error('删除成功！')
+                    message.success('删除成功！')
                 }
                 this.setState({
                     visible: false,
