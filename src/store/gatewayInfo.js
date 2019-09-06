@@ -121,7 +121,6 @@ class GatewayInfo {
         this.apps_count = Object.keys(value).length;
         let vserial = false;
         let vnet = false;
-        console.log(value)
         value && value.length > 0 && value.map(item=>{
             if (item.name === 'APP00000130' && item.status === 'running') {
                 this.isVserial = true;

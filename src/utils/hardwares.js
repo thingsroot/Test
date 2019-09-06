@@ -34,7 +34,7 @@ export function GetInfoBySN (sn) {
     } else if (/TRTX01.+/.test(sn)) {
         // TLink X1
         return {
-            model: 'X1',
+            model: 'T1-3000',
             cpu: 'Allwinner H3 (Quad-Core Arm® Cortex®-A7)',
             ram: '256M',
             rom: '4GB'

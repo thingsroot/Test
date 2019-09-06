@@ -272,7 +272,6 @@ class GatewaySettings extends Component {
         const { gatewayInfo } = this.props.store;
         const { upgrading, showUpgrade, showEdit, freeioe_version_list, skynet_version_list,
             loading, freeioe_latest_version, skynet_latest_version } = this.state;
-
         let version = gatewayInfo.data.version;
         let skynet_version = gatewayInfo.data.skynet_version;
         let freeioe_upgradable = version !== undefined && freeioe_latest_version !== undefined && version < freeioe_latest_version;

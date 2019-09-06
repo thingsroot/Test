@@ -164,7 +164,7 @@ class ServiceState extends Component {
         : mqtt.vnet_channel.vnet_config && mqtt.vnet_channel.is_running ? mqtt.vnet_channel.vnet_config.gate_sn : '------';
         return (
             <div className="VserviceStateWrapper">
-                <p>远程编程服务关联网关：<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
+                <p>远程编程服务状态：<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
                 <div>
                     <div className="flex">
                         <p>服务版本:</p>
