@@ -6,6 +6,7 @@ import ServiceState from '../../../common/ServiceState';
 import Logviewer from './Logview';
 import http from '../../../utils/Server';
 import './style.scss';
+import {_getCookie} from "../../../utils/Session";
 const Option = Select.Option;
 const cloums = [
     {
@@ -312,6 +313,7 @@ class Vserial extends Component {
                     info: {
                         sn: this.props.gateway,
                         com_cfg: {
+                            user_id: _getCookie('user_id'),
                             server_addr: mqtt.vserial_channel.Proxy,
                             serial: SerialPort,
                             baudrate: BaudRate,
@@ -358,6 +360,7 @@ class Vserial extends Component {
                 parity: Check,
                 serial: SerialPort,
                 server_addr: mqtt.vserial_channel.Proxy,
+                user_id: _getCookie('user_id'),
                 stopbit: StopBit
             },
             id: `send_output/${this.props.gateway}/ ${this.props.gateway}.freeioe_Vserial/ serial_config/${new Date() * 1}`
