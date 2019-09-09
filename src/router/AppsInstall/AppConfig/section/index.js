@@ -326,6 +326,7 @@ class AppConfigSection extends Component {
                         <Button
                             type="primary"
                             onClick={()=>{
+                                console.log(config)
                                 this.onAddTemplate(config, record.name, record.conf_name, record.description, record.latest_version)
                             }}
                         > 添加 </Button>

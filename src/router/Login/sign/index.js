@@ -24,11 +24,16 @@ class Sign extends PureComponent {
                             location.href = '/';
                         })
                     } else {
-                        message.info('账号密码错误，请重新输入')
+                        if (res.message === 'Incorrect password') {
+                            message.info('账号密码错误，请重新输入')
+                        }
+                        if (res.message === 'User disabled or missing') {
+                            message.info('用户未注册或已被禁用，请重新输入')
+                        }
                     }
                 }).catch(function (error){
                     if (error){
-                        message.info('账号密码错误，请重新输入')
+                        message.info('系统错误，请稍后重试')
                     }
                 })
             }
@@ -50,7 +55,7 @@ class Sign extends PureComponent {
                                 <Icon type="user"
                                     style={{ color: 'rgba(0,0,0,.25)' }}
                                 />}
-                                placeholder="Username"
+                                placeholder="邮件地址或用户名"
                             />
                         )}
                     </Form.Item>
@@ -63,7 +68,7 @@ class Sign extends PureComponent {
                                     style={{ color: 'rgba(0,0,0,.25)' }}
                                 />}
                                 type="password"
-                                placeholder="Password"
+                                placeholder="密码"
                             />
                         )}
                     </Form.Item>

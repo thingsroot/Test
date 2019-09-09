@@ -495,6 +495,7 @@ class AppConfig extends Component {
                         >
                         {
                             configStore.sections && configStore.sections.length > 0 && configStore.sections.map((v, key) => {
+                                console.log(v)
                                 return (
                                     <AppConfigSection
                                         key={key}
