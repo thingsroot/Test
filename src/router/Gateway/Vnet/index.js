@@ -106,7 +106,7 @@ class VPN extends Component {
             mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/service_start', JSON.stringify(data))
             setTimeout(() => {
                 mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
-            }, 3000);
+            }, 5000);
         } else {
             message.warning('您的账户暂无AccessKey,将为您自动创建AccessKey。', 3)
             http.post('/api/user_token_create').then(res=>{
