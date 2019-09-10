@@ -493,6 +493,9 @@ class AppConfig extends Component {
                             ref="content"
                             style={errorCode === false ? block : none}
                         >
+                            {
+                                console.log(configStore)
+                            }
                         {
                             configStore.sections && configStore.sections.length > 0 && configStore.sections.map((v, key) => {
                                 console.log(v)

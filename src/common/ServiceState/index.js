@@ -180,7 +180,7 @@ class ServiceState extends Component {
                                         请升级到最新版本！&nbsp;&nbsp;&nbsp;&nbsp;
                                         <Button
                                             type="primary"
-                                            loading={!mqtt.versionMsg}
+                                            loading={mqtt.versionMsg}
                                             onClick={this.upgradeRprogramming}
                                         >升级</Button>
                                     </div>
