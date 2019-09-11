@@ -529,7 +529,7 @@ class GatewayMQTT {
             }
             return
         }
-        const url = flag ? 'wss://127.0.0.1:7884/mqtt' : 'wss://cloud.thingsroot.com/ws';
+        const url = flag ? 'wss://127.0.0.1:6884/mqtt' : 'wss://cloud.thingsroot.com/ws';
         this.client = mqtt.connect(url, options)
         this.client.on('connect', ()=>{
             message.success('连接服务器成功')
