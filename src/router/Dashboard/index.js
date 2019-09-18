@@ -131,7 +131,7 @@ class Dashboard extends PureComponent {
                         name: '设备类型',
                         type: 'pie',
                         radius: '55%',
-                        color: ['#3CB2EF', '#50a3ba', '#FFD85C'],
+                        color: ['#3CB2EF', '#50A3BA', '#236192', '#FFD85C'],
                         data: [
                             {value: this.state.pieData['Q102'], name: 'Q102'},
                             {value: this.state.pieData['Q204'], name: 'Q204'},
