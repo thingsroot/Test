@@ -8,7 +8,7 @@ export function GetSerialListBySN (sn) {
         // Q204
         tty_list = ['/dev/ttymxc0', '/dev/ttymxc1', '/dev/ttymxc2', '/dev/ttymxc3']
     } else if (/TRTX01.+/.test(sn)) {
-        // TLink X1
+        // T1-3000
         tty_list = ['/dev/ttyS1', '/dev/ttyS2']
     }
     return tty_list
@@ -32,7 +32,7 @@ export function GetInfoBySN (sn) {
             rom: '4GB'
         }
     } else if (/TRTX01.+/.test(sn)) {
-        // TLink X1
+        // T1-3000
         return {
             model: 'T1-3000',
             cpu: 'Allwinner H3 (Quad-Core Arm® Cortex®-A7)',
