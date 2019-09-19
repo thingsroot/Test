@@ -225,7 +225,6 @@ class MyGates extends Component {
         })
     }
     confirm (record) {
-        if (record.device_status === 'ONLINE'){
             http.post('/api/gateways_remove', {
                 name: record.name
             }).then(res=>{
@@ -234,7 +233,6 @@ class MyGates extends Component {
                 }
                 this.refreshDevicesList()
             })
-        }
     }
 
     filterGatewayList = (data, filter_text) => {

@@ -64,11 +64,11 @@ class AppConfigSection extends Component {
     };
 
     onCreateNewTemplate = () => {
-        const w = window.open('about: blank');
+        const w = window.open('about:blank');
         w.location.href = '/appdetails/' + this.props.app_info.name + '/new_template'
     }
     onViewTemplate = (conf, version) => {
-        const w = window.open('about: blank');
+        const w = window.open('about:blank');
         if (version !== undefined && version !== 0) {
             w.location.href = '/template/' + this.props.app_info.name + '/' + conf + '/' + version
         } else {
@@ -76,7 +76,7 @@ class AppConfigSection extends Component {
         }
     }
     onCloneTemplate = (conf, version) => {
-        const w = window.open('about: blank');
+        const w = window.open('about:blank');
         w.location.href = '/template/' + this.props.app_info.name + '/' + conf + '/' + version + '/clone'
     }
 
