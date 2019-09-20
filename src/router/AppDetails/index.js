@@ -7,6 +7,7 @@ import VersionList from './VersionList';
 import TemplateList from './TemplateList';
 import AppDescription from './Description';
 import {inject, observer} from 'mobx-react';
+import { _getCookie } from '../../utils/Session';
 
 const TabPane = Tabs.TabPane;
 const block = {
@@ -200,15 +201,19 @@ class AppDetails extends Component {
                             <Icon type="share-alt" />
                             分支
                         </Link>
-                        <Button
-                            type="danger"
-                            onClick={this.showModal}
-                            size="default"
-                            style={{height: 36, marginLeft: 15}}
-                        >
-                            <Icon type="info-circle" />
-                            <span>删除</span>
-                        </Button>
+                        {
+                            app_info.owner === _getCookie('user_id')
+                            ? <Button
+                                type="danger"
+                                onClick={this.showModal}
+                                size="default"
+                                style={{height: 36, marginLeft: 15}}
+                              >
+                                <Icon type="info-circle" />
+                                <span>删除</span>
+                            </Button>
+                            : ''
+                        }
                         <Modal
                             title={<span><Icon type="info-circle" /> 提示信息</span>}
                             visible={visible}
