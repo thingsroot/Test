@@ -72,9 +72,6 @@ class MyGatesAppsInstall extends Component {
                 app_list: res.data,
                 app_show: res.data
             })
-            res.data.map(item=>{
-                console.log(item.name)
-            })
             if (this.state.app && this.state.install_step === 'view') {
                 let item = res.data.find(item => item.name === this.state.app)
                 if (item) {
@@ -244,7 +241,7 @@ class MyGatesAppsInstall extends Component {
 
     render () {
         const preview = true;
-        const { gateway_sn, app_show, install_step, app_inst, app_info, inst_editable, showLinkSelection } = this.state;
+        const { gateway_sn, app_show, install_step, app_inst, app_info, showLinkSelection } = this.state;
         return (<div>
             <GatewayStatus gateway={gateway_sn}/>
                 <div className="AppInstall">
@@ -381,18 +378,19 @@ class MyGatesAppsInstall extends Component {
                         </div>
                         <div className={install_step !== 'install' ? 'installapp hide' : 'installapp show'}>
                             {
-                                console.log(inst_editable)
+                                install_step === 'install'
+                                ? <AppConfig
+                                    gateway_sn={gateway_sn}
+                                    configStore={this.state.configStore}
+                                    app_inst={app_inst}
+                                    inst_editable
+                                    disabled={this.state.installing}
+                                    app_info={app_info}
+                                    onSubmit={this.onInstallSubmit}
+                                    onCancel={this.onInstallCancel}
+                                  />
+                                : ''
                             }
-                            <AppConfig
-                                gateway_sn={gateway_sn}
-                                configStore={this.state.configStore}
-                                app_inst={app_inst}
-                                inst_editable
-                                disabled={this.state.installing}
-                                app_info={app_info}
-                                onSubmit={this.onInstallSubmit}
-                                onCancel={this.onInstallCancel}
-                            />
                         </div>
                     </div>
                     <div className={install_step === '' ? 'show' : 'hide'}>
@@ -437,7 +435,7 @@ class MyGatesAppsInstall extends Component {
                                                         onClick={()=>{
                                                             this.setState({
                                                                 install_step: 'view',
-                                                                app_info: val
+                                                                app_info: {...val}
                                                             })
                                                         }}
                                                     />

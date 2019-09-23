@@ -219,7 +219,6 @@ class AppConfig extends Component {
             } else {
                 this.getNoAppConfig()
             }
-            console.log(this.state.pre_configuration)
         })
     }
 
@@ -395,7 +394,6 @@ class AppConfig extends Component {
                     cur_section.child.push(v);
                 }
             });
-            console.log(sections)
 
             this.setState({
                 errorCode: errorCode,
@@ -493,12 +491,8 @@ class AppConfig extends Component {
                             ref="content"
                             style={errorCode === false ? block : none}
                         >
-                            {
-                                console.log(configStore)
-                            }
                         {
                             configStore.sections && configStore.sections.length > 0 && configStore.sections.map((v, key) => {
-                                console.log(v)
                                 return (
                                     <AppConfigSection
                                         key={key}
