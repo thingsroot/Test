@@ -346,30 +346,44 @@ class AppConfig extends Component {
                 }
                 if (v.type === 'templates') {
                     v.child = [templates_childs]
-                    if (cur_section.type === 'section') {
-                        cur_section.child.push(v);
-                    } else {
-                        cur_section = {
-                            name: v.name + '__section',
-                            desc: v.desc,
-                            type: 'fake_section',
-                            child: [v]
-                        }
-                        sections.push(cur_section);
+                    // if (cur_section.type === 'section') {
+                    //     cur_section.child.push(v);
+                    // } else {
+                    //     cur_section = {
+                    //         name: v.name + '__section',
+                    //         desc: v.desc,
+                    //         type: 'fake_section',
+                    //         child: [v]
+                    //     }
+                    //     sections.push(cur_section);
+                    // }
+                    cur_section = {
+                        name: v.name + '__section',
+                        desc: v.desc,
+                        type: 'fake_section',
+                        child: [v]
                     }
+                    sections.push(cur_section);
                 } else if (v.type === 'table') {
                     v.cols = v.cols === undefined ? [] : v.cols
-                    if (cur_section.type === 'section') {
-                        cur_section.child.push(v);
-                    } else {
-                        cur_section = {
-                            name: v.name + '__section',
-                            desc: v.desc,
-                            type: 'fake_section',
-                            child: [v]
-                        }
-                        sections.push(cur_section);
+                    // if (cur_section.type === 'section') {
+                    //     cur_section.child.push(v);
+                    // } else {
+                    //     cur_section = {
+                    //         name: v.name + '__section',
+                    //         desc: v.desc,
+                    //         type: 'fake_section',
+                    //         child: [v]
+                    //     }
+                    //     sections.push(cur_section);
+                    // }
+                    cur_section = {
+                        name: v.name + '__section',
+                        desc: v.desc,
+                        type: 'fake_section',
+                        child: [v]
                     }
+                    sections.push(cur_section);
                 } else if (v.type === 'section' || v.type === 'fake_section') {
                     v.child = v.child === undefined ? [] : v.child
 
