@@ -39,7 +39,7 @@ const createDefaultValue = (type, default_value, values) => {
     }
 }
 
-const newConfigItem = (name, desc, type, default_value, depends, values, cols) => {
+const newConfigItem = (name, desc, type, default_value, depends, values, cols, limit) => {
     var item = observable({
         // observable 属性:
         name: name,
@@ -49,6 +49,7 @@ const newConfigItem = (name, desc, type, default_value, depends, values, cols) =
         depends: depends,
         values: values,
         cols: cols,
+        limit: limit,
         value: createDefaultValue(type, default_value, values),
         hide: false,
 
@@ -106,6 +107,10 @@ const newConfigItem = (name, desc, type, default_value, depends, values, cols) =
 
         get Value () {
             return this.value
+        },
+
+        get Limit () {
+            return this.limit instanceof Number ? this.limit : parseInt(this.limit !== undefined ? this.limit : 0)
         }
     }, {
         setName: action,
@@ -135,8 +140,8 @@ class ConfigSection {
     @action delChild (name) {
         this.child.slice(this.child.findIndex( item => item.name === name), 1)
     }
-    @action addChild (name, desc, type, default_value, depends, values, cols) {
-        let item = newConfigItem(name, desc, type, default_value, depends, values, cols)
+    @action addChild (name, desc, type, default_value, depends, values, cols, limit) {
+        let item = newConfigItem(name, desc, type, default_value, depends, values, cols, limit)
         this.child.push(item)
     }
 
@@ -146,7 +151,7 @@ class ConfigSection {
         this.type = obj.type
         obj.child && obj.child.length > 0 && obj.child.map( (v, key) => {
             key;
-            this.addChild(v.name, v.desc, v.type, v.default, v.depends, v.values, v.cols)
+            this.addChild(v.name, v.desc, v.type, v.default, v.depends, v.values, v.cols, v.limit)
         })
     }
 
