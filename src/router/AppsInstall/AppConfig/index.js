@@ -359,7 +359,7 @@ class AppConfig extends Component {
                     // }
                     cur_section = {
                         name: v.name + '__section',
-                        desc: v.desc,
+                        desc: v.desc !== undefined ? v.desc : '设备模板列表',
                         type: 'fake_section',
                         child: [v]
                     }
