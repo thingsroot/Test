@@ -1,6 +1,6 @@
 import React from 'react';
 import './style.scss';
-import { Table, Input, Select, Button, Form } from 'antd';
+import { Table, Input, Select, Button, Form, message } from 'antd';
 
 const EditableContext = React.createContext();
 
@@ -232,6 +232,11 @@ class EditableTable extends React.Component {
         const { count } = this.state;
         const { tableColumns, dataSource } = this.props;
 
+        if (this.props.config.Limit !== 0 && this.props.config.Limit <= this.props.config.Value.length) {
+            message.error('已达到可选模板的数量上限')
+            return
+        }
+
         const newData = {key: count};
         if (tableColumns !== undefined && tableColumns.length > 0) {
             tableColumns.map( (col, index) => {
@@ -302,7 +307,7 @@ class EditableTable extends React.Component {
                 type="primary"
                 style={{ marginBottom: 16 }}
             >
-                Add
+                添加
             </Button>
             <Table
                 rowKey="key"

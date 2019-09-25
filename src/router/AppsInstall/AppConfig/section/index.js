@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {inject, observer} from 'mobx-react';
 import {Link} from 'react-router-dom';
-import {Button, Checkbox, Input, Modal, Select, Table, Divider} from 'antd';
+import {Button, Checkbox, Input, Modal, Select, Table, Divider, message} from 'antd';
 import EditableTable from './table';
 import EditableTemplates from './templates';
 const Option = Select.Option;
@@ -27,8 +27,12 @@ class AppConfigSection extends Component {
 
     //添加模板
     onAddTemplate = (config, name, conf_name, desc, version)=>{
-        this.props.configStore.addTemplate(name, conf_name, desc, version)
         let val = config.Value
+        if (config.Limit !== 0 && config.Limit <= val.length) {
+            message.error('已达到可选模板的数量上限')
+            return
+        }
+        this.props.configStore.addTemplate(name, conf_name, desc, version)
         let max_key = 0
         val.map(item => max_key < item.key ? max_key = item.key : max_key)
         val.push({
@@ -272,6 +276,69 @@ class AppConfigSection extends Component {
             </div>
         )
     }
+    // render_template (key, config, templatesSource) {
+    //     return (
+    //         <div
+    //             id={config.name}
+    //             key={key}
+    //             style={config.hide === true ? none : block}
+    //         >
+    //            <div style={{lineHeight: '50px'}}>
+    //                 <span className="spanStyle">{config.desc}：</span>
+    //                 <Select
+    //                     showSearch
+    //                     value={config.value}
+    //                     style={{width: 300}}
+    //                     placeholder="选择模板"
+    //                     optionFilterProp="children"
+    //                     onChange={(value)=>{
+    //                         config.setValue(value)
+    //                         this.props.onChange()
+    //                     }}
+    //                     onFocus={()=>{}}
+    //                     onBlur={()=>{}}
+    //                     onSearch={()=>{}}
+    //                     // filterOption={(input, option) =>
+    //                     //   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    //                     // }
+    //                     dropdownRender={menu => (
+    //                         <div>
+    //                             {menu}
+    //                             <Divider style={{ margin: '4px 0' }} />
+    //                             <div style={{ padding: '8px', cursor: 'pointer' }}
+    //                                 onClick={()=>{
+    //                                     this.onCreateNewTemplate()
+    //                                 }}
+    //                             >
+    //                                 <Icon type="plus" /> 新建模板
+    //                             </div>
+    //                             <div style={{ padding: '8px', cursor: 'pointer' }}
+    //                                 onClick={()=>{
+    //                                     this.props.refreshTemplateList()
+    //                                 }}
+    //                             >
+    //                                 <Icon type="reload" /> 刷新模板列表
+    //                             </div>
+    //                         </div>
+    //                     )}
+    //                 >
+    //                     {templatesSource && templatesSource.length > 0 && templatesSource.map(w => {
+    //                         return (
+    //                         <Option key={w.name}
+    //                             title={w.name + ' : ' + w.latest_version}
+    //                         > {w.conf_name} - {w.last_version} - <i> {w.description} </i> </Option>
+    //                         )
+    //                     } )}
+    //                 </Select>
+    //                 <Input
+    //                     type="hidden"
+    //                     value={config.default ? config.value[0] : ''}
+    //                     ref={config.name}
+    //                 />
+    //             </div>
+    //         </div>
+    //     )
+    // }
     render_templates (key, config, templates, templateStore) {
         const addTempLists = [
             {
@@ -387,7 +454,7 @@ class AppConfigSection extends Component {
                         </Button>
                         <span style={{padding: '0 20px'}}> </span>
                         <Input.Search
-                            placeholder="网关名称、描述、序列号"
+                            placeholder="模板名称、描述"
                             onChange={this.search}
                             style={{ width: 200 }}
                         />
@@ -427,6 +494,9 @@ class AppConfigSection extends Component {
                         if (v.type === 'number') {
                             return this.render_nubmer(key, v)
                         }
+                        // if (v.type === 'template') {
+                        //     return this.render_template(key, v,  templatesSource)
+                        // }
                         if (v.type === 'string') {
                             return this.render_string(key, v)
                         }
