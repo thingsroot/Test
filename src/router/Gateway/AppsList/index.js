@@ -357,23 +357,27 @@ class AppsList extends Component {
                 >
                     X
                 </Button>
-                <AppConfig
-                    gateway_sn={gateway_sn}
-                    configStore={configStore}
-                    app_info={edit_app_info}
-                    app_inst={edit_app_inst}
-                    inst_editable={false}
-                    update_config
-                    pre_configuration={edit_app_conf}
-                    disabled={!this.props.store.gatewayInfo.actionEnable || this.state.apply_app_config}
-                    onSubmit={this.onSubmitAppConfig}
-                    onCancel={()=>{
-                        this.setState({close_after_submit: false, show_app_config: false})
-                    }}
-                    closeOnSubmit={()=>{
-                        this.setState({close_after_submit: true})
-                    }}
-                />
+                {
+                    show_app_config
+                    ? <AppConfig
+                        gateway_sn={gateway_sn}
+                        configStore={configStore}
+                        app_info={edit_app_info}
+                        app_inst={edit_app_inst}
+                        inst_editable={false}
+                        update_config
+                        pre_configuration={edit_app_conf}
+                        disabled={!this.props.store.gatewayInfo.actionEnable || this.state.apply_app_config}
+                        onSubmit={this.onSubmitAppConfig}
+                        onCancel={()=>{
+                            this.setState({close_after_submit: false, show_app_config: false})
+                        }}
+                        closeOnSubmit={()=>{
+                            this.setState({close_after_submit: true})
+                        }}
+                      />
+                    : ''
+                    }
                 </div>
             </div>
         );
