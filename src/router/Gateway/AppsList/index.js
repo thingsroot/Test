@@ -238,7 +238,7 @@ class AppsList extends Component {
             gateway: gateway_sn,
             inst: edit_app_inst,
             conf: configuration,
-            id: `/gateways/${gateway_sn}/config/${edit_app_inst}/${new Date() * 1}`
+            id: `/config/${gateway_sn}/${edit_app_inst}/${new Date() * 1}`
         };
         this.setState({apply_app_config: true})
         http.post('/api/gateways_applications_conf', data).then(res=>{

@@ -261,7 +261,7 @@ class Vserial extends Component {
             output: 'heartbeat_timeout',
             value: 60,
             prop: 'value',
-            id: 'send_output/' + this.props.gateway + '/ ' + this.props.gateway + '/ heartbeat_timeout/60/' + new Date() * 1
+            id: 'send_output/ ' + this.props.gateway + '/ heartbeat_timeout/60/' + new Date() * 1
             }
         http.post('/api/gateways_dev_outputs', params)
         const id = 'keep_alive/' + Date.parse(new Date());
@@ -347,7 +347,7 @@ class Vserial extends Component {
             output: 'heartbeat_timeout',
             value: 60,
             prop: 'value',
-            id: 'send_output/' + this.props.gateway + '/ ' + this.props.gateway + '/ heartbeat_timeout/60/' + new Date() * 1
+            id: 'send_output/' + this.props.gateway + '/ heartbeat_timeout/60/' + new Date() * 1
             }
         const params1 = {
             gateway: this.props.gateway,
@@ -363,7 +363,7 @@ class Vserial extends Component {
                 user_id: _getCookie('user_id'),
                 stopbit: StopBit
             },
-            id: `send_output/${this.props.gateway}/ ${this.props.gateway}.freeioe_Vserial/ serial_config/${new Date() * 1}`
+            id: `send_output/ ${this.props.gateway}.freeioe_Vserial/ serial_config/${new Date() * 1}`
         }
         http.post('/api/gateways_dev_outputs', params1).then(res=>{
             let output_record = {};
@@ -435,7 +435,7 @@ class Vserial extends Component {
             value: {
                 serial: SerialPort
             },
-            id: `send_output/${this.props.gateway}/ ${this.props.gateway}.freeioe_Vserial/ serial_stop/${new Date() * 1}`
+            id: `send_output/ ${this.props.gateway}.freeioe_Vserial/ serial_stop/${new Date() * 1}`
         }
         http.post('/api/gateways_dev_outputs', params)
         const data = {

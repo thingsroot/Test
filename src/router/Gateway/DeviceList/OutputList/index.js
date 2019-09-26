@@ -131,7 +131,7 @@ class OutputList extends Component {
     handleOk = () => {
         const { sn, vsn } = this.props;
         const { record, value } = this.state;
-        const id = `send_output/${sn}/${vsn}/${record.name}/${value}/${new Date() * 1}`
+        const id = `send_output/${vsn}/${record.name}/${new Date() * 1}`
         let params = {
             gateway: sn,
             name: vsn,

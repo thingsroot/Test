@@ -136,7 +136,7 @@ class CommandList extends Component {
     handleOk = () => {
         const { sn, vsn } = this.props;
         const { record, value } = this.state;
-        const id = `send_command/${sn}/${vsn}/${record.name}/${new Date() * 1}`
+        const id = `send_command/${vsn}/${record.name}/${new Date() * 1}`
         let param = undefined;
         try {
             param = JSON.parse(value);
