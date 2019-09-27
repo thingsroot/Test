@@ -124,7 +124,7 @@ class HeaderBar extends PureComponent {
                         className="ant-dropdown-link"
                         style={{padding: '10px', cursor: 'pointer'}}
                     >
-                        <Icon type="question-circle" />
+                        <Icon style={{padding: '0 4px', fontWeight: 800}} type="question-circle" />帮助
                     </span>
                 </Dropdown>
                 <span style={{padding: '0 5px'}}> </span>
@@ -140,6 +140,21 @@ class HeaderBar extends PureComponent {
                     讨论
                 </a>
                 <span style={{padding: '0 5px'}}> </span>
+
+                <span style={{padding: '0 5px'}}> </span>
+                <a onClick={()=>{
+                    window.open('https://wiki.freeioe.org/', '_blank')
+                }}
+                >
+                    <Icon
+                        style={{padding: '0 4px', fontWeight: 800}}
+                        type="message"
+                    />
+
+                    知识库
+                </a>
+                <span style={{padding: '0 5px'}}> </span>
+
                 <Dropdown
                     overlay={menu}
                     placement="bottomRight"
