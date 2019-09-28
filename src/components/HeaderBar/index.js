@@ -148,7 +148,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon
                         style={{padding: '0 4px', fontWeight: 800}}
-                        type="message"
+                        type="book"
                     />
 
                     知识库
