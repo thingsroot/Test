@@ -239,7 +239,7 @@ class MyGates extends Component {
         if (filter_text === undefined || filter_text === '' || data === undefined) {
             return data
         }
-        let text = filter_text.toLowerCase()
+        let text = filter_text.toLowerCase();
         let arr = [];
         data.map(item=>{
             if (item.dev_name.toLowerCase().indexOf(text) !== -1 ||

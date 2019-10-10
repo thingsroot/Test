@@ -1,0 +1,21 @@
+.share-group{
+  .add{
+    float: right;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .company{
+    font-weight: 600;
+  }
+  .group {
+    border: 1px solid #ccc;
+    width: 260px;
+    padding: 10px;
+  }
+  .ant-list-item-content-single {
+    width: 100%;
+  }
+}

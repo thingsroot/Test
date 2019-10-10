@@ -114,8 +114,51 @@ class HeaderBar extends PureComponent {
                 </Menu.Item>
             </Menu>
         );
+        const menu2 = (
+            <Menu style={{width: 160}}>
+                <Menu.Item
+                    key="17"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.location.href = '/sharegroup'
+                        }
+                    }
+                >
+                    <Icon type="share-alt"/>
+                    <span>
+                        共享组管理
+                    </span>
+                </Menu.Item>
+                <Menu.Item
+                    key="18"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.location.href = '/member'
+                        }
+                    }
+                >
+                    <Icon type="team" />
+                    <span>
+                        成员管理
+                    </span>
+                </Menu.Item>
+            </Menu>
+        )
         return (
             <div className="headerUser">
+                <Dropdown
+                    overlay={menu2}
+                    placement="bottomRight"
+                >
+                    <span
+                        className="ant-dropdown-link"
+                        style={{padding: '10px', cursor: 'pointer'}}
+                    >
+                        <Icon style={{padding: '0 4px', fontWeight: 800}}  type="global"/>企业 <Icon type="down" />
+                    </span>
+                </Dropdown>
                 <Dropdown
                     overlay={menu1}
                     placement="bottomRight"
