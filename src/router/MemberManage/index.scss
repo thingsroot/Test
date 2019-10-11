@@ -1,13 +1,13 @@
-.share-group{
+.share-device{
   .manage{
     color:#666;
     font-size: 20px;
     line-height: 50px;
     font-weight: 600;
   }
-  .add-user{
-    float: right;
-  }
+ .add-user{
+   float: right;
+ }
   .company-name{
     font-weight: 600;
   }
@@ -18,5 +18,10 @@
   }
   .ant-list-item-content-single {
     width: 100%;
+  }
+  .editable-row .ant-form-explain {
+    position: absolute;
+    font-size: 12px;
+    margin-top: -4px;
   }
 }
