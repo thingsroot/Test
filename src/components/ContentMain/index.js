@@ -144,7 +144,8 @@ class ContentMain extends Component {
                     path="/sharegroup"
                     component={ShareGroup}
                     title={'共享组管理'}
-                /><PrivateRoute
+                />
+                <PrivateRoute
                     path="/member"
                     component={MemberManage}
                     title={'成员管理'}

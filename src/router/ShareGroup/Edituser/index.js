@@ -84,17 +84,36 @@ class Edituser extends React.Component {
                     </a>
                 )}
               </EditableContext.Consumer>
-              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}>
-                <a>取消</a>
-              </Popconfirm>
+                <Popconfirm
+                    title="Sure to cancel?"
+                    onConfirm={() => {
+                        this.cancel(record.key)
+                    }}
+                >
+                    <a>取消</a>
+                </Popconfirm>
             </span>
                     ) : (
                         <Fragment>
-                            <a disabled={editingKey !== ''} onClick={() => this.edit(record.key)} style={{marginRight: '20px'}}>
+                            <a
+                                disabled={editingKey !== ''}
+                                onClick={() => {
+                                    this.edit(record.key)
+                                }}
+                                style={{marginRight: '20px'}}
+                            >
                                 编辑
                             </a>
-                            <Popconfirm title="Sure to delete?" onConfirm={() => this.delete(record.key)}>
-                                <a type="danger" disabled={editingKey !== ''} >删除</a>
+                            <Popconfirm
+                                title="Sure to delete?"
+                                onConfirm={() => {
+                                    this.delete(record.key)
+                                }}
+                            >
+                                <a
+                                    type="danger"
+                                    disabled={editingKey !== ''}
+                                >删除</a>
                             </Popconfirm>
                         </Fragment>
                     );
@@ -177,7 +196,10 @@ class Edituser extends React.Component {
         return (
             <div className="company-name">
                 <span>xxx公司</span>
-                <span className="add-user" onClick={this.addGroup}>
+                <span
+                    className="add-user"
+                    onClick={this.addGroup}
+                >
                     <Icon type="usergroup-add" />
                 </span>
             </div>
@@ -231,7 +253,8 @@ class Edituser extends React.Component {
                         <Input
                             style={{'width': '80%'}}
                             value={this.state.groupValue}
-                            onChange={e=>this.setState({groupValue: e.target.value})}/>
+                            onChange={e=>this.setState({groupValue: e.target.value})}
+                        />
                     </div>
                 </Modal>
             </div>

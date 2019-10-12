@@ -25,7 +25,12 @@ class Editable extends Component {
                     dataIndex: 'operation',
                     render: (text, record, index) =>
                         this.state.dataSourceUser.length >= 1 ? (
-                            <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDeleteUser(record.key, index)}>
+                            <Popconfirm
+                                title="Sure to delete?"
+                                onConfirm={() => {
+                                    this.handleDeleteUser(record.key, index)
+                                }}
+                            >
                                 <Button type="danger" >删除</Button>
                             </Popconfirm>
                         ) : null
@@ -60,7 +65,12 @@ class Editable extends Component {
                     dataIndex: 'operation',
                     render: (text, record) =>
                         this.state.dataSourceDevice.length >= 1 ? (
-                            <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDeleteDevice(record.key)}>
+                            <Popconfirm
+                                title="Sure to delete?"
+                                onConfirm={() => {
+                                    this.handleDeleteDevice(record.key)
+                                }}
+                            >
                                 <Button type="danger" >删除</Button>
                             </Popconfirm>
                         ) : null
