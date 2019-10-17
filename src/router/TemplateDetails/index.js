@@ -327,20 +327,22 @@ class MyTemplateDetails extends PureComponent {
                             {
                                 previewCsvData && previewCsvData.length > 0 && previewCsvData.map((v, key)=>{
                                     if (v.length > 1) {
-                                        return <tr key={key}>
-                                            {
-                                                v && v.length > 0 && v.map((w, key)=>{
-                                                    return (
-                                                        <td
-                                                            key={key}
-                                                            style={{width: '100px', padding: '10px', whiteSpace: 'nowrap'}}
-                                                        >
-                                                            {w}
-                                                        </td>
-                                                    )
-                                                })
-                                            }
-                                        </tr>
+                                        return (
+                                            <tr key={key}>
+                                                {
+                                                    v && v.length > 0 && v.map((w, key)=>{
+                                                        return (
+                                                            <td
+                                                                key={key}
+                                                                style={{width: '100px', padding: '10px', whiteSpace: 'nowrap'}}
+                                                            >
+                                                                {w}
+                                                            </td>
+                                                        )
+                                                    })
+                                                }
+                                            </tr>
+                                        )
                                     }
                                 })
                             }
