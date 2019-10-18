@@ -6,7 +6,7 @@ import {Table, Button, Modal, Input, message, notification, Tooltip} from 'antd'
 import './style.scss';
 
 function formatTime (date, fmt) {
-    var o = {
+    const o = {
         'M+': date.getMonth() + 1,     //月份
         'd+': date.getDate(),     //日
         'h+': date.getHours(),     //小时

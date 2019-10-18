@@ -8,7 +8,7 @@ import Register from './register'
 import Retrieve from './retrieve'
 import Password from './password'
 
-var sectionStyle = {
+const sectionStyle = {
     posation: 'absolute',
     top: 0,
     right: 0,

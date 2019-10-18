@@ -14,15 +14,15 @@ const convertUTCTimeToLocalTime = function (UTCDateString) {
   function formatFunc (str) {
     return str > 9 ? str : '0' + str
   }
-  var date2 = new Date(UTCDateString);
-  var year = date2.getFullYear();
-  var mon = formatFunc(date2.getMonth() + 1);
-  var day = formatFunc(date2.getDate());
-  var hour = date2.getHours();
-  var minute  = date2.getSeconds() < 10 ? '0' + date2.getSeconds() : date2.getSeconds();
+  const date2 = new Date(UTCDateString);
+  const year = date2.getFullYear();
+  const mon = formatFunc(date2.getMonth() + 1);
+  const day = formatFunc(date2.getDate());
+  let hour = date2.getHours();
+  const minute  = date2.getSeconds() < 10 ? '0' + date2.getSeconds() : date2.getSeconds();
   hour = formatFunc(hour);
-  var min = formatFunc(date2.getMinutes());
-  var dateStr = year + '-' + mon + '-' + day + ' ' + hour + ':' + min + ':' + minute;
+  const min = formatFunc(date2.getMinutes());
+  const dateStr = year + '-' + mon + '-' + day + ' ' + hour + ':' + min + ':' + minute;
   return dateStr;
 }
 const columns = [{
@@ -97,7 +97,6 @@ class BrowsingHistory extends Component {
           this.fetch();
         })
         this.props.store.timer.setGateStatusLast(0)
-        console.log(this)
       }
       UNSAFE_componentWillReceiveProps (nextProps){
         if (this.props.match.params.sn !== nextProps.match.params.sn){
