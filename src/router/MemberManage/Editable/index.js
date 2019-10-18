@@ -100,17 +100,31 @@ class EditableTable extends React.Component {
                     </Button>
                 )}
               </EditableContext.Consumer>
-              <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}>
+              <Popconfirm
+                  title="Sure to cancel?"
+                  onConfirm={() => this.cancel(record.key)}
+              >
                 <Button>取消</Button>
               </Popconfirm>
             </span>
                     ) : (
                         <Fragment>
-                            <Button type="primary" disabled={editingKey !== ''} onClick={() => this.edit(record.key)} style={{marginRight: '20px'}}>
+                            <Button
+                                type="primary"
+                                disabled={editingKey !== ''}
+                                onClick={() => this.edit(record.key)}
+                                style={{marginRight: '20px'}}
+                            >
                                 编辑
                             </Button>
-                            <Popconfirm title="Sure to delete?" onConfirm={() => this.delete(record.key, index)}>
-                                <Button type="danger" disabled={editingKey !== ''} >删除</Button>
+                            <Popconfirm
+                                title="Sure to delete?"
+                                onConfirm={() => this.delete(record.key, index)}
+                            >
+                                <Button
+                                    type="danger"
+                                    disabled={editingKey !== ''}
+                                >删除</Button>
                             </Popconfirm>
                         </Fragment>
                     );
@@ -253,12 +267,14 @@ class EditableTable extends React.Component {
                     float: 'right',
                     position: 'absolute',
                     right: 0,
-                    top: '-40px'}}>
+                    top: '-40px'}}
+                >
                     <Icon
                         type="user-add"
                         style={{fontSize: '30px'}}
                         onClick={this.addMember}
-                    /></p>
+                    />
+                </p>
                 <EditableContext.Provider value={this.props.form}>
                     <Table
                         components={components}
@@ -320,7 +336,10 @@ class EditableTable extends React.Component {
                                 ]
                             })(<Input type="number"/>)}
                         </Form.Item>
-                        <Form.Item label="新密码" hasFeedback>
+                        <Form.Item
+                            label="新密码"
+                            hasFeedback
+                        >
                             {getFieldDecorator('password', {
                                 rules: [
                                     {
@@ -333,7 +352,10 @@ class EditableTable extends React.Component {
                                 ]
                             })(<Input.Password />)}
                         </Form.Item>
-                        <Form.Item label="确认新密码" hasFeedback>
+                        <Form.Item
+                            label="确认新密码"
+                            hasFeedback
+                        >
                             {getFieldDecorator('confirm', {
                                 rules: [
                                     {
@@ -347,7 +369,11 @@ class EditableTable extends React.Component {
                             })(<Input.Password onBlur={this.handleConfirmBlur} />)}
                         </Form.Item>
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" style={{marginRight: '20px'}}>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                style={{marginRight: '20px'}}
+                            >
                                 确认
                             </Button>
                             <Button onClick={this.handleCancelMember}>取消</Button>

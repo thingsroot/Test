@@ -156,7 +156,12 @@ class HeaderBar extends PureComponent {
                         className="ant-dropdown-link"
                         style={{padding: '10px', cursor: 'pointer'}}
                     >
-                        <Icon style={{padding: '0 4px', fontWeight: 800}}  type="global"/>企业 <Icon type="down" />
+                        <Icon
+                            style={{padding: '0 4px', fontWeight: 800}}
+                            type="global"
+                        />
+                        企业
+                        <Icon type="down" />
                     </span>
                 </Dropdown>
                 <Dropdown
@@ -167,7 +172,10 @@ class HeaderBar extends PureComponent {
                         className="ant-dropdown-link"
                         style={{padding: '10px', cursor: 'pointer'}}
                     >
-                        <Icon style={{padding: '0 4px', fontWeight: 800}} type="question-circle" />帮助
+                        <Icon
+                            style={{padding: '0 4px', fontWeight: 800}}
+                            type="question-circle"
+                        />帮助
                     </span>
                 </Dropdown>
                 <span style={{padding: '0 5px'}}> </span>
