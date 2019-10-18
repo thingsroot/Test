@@ -52,7 +52,7 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                     http.post('/api/configurations_create', params).then(res=>{
                         let conf_info = res.data;
                         if (res.ok === false) {
-                            message.error('复制模板信息失败！');
+                            message.error('复制模板信息失败！请更改名称后重试！');
                         } else {
                             conf_name = res.data.name;
                             if (this.props.copyData.version !== 0) {
