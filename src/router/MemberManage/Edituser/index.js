@@ -15,6 +15,7 @@ class EditableCell extends React.Component {
         return <Input />;
     };
 
+
     renderCell = ({ getFieldDecorator }) => {
         const {
             editing,
@@ -77,43 +78,37 @@ class Edituser extends React.Component {
                     const editable = this.isEditing(record);
                     return editable
                         ? (
-                <span>
-                <EditableContext.Consumer>
-                    {form => (
-                        <a
-                            type="primary"
-                            onClick={() => this.save(form, record.key)}
-                            style={{ marginRight: 8 }}
-                        >
-                            保存
-                        </a>
-                    )}
-                </EditableContext.Consumer>
-                <Popconfirm
-                    title="Sure to cancel?"
-                    onConfirm={() => {
-                        this.cancel(record.key)
-                    }}
-                >
-                    <a>取消</a>
-                </Popconfirm>
+              <span>
+              <EditableContext.Consumer>
+                {form => (
+                    <a
+                        type="primary"
+                        onClick={() => this.save(form, record.key)}
+                        style={{ marginRight: 8 }}
+                    >
+                        保存
+                    </a>
+                )}
+              </EditableContext.Consumer>
+              <Popconfirm
+                  title="Sure to cancel?"
+                  onConfirm={() => this.cancel(record.key)}
+              >
+                <a>取消</a>
+              </Popconfirm>
             </span>
                     ) : (
                         <Fragment>
                             <a
                                 disabled={editingKey !== ''}
-                                onClick={() => {
-                                    this.edit(record.key)
-                                }}
+                                onClick={() => this.edit(record.key)}
                                 style={{marginRight: '20px'}}
                             >
                                 编辑
                             </a>
                             <Popconfirm
                                 title="Sure to delete?"
-                                onConfirm={() => {
-                                    this.delete(record.key)
-                                }}
+                                onConfirm={() => this.delete(record.key)}
                             >
                                 <a
                                     type="danger"

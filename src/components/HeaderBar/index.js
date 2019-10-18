@@ -121,7 +121,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            this.props.history.push('/sharegroup')
+                            window.location.href = '/sharegroup'
                         }
                     }
                 >
@@ -135,7 +135,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            this.props.history.push('/member')
+                            window.location.href = '/member'
                         }
                     }
                 >
@@ -159,7 +159,9 @@ class HeaderBar extends PureComponent {
                         <Icon
                             style={{padding: '0 4px', fontWeight: 800}}
                             type="global"
-                        />企业 <Icon type="down" />
+                        />
+                        企业
+                        <Icon type="down" />
                     </span>
                 </Dropdown>
                 <Dropdown

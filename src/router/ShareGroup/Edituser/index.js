@@ -84,31 +84,25 @@ class Edituser extends React.Component {
                     </a>
                 )}
               </EditableContext.Consumer>
-                <Popconfirm
-                    title="Sure to cancel?"
-                    onConfirm={() => {
-                        this.cancel(record.key)
-                    }}
-                >
-                    <a>取消</a>
-                </Popconfirm>
+              <Popconfirm
+                  title="Sure to cancel?"
+                  onConfirm={() => this.cancel(record.key)}
+              >
+                <a>取消</a>
+              </Popconfirm>
             </span>
                     ) : (
                         <Fragment>
                             <a
                                 disabled={editingKey !== ''}
-                                onClick={() => {
-                                    this.edit(record.key)
-                                }}
+                                onClick={() => this.edit(record.key)}
                                 style={{marginRight: '20px'}}
                             >
                                 编辑
                             </a>
                             <Popconfirm
                                 title="Sure to delete?"
-                                onConfirm={() => {
-                                    this.delete(record.key)
-                                }}
+                                onConfirm={() => this.delete(record.key)}
                             >
                                 <a
                                     type="danger"
@@ -159,7 +153,6 @@ class Edituser extends React.Component {
         this.setState({ editingKey: key });
     }
     addGroup=()=> {
-        console.log(1)
         this.showModal()
     };
     showModal = () => {

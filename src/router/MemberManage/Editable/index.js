@@ -100,31 +100,26 @@ class EditableTable extends React.Component {
                     </Button>
                 )}
               </EditableContext.Consumer>
-            <Popconfirm
-                title="Sure to cancel?"
-                onConfirm={() => this.cancel(record.key)}
-            >
-            <Button>取消</Button>
-            </Popconfirm>
+              <Popconfirm
+                  title="Sure to cancel?"
+                  onConfirm={() => this.cancel(record.key)}
+              >
+                <Button>取消</Button>
+              </Popconfirm>
             </span>
                     ) : (
                         <Fragment>
                             <Button
                                 type="primary"
                                 disabled={editingKey !== ''}
-                                onClick={() => {
-                                        this.edit(record.key)
-                                    }
-                                }
+                                onClick={() => this.edit(record.key)}
                                 style={{marginRight: '20px'}}
                             >
                                 编辑
                             </Button>
                             <Popconfirm
                                 title="Sure to delete?"
-                                onConfirm={() => {
-                                    this.delete(record.key, index)
-                                }}
+                                onConfirm={() => this.delete(record.key, index)}
                             >
                                 <Button
                                     type="danger"
@@ -278,7 +273,8 @@ class EditableTable extends React.Component {
                         type="user-add"
                         style={{fontSize: '30px'}}
                         onClick={this.addMember}
-                    /></p>
+                    />
+                </p>
                 <EditableContext.Provider value={this.props.form}>
                     <Table
                         components={components}

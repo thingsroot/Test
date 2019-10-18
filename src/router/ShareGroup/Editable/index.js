@@ -27,9 +27,7 @@ class Editable extends Component {
                         this.state.dataSourceUser.length >= 1 ? (
                             <Popconfirm
                                 title="Sure to delete?"
-                                onConfirm={() => {
-                                    this.handleDeleteUser(record.key, index)
-                                }}
+                                onConfirm={() => this.handleDeleteUser(record.key, index)}
                             >
                                 <Button type="danger" >删除</Button>
                             </Popconfirm>
@@ -67,9 +65,7 @@ class Editable extends Component {
                         this.state.dataSourceDevice.length >= 1 ? (
                             <Popconfirm
                                 title="Sure to delete?"
-                                onConfirm={() => {
-                                    this.handleDeleteDevice(record.key)
-                                }}
+                                onConfirm={() => this.handleDeleteDevice(record.key)}
                             >
                                 <Button type="danger" >删除</Button>
                             </Popconfirm>
