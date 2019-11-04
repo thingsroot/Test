@@ -1,14 +1,8 @@
 import React, {Fragment} from 'react';
-import {Table, Input, Popconfirm, Form, Button, Icon, Modal} from 'antd';
-
-const data = [];
-for (let i = 0; i < 2; i++) {
-    data.push({
-        key: i.toString(),
-        name: `Edrward ${i}`,
-        phone: '13213212312'
-    });
-}
+import {Table, Input, Popconfirm, Form, Button, Modal, message} from 'antd';
+import {inject, observer} from 'mobx-react';
+import { withRouter } from 'react-router-dom';
+import http from '../../../utils/Server';
 const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
@@ -58,12 +52,17 @@ class EditableCell extends React.Component {
         return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
     }
 }
-
+@withRouter
+@inject('store')
+@observer
 class EditableTable extends React.Component {
     constructor (props) {
         super(props);
         this.state = {
-            data,
+            data: [],
+            user_list: [],
+            record: {},
+            loading: true,
             editingKey: '',
             visibleMember: false,
             confirmDirty: false
@@ -71,20 +70,20 @@ class EditableTable extends React.Component {
         this.columns = [
             {
                 title: '姓名',
-                dataIndex: 'name',
+                dataIndex: 'username',
                 width: '25%',
                 editable: true
             },
             {
                 title: '手机号',
-                dataIndex: 'phone',
+                dataIndex: 'mobile_no',
                 width: '40%',
                 editable: true
             },
             {
                 title: '操作',
                 dataIndex: 'operation',
-                render: (text, record, index) => {
+                render: (text, record) => {
                     const { editingKey } = this.state;
                     const editable = this.isEditing(record);
                     return editable ? (
@@ -93,7 +92,7 @@ class EditableTable extends React.Component {
                 {form => (
                     <Button
                         type="primary"
-                        onClick={() => this.save(form, record.key)}
+                        onClick={() => this.save(form, record.idx, record)}
                         style={{ marginRight: 8 }}
                     >
                         保存
@@ -102,7 +101,7 @@ class EditableTable extends React.Component {
               </EditableContext.Consumer>
               <Popconfirm
                   title="Sure to cancel?"
-                  onConfirm={() => this.cancel(record.key)}
+                  onClick={() => this.cancel(record.key)}
               >
                 <Button>取消</Button>
               </Popconfirm>
@@ -112,14 +111,18 @@ class EditableTable extends React.Component {
                             <Button
                                 type="primary"
                                 disabled={editingKey !== ''}
-                                onClick={() => this.edit(record.key)}
+                                onClick={() => {
+                                    this.EditUser(record)
+                                }}
                                 style={{marginRight: '20px'}}
                             >
                                 编辑
                             </Button>
                             <Popconfirm
-                                title="Sure to delete?"
-                                onConfirm={() => this.delete(record.key, index)}
+                                title="确定要删除此成员吗?"
+                                onConfirm={() => this.delete(record)}
+                                okText="确定"
+                                cancelText="取消"
                             >
                                 <Button
                                     type="danger"
@@ -132,46 +135,94 @@ class EditableTable extends React.Component {
             }
         ];
     }
-
-    isEditing = record => record.key === this.state.editingKey;
+    UNSAFE_componentWillReceiveProps (nextProps) {
+        if (nextProps.user_list !== this.props.user_list) {
+            this.setState({
+                loading: true
+            })
+            if (nextProps.user_list.length > 0) {
+                this.mapGetUserinfo(nextProps.user_list, 0)
+            } else {
+                this.mapGetUserinfo([])
+            }
+        }
+    }
+    EditUser = (record) =>{
+        this.setState({
+            visibleMember: true,
+            status: 'updateUser',
+            record: record
+        })
+    }
+    mapGetUserinfo = (arr, index) => {
+        let list = []
+        if (index !== 0) {
+            list = this.state.user_list
+        }
+        if (arr.length > 0) {
+            if (index !== undefined && index < arr.length) {
+                http.get('/api/companies_users_read?name=' + arr[index].user).then(res=>{
+                    if (res.ok) {
+                        list.push(res.data)
+                        this.setState({
+                            user_list: list
+                        }, ()=>{
+                            this.mapGetUserinfo(arr, index + 1)
+                        })
+                    }
+                })
+            } else {
+                this.setState({
+                    data: this.state.user_list,
+                    loading: false
+                })
+            }
+        } else {
+            this.setState({
+                data: [],
+                loading: false
+            })
+        }
+    }
+    isEditing = record => record.name === this.state.editingKey;
 
     cancel = () => {
         this.setState({ editingKey: '' });
     };
-    delete= (key, index) => {
-        key;
-        let list = [...this.state.data]
-        list.splice(index, 1)
-        this.setState({
-            data: list
+    delete = (record) => {
+        http.post('/api/companies_groups_remove_user', {
+            name: this.props.activeKey,
+            user: record.name
+        }).then(res=>{
+            if (res.ok) {
+                this.props.getdata()
+                message.success('删除用户成功！')
+            }
         })
     };
 
-    save (form, key) {
+    save (form, key, record) {
         form.validateFields((error, row) => {
-            if (error) {
-                return;
+            // if (error) {
+            //     return;
+            // }
+            const data = {
+                name: record.name,
+                company: record.company,
+                group_name: row.group_name,
+                role: 'Admin',
+                description: ''
             }
-            const newData = [...this.state.data];
-            const index = newData.findIndex(item => key === item.key);
-            if (index > -1) {
-                const item = newData[index];
-                newData.splice(index, 1, {
-                    ...item,
-                    ...row
-                });
-                this.setState({ data: newData, editingKey: '' });
-            } else {
-                newData.push(row);
-                this.setState({ data: newData, editingKey: '' });
-            }
+            console.log(data, record)
         });
     }
 
     edit (key) {
         this.setState({ editingKey: key });
+        console.log(this.state.record)
     }
     handleOkMember = e => {
+        console.log(this.state)
         e;
         this.setState({
             visibleMember: true
@@ -180,7 +231,8 @@ class EditableTable extends React.Component {
     handleCancelMember = e => {
         e;
         this.setState({
-            visibleMember: false
+            visibleMember: false,
+            status: ''
         });
     };
     addMember=()=> {
@@ -213,26 +265,63 @@ class EditableTable extends React.Component {
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
-            console.log(values)
-            console.log(values.name, values.password)
             if (!err) {
                 console.log('Received values of form: ', values);
             }
-            if (values.name !== undefined &&
-                values.phone !== undefined &&
-                values.user !==  undefined &&
-                values.password !== undefined &&
-                values.confirm !== undefined &&
-                this.errPassword ) {
-                let arr = {
-                    name: values.name,
-                    phone: values.phone,
-                    key: this.state.data.length + 1
-                };
-                this.setState({
-                    visibleMember: false,
-                    data: [...this.state.data, arr]})
+            if (this.state.status === 'updateUser') {
+                const datas = {
+                    name: values.user,
+                    first_name: values.name,
+                    last_name: '',
+                    mobile_no: values.phone,
+                    new_password: values.password
+                }
+                http.post('/api/companies_users_update', datas).then(res=>{
+                    this.setState({
+                        visibleMember: false,
+                        status: ''
+                    })
+                    if (res.ok) {
+                        message.success('修改用户信息成功！')
+                        this.props.getdata()
+                    }
+                })
+            } else {
+                if (values.name !== undefined &&
+                    values.phone !== undefined &&
+                    values.user !==  undefined &&
+                    values.password !== undefined &&
+                    values.confirm !== undefined &&
+                    this.errPassword ) {
+                    if (!this.props.activeKey) {
+                        return false;
+                    }
+                    const data = {
+                        user: values.user,
+                        email: values.user,
+                        mobile_no: values.phone,
+                        first_name: values.name,
+                        last_name: '',
+                        new_password: values.password,
+                        company: this.props.company
+                    }
+                    http.post('/api/companies_users_create', data).then(res=>{
+                        if (res.ok) {
+                            http.post('/api/companies_groups_add_user', {name: this.props.activeKey, user: res.data}).then(result=>{
+                                if (result.ok) {
+                                    message.success('创建用户成功！')
+                                    this.props.getdata()
+                                }
+                            })
+                        }
+                    })
+                    this.setState({
+                        visibleMember: false,
+                        status: ''
+                    })
+                }
             }
+
         });
     };
 
@@ -263,58 +352,50 @@ class EditableTable extends React.Component {
 
         return (
             <div>
-                <p style={{
-                    float: 'right',
-                    position: 'absolute',
-                    right: 0,
-                    top: '-40px'}}
-                >
-                    <Icon
-                        type="user-add"
-                        style={{fontSize: '30px'}}
-                        onClick={this.addMember}
-                    />
-                </p>
                 <EditableContext.Provider value={this.props.form}>
                     <Table
                         components={components}
                         bordered
+                        loading={this.state.loading}
                         dataSource={this.state.data}
                         columns={columns}
                         rowClassName="editable-row"
+                        rowKey="email"
                         pagination={false}
                         size="small"
                     />
+                    <Button
+                        onClick={()=>{
+                            this.setState({visibleMember: true})
+                        }}
+                        disabled={this.props.activeKey === ''}
+                    >
+                        添加企业成员
+                    </Button>
                 </EditableContext.Provider>
                 <Modal
-                    title="添加企业成员"
+                    title={this.state.status === 'updateUser' ? '修改企业成员' : '添加企业成员'}
                     visible={this.state.visibleMember}
                     onOk={this.handleOkMember}
                     onCancel={this.handleCancelMember}
                     footer={null}
+                    maskClosable={false}
                 >
-                    <Form onSubmit={this.handleSubmit}>
+                    <Form onSubmit={this.handleSubmit} >
                         <Form.Item label="用户">
                             {getFieldDecorator('user', {
+                                initialValue: this.state.record.name,
                                 rules: [
-                                    // {
-                                    //     type: 'user',
-                                    //     message: 'The input is not valid E-mail!'
-                                    // },
                                     {
-                                        required: true,
+                                        required: this.state.status === 'updateUser' ? false : true,
                                         message: '请输入用户'
                                     }
                                 ]
-                            })(<Input />)}
+                            })(<Input disabled={this.state.status === 'updateUser'} />)}
                         </Form.Item>
                         <Form.Item label="姓名">
                             {getFieldDecorator('name', {
                                 rules: [
-                                    // {
-                                    //     type: 'name',
-                                    //     message: 'The input is not valid E-mail!'
-                                    // },
                                     {
                                         required: true,
                                         message: '请输入姓名'
@@ -325,10 +406,6 @@ class EditableTable extends React.Component {
                         <Form.Item label="手机号码">
                             {getFieldDecorator('phone', {
                                 rules: [
-                                    // {
-                                    //     type: 'name',
-                                    //     message: 'The input is not valid E-mail!'
-                                    // },
                                     {
                                         required: true,
                                         message: '请输入手机号码'
@@ -343,7 +420,7 @@ class EditableTable extends React.Component {
                             {getFieldDecorator('password', {
                                 rules: [
                                     {
-                                        required: true,
+                                        required: this.state.status === 'updateUser' ? false : true,
                                         message: '请输入密码!'
                                     },
                                     {
@@ -359,7 +436,7 @@ class EditableTable extends React.Component {
                             {getFieldDecorator('confirm', {
                                 rules: [
                                     {
-                                        required: true,
+                                        required: this.state.status === 'updateUser' ? false : true,
                                         message: '请确认输入的密码'
                                     },
                                     {

@@ -342,29 +342,33 @@ class GatewaySettings extends Component {
                             <p><b>操作系统:</b>{gatewayInfo.data.platform}</p>
                             <p><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}
                             {
-                                freeioe_upgradable
-                                ? <Tag color="red"
-                                    style={{marginLeft: 15}}
-                                    onClick={()=>{
-                                        this.setState({showUpgrade: true})
-                                    }}
-                                  >发现新版本</Tag>
-                                : <Tag color="cyan"
-                                    style={{marginLeft: 15}}
-                                  >已是最新版</Tag>
+                                Number(gatewayInfo.data.version) !== 0
+                                ? freeioe_upgradable
+                                    ? <Tag color="red"
+                                        style={{marginLeft: 15}}
+                                        onClick={()=>{
+                                            this.setState({showUpgrade: true})
+                                        }}
+                                      >发现新版本</Tag>
+                                    : <Tag color="cyan"
+                                        style={{marginLeft: 15}}
+                                      >已是最新版</Tag>
+                                : ''
                             }</p>
                             <p><b>核心软件:</b>{gatewayInfo.data && gatewayInfo.data.skynet_version}
                             {
-                                skynet_upgradable
-                                ? <Tag color="red"
-                                    style={{marginLeft: 15}}
-                                    onClick={()=>{
-                                        this.setState({showUpgrade: true})
-                                    }}
-                                  >发现新版本</Tag>
-                                : <Tag color="cyan"
-                                    style={{marginLeft: 15}}
-                                  >已是最新版</Tag>
+                                Number(gatewayInfo.data.skynet_version) !== 0
+                                ? skynet_upgradable
+                                    ? <Tag color="red"
+                                        style={{marginLeft: 15}}
+                                        onClick={()=>{
+                                            this.setState({showUpgrade: true})
+                                        }}
+                                      >发现新版本</Tag>
+                                    : <Tag color="cyan"
+                                        style={{marginLeft: 15}}
+                                      >已是最新版</Tag>
+                                : ''
                             }</p>
                             <p><b>调试模式:</b>{gatewayInfo.data && gatewayInfo.data.enable_beta === 1 ? '开启' : '关闭'}</p>
                             <p><b>数据上传:</b>{gatewayInfo.data && gatewayInfo.data.data_upload ? '开启' : '关闭'}</p>

@@ -65,6 +65,9 @@ class Login extends PureComponent {
                         </Switch>
                     </div>
                 </div>
+                <div className="footer">
+                    冬笋科技 版权所有 2018 京ICP备18043454号
+                </div>
             </div>
         );
     }

@@ -2,3 +2,10 @@
   .custom-class .ant-table-thead {
     display: none !important;
   }
+  .clickRowStyl{
+    background-color: #B0BED9;
+}
+.ant-table-tbody>.clickRowStyl:hover>td{
+    background-color: #B0BED9;
+}
+

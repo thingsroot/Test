@@ -121,7 +121,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.location.href = '/sharegroup'
+                            this.props.history.push('/sharegroup')
                         }
                     }
                 >
@@ -135,7 +135,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.location.href = '/member'
+                            this.props.history.push('/member')
                         }
                     }
                 >

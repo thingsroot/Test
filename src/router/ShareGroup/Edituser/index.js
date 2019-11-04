@@ -1,5 +1,8 @@
 import React, {Fragment} from 'react';
-import {Table, Input, Popconfirm, Form, Icon, Modal, message} from 'antd';
+import {Table, Input, Popconfirm, Form, Icon, Modal, message, Empty} from 'antd';
+import { withRouter } from 'react-router-dom';
+import http from '../../../utils/Server';
+import {inject, observer} from 'mobx-react';
 import './index.scss'
 const data = [];
 const EditableContext = React.createContext();
@@ -47,7 +50,9 @@ class EditableCell extends React.Component {
         return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
     }
 }
-
+@withRouter
+@inject('store')
+@observer
 class Edituser extends React.Component {
     constructor (props) {
         super(props);
@@ -55,12 +60,13 @@ class Edituser extends React.Component {
             data,
             editingKey: '',
             visible: false,
-            groupValue: ''
+            groupValue: '',
+            companies_list: []
         };
         this.columns = [
             {
                 title: '',
-                dataIndex: 'name',
+                dataIndex: 'group_name',
                 editable: true,
                 width: '65%'
             },
@@ -77,7 +83,7 @@ class Edituser extends React.Component {
                 {form => (
                     <a
                         type="primary"
-                        onClick={() => this.save(form, record.key)}
+                        onClick={() => this.save(form, record)}
                         style={{ marginRight: 8 }}
                     >
                         保存
@@ -85,8 +91,7 @@ class Edituser extends React.Component {
                 )}
               </EditableContext.Consumer>
               <Popconfirm
-                  title="Sure to cancel?"
-                  onConfirm={() => this.cancel(record.key)}
+                  onClick={() => this.cancel(record.key)}
               >
                 <a>取消</a>
               </Popconfirm>
@@ -95,14 +100,18 @@ class Edituser extends React.Component {
                         <Fragment>
                             <a
                                 disabled={editingKey !== ''}
-                                onClick={() => this.edit(record.key)}
+                                onClick={() => {
+                                    this.edit(record)
+                                }}
                                 style={{marginRight: '20px'}}
                             >
                                 编辑
                             </a>
                             <Popconfirm
-                                title="Sure to delete?"
-                                onConfirm={() => this.delete(record.key)}
+                                title="确定要删除此共享组吗?"
+                                onConfirm={() => this.delete(record)}
+                                okText="确定"
+                                cancelText="取消"
                             >
                                 <a
                                     type="danger"
@@ -115,42 +124,46 @@ class Edituser extends React.Component {
             }
         ];
     }
-
-    isEditing = record => record.key === this.state.editingKey;
+    isEditing = record => {
+        return record.name === this.state.editingKey
+    };
 
     cancel = () => {
         this.setState({ editingKey: '' });
     };
     delete= (record) => {
-        console.log(record)
-        let list = [...this.state.data]
-        list.splice(record - 1, 1)
-        this.setState({data: list})
+        http.post('/api/companies_sharedgroups_remove', {name: record.name}).then(res=>{
+            console.log(res)
+            if (res.ok) {
+                this.props.getdata()
+                message.success('删除共享组成功！')
+            }
+        })
     };
 
-    save (form, key) {
+    save (form, record) {
         form.validateFields((error, row) => {
             if (error) {
                 return;
             }
-            const newData = [...this.state.data];
-            const index = newData.findIndex(item => key === item.key);
-            if (index > -1) {
-                const item = newData[index];
-                newData.splice(index, 1, {
-                    ...item,
-                    ...row
-                });
-                this.setState({ data: newData, editingKey: '' });
-            } else {
-                newData.push(row);
-                this.setState({ data: newData, editingKey: '' });
+            const data = {
+                name: record.name,
+                company: record.company,
+                group_name: row.group_name,
+                role: 'Admin',
+                description: ''
             }
+            http.post('/api/companies_sharedgroups_update', data).then(res=>{
+                if (res.ok) {
+                    this.props.getdata()
+                    message.success('更新共享组信息成功！')
+                }
+            })
+                this.setState({ editingKey: '' });
         });
     }
-
-    edit (key) {
-        this.setState({ editingKey: key });
+    edit (record) {
+        this.setState({ editingKey: record.name });
     }
     addGroup=()=> {
         this.showModal()
@@ -169,14 +182,26 @@ class Edituser extends React.Component {
                 name: this.state.groupValue,
                 key: this.state.data.length + 1
             }
-            this.setState({
-                data: [...this.state.data, list],
-                visible: false,
-                groupValue: ''
-            });
-            console.log(this.state.data)
+            const  data = {
+                company: '测试',
+                group_name: this.state.groupValue,
+                enabled: 1,
+                description: '描述',
+                uset_list: [],
+                role: 'admin'
+            }
+            http.post('/api/companies_sharedgroups_create', data).then(res=>{
+                if (res.ok) {
+                    message.success('创建共享组成功！')
+                    this.props.getdata()
+                    this.setState({
+                        data: [...this.state.data, list],
+                        visible: false,
+                        groupValue: ''
+                    });
+                }
+            })
         }
-
     };
 
     handleCancel = e => {
@@ -185,10 +210,10 @@ class Edituser extends React.Component {
             visible: false
         });
     };
-    companyTitle=()=> {
+    companyTitle=(title)=> {
         return (
             <div className="company-name">
-                <span>xxx公司</span>
+                <span>{title}</span>
                 <span
                     className="add-user"
                     onClick={this.addGroup}
@@ -198,13 +223,16 @@ class Edituser extends React.Component {
             </div>
         )
     }
+    setRowClassName = (record) => {
+        return record.name === this.props.activeKey ? 'clickRowStyl editable-row' : 'editable-row';
+    }
     render () {
         const components = {
             body: {
                 cell: EditableCell
             }
         };
-
+        const { companies_list } = this.props;
         const columns = this.columns.map(col => {
             if (!col.editable) {
                 return col;
@@ -225,22 +253,45 @@ class Edituser extends React.Component {
         return (
             <div>
                 <EditableContext.Provider value={this.props.form}>
-                    <Table
-                        components={components}
-                        dataSource={this.state.data}
-                        columns={columns}
-                        rowClassName="editable-row"
-                        pagination={false}
-                        showHeader={false}
-                        title={this.companyTitle}
-                        size="small"
-                    />
+                    {
+                        companies_list && companies_list.length > 0
+                        ? companies_list.map((item, key) => {
+                            return (
+                                <div key={key}>
+                                    <Table
+                                        rowKey="name"
+                                        components={components}
+                                        dataSource={this.props.group_list}
+                                        columns={columns}
+                                        rowClassName={this.setRowClassName}
+                                        pagination={false}
+                                        showHeader={false}
+                                        title={()=>{
+                                            return this.companyTitle(item.full_name)
+                                        }}
+                                        onRow={(record)=>{
+                                            return {
+                                                onClick: ()=>{
+                                                    this.props.setActiveKey(record)
+                                                    this.props.store.groups.setGroupsUserlist(record)
+                                                }
+                                            }
+                                        }}
+                                        size="small"
+                                    />
+                                </div>
+                            )
+                        })
+                        : <Empty />
+                    }
                 </EditableContext.Provider>
                 <Modal
                     title="新增共享组"
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
+                    okText="确定"
+                    cancelText="取消"
                 >
                     <div> 共享组名：
                         <Input

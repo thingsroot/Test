@@ -125,7 +125,6 @@ class BrowsingHistory extends Component {
         });
       }
       fetch = (params = {}) => {
-        console.log('params:', params);
         this.setState({ loading: true });
         axios({
           url: `/api/gateways_dev_data?gateway=${this.state.gateway}&name=${this.state.device_sn}&_=${new Date() * 1}`,
@@ -137,7 +136,6 @@ class BrowsingHistory extends Component {
           type: 'json'
         }).then((resp) => {
           let res = resp.data;
-          console.log(res)
           if (!res.ok) {
             return
           }
@@ -158,7 +156,6 @@ class BrowsingHistory extends Component {
             filterdata: res.data,
             pagination
           }, ()=>{
-            console.log(this.state)
             if (current_record) {
               this.getData(current_record)
             }
@@ -220,7 +217,6 @@ class BrowsingHistory extends Component {
         return record.id === this.state.rowId ? 'clickRowStyl' : '';
       }
       handleChange (type, value) {
-        console.log(value)
         switch (type){
           case 'value_function':
               this.setState({value_function: value}, ()=>{
