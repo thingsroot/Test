@@ -10,8 +10,8 @@ const GatewayRoute = ({component: Component, ...rest}) => (
           !!isAuthenticated()
           ? <Component {...Object.assign({mqtt: rest.mqtt, gateway: rest.gateway}, props)} />
           : <Redirect to={{
-            pathname: '/login',
-            state: {from: props.location}
+              pathname: '/login',
+              state: {from: props.location}
           }}/>
       )
       }}

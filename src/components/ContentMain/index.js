@@ -14,8 +14,8 @@ const Developer = LoadableComponent(()=>import('../../router/Developer'));
 const AppStore = LoadableComponent(()=>import('../../router/AppStore'));
 const UserSettings = LoadableComponent(()=>import('../../router/UserSettings'));
 const AccessKeys = LoadableComponent(()=>import('../../router/AccessKeys'));
-// const ShareGroup = LoadableComponent(()=>import('../../router/ShareGroup'));
-// const MemberManage = LoadableComponent(()=>import('../../router/MemberManage'));
+const ShareGroup = LoadableComponent(()=>import('../../router/ShareGroup'));
+const MemberManage = LoadableComponent(()=>import('../../router/MemberManage'));
 const VirtualGateways = LoadableComponent(()=>import('../../router/VirtualGateways'));
 const Gateway = LoadableComponent(()=>import('../../router/Gateway'));
 //const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
@@ -140,7 +140,7 @@ class ContentMain extends Component {
                     component={VirtualGateways}
                     title={'虚拟网关'}
                 />
-                {/* <PrivateRoute
+                <PrivateRoute
                     path="/sharegroup"
                     component={ShareGroup}
                     title={'共享组管理'}
@@ -149,7 +149,7 @@ class ContentMain extends Component {
                     path="/member"
                     component={MemberManage}
                     title={'成员管理'}
-                /> */}
+                />
                 <PrivateRoute
                     path="/platformevents/:limitTime?"
                     component={PlatformEvents}

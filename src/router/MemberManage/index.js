@@ -11,7 +11,8 @@ class ShareGroup extends React.Component {
             companies_list: [],
             user_list: [],
             activeKey: '',
-            company: ''
+            company: '',
+            empty: false
         }
     }
     componentDidMount () {
@@ -19,20 +20,26 @@ class ShareGroup extends React.Component {
     }
     getData = () => {
         http.get('/api/companies_list').then(res=>{
-            if (res.ok && res.data.length > 0) {
-                http.get('/api/companies_read?name=' + res.data[0]).then(data=>{
-                    let arr = [];
-                    http.get('/api/companies_groups_list?company=' + res.data[0]).then(groups_list=>{
-                       if (groups_list.ok && groups_list.data.length > 0) {
-                            data.data.groups_list = groups_list.data
-                            arr.push(data.data)
-                            this.setActiveKey(groups_list.data[0])
-                            this.setState({
-                                companies_list: arr
-                            })
-                       }
+            if (res.ok) {
+                if (res.data.length > 0) {
+                    http.get('/api/companies_read?name=' + res.data[0]).then(data=>{
+                        let arr = [];
+                        http.get('/api/companies_groups_list?company=' + res.data[0]).then(groups_list=>{
+                           if (groups_list.ok && groups_list.data.length > 0) {
+                                data.data.groups_list = groups_list.data
+                                arr.push(data.data)
+                                this.setActiveKey(groups_list.data[0])
+                                this.setState({
+                                    companies_list: arr
+                                })
+                           }
+                        })
                     })
-                })
+                } else {
+                    this.setState({
+                        empty: true
+                    })
+                }
             }
         })
     }
@@ -64,6 +71,7 @@ class ShareGroup extends React.Component {
                             user_list={this.state.user_list}
                             getdata={this.getData}
                             company={this.state.company}
+                            empty={this.state.empty}
                         />
                     </Col>
                 </Row>
