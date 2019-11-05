@@ -114,41 +114,41 @@ class HeaderBar extends PureComponent {
                 </Menu.Item>
             </Menu>
         );
-        const menu2 = (
-            <Menu style={{width: 160}}>
-                <Menu.Item
-                    key="17"
-                    style={{lineHeight: '30px'}}
-                    onClick={
-                        ()=>{
-                            this.props.history.push('/sharegroup')
-                        }
-                    }
-                >
-                    <Icon type="share-alt"/>
-                    <span>
-                        共享组管理
-                    </span>
-                </Menu.Item>
-                <Menu.Item
-                    key="18"
-                    style={{lineHeight: '30px'}}
-                    onClick={
-                        ()=>{
-                            this.props.history.push('/member')
-                        }
-                    }
-                >
-                    <Icon type="team" />
-                    <span>
-                        成员管理
-                    </span>
-                </Menu.Item>
-            </Menu>
-        )
+        // const menu2 = (
+        //     <Menu style={{width: 160}}>
+        //         <Menu.Item
+        //             key="17"
+        //             style={{lineHeight: '30px'}}
+        //             onClick={
+        //                 ()=>{
+        //                     this.props.history.push('/sharegroup')
+        //                 }
+        //             }
+        //         >
+        //             <Icon type="share-alt"/>
+        //             <span>
+        //                 共享组管理
+        //             </span>
+        //         </Menu.Item>
+        //         <Menu.Item
+        //             key="18"
+        //             style={{lineHeight: '30px'}}
+        //             onClick={
+        //                 ()=>{
+        //                     this.props.history.push('/member')
+        //                 }
+        //             }
+        //         >
+        //             <Icon type="team" />
+        //             <span>
+        //                 成员管理
+        //             </span>
+        //         </Menu.Item>
+        //     </Menu>
+        // )
         return (
             <div className="headerUser">
-                <Dropdown
+                {/* <Dropdown
                     overlay={menu2}
                     placement="bottomRight"
                 >
@@ -163,7 +163,7 @@ class HeaderBar extends PureComponent {
                         企业
                         <Icon type="down" />
                     </span>
-                </Dropdown>
+                </Dropdown> */}
                 <Dropdown
                     overlay={menu1}
                     placement="bottomRight"
