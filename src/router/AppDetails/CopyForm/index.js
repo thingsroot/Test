@@ -110,14 +110,14 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                 >
                     <Form layout="vertical">
                         <Form.Item label="模板名称">
-                            {getFieldDecorator('conf_name', { initialValue: copyData.conf_name }, {
+                            {getFieldDecorator('conf_name', { initialValue: copyData.conf_name + '_copy' }, {
                                 rules: [{ required: true, message: '请填写模板名称!' }]
                             })(
                                 <Input type="text"/>
                             )}
                         </Form.Item>
                         <Form.Item label="描述">
-                            {getFieldDecorator('description', { initialValue: copyData.description }, {
+                            {getFieldDecorator('description', { initialValue: copyData.description + '_copy' }, {
                                 rules: [{ required: true, message: '请填写描述信息!' }]
                             })(
                                 <Input type="textarea" />
