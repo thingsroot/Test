@@ -395,7 +395,7 @@ class EditableTable extends React.Component {
                     </Button>
                 </EditableContext.Provider>
                 <Modal
-                    title={this.state.status === 'updateUser' ? '修改企业成员' : '添加企业成员'}
+                    title={(this.state.status === 'updateUser' ? '修改' : '添加') + '企业成员'}
                     visible={this.state.visibleMember}
                     onOk={this.handleOkMember}
                     onCancel={this.handleCancelMember}

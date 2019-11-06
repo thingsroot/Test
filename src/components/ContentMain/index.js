@@ -5,7 +5,9 @@ import { Switch, withRouter} from 'react-router-dom';
 import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
 import { doUpdate } from '../../utils/Action';
-import { isDeveloper } from '../../utils/Session'
+import { isDeveloper } from '../../utils/Session';
+import OEM from '../../assets/OEM';
+console.log(OEM)
 const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
 const Dashboard = LoadableComponent(()=>import('../../router/Dashboard'));

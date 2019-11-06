@@ -7,12 +7,6 @@ import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
 import './index.scss'
 const data = [];
-for (let i = 0; i < 1; i++) {
-    data.push({
-        key: i.toString(),
-        name: '默认组'
-    });
-}
 const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
@@ -149,6 +143,8 @@ class Edituser extends React.Component {
             if (res.ok) {
                 this.props.getdata()
                 message.success('删除公司组成功！')
+            } else {
+                message.error('删除公司组失败！错误信息：' + res.error)
             }
         })
     };
@@ -169,6 +165,8 @@ class Edituser extends React.Component {
                 if (res.ok) {
                     this.props.getdata()
                     message.success('更新组信息成功！')
+                } else {
+                    message.error('更新组信息失败！错误信息：' + res.error)
                 }
             })
                 this.setState({ editingKey: '' });
@@ -202,6 +200,8 @@ class Edituser extends React.Component {
                         visible: false,
                         groupValue: ''
                     })
+                } else {
+                    message.error('创建公司组失败！错误信息：' + res.error)
                 }
             })
         }
@@ -277,7 +277,6 @@ class Edituser extends React.Component {
                                             return {
                                                 onClick: ()=>{
                                                     this.props.setActiveKey(record)
-                                                    console.log(this.props.store.groups, 'user', this.props.store.gatewayList)
                                                     this.props.store.groups.setUserlist(record)
                                                 }
                                             }
@@ -291,12 +290,13 @@ class Edituser extends React.Component {
                     }
                 </EditableContext.Provider>
                 <Modal
-                    title="新增共享组"
+                    title="新增公司组"
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     okText="确定"
                     cancelText="取消"
+                    maskClosable={false}
                 >
                     <div> 共享组名：
                         <Input
