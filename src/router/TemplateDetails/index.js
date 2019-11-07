@@ -34,6 +34,7 @@ class MyTemplateDetails extends PureComponent {
             versionList: [],   //版本号列表
             visible: false,
             visibleClone: false,
+            visibleEdit: false,
             dataList: [],    //版本信息列表
             file: '',        //文件流
             previewData: '',  //预览数据原型
@@ -192,7 +193,7 @@ class MyTemplateDetails extends PureComponent {
         });
     };
     handleCloneSuccess = (conf_info) => {
-        this.props.history.push('/template/APP00000025/' + conf_info.name + '/1')
+        this.props.history.push('/template/' + conf_info.app + '/' + conf_info.name + '/1')
         this.UpdateFetchData()
     }
 
@@ -227,6 +228,14 @@ class MyTemplateDetails extends PureComponent {
                         <span style={{paddingLeft: '50px'}}>关联应用：{conf_info.app}</span>
                     </div>
                     <div>
+                        <Button
+                            style={this.state.conf_info.owner === this.props.store.session.user_id ? {display: 'inline-block', marginRight: '20px'} : {display: 'none', marginRight: '20px'}}
+                            onClick={()=>{
+                                this.setState({visibleEdit: true})
+                            }}
+                        >
+                            编辑
+                        </Button>
                         <Button
                             style={this.state.conf_info.owner === this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showModal}
@@ -371,6 +380,21 @@ class MyTemplateDetails extends PureComponent {
                     }}
                     onOK={() => {
                         this.setState({visibleClone: false})
+                    }}
+                    onSuccess={this.handleCloneSuccess}
+                    app={this.state.app}
+                    copyData={conf_info}
+                    csvData={csvData}
+                />
+                <CopyForm
+                    type={'编辑'}
+                    conf={this.state.conf}
+                    visible={this.state.visibleEdit}
+                    onCancel={() => {
+                        this.setState({visibleEdit: false})
+                    }}
+                    onOK={() => {
+                        this.setState({visibleEdit: false})
                     }}
                     onSuccess={this.handleCloneSuccess}
                     app={this.state.app}

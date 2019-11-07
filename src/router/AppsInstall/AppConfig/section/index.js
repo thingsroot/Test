@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {inject, observer} from 'mobx-react';
 import {Link} from 'react-router-dom';
-import {Button, Checkbox, Input, Modal, Select, Table, Divider, message} from 'antd';
+import {Button, Checkbox, Input, Modal, Select, Table, Divider, message, Tooltip} from 'antd';
+import { _getCookie } from '../../../../utils/Session';
 import EditableTable from './table';
 import EditableTemplates from './templates';
 const Option = Select.Option;
@@ -231,7 +232,6 @@ class AppConfigSection extends Component {
         )
     }
     render_table (key, config) {
-        console.log(key, config)
         let tableColumns = [];
         config.cols && config.cols.length && config.cols.map((col, col_key)=>{
             let columnReference = col.reference
@@ -340,18 +340,31 @@ class AppConfigSection extends Component {
     //     )
     // }
     render_templates (key, config, templates, templateStore) {
+        const owner = this.props.app_info.owner ? this.props.app_info.owner : '';
+        templateStore.sort(function (b, a) {
+            const id = _getCookie('user_id')
+            const order = [owner, id];
+            return order.indexOf(a.owner_id) - order.indexOf(b.owner_id)
+        });
         const addTempLists = [
             {
                 title: '名称',
                 width: '20%',
                 dataIndex: 'conf_name',
                 key: 'conf_name',
-                render: text => <span>{text}</span>
+                render: text => <Tooltip title={text}><span className="col_name">{text}</span></Tooltip>
             }, {
                 title: '描述',
-                width: '30%',
+                width: '15%',
                 dataIndex: 'description',
-                key: 'description'
+                key: 'description',
+                render: text => <Tooltip title={text}><span className="col">{text}</span></Tooltip>
+            }, {
+                title: '所有者ID',
+                width: '15%',
+                dataIndex: 'owner_id',
+                key: 'owner_id',
+                render: text => <Tooltip title={text}><span className="col">{text}</span></Tooltip>
             }, {
                 title: '模板ID',
                 width: '15%',
@@ -393,7 +406,6 @@ class AppConfigSection extends Component {
                         <Button
                             type="primary"
                             onClick={()=>{
-                                console.log(config)
                                 this.onAddTemplate(config, record.name, record.conf_name, record.description, record.latest_version)
                             }}
                         > 添加 </Button>
@@ -434,6 +446,7 @@ class AppConfigSection extends Component {
                     wrapClassName={'templatesModal'}
                     okText="确定"
                     cancelText="取消"
+                    maskClosable={false}
                 >
                     <div
                         style={{

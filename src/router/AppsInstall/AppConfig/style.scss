@@ -1,7 +1,7 @@
 
 .templatesModal{
     .ant-modal-content {
-        width: 1000px!important;
+        width: 1200px!important;
         height: 500px!important;
         margin-left: -500px!important;
         position: absolute;
@@ -9,7 +9,19 @@
         overflow-y: auto;
     }
     .ant-modal-body {
-        width: 1000px!important;
+        width: 1200px!important;
         height: 390px!important;
+        word-wrap:break-word;
+        word-break:break-all;
+        .col, .col_name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+            width: 140px;
+        }
+        .col_name{
+            width: 196px;
+        }
     }
 }

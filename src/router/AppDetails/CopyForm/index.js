@@ -85,6 +85,7 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                             if (res.ok) {
                                 message.success('更新模板信息成功！');
                                 this.props.onOK();
+                                this.props.onSuccess({name: this.props.conf, app: this.props.app})
                             } else {
                                 message.error('更新模板信息失败！');
                             }
@@ -110,14 +111,14 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                 >
                     <Form layout="vertical">
                         <Form.Item label="模板名称">
-                            {getFieldDecorator('conf_name', { initialValue: copyData.conf_name + '_copy' }, {
+                            {getFieldDecorator('conf_name', { initialValue: this.props.type === '编辑' ? copyData.conf_name : copyData.conf_name + '_copy' }, {
                                 rules: [{ required: true, message: '请填写模板名称!' }]
                             })(
                                 <Input type="text"/>
                             )}
                         </Form.Item>
                         <Form.Item label="描述">
-                            {getFieldDecorator('description', { initialValue: copyData.description + '_copy' }, {
+                            {getFieldDecorator('description', { initialValue: this.props.type === '编辑' ? copyData.description : copyData.description + '_copy' }, {
                                 rules: [{ required: true, message: '请填写描述信息!' }]
                             })(
                                 <Input type="textarea" />
