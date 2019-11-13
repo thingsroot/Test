@@ -6,8 +6,6 @@ import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
 import { doUpdate } from '../../utils/Action';
 import { isDeveloper } from '../../utils/Session';
-import OEM from '../../assets/OEM';
-console.log(OEM)
 const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
 const Dashboard = LoadableComponent(()=>import('../../router/Dashboard'));
@@ -27,7 +25,7 @@ const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHisto
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
 const TemplateDetails = LoadableComponent(()=>import('../../router/TemplateDetails'));
-
+const AppItems = LoadableComponent(()=>import('../../router/AppItems'))
 let timer;
 const openNotification = (title, message) => {
     notification.open({
@@ -91,6 +89,11 @@ class ContentMain extends Component {
                     path="/appstore"
                     component={AppStore}
                     title={'应用商店'}
+                />
+                <PrivateRoute
+                    path="/appitems/:name"
+                    component={AppItems}
+                    title={'应用详情'}
                 />
                 <PrivateRoute
                     path="/gateway/:sn"

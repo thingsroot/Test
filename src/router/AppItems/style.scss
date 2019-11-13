@@ -1,0 +1,25 @@
+.app_items{
+    .app_desc{
+        display: flex;
+    }
+    .appDescription{
+        width: 70%;
+    }
+    .app_desc_right{
+        padding-left: 20px;
+        p{
+            vertical-align: inherit; 
+            // box-sizing: border-box;
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+            padding:5px;
+        }
+        .info_title{
+            width: 120px;
+            display: inline-block;
+            padding: 5px;
+        
+        }
+    }
+}

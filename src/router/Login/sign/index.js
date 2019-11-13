@@ -6,6 +6,7 @@ import {
 import http  from '../../../utils/Server';
 import { authenticateSuccess } from '../../../utils/Session';
 import Cookies from 'js-cookie'
+import OEM from '../../../assets/OEM';
 
 @withRouter
 class Sign extends PureComponent {
@@ -86,18 +87,26 @@ class Sign extends PureComponent {
                         })(
                             <Checkbox>记住我！</Checkbox>
                         )}
-                        <Link className="login-form-forgot"
-                            style={{float: 'right'}}
-                            to="/login/retrieve"
-                        >忘记密码</Link>
+                        {
+                            OEM.Title === '冬笋云'
+                            ? <Link className="login-form-forgot"
+                                style={{float: 'right'}}
+                                to="/login/retrieve"
+                              >忘记密码</Link>
+                            : ''
+                        }
                         <Button type="primary"
                             htmlType="submit"
                             className="login-form-button"
                             style={{width: '100%'}}
                         >登录</Button>
-                        <Link to="/login/register"
-                            style={{display: 'block', height: '60px', float: 'right'}}
-                        >免费注册</Link>
+                        {
+                            OEM.Title === '冬笋云'
+                            ? <Link to="/login/register"
+                                style={{display: OEM.Title === '冬笋云' ? 'block' : 'none', height: '60px', float: 'right'}}
+                              >免费注册</Link>
+                            : <div style={{height: '60px'}}></div>
+                        }
                     </Form.Item>
                 </Form>
             </div>

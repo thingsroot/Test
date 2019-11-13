@@ -7,6 +7,7 @@ import Sign from './sign'
 import Register from './register'
 import Retrieve from './retrieve'
 import Password from './password'
+import OEM from '../../assets/OEM';
 
 const sectionStyle = {
     posation: 'absolute',
@@ -36,7 +37,7 @@ class Login extends PureComponent {
                         <img src=""
                             alt=""
                         />
-                        <span>冬笋云</span>
+                        <span>{OEM.Title}</span>
                     </p>
                 </div>
                 <div className="main">
@@ -66,7 +67,7 @@ class Login extends PureComponent {
                     </div>
                 </div>
                 <div className="footer">
-                    冬笋科技 版权所有 2018 京ICP备18043454号
+                    {OEM.Companies} 版权所有 2018 京ICP备18043454号
                 </div>
             </div>
         );

@@ -3,6 +3,7 @@ import { Icon, message, Menu, Dropdown } from 'antd';
 import { withRouter} from 'react-router-dom';
 import { _getCookie, isAuthenticated, authenticateClear } from '../../utils/Session';
 import http  from '../../utils/Server';
+import OEM from '../../assets/OEM';
 
 @withRouter
 class HeaderBar extends PureComponent {
@@ -164,48 +165,54 @@ class HeaderBar extends PureComponent {
                         <Icon type="down" />
                     </span>
                 </Dropdown>
-                <Dropdown
-                    overlay={menu1}
-                    placement="bottomRight"
-                >
-                    <span
-                        className="ant-dropdown-link"
-                        style={{padding: '10px', cursor: 'pointer'}}
+                {
+                    OEM.Title === '冬笋云'
+                    ? <span>
+                        <Dropdown
+                            overlay={menu1}
+                            placement="bottomRight"
+                        >
+                        <span
+                            className="ant-dropdown-link"
+                            style={{padding: '10px', cursor: 'pointer'}}
+                        >
+                            <Icon
+                                style={{padding: '0 4px', fontWeight: 800}}
+                                type="question-circle"
+                            />帮助
+                        </span>
+                    </Dropdown>
+                    <span style={{padding: '0 5px'}}> </span>
+                    <a onClick={()=>{
+                        window.open('https://freeioe.org/', '_blank')
+                    }}
                     >
                         <Icon
                             style={{padding: '0 4px', fontWeight: 800}}
-                            type="question-circle"
-                        />帮助
+                            type="message"
+                        />
+
+                        讨论
+                    </a>
+                    <span style={{padding: '0 5px'}}> </span>
+
+                    <span style={{padding: '0 5px'}}> </span>
+                    <a onClick={()=>{
+                        window.open('https://wiki.freeioe.org/', '_blank')
+                    }}
+                    >
+                        <Icon
+                            style={{padding: '0 4px', fontWeight: 800}}
+                            type="book"
+                        />
+
+                        知识库
+                    </a>
+                    <span style={{padding: '0 5px'}}> </span>
                     </span>
-                </Dropdown>
-                <span style={{padding: '0 5px'}}> </span>
-                <a onClick={()=>{
-                    window.open('https://freeioe.org/', '_blank')
-                }}
-                >
-                    <Icon
-                        style={{padding: '0 4px', fontWeight: 800}}
-                        type="message"
-                    />
 
-                    讨论
-                </a>
-                <span style={{padding: '0 5px'}}> </span>
-
-                <span style={{padding: '0 5px'}}> </span>
-                <a onClick={()=>{
-                    window.open('https://wiki.freeioe.org/', '_blank')
-                }}
-                >
-                    <Icon
-                        style={{padding: '0 4px', fontWeight: 800}}
-                        type="book"
-                    />
-
-                    知识库
-                </a>
-                <span style={{padding: '0 5px'}}> </span>
-
+                    : ''
+                }
                 <Dropdown
                     overlay={menu}
                     placement="bottomRight"

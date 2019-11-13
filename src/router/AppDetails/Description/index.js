@@ -20,7 +20,7 @@ class AppDescription extends Component {
                     style={this.props.source !== '' ? block : none}
                 >
                     <Editor
-                        style={{height: 400}}
+                        // style={{height: 400}}
                         preview={preview}
                         value={this.props.source}
                         toolbar={false}
