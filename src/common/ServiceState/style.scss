@@ -1,5 +1,19 @@
 .VserviceStateWrapper{
-    padding: 5px;
+    position: relative;
+    margin-top: 30px;
+    padding-top: 20px;
+    box-sizing: border-box;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+        .VserviceState_title{
+            position: absolute;
+            left:15px;
+            top:-10px;
+            display: inline-block;
+            background: #fff;
+            padding: 0 5px;
+        }
     .prompt{
         position: absolute;
         right: 10px;

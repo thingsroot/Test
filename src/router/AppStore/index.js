@@ -6,24 +6,7 @@ import { Carousel } from 'antd';
 // import AppCard from '../../common/AppCard';
 // import Developer from '../Developer';
 import './style.scss';
-// import { Tabs } from 'antd';
 import http from '../../utils/Server';
-// const { TabPane } = Tabs;
-/*
-import {Input, Icon, Button, message, notification, Rate, Drawer } from 'antd';  //
-const openNotification = (title, message) => {
-    notification.open({
-        message: title,
-        description: message,
-        placement: 'buttonRight'
-    });
-};
-*/
-// function callback (key) {
-//     console.log(key);
-// }
-
-
 @withRouter
 @inject('store')
 @observer

@@ -5,7 +5,6 @@ import { inject, observer } from 'mobx-react';
 import {_getCookie} from '../../../utils/Session';
 import http from '../../../utils/Server';
 import ServiceState from '../../../common/ServiceState';
-// import { apply_AccessKey } from '../../../utils/Session';
 import './style.scss';
 const Option = Select.Option;
 const columns = [{
@@ -14,12 +13,6 @@ const columns = [{
     key: 'name',
     width: '150px'
   },
-//   {
-//     title: '描述',
-//     dataIndex: 'desc',
-//     key: 'desc',
-//     width: '80px'
-//   },
   {
     title: '状态',
     dataIndex: 'status',
@@ -98,15 +91,15 @@ class VPN extends Component {
                     server_addr: this.props.mqtt.vserial_channel.Proxy
                 }
             }
-            const postData = {
-                id: 'post_gate/' + new Date() * 1,
-                auth_code: this.state.auth_code,
-                output: 'vnet_config'
-            }
+            // const postData = {
+            //     id: 'post_gate/' + new Date() * 1,
+            //     auth_code: this.state.auth_code,
+            //     output: 'vnet_config'
+            // }
             mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/service_start', JSON.stringify(data))
-            setTimeout(() => {
-                mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
-            }, 5000);
+            // setTimeout(() => {
+            //     mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
+            // }, 5000);
         } else {
             message.warning('您的账户暂无AccessKey,将为您自动创建AccessKey。', 3)
             http.post('/api/user_token_create').then(res=>{
@@ -157,10 +150,12 @@ class VPN extends Component {
                                 this.setState({lan_ip: item.pv})
                             }
                                 if (!this.state.tap_ip){
-                                    const tap_ip = item.pv.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10)
-                                    this.setState({
-                                        tap_ip
-                                    })
+                                    if (item.pv){
+                                        const tap_ip = item.pv.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10)
+                                        this.setState({
+                                            tap_ip
+                                        })
+                                    }
                                 }
                         }
                         if (item.name === 'router_run') {
@@ -180,10 +175,14 @@ class VPN extends Component {
             }
         })
         if (mqtt.client && mqtt.vnet_channel.is_running) {
-            this.setState({stop_loading: false})
+            setTimeout(() => {
+                this.setState({stop_loading: false})
+            }, 3000);
         }
         if (mqtt.client && !mqtt.vnet_channel.is_running) {
-            this.setState({start_loading: false})
+            setTimeout(() => {
+                this.setState({start_loading: false})
+            }, 3000);
         }
     }
 
@@ -223,11 +222,52 @@ class VPN extends Component {
                     />
                 </div>
                 <div className="VPNLeft">
+                    <p className="vnet_title">运行参数</p>
                     <div className="VPNlist">
                         <p>网关状态：</p>
                         <Input
                             value={this.props.store.gatewayInfo.device_status}
                         />
+                    </div>
+                    <div className="VPNlist">
+                        <p>网络模式：</p>
+                        <Button
+                            type={this.state.model === 'bridge' ? 'primary' : ''}
+                            disabled={is_running}
+                            onClick={()=>{
+                                if (this.state.tap_ip) {
+                                    const Num = this.state.tap_ip.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10);
+                                    this.setState({model: 'bridge', port: '665', tap_ip: Num})
+                                }
+                            }}
+                        >桥接模式</Button>
+                        <Button
+                            type={this.state.model === 'router' ? 'primary' : ''}
+                            disabled={is_running}
+                            onClick={()=>{
+                                if (this.state.tap_ip) {
+                                    const Num = this.state.tap_ip.split('.', 3).join('.') + '.0';
+                                    this.setState({model: 'router', port: '666', tap_ip: Num})
+                                }
+                            }}
+                        >路由模式</Button>
+                    </div>
+                    <div className="VPNlist">
+                        <p>传输协议：</p>
+                        <Button
+                            type={this.state.agreement === 'tcp' ? 'primary' : ''}
+                            disabled={is_running}
+                            onClick={()=>{
+                                this.setState({agreement: 'tcp'})
+                            }}
+                        >tcp</Button>
+                        <Button
+                            type={this.state.agreement === 'kcp' ? 'primary' : ''}
+                            disabled={is_running}
+                            onClick={()=>{
+                                this.setState({agreement: 'kcp'})
+                            }}
+                        >kcp</Button>
                     </div>
                     <div className="VPNlist">
                         <p>
@@ -286,44 +326,6 @@ class VPN extends Component {
                             }}
                         />
                     </div>
-
-
-                    <div className="VPNlist">
-                        <p>传输协议：</p>
-                        <Button
-                            type={this.state.agreement === 'tcp' ? 'primary' : ''}
-                            disabled={is_running}
-                            onClick={()=>{
-                                this.setState({agreement: 'tcp'})
-                            }}
-                        >tcp</Button>
-                        <Button
-                            type={this.state.agreement === 'kcp' ? 'primary' : ''}
-                            disabled={is_running}
-                            onClick={()=>{
-                                this.setState({agreement: 'kcp'})
-                            }}
-                        >kcp</Button>
-                    </div>
-                    <div className="VPNlist">
-                        <p>网络模式：</p>
-                        <Button
-                            type={this.state.model === 'bridge' ? 'primary' : ''}
-                            disabled={is_running}
-                            onClick={()=>{
-                                const Num = this.state.tap_ip.split('.', 3).join('.') + '.' + parseInt(Math.random() * 200 + 10, 10);
-                                this.setState({model: 'bridge', port: '665', tap_ip: Num})
-                            }}
-                        >桥接模式</Button>
-                        <Button
-                            type={this.state.model === 'router' ? 'primary' : ''}
-                            disabled={is_running}
-                            onClick={()=>{
-                                const Num = this.state.tap_ip.split('.', 3).join('.') + '.0';
-                                this.setState({model: 'router', port: '666', tap_ip: Num})
-                            }}
-                        >路由模式</Button>
-                    </div>
                     {
                         !is_running
                         ? <Button
@@ -358,12 +360,13 @@ class VPN extends Component {
                     }
                 </div>
                 <div className="VPNRight">
-                    <div className="VPNlist">
+                    {/* <div className="VPNlist">
                         <p>
                             本地运行环境：
                         </p>
                         <span>{mqtt.connected ? '运行环境正常' : '运行环境异常'}</span>
-                    </div>
+                    </div> */}
+                    <p className="vnet_title">运行状态</p>
                     <div className="VPNlist">
                         <p>
                             本地连接状态：

@@ -557,6 +557,7 @@ class GatewayMQTT {
         })
 
         this.client.on('message', (msg_topic, msg)=>{
+            // console.log(msg_topic, JSON.parse(msg.toString()))
             if (msg_topic === this.gateway + '/comm') {
                 const data = JSON.parse(msg.toString());
                 this.onReceiveCommMsg(data)
@@ -565,11 +566,6 @@ class GatewayMQTT {
                 const data = JSON.parse(msg.toString());
                 this.onReceiveLogMsg(data)
             }
-            // if (msg_topic === 'v1/update/api/servers_list') {
-            //     this.onReceiveLogMsg(data)
-            //     this.setServiceNode(data.data)
-            //     console.log(this)
-            // }
             if (msg_topic.indexOf('v1/vspax/VSPAX_STREAM') !== -1) {
                 if (this.vserial_channel.LogViewFlag) {
                     this.onReceiveVserialLogView(msg_topic, msg)
@@ -610,6 +606,21 @@ class GatewayMQTT {
                     if (parseInt(data.data.new_version) > parseInt(data.data.version)){
                         this.onReceiveLocalVersionMsg(false)
                     }
+                }
+            }
+            if (msg_topic === 'v1/vnet/api/RESULT') {
+                console.log(JSON.parse(msg.toString()))
+                const data = JSON.parse(msg.toString());
+                if (data.id.indexOf('start_vnet') !== -1 && data.result && !this.vnet_channel.is_running) {
+                    const postData = {
+                        id: 'post_gate/' + new Date() * 1,
+                        auth_code: this.auth_code,
+                        output: 'vnet_config'
+                    }
+                    this.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
+                }
+                if (data.id.indexOf('start_vnet') !== -1 && !data.result && !this.vnet_channel.is_running) {
+                    message.error('启动服务失败，请检查本地服务后重试！')
                 }
             }
             if (msg_topic.indexOf('v1/vspax/VSPAX_STATUS/') !== -1) {
@@ -653,6 +664,10 @@ class GatewayMQTT {
                     delay: data.delay,
                     message: data.message
                 })
+            }
+            if (msg_topic.indexOf('v1/vnet/api/post_gate') !== -1){
+                const data = JSON.parse(msg.toString());
+                console.log(data)
             }
         })
     }

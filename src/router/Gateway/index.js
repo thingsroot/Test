@@ -22,6 +22,7 @@ const Appconfig = LoadableComponent(()=>import('../AppsInstall/AppConfig'));
 const PlatformEvents = LoadableComponent(()=>import('./PlatformEvents'));
 const DeviceEvents = LoadableComponent(()=>import('./DeviceEvents'));
 const GatewaysDrawer = LoadableComponent(()=>import('../../common/GatewaysDrawer'));
+const Networkconfig  = LoadableComponent(()=>import('./NetworkConfig'));
 
 @withRouter
 @inject('store')
@@ -253,6 +254,11 @@ class MyGatesDevices extends Component {
                         <GatewayRoute path="/gateways/appconfig"
                             component={Appconfig}
                             title="我的网关·应用配置"
+                            gateway={this.state.gateway}
+                        />
+                        <GatewayRoute path={`${path}/networkconfig`}
+                            component={Networkconfig}
+                            title="我的网关·网络配置"
                             gateway={this.state.gateway}
                         />
                         <Redirect from={path}

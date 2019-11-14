@@ -198,6 +198,7 @@ class Vserial extends Component {
                         return (
                             !this.state.logFlag
                             ? <Button
+                                type="primary"
                                 onClick={()=>{
                                     this.setState({
                                         logFlag: true
@@ -377,36 +378,6 @@ class Vserial extends Component {
                                 output_record1.action_tm = formatTime(new Date(), 'hh:mm:ss S')
                                 this.props.store.action.pushAction(respones.data, '设备数据下置执行', '', params, 10000)
                                 this.loop()
-                                // if (this.state.port > 0) {
-                                //     const datas = {
-                                //         id: 'add_local_com' + new Date() * 1,
-                                //         by_name: 1,
-                                //         name: SerialPort.toUpperCase(),
-                                //         peer: {
-                                //             type: 'tcp_client',
-                                //             host: mqtt.vserial_channel.Proxy,
-                                //             port: this.state.port,
-                                //             info: {
-                                //                 sn: this.props.gateway,
-                                //                 com_cfg: {
-                                //                     server_addr: mqtt.vserial_channel.Proxy,
-                                //                     serial: SerialPort,
-                                //                     baudrate: BaudRate,
-                                //                     databit: DataBits,
-                                //                     stopbit: StopBit,
-                                //                     parity: Check
-                                //                 },
-                                //                 serial_driver: 'vspax'
-                                //             }
-                                //         }
-                                //     }
-                                //     mqtt.client.publish('v1/vspax/api/list', JSON.stringify({id: 'vspax/api/list' + new Date() * 1}))
-                                //     mqtt.client.publish('v1/vspax/api/add', JSON.stringify(datas))
-                                // } else {
-                                //     output_record1.result = data.message
-                                //     output_record1.result_tm = formatTime(new Date(data.timestamp * 1000), 'hh:mm:ss S')
-                                //     // this.loop()
-                                // }
                             } else {
                                 this.setState({openLoading: false})
                             }
@@ -465,43 +436,7 @@ class Vserial extends Component {
                 />
                 <div className="vserialPort">
                     <div>
-                        <div className="vserialBtn">
-                            {
-                                addPortData[0] && Object.keys(addPortData[0]).length === 0
-                                ? <Button
-                                    type="primary"
-                                    loading={openLoading}
-                                    disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0)}
-                                    onClick={()=>{
-                                        this.setState({
-                                            openLoading: true,
-                                            stopLoading: false
-                                        }, ()=>{
-                                            this.openVserial()
-                                        })
-                                    }}
-                                  >开启</Button>
-                                    : <Button
-                                        type="danger"
-                                        loading={stopLoading}
-                                        onClick={()=>{
-                                            if (addPortData[0].app_path === '' || addPortData[0].app_path.indexOf('freeioe_Rprogramming') !== -1) {
-                                                this.setState({
-                                                    stopLoading: true,
-                                                    openLoading: false,
-                                                    logFlag: false
-                                                }, ()=>{
-                                                    mqtt.vserial_channel.setLogView(null)
-                                                    this.stopVserial()
-                                                })
-                                            } else {
-                                                showConfirm(addPortData[0].name, addPortData[0].app_path.split('\\')[addPortData[0].app_path.split('\\').length - 1])
-                                            }
-                                        }}
-                                      >停止</Button>
-                            }
-                        </div>
-                        <p>网关串口：{SerialPort}</p>
+                        <p className="vserial_title">网关串口：{SerialPort}</p>
                         <div className="selectWrap">
                             <div className="selectChild">
                                 <p>串口:</p>
@@ -590,10 +525,46 @@ class Vserial extends Component {
                             dataSource={serviceName}
                             pagination={false}
                         />
+                        <div className="vserialBtn">
+                            {
+                                addPortData[0] && Object.keys(addPortData[0]).length === 0
+                                ? <Button
+                                    type="primary"
+                                    loading={openLoading}
+                                    disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0)}
+                                    onClick={()=>{
+                                        this.setState({
+                                            openLoading: true,
+                                            stopLoading: false
+                                        }, ()=>{
+                                            this.openVserial()
+                                        })
+                                    }}
+                                  >启动</Button>
+                                    : <Button
+                                        type="danger"
+                                        loading={stopLoading}
+                                        onClick={()=>{
+                                            if (addPortData[0].app_path === '' || addPortData[0].app_path.indexOf('freeioe_Rprogramming') !== -1) {
+                                                this.setState({
+                                                    stopLoading: true,
+                                                    openLoading: false,
+                                                    logFlag: false
+                                                }, ()=>{
+                                                    mqtt.vserial_channel.setLogView(null)
+                                                    this.stopVserial()
+                                                })
+                                            } else {
+                                                showConfirm(addPortData[0].name, addPortData[0].app_path.split('\\')[addPortData[0].app_path.split('\\').length - 1])
+                                            }
+                                        }}
+                                      >停止</Button>
+                            }
+                        </div>
                     </div>
                 </div>
                 <div className="wrapper">
-                    <p>本地串口：{addPortData[0].name}</p>
+                    <p className="vserial_title">本地串口状态</p>
                     <Table
                         columns={this.state.cloum}
                         dataSource={addPortData}

@@ -64,6 +64,7 @@ class GatewayInfo {
 
     @observable install_apps = [] // Instance name list from realtime-data for running
     @observable ioe_network = false
+    @observable isNetworkConf = false
     @observable ioe_frpc = false
     @observable isVserial = false
     @observable isVnet = false;
@@ -121,6 +122,7 @@ class GatewayInfo {
         this.apps_count = Object.keys(value).length;
         let vserial = false;
         let vnet = false;
+        let net_info = false;
         value && value.length > 0 && value.map(item=>{
             if (item.name === 'APP00000130' && item.status === 'running') {
                 this.isVserial = true;
@@ -130,12 +132,19 @@ class GatewayInfo {
                 this.isVnet = true;
                 vnet = true;
             }
+            if (item.name === 'APP00000115' && item.status === 'running') {
+                this.isNetworkConf = true;
+                net_info = true;
+            }
         })
         if (!vserial){
             this.isVserial = vserial;
         }
         if (!vnet){
             this.isVnet = vnet;
+        }
+        if (!net_info){
+            this.isNetworkConf = net_info;
         }
     }
     @action setAppsIsShow (value) {

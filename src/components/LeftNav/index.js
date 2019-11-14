@@ -79,6 +79,10 @@ class LeftNav extends Component {
             this.setState({
                 index: 9
             })
+        } else if (pathname.indexOf('/networkconfig') !== -1) {
+            this.setState({
+                index: 10
+            })
         }
     }
     componentWillUnmount (){
@@ -132,9 +136,9 @@ class LeftNav extends Component {
     }
     enableIOENetwork (enable){
         if (enable) {
-            return this.installApp('ioe_network', 'network_uci', '开启虚拟网络功能')
+            return this.installApp('net_info', 'APP00000115', '开启虚拟网络功能')
         } else {
-            return this.removeApp('ioe_network', '关闭虚拟网络功能')
+            return this.removeApp('net_info', '关闭虚拟网络功能')
         }
     }
     installApp (inst_name, app_name, title){
@@ -320,17 +324,20 @@ class LeftNav extends Component {
                               <li className={index === 4 ? 'active' : ''}><Icon type="compass" />&nbsp;&nbsp;远程编程-网络</li></Link>
                             : ''
                         }
-                        {/* {
-                            gatewayInfo.isNtworkConf
-                            ? <Link to={`${url}/vnet`}
-                                key="4"
+                        {
+                            gatewayInfo.isNetworkConf
+                            ? <Link
+                                to={`${url}/networkconfig`}
                                 onClick={()=>{
-                                    this.setIndex(4)
+                                    this.setIndex(10)
                                 }}
                               >
-                              <li className={index === 4 ? 'active' : ''}><Icon type="switcher" />&nbsp;&nbsp;远程编程-网络</li></Link>
+                                <li
+                                    className={index === 10 ? 'active' : ''}
+                                ><Icon type="bell"/>&nbsp;&nbsp;网络配置</li>
+                            </Link>
                             : ''
-                        } */}
+                        }
                     </ul>
                 </div>
                 <Modal
@@ -346,7 +353,7 @@ class LeftNav extends Component {
                             网络配置
                         </span>
                         <EditSwitch
-                            checked={gatewayInfo.ioe_network}
+                            checked={gatewayInfo.isNetworkConf}
                             disabled={!gatewayInfo.actionEnable}
                             gateway={gateway}
                             onChange={(checked, onResult)=>{

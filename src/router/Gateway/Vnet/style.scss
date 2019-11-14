@@ -1,12 +1,22 @@
 .VPN{
     display: flex;
     flex-wrap: wrap;
+    max-width: 1024px;
+    margin-left: 20px;
+    .vnet_title{
+        position: absolute;
+        left:15px;
+        top:-10px;
+        display: inline-block;
+        background: #fff;
+        padding: 0 5px;
+    }
     h1{
         text-align: center;
     }
     .vnetVserState{
         width: 100%;
-        border-top: 2px solid #ccc;
+        // border-top: 2px solid #ccc;
         border-radius: 5px;
         margin-bottom: 40px;
     }
@@ -34,7 +44,15 @@
         }
     }
     .VPNLeft{
-        width:40%;
+        width:49%;
+        position: relative;
+        padding: 20px;
+        padding-top: 20px;
+        padding-left: 0px;
+        padding-left: 0;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 3px;
         .VPNlist{
             display: flex;
             padding:10px 0;
@@ -69,12 +87,22 @@
         }
     }
     .VPNRight{
-        width:40%;
+        width:49%;
+        margin-left: 2%;
+        position: relative;
+        padding-top: 20px;
+        box-sizing: border-box;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
         .VPNlist{
             display: flex;
             padding:10px 0;
             position: relative;
             .statusDetail{
+                position: absolute;
+                right:50px;
+                top:10px;
                 line-height: 32px;
                 text-indent: 30px;
             }
@@ -83,8 +111,8 @@
                 border-radius: 5px;
                 position: absolute;
                 background:#f1f1f1;
-                left:300px;
-                top:-30px;
+                right:100px;
+                top:10px;
                 z-index: 999;
                 overflow: hidden;
             }

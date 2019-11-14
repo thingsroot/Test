@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Select, Button, message} from 'antd';
+import { Input, Select, message} from 'antd';
 import { inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
@@ -15,7 +15,8 @@ class ServiceState extends Component {
         apps: [],
         latestVersion: 0,
         instName: '',
-        settimer: false
+        settimer: false,
+        app_name: ''
     }
     componentDidMount (){
         const { mqtt } = this.props;
@@ -44,6 +45,7 @@ class ServiceState extends Component {
         this.getVersionLatest()
     }
     UNSAFE_componentWillReceiveProps (nextprops){
+        console.log(nextprops.store.gatewayInfo)
         const pathname = nextprops.location.pathname.toLowerCase();
         if (nextprops.store.gatewayInfo.apps !== this.state.apps){
             this.setState({
@@ -52,10 +54,10 @@ class ServiceState extends Component {
                 if (this.state.apps && this.state.apps.length > 0){
                     this.state.apps.map(item=>{
                         if (item.name === 'APP00000130' && pathname.indexOf('vserial') !== -1){
-                            this.setState({appVersion: item.version})
+                            this.setState({appVersion: item.version, app_name: 'isVserial'})
                         }
                         if (item.name === 'APP00000135' && pathname.indexOf('vnet') !== -1) {
-                            this.setState({appVersion: item.version})
+                            this.setState({appVersion: item.version, app_name: 'isVnet'})
                         }
                     })
                 }
@@ -156,7 +158,7 @@ class ServiceState extends Component {
     }
     render () {
         const { mqtt } = this.props;
-        const { message, appVersion, latestVersion} = this.state;
+        const { message } = this.state;
         const { addPortData, serviceNode } = mqtt.vserial_channel;
         const { pathname } = this.props.location;
         const gateway = pathname.indexOf('vserial') !== -1
@@ -164,14 +166,14 @@ class ServiceState extends Component {
         : mqtt.vnet_channel.vnet_config && mqtt.vnet_channel.is_running ? mqtt.vnet_channel.vnet_config.gate_sn : '------';
         return (
             <div className="VserviceStateWrapper">
-                <p>远程编程服务状态：<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
+                <p className="VserviceState_title">服务状态<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
                 <div>
                     <div className="flex">
-                        <p>服务版本:</p>
+                        <p>服务状态:</p>
                         <Input
-                            value={mqtt.new_version}
+                            value={this.state.settimer ? '异常' : '正常'}
                         />
-                        <div className="versionMsg">
+                        {/* <div className="versionMsg">
                                 {
                                     mqtt.new_version
                                     ? mqtt.vserial_channel.Active && mqtt.versionMsg
@@ -186,7 +188,7 @@ class ServiceState extends Component {
                                     </div>
                                     : ''
                                 }
-                            </div>
+                            </div> */}
                     </div>
                     {
                             this.state.settimer
@@ -202,6 +204,12 @@ class ServiceState extends Component {
                         />
                     </div>
                     <div className="flex">
+                        <p>应用状态:</p>
+                        <Input
+                            value={this.props.store.gatewayInfo[this.state.app_name] ? '正常' : '异常'}
+                        />
+                    </div>
+                    {/* <div className="flex">
                         <p>应用版本:</p>
                         <Input
                             value={appVersion}
@@ -221,7 +229,7 @@ class ServiceState extends Component {
                                     : ''
                                 }
                             </div>
-                    </div>
+                    </div> */}
                     <div className="flex">
                         <p>服务节点:</p>
                         <div>

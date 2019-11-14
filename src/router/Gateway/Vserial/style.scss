@@ -17,15 +17,27 @@
     }
 }
 .vserialWrapper{
+    max-width: 1024px;
+    margin-left: 20px;
     margin-top: 10px;
-    border-top: 2px solid #ccc;
     border-radius: 3px;
     position: relative;
-    .vserialPort{
-        margin-top: 10px;
+    .vserialPort, .wrapper{
+        position: relative;
+        margin-top: 30px;
         padding-top: 20px;
-        border-top: 2px solid #ccc;
+        box-sizing: border-box;
+        padding: 20px;
+        border: 1px solid #ccc;
         border-radius: 3px;
+        .vserial_title{
+            position: absolute;
+            left:15px;
+            top:-10px;
+            display: inline-block;
+            background: #fff;
+            padding: 0 5px;
+        }
     }
     .flex{
         display: flex;
@@ -45,8 +57,12 @@
         }
     }
     .vserialBtn{
-        position: absolute;
-        right:50px;
-        top:210px;
+        padding:20px;
+        button{
+            width: 100px;
+            height:40px;
+            font-size: 18px;
+            font-weight: 800;
+        }
     }
 }
