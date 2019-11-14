@@ -178,7 +178,7 @@ class MyGatesDevices extends Component {
                             mqtt={this.state.mqtt}
                         />
                         {
-                            pathname.indexOf('vnet') === -1 && pathname.indexOf('vserial') === -1
+                            pathname.indexOf('vnet') === -1 && pathname.indexOf('vserial') === -1 && pathname.indexOf('networkconfig') === -1
                             ? <Button type="primary"
                                 onClick={this.showDrawer}
                                 className="listbutton"
