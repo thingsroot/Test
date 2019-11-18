@@ -98,8 +98,8 @@ class AppItems extends PureComponent {
                                     <div className="info_details">
                                         <p>更多信息</p>
                                         <div><span className="info_title">版本:</span><span>{version}</span></div>
-                                        <div><span className="info_title">发布时间:</span><span>{data.creation}</span></div>
-                                        <div><span className="info_title">最近更新时间:</span><span>{data.modified}</span></div>
+                                        <div><span className="info_title">发布时间:</span><span>{data.creation && data.creation.indexOf('.') !== -1 ? data.creation.split('.')[0] : ''}</span></div>
+                                        <div><span className="info_title">最近更新时间:</span><span>{data.modified && data.modified.indexOf('.') !== -1 ? data.modified.split('.')[0] : ''}</span></div>
                                         <div><span className="info_title">作者:</span><span>{data.owner}</span></div>
                                     </div>
                                 </div>
