@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import http from '../../utils/Server';
-import { Tabs } from 'antd';
+import { Tabs, Button, Rate, Tag } from 'antd';
 import Description from '../AppDetails/Description';
 import './style.scss';
 const { TabPane } = Tabs;
@@ -32,19 +32,32 @@ class AppItems extends PureComponent {
         const {data, version} = this.state;
         return (
             <div className="app_items">
-                AppItems
                 <div className="app_title">
                     <div className="app_logo">
                         <img src={'http://ioe.thingsroot.com' + data.icon_image}/>
                     </div>
                     <div className="app_simple_info">
                         <p>{data.app_name}</p>
-                        <div>
+                        <div className="app_simple_desc">
                             <span>简易描述</span>
-                            <span>xxx installs</span>
-                            <span>醒醒</span>
+                            <span>xxx次下载</span>
+                            <span>
+                                <Rate
+                                    disabled
+                                    defaultValue={data.star}
+                                />
+                            </span>
                             <span>免费</span>
                         </div>
+                        <div
+                            style={{marginLeft: '20px', marginTop: '10px'}}
+                        >
+                            {data.protocol}
+                        </div>
+                        <Button
+                            style={{marginLeft: '30px', marginTop: '10px', width: '100px'}}
+                            type="primary"
+                        >收藏</Button>
                     </div>
                 </div>
                 <div className="app_info">
@@ -65,6 +78,19 @@ class AppItems extends PureComponent {
                                     </div>
                                     <div>
                                         <p>标签</p>
+                                        <div>
+                                            {
+                                                data.tags &&
+                                                data.tags.length > 0 &&
+                                                data.tags.split(',').map((item, key)=>{
+                                                    return (
+                                                        <Tag key={key}>
+                                                            {item}
+                                                        </Tag>
+                                                    )
+                                                })
+                                            }
+                                        </div>
                                     </div>
                                     <div>
                                         <p>适用于</p>
