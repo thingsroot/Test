@@ -3,6 +3,19 @@
     flex-wrap: wrap;
     max-width: 1024px;
     margin-left: 20px;
+    .vnet_message{
+        width: 100%;
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        position: relative;
+        padding: 20px;
+        .vnet_message_item:not(:first-child){
+            border-top: 1px solid #ccc;
+        }
+        .vnet_message_item{
+            padding: 15px;
+        }
+    }
     .vnet_title{
         position: absolute;
         left:15px;

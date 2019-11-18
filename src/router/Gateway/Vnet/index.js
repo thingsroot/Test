@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Select, Button, Table, message } from 'antd';
+import { Input, Select, Button, Table, message, Collapse, Icon } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import {_getCookie} from '../../../utils/Session';
@@ -7,6 +7,7 @@ import http from '../../../utils/Server';
 import ServiceState from '../../../common/ServiceState';
 import './style.scss';
 const Option = Select.Option;
+const { Panel } = Collapse;
 const columns = [{
     title: '服务名称',
     dataIndex: 'name',
@@ -54,6 +55,8 @@ class VPN extends Component {
         http.get('/api/user_token_read').then(res=>{
             this.setState({
                 auth_code: res.data
+            }, () => {
+                this.props.mqtt.auth_code = res.data
             })
         })
         this.getStatus()
@@ -208,6 +211,17 @@ class VPN extends Component {
         }
         mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/service_stop', JSON.stringify(data))
         mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
+    }
+    genExtra = () => {
+        return (
+            <Icon
+                type="setting"
+                onClick={event => {
+                // If you don't want click extra trigger collapse, you can prevent this:
+                    event.stopPropagation();
+                }}
+            />
+        )
     }
     render () {
         const { mqtt } = this.props;
@@ -371,7 +385,7 @@ class VPN extends Component {
                         <p>
                             本地连接状态：
                         </p>
-                        <span>{is_running ? 'running' : '------'}</span>
+                        <span>{is_running ? '正常' : '------'}</span>
                         <div
                             className="statusDetail"
                             style={{cursor: 'pointer', color: '#ccc'}}
@@ -403,7 +417,7 @@ class VPN extends Component {
                             云端隧道状态：
                         </p>
                         <span>{
-                            is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.cur_conns && parseInt(mqtt.vnet_channel.serviceState.cur_conns) > 0 ? 'connected' : 'disconnected' : '------'
+                            is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.cur_conns && parseInt(mqtt.vnet_channel.serviceState.cur_conns) > 0 ? '正常' : '异常' : '------'
                             }</span>
                     </div>
                     {
@@ -412,7 +426,7 @@ class VPN extends Component {
                             <p>
                                 网关桥接隧道状态：
                             </p>
-                            <span>{this.state.bridge_run}</span>
+                            <span>{this.state.bridge_run === 'running' ? '正常' : '异常'}</span>
                         </div>
                         : <div className="VPNlist">
                             <p>
@@ -441,13 +455,42 @@ class VPN extends Component {
                         <p>
                             Ping目标IP状态：
                         </p>
-                        <span>{is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.message ? mqtt.vnet_channel.serviceState.message : '------' : '------'}</span>
+                        <span>{is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.message ? mqtt.vnet_channel.serviceState.message === 'online' ? '正常' : '异常' : '------' : '------'}</span>
                     </div>
                     <div className="VPNlist">
                         <p>
                             Ping目标IP延迟：
                         </p>
                         <span>{is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.delay ? mqtt.vnet_channel.serviceState.delay : '------' : '------'}</span>
+                    </div>
+                </div>
+                <div className="vnet_message">
+                    <p className="vnet_title">消息</p>
+                    <div>
+                    <Collapse
+                        // defaultActiveKey={['1']}
+                        // onChange={callback}
+                        expandIconPosition="right"
+                    >
+                        <Panel
+                            header="消息列表"
+                            key="1"
+                            extra={this.genExtra}
+                        >
+                        {
+                            mqtt.vnet_message && mqtt.vnet_message.length > 0 && mqtt.vnet_message.map((item, key) => {
+                                return (
+                                    <div
+                                        key={key}
+                                        className="vnet_message_item"
+                                    >
+                                        {JSON.stringify(item)}
+                                    </div>
+                                )
+                            })
+                        }
+                        </Panel>
+                    </Collapse>
                     </div>
                 </div>
             </div>

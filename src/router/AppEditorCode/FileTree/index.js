@@ -38,7 +38,6 @@ const newNodeItem = (title, isLeaf, type, key, icon) => {
             this.children.push(item);
         },
         removeChild (item) {
-            console.log(item)
             let arr = this.children;
             this.children.map(v => {
                 if (v.key !== item.key) {
@@ -337,7 +336,6 @@ class MyTree extends Component {
             if (delData !== '0') {
                 //如果循环的节点数据中有跟你传过来要删的数据delData.key相同的 那就将这条数据丛树节点删掉
                 if (item.key === delData.key) {
-                    console.log(i)
                     data.splice(i, 1);
                 }
             }

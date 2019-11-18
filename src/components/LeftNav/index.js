@@ -98,17 +98,15 @@ class LeftNav extends Component {
           visible: true
         });
       };
-    handleOk = e => {
-    console.log(e);
-    this.setState({
-        visible: false
-    });
+    handleOk = () => {
+        this.setState({
+            visible: false
+        });
     };
-    handleCancel = e => {
-    console.log(e);
-    this.setState({
-        visible: false
-    });
+    handleCancel = () => {
+        this.setState({
+            visible: false
+        });
     };
     info () {
         Modal.info({

@@ -9,16 +9,6 @@ import AppConfig from '../../AppsInstall/AppConfig';
 import {ConfigStore} from '../../../utils/ConfigUI';
 import {formatTime} from '../../../utils/time';
 import './style.scss';
-// const openNotification = () => {
-//   notification.open({
-//     message: 'Notification Title',
-//     description:
-//       'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
-//     onClick: () => {
-//       console.log('Notification Clicked!');
-//     }
-//   });
-// };
 
 import {IconIOT, IconCloud} from '../../../utils/iconfont';
 

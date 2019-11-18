@@ -91,10 +91,24 @@ class Vserial extends Component {
                 dataIndex: 'parame',
                 key: 'parame',
                 width: '100px',
+                onCell: () => {
+                    return {
+                      style: {
+                        maxWidth: 100,
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                        cursor: 'pointer'
+                      }
+                    }
+                  },
                 render: (key, item)=>{
                     if (Object.keys(item).length > 0) {
                         return (
-                            <span>{item.BaudRate}/{item.DataBits || 8}/{Parity(item.Parity || 0)}/{item.StopBits || 1}</span>
+                            <Tooltip
+                                placement="topLeft"
+                                title={`${item.BaudRate}/${item.DataBits || 8}/${Parity(item.Parity || 0)}/${item.StopBits || 1}`}
+                            >{item.BaudRate}/{item.DataBits || 8}/{Parity(item.Parity || 0)}/{item.StopBits || 1}</Tooltip>
                         )
                     }
                 }

@@ -45,7 +45,6 @@ class ServiceState extends Component {
         this.getVersionLatest()
     }
     UNSAFE_componentWillReceiveProps (nextprops){
-        console.log(nextprops.store.gatewayInfo)
         const pathname = nextprops.location.pathname.toLowerCase();
         if (nextprops.store.gatewayInfo.apps !== this.state.apps){
             this.setState({

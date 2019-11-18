@@ -49,7 +49,6 @@ const newMessageChannel = (topic) => {
             this.topic = value;
         },
         pushData (value) {
-            // console.log(value)
             this.allData.push(value)
             if (this.filter === undefined) {
                 this.data.push(value)
@@ -204,6 +203,7 @@ class GatewayMQTT {
     @observable newVersionMsg = {};
     @observable new_version = undefined;
     @observable auth_code = '';
+    @observable vnet_message = [];
     @observable comm_channel = newMessageChannel('/comm');
     @observable log_channel = newMessageChannel('/log');
     @observable vserial_channel = newMessageChannel('v1/vspax/#');
@@ -609,8 +609,10 @@ class GatewayMQTT {
                 }
             }
             if (msg_topic === 'v1/vnet/api/RESULT') {
-                console.log(JSON.parse(msg.toString()))
                 const data = JSON.parse(msg.toString());
+                if (data.id.indexOf('start_vnet') !== -1 || data.id.indexOf('stop_vnet') !== -1 || data.id.indexOf('post_gate') !== -1){
+                    this.vnet_message.unshift(data)
+                }
                 if (data.id.indexOf('start_vnet') !== -1 && data.result && !this.vnet_channel.is_running) {
                     const postData = {
                         id: 'post_gate/' + new Date() * 1,

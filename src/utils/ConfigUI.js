@@ -78,7 +78,6 @@ const newConfigItem = (name, desc, type, default_value, depends, values, cols, l
         setValue (value) {
             if (value === undefined) {
                 this.value = createDefaultValue(this.type, this.default, this.values)
-                console.log(this.name, this.type, value)
                 return
             }
 
@@ -99,7 +98,6 @@ const newConfigItem = (name, desc, type, default_value, depends, values, cols, l
             } else {
                 this.value = value;
             }
-            console.log(this.name, this.type, value)
         },
         setHide (value) {
             this.hide = value;

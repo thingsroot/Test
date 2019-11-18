@@ -26,7 +26,6 @@ export function doUpdate (actions, cb) {
         if (now > action.last + 1000){
             action.last = now + 3000
             exec_result(action.id).then( ([result, data]) => {
-                console.log(result, data)
                 if (result) {
                     cb(action, 'done', data)
                 } else {

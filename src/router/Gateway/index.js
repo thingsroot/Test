@@ -49,24 +49,6 @@ class MyGatesDevices extends Component {
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
-        // const pathname = this.props.location.pathname.toLocaleLowerCase()
-        // console.log(pathname.indexOf('vnet'))
-        // if (pathname.indexOf('vserial') === -1 && this.state.ModalFlag){
-        //     this.setState({
-        //         ModalFlag: false
-        //     })
-        // }
-        // if (pathname.indexOf('vnet') === -1 && this.state.ModalFlag){
-        //     this.setState({
-        //         ModalFlag: false
-        //     })
-        // }
-        // if (pathname.indexOf('vserial') !== -1 && !this.state.ModalFlag){
-        //     this.setState({
-        //         ModalFlag: true
-        //     })
-        // }
-
         if (this.props.match.params.sn !== nextProps.match.params.sn &&
             this.state.gateway !== nextProps.match.params.sn){
             this.setState({gateway: nextProps.match.params.sn}, ()=>{
@@ -74,21 +56,10 @@ class MyGatesDevices extends Component {
                 this.props.store.timer.setGateStatusLast(0)
                 this.fetch()
                 clearInterval(this.timer)
-                //console.log('ClearInterval', this.timer)
                 this.timer = setInterval(() => this.fetch(), 10000)
             })
         }
     }
-    // shouldComponentUpdate () {
-    //     const pathname = this.props.location.pathname.toLocaleLowerCase()
-    //     console.log('222222222222222222222222223333')
-    //     if (pathname.indexOf('vserial') === -1 && this.state.ModalFlag || pathname.indexOf('vnet') === -1 && this.state.ModalFlag){
-    //         this.setState({
-    //             ModalFlag: false
-    //         })
-    //         console.log('2222222222222222222222')
-    //     }
-    // }
     componentWillUnmount (){
         clearInterval(this.timer)
     }
@@ -106,7 +77,6 @@ class MyGatesDevices extends Component {
               })
       }
     fetch = () => {
-        //console.log(new Date())
         const {gateway} = this.state;
         if (gateway === undefined || gateway === '') {
             return;
