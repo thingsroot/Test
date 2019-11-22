@@ -424,13 +424,13 @@ class VPN extends Component {
                         model === 'bridge'
                         ? <div className="VPNlist">
                             <p>
-                                网关桥接隧道状态：
+                                网关隧道状态：
                             </p>
                             <span>{this.state.bridge_run === 'running' ? '正常' : '异常'}</span>
                         </div>
                         : <div className="VPNlist">
                             <p>
-                            网关路由隧道状态：
+                            网关隧道状态：
                         </p>
                         <span>{this.state.router_run}</span>
                         </div>

@@ -197,15 +197,15 @@ class ServiceState extends Component {
                             :  ''
                         }
                     <div className="flex">
-                        <p>关联网关:</p>
-                        <Input
-                            value={gateway}
-                        />
-                    </div>
-                    <div className="flex">
                         <p>应用状态:</p>
                         <Input
                             value={this.props.store.gatewayInfo[this.state.app_name] ? '正常' : '异常'}
+                        />
+                    </div>
+                    <div className="flex">
+                        <p>关联网关:</p>
+                        <Input
+                            value={gateway}
                         />
                     </div>
                     {/* <div className="flex">
