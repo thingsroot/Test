@@ -5,6 +5,7 @@ import { inject, observer } from 'mobx-react';
 import {_getCookie} from '../../../utils/Session';
 import http from '../../../utils/Server';
 import ServiceState from '../../../common/ServiceState';
+import JSONPretty from 'react-json-pretty';
 import './style.scss';
 const Option = Select.Option;
 const { Panel } = Collapse;
@@ -20,6 +21,15 @@ const columns = [{
     key: 'status',
     width: '140px'
   }];
+  const genExtra = () => (
+    <Icon
+        type="setting"
+        onClick={event => {
+            // If you don't want click extra trigger collapse, you can prevent this:
+            event.stopPropagation();
+        }}
+    />
+  );
   @withRouter
   @inject('store')
   @observer
@@ -212,16 +222,17 @@ class VPN extends Component {
         mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/service_stop', JSON.stringify(data))
         mqtt && mqtt.client && mqtt.client.connected && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
     }
-    genExtra = () => {
-        return (
-            <Icon
-                type="setting"
-                onClick={event => {
-                // If you don't want click extra trigger collapse, you can prevent this:
-                    event.stopPropagation();
-                }}
-            />
-        )
+    getDate = (record) =>{
+        if (record.id){
+            const id = record.id;
+            const timeStamp = Number(id.split('/')[1]);
+            const date = new Date(timeStamp)
+            const Hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+            const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+            const seconds = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+            const time = Hours + ':' + minutes + ':' + seconds;
+            return time
+        }
     }
     render () {
         const { mqtt } = this.props;
@@ -468,14 +479,13 @@ class VPN extends Component {
                     <p className="vnet_title">消息</p>
                     <div>
                     <Collapse
-                        // defaultActiveKey={['1']}
-                        // onChange={callback}
                         expandIconPosition="right"
+                        // extra={genExtra()}
                     >
                         <Panel
                             header="消息列表"
                             key="1"
-                            extra={this.genExtra}
+                            extra={genExtra()}
                         >
                         {
                             mqtt.vnet_message && mqtt.vnet_message.length > 0 && mqtt.vnet_message.map((item, key) => {
@@ -484,7 +494,14 @@ class VPN extends Component {
                                         key={key}
                                         className="vnet_message_item"
                                     >
-                                        {JSON.stringify(item)}
+                                        时间:
+                                        {this.getDate(item)}
+                                        <br />
+                                        内容:
+                                        <JSONPretty
+                                            id="json-pretty"
+                                            data={JSON.stringify(item)}
+                                        ></JSONPretty>
                                     </div>
                                 )
                             })

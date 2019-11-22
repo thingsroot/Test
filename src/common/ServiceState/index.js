@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Select, message} from 'antd';
+import { Input, Select, message, Button} from 'antd';
 import { inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
@@ -172,7 +172,7 @@ class ServiceState extends Component {
                         <Input
                             value={this.state.settimer ? '异常' : '正常'}
                         />
-                        {/* <div className="versionMsg">
+                        <div className="versionMsg">
                                 {
                                     mqtt.new_version
                                     ? mqtt.vserial_channel.Active && mqtt.versionMsg
@@ -187,7 +187,7 @@ class ServiceState extends Component {
                                     </div>
                                     : ''
                                 }
-                            </div> */}
+                            </div>
                     </div>
                     {
                             this.state.settimer
