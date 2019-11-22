@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react'
 import http from '../../utils/Server';
 import { Tabs, Button, Rate, Tag } from 'antd';
 import Description from '../AppDetails/Description';
+import Comments from './Comments';
+import Issues from './Issues';
 import './style.scss';
 const { TabPane } = Tabs;
 function callback (key) {
@@ -12,14 +14,14 @@ class AppItems extends PureComponent {
         super(props)
 
         this.state = {
-            data: []
+            data: [],
+            visible: false,
+            comment: ''
         }
     }
     componentDidMount () {
-        console.log()
         const {name} = this.props.match.params;
         http.get('/api/applications_read?app=' + name).then(res=>{
-            console.log(res)
             if (res.ok) {
                 this.setState({
                     data: res.data.data,
@@ -39,12 +41,13 @@ class AppItems extends PureComponent {
                     <div className="app_simple_info">
                         <p>{data.app_name}</p>
                         <div className="app_simple_desc">
-                            <span>简易描述</span>
-                            <span>xxx次下载</span>
+                            <span>{data.name}</span>
+                            <span>{data.installed}次安装</span>
                             <span>
                                 <Rate
                                     disabled
                                     defaultValue={data.star}
+                                    style={{fontSize: '16px'}}
                                 />
                             </span>
                             <span>免费</span>
@@ -94,6 +97,9 @@ class AppItems extends PureComponent {
                                     </div>
                                     <div>
                                         <p>适用于</p>
+                                        <Tag>
+                                            {data.device_serial === 'ALL' ? '全部' : data.device_serial}
+                                        </Tag>
                                     </div>
                                     <div className="info_details">
                                         <p>更多信息</p>
@@ -106,16 +112,16 @@ class AppItems extends PureComponent {
                             </div>
                         </TabPane>
                         <TabPane
-                            tab="讨论"
+                            tab="评论"
                             key="2"
                         >
-                            讨论
+                            <Issues />
                         </TabPane>
                         <TabPane
                             tab="评分与评论"
                             key="3"
                         >
-                            评分与评论
+                            <Comments />
                         </TabPane>
                     </Tabs>
                     </div>
