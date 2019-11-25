@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Select, Button, Table, message, Collapse, Icon } from 'antd';
+import { Input, Select, Button, Table, message, Collapse } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import {_getCookie} from '../../../utils/Session';
@@ -21,15 +21,6 @@ const columns = [{
     key: 'status',
     width: '140px'
   }];
-  const genExtra = () => (
-    <Icon
-        type="setting"
-        onClick={event => {
-            // If you don't want click extra trigger collapse, you can prevent this:
-            event.stopPropagation();
-        }}
-    />
-  );
   @withRouter
   @inject('store')
   @observer
@@ -477,15 +468,20 @@ class VPN extends Component {
                 </div>
                 <div className="vnet_message">
                     <p className="vnet_title">消息</p>
+                    <span className="vnet_remove_message">
+                        <Button
+                            onClick={()=>{
+                                mqtt.vnet_message = []
+                            }}
+                        >清除</Button>
+                    </span>
                     <div>
                     <Collapse
                         expandIconPosition="right"
-                        // extra={genExtra()}
                     >
                         <Panel
                             header="消息列表"
                             key="1"
-                            extra={genExtra()}
                         >
                         {
                             mqtt.vnet_message && mqtt.vnet_message.length > 0 && mqtt.vnet_message.map((item, key) => {

@@ -16,6 +16,13 @@
             padding: 15px;
         }
     }
+    .vnet_remove_message{
+        position: absolute;
+        right:50px;
+        top:28px;
+        padding: '10px solid #ccc';
+        z-index: 999;
+    }
     .vnet_title{
         position: absolute;
         left:15px;

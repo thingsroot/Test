@@ -46,7 +46,7 @@ class ServiceState extends Component {
     }
     UNSAFE_componentWillReceiveProps (nextprops){
         const pathname = nextprops.location.pathname.toLowerCase();
-        if (nextprops.mqtt.upgrade_status === 'failed') {
+        if (nextprops.mqtt.upgrade_status === 'failed' && this.t1) {
             clearInterval(this.t1)
         }
         if (nextprops.store.gatewayInfo.apps !== this.state.apps){
@@ -166,7 +166,7 @@ class ServiceState extends Component {
     }
     render () {
         const { mqtt } = this.props;
-        const { message } = this.state;
+        const { message, appVersion, latestVersion } = this.state;
         const { addPortData, serviceNode } = mqtt.vserial_channel;
         const { pathname } = this.props.location;
         const gateway = pathname.indexOf('vserial') !== -1
@@ -205,22 +205,16 @@ class ServiceState extends Component {
                           </div>
                             :  ''
                         }
-                    <div className="flex">
+                    {/* <div className="flex">
                         <p>应用状态:</p>
                         <Input
                             value={this.props.store.gatewayInfo[this.state.app_name] ? '正常' : '异常'}
                         />
-                    </div>
+                    </div> */}
                     <div className="flex">
-                        <p>关联网关:</p>
+                        <p>应用状态:</p>
                         <Input
-                            value={gateway}
-                        />
-                    </div>
-                    {/* <div className="flex">
-                        <p>应用版本:</p>
-                        <Input
-                            value={appVersion}
+                            value={this.props.store.gatewayInfo[this.state.app_name] ? '正常' : '异常'}
                         />
                             <div className="versionMsg">
                                 {
@@ -237,7 +231,13 @@ class ServiceState extends Component {
                                     : ''
                                 }
                             </div>
-                    </div> */}
+                    </div>
+                    <div className="flex">
+                        <p>关联网关:</p>
+                        <Input
+                            value={gateway}
+                        />
+                    </div>
                     <div className="flex">
                         <p>服务节点:</p>
                         <div>

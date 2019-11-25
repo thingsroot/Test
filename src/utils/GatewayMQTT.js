@@ -580,7 +580,11 @@ class GatewayMQTT {
                         message.loading('服务重启中，请稍后...')
                         this.upgrade_status = data.result.status;
                     }
-                    if (data.result && data.data.status === 'failed') {
+                    if (data.result && data.data.status === 'failed' && data.data.md5 === 'None') {
+                        message.error('服务升级失败！')
+                        this.upgrade_status = 'failed';
+                    }
+                    if (data.result && data.data.status === 'failed' && data.data.md5 !== 'None') {
                         message.success('服务升级成功！')
                         this.upgrade_status = 'failed';
                     }
