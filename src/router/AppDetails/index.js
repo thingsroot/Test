@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Icon, Tabs, message, Button, Modal, Table, Tag } from 'antd';
+import { Icon, Tabs, message, Button, Modal, Table, Tag, Radio } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import VersionList from './VersionList';
@@ -31,6 +31,7 @@ class AppDetails extends Component {
         app: '',
         desc: '',
         groupName: '',
+        selectedRowKeys: '',
         sn_visible: false,
         newTemplateVisiable: false,
         name: '',
@@ -41,6 +42,15 @@ class AppDetails extends Component {
         dataSource: [],
         loading: false,
         columns: [
+            {
+                title: '',
+                data: 'dataIndex',
+                key: 'dataIndex',
+                width: '35px',
+                render: record=>{
+                    return <Radio checked={record.sn === this.state.sn}/>
+                }
+            },
             {
                 title: '序列号',
                 dataIndex: 'sn',
@@ -169,7 +179,6 @@ class AppDetails extends Component {
     getGatewayList = () => {
         this.setState({sn_visible: true, loading: true})
         http.get('/api/gateways_list?status=online').then(res=>{
-            console.log(res)
             this.setState({
                 dataSource: res.data,
                 loading: false
@@ -177,12 +186,16 @@ class AppDetails extends Component {
         })
     }
     JumpToInstall = () => {
-        console.log(this.state)
         if (this.state.sn === '') {
             message.error('请先选择需要安装到的网关！')
             return false;
         }
         this.props.history.push(`/appsinstall/${this.state.sn}/${this.state.app}/install`)
+    }
+    cancelInstall = () =>{
+        this.setState({
+            sn_visible: false
+        })
     }
     render () {
         let { app, app_info, time, user, desc, visible, confirmLoading, ModalText } = this.state;
@@ -278,6 +291,8 @@ class AppDetails extends Component {
                             title={<span><Icon type="info-circle" /> 请选择要安装到的网关</span>}
                             visible={this.state.sn_visible}
                             onOk={this.JumpToInstall}
+                            onCancel={this.cancelInstall}
+                            maskClosable={false}
                             cancelText="取消"
                             okText="确定"
                             width="1024px"
@@ -287,17 +302,11 @@ class AppDetails extends Component {
                                 columns={this.state.columns}
                                 loading={this.state.loading}
                                 size="small"
-                                rowSelection={{
-                                    type: 'radio',
-                                    onChange: (selectedRowKeys, selectedRows) => {
-                                    //   console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows[0].sn);
-                                      this.setState({sn: selectedRows[0].sn})
-                                    },
-                                    getCheckboxProps: record => ({
-                                      disabled: record.name === 'Disabled User', // Column configuration not to be checked
-                                      name: record.name
-                                    })
-                                  }}
+                                onRow={(record) => ({
+                                    onClick: () => {
+                                      this.setState({sn: record.sn});
+                                    }
+                                })}
                             />
                         </Modal>
                     </div>
