@@ -199,6 +199,7 @@ class GatewayMQTT {
     @observable flag = true;
     @observable connected = false;
     @observable gateway = '';
+    @observable upgrade_status = '';
     @observable versionMsg = false;
     @observable newVersionMsg = {};
     @observable new_version = undefined;
@@ -573,6 +574,17 @@ class GatewayMQTT {
             }
             if (msg_topic === 'v1/update/api/RESULT') {
                 const data = JSON.parse(msg.toString());
+                if (data.id.indexOf('get_upgrade_status') !== -1){
+                    console.log(data)
+                    if (data.result && data.data.status === 'done' && this.upgrade_status === ''){
+                        message.loading('服务重启中，请稍后...')
+                        this.upgrade_status = data.result.status;
+                    }
+                    if (data.result && data.data.status === 'failed') {
+                        message.success('服务升级成功！')
+                        this.upgrade_status = 'failed';
+                    }
+                }
                 if (data.result && data.data && data.data.length > 0){
                     this.onReceiveVserialMsg(data.data)
                 }

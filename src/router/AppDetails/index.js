@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Icon, Tabs, message, Button, Modal } from 'antd';
+import { Icon, Tabs, message, Button, Modal, Table, Tag } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import VersionList from './VersionList';
@@ -31,11 +31,43 @@ class AppDetails extends Component {
         app: '',
         desc: '',
         groupName: '',
+        sn_visible: false,
         newTemplateVisiable: false,
         name: '',
+        sn: '',
         ModalText: '确认删除此应用？',
         visible: false,
-        confirmLoading: false
+        confirmLoading: false,
+        dataSource: [],
+        loading: false,
+        columns: [
+            {
+                title: '序列号',
+                dataIndex: 'sn',
+                key: 'sn'
+            },
+            {
+                title: '名称',
+                dataIndex: 'dev_name',
+                key: 'dev_name',
+                sorter: (a, b) => a.dev_name.length - b.dev_name.length,
+                render: (props, record)=>{
+                    return (
+                        <div style={{lineHeight: '45px'}}>
+                            {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >公司</Tag> : null}
+                            {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >个人</Tag> : null}
+                            {record.is_shared ? <Tag color="orange" >分享</Tag> : null}
+                            {record.dev_name}
+                        </div>
+                    )
+                }
+              }, {
+                title: '描述',
+                dataIndex: 'description',
+                key: 'description',
+                sorter: (a, b) => a.description && b.description && a.description.length - b.description.length
+              }
+          ]
     };
     UNSAFE_componentWillMount () {
             this.setState({
@@ -69,7 +101,7 @@ class AppDetails extends Component {
     getDetails = ()=>{
         const {name} = this.state;
         http.get('/api/applications_read?app=' + name).then(res=>{
-            if (res.data.data.name.indexOf('/') !== -1) {
+            if (res.ok && res.data && res.data.data.name.indexOf('/') !== -1) {
                 res.data.data.name = res.data.data.name.replace(/\//g, '*')
             }
             if (!res.ok) {
@@ -134,6 +166,24 @@ class AppDetails extends Component {
     callback = (key)=>{
         this.setState({activeKey: key})
     };
+    getGatewayList = () => {
+        this.setState({sn_visible: true, loading: true})
+        http.get('/api/gateways_list?status=online').then(res=>{
+            console.log(res)
+            this.setState({
+                dataSource: res.data,
+                loading: false
+            })
+        })
+    }
+    JumpToInstall = () => {
+        console.log(this.state)
+        if (this.state.sn === '') {
+            message.error('请先选择需要安装到的网关！')
+            return false;
+        }
+        this.props.history.push(`/appsinstall/${this.state.sn}/${this.state.app}/install`)
+    }
     render () {
         let { app, app_info, time, user, desc, visible, confirmLoading, ModalText } = this.state;
         return (
@@ -183,16 +233,15 @@ class AppDetails extends Component {
                             <Icon type="edit" />
                             代码编辑
                         </Link>
-                        {
-                            this.props.store.gatewayList.FirstGateway
-                            ? <Link
-                                className="button"
-                                to={`/appsinstall/${this.props.store.gatewayList.FirstGateway.sn}/${app_info.name}/install`}
-                              >
-                                <Icon type="download" />
-                                安装此应用
-                            </Link> : ''
-                        }
+                        <Button
+                            onClick={()=>{
+                                this.getGatewayList()
+                            }}
+                            style={{height: '35px'}}
+                        >
+                            <Icon type="download" />
+                            安装此应用
+                        </Button>
                         <Link
                             className="button"
                             style={app_info.fork_from ? block : none}
@@ -224,6 +273,32 @@ class AppDetails extends Component {
                             okText="确定"
                         >
                             <p>{ModalText}</p>
+                        </Modal>
+                        <Modal
+                            title={<span><Icon type="info-circle" /> 请选择要安装到的网关</span>}
+                            visible={this.state.sn_visible}
+                            onOk={this.JumpToInstall}
+                            cancelText="取消"
+                            okText="确定"
+                            width="1024px"
+                        >
+                            <Table
+                                dataSource={this.state.dataSource}
+                                columns={this.state.columns}
+                                loading={this.state.loading}
+                                size="small"
+                                rowSelection={{
+                                    type: 'radio',
+                                    onChange: (selectedRowKeys, selectedRows) => {
+                                    //   console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows[0].sn);
+                                      this.setState({sn: selectedRows[0].sn})
+                                    },
+                                    getCheckboxProps: record => ({
+                                      disabled: record.name === 'Disabled User', // Column configuration not to be checked
+                                      name: record.name
+                                    })
+                                  }}
+                            />
                         </Modal>
                     </div>
                 </div>

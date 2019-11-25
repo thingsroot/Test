@@ -46,6 +46,9 @@ class ServiceState extends Component {
     }
     UNSAFE_componentWillReceiveProps (nextprops){
         const pathname = nextprops.location.pathname.toLowerCase();
+        if (nextprops.mqtt.upgrade_status === 'failed') {
+            clearInterval(this.t1)
+        }
         if (nextprops.store.gatewayInfo.apps !== this.state.apps){
             this.setState({
                 apps: nextprops.store.gatewayInfo.apps
@@ -148,6 +151,12 @@ class ServiceState extends Component {
             'new_version_filename': newVersionMsg.new_version_filename
         }
         mqtt.client.publish('v1/update/api/update', JSON.stringify(data))
+        const datas = {
+            id: 'get_upgrade_status/' + new Date() * 1
+        }
+        this.t1 = setInterval(() => {
+            mqtt.client.publish('v1/update/api/update_status', JSON.stringify(datas))
+        }, 3000);
     }
     handleChange = (value)=>{
         console.log(value)

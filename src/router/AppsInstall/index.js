@@ -47,6 +47,9 @@ class MyGatesAppsInstall extends Component {
         let app = this.props.match.params.app ? this.props.match.params.app.replace(/\*/g, '/') : ''
         let gateway_sn = this.props.match.params.sn;
         let install_step = this.props.match.params.step ? this.props.match.params.step : ''
+        if (this.props.match.params.sn && this.props.match.params.app) {
+            console.log('pushspsushdbiqgeibakbfj')
+        }
         if (this.props.match.params.app !== undefined && install_step === '') {
             install_step = 'view'
         }
