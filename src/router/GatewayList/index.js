@@ -3,13 +3,13 @@ import http from '../../utils/Server';
 import { Table, Tabs, Button, Popconfirm, message, Input, Icon, Menu, Dropdown, Tag } from 'antd';
 import './style.scss';
 import { inject, observer } from 'mobx-react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import GatewayForm from './GatewayForm'
 
 const Search = Input.Search;
 const TabPane = Tabs.TabPane;
 let timer;
-
+@withRouter
 @inject('store')
 @observer
 class MyGates extends Component {
@@ -88,16 +88,14 @@ class MyGates extends Component {
                   return (
                       <span>
                         <Link to={{
-                            pathname: `/gateway/${record.sn}/devices`,
-                            state: record
+                            pathname: `/gateway/${record.sn}/devices`
                         }}
                         >
                             <Button key="1">设备</Button>
                         </Link>
                         <span style={{padding: '0 1px'}} />
                         <Link to={{
-                            pathname: `/gateway/${record.sn}/apps`,
-                            state: record
+                            pathname: `/gateway/${record.sn}/apps`
                         }}
                         >
                             <Button key="2">应用</Button>
@@ -109,8 +107,7 @@ class MyGates extends Component {
                                 <Menu>
                                 <Menu.Item key="0">
                                     <Link to={{
-                                        pathname: `/gateway/${record.sn}/settings`,
-                                        state: record
+                                        pathname: `/gateway/${record.sn}/settings`
                                     }}
                                         style={{color: 'rgba(0, 0, 0, 0.65)'}}
                                         disabled={record.disabled}
@@ -122,8 +119,7 @@ class MyGates extends Component {
                                 </Menu.Item>
                                 <Menu.Item key="2">
                                     <Link to={{
-                                        pathname: `/gateway/${record.sn}/onlinerecords`,
-                                        state: record
+                                        pathname: `/gateway/${record.sn}/onlinerecords`
                                     }}
                                         style={{color: 'rgba(0, 0, 0, 0.65)'}}
                                         disabled={record.disabled}

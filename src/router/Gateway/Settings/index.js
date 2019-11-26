@@ -41,6 +41,10 @@ class GatewaySettings extends Component {
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
+        if (nextProps.store.gatewayInfo.data.platform !== this.props.store.gatewayInfo.data.platform) {
+            this.fetchUpdate()
+            this.setState({skynet_latest_version: undefined})
+        }
         if (nextProps.gateway !== this.state.gateway){
             this.setState({
                 gateway: nextProps.gateway,
@@ -223,6 +227,7 @@ class GatewaySettings extends Component {
                 message.error(res.error)
                 return
             }
+            console.log(res.data, 'res.data')
             this.props.store.gatewayInfo.updateStatus(res.data);
             this.setState({loading: false})
             this.fetchFreeIOEVersion()
@@ -252,9 +257,15 @@ class GatewaySettings extends Component {
         }
         http.post('/api/gateways_upgrade', data).then(res=>{
             if (res.ok) {
-                this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 30000,  (result)=> {
+                this.setState({skynet_latest_version: undefined}, ()=>{
+                    this.fetchSkynetVersion()
+                })
+                console.log(this.props.store.gatewayInfo.data.platform, 'ssssssssssssssssssssssssssssssssssssssssss')
+                this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 3000,  (result)=> {
+                    this.fetchSkynetVersion()
+                    console.log(this.props.store.gatewayInfo.data.platform, 'ssssssssssssssssssssssssssssssssssssssssss')
                     if (result.ok){
-                        this.setState({showUpgrade: false})
+                        this.setState({showUpgrade: false, skynet_latest_version: undefined})
                     } else {
                         this.setState({upgrading: false})
                     }
