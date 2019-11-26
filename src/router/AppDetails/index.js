@@ -288,7 +288,7 @@ class AppDetails extends Component {
                             <p>{ModalText}</p>
                         </Modal>
                         <Modal
-                            title={<span><Icon type="info-circle" /> 请选择要安装到的网关</span>}
+                            title={<span><Icon type="download" /> 请选择要安装到的网关</span>}
                             visible={this.state.sn_visible}
                             onOk={this.JumpToInstall}
                             onCancel={this.cancelInstall}

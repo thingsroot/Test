@@ -135,7 +135,6 @@ class ServiceState extends Component {
             return false;
         } else {
             setTimeout(() => {
-                console.log('1111111111')
                 this.getVersionLatest()
             }, 2000);
         }
@@ -143,7 +142,6 @@ class ServiceState extends Component {
     upgradeRprogramming = () =>{
         const { mqtt } = this.props;
         const { newVersionMsg } = mqtt.vserial_channel;
-        console.log(mqtt)
         const data = {
             'id': 'upgradeRprogramming/' + new Date() * 1,
             'update_confirm': newVersionMsg.update,
@@ -159,10 +157,8 @@ class ServiceState extends Component {
         }, 3000);
     }
     handleChange = (value)=>{
-        console.log(value)
         const { mqtt } = this.props;
         mqtt.vserial_channel.setProxy(value)
-        console.log(mqtt.vserial_channel.Proxy)
     }
     render () {
         const { mqtt } = this.props;
@@ -198,19 +194,13 @@ class ServiceState extends Component {
                                 }
                             </div>
                     </div>
-                    {
+                        {
                             this.state.settimer
                             ? <div className="prompt">
                             未能连接到远程编程服务，请确认freeioe_Rprogramming是否安装并运行。下载<a href="http://thingscloud.oss-cn-beijing.aliyuncs.com/freeioe_Rprogramming/freeioe_Rprogramming.zip">freeioe_Rprogramming</a>
                           </div>
                             :  ''
                         }
-                    {/* <div className="flex">
-                        <p>应用状态:</p>
-                        <Input
-                            value={this.props.store.gatewayInfo[this.state.app_name] ? '正常' : '异常'}
-                        />
-                    </div> */}
                     <div className="flex">
                         <p>应用状态:</p>
                         <Input

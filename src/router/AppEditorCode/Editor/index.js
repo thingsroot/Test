@@ -357,7 +357,7 @@ class MyCode extends Component {
             this.setState({
                 showReleaseModal: false
             });
-            codeStore.change();
+            codeStore && codeStore.change();
             window.location.reload()
         }, 1500)
     };
