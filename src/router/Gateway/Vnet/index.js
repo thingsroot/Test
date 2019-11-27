@@ -51,7 +51,7 @@ class VPN extends Component {
         chouldstatus: {},
         isShow: false,
         pingIP: '',
-        timer: false
+        timer: undefined
     }
     componentDidMount (){
         http.get('/api/user_token_read').then(res=>{
@@ -67,7 +67,7 @@ class VPN extends Component {
         }, 10000);
         this.timer1 = setInterval(() => {
             this.sendKeepAlive()
-        }, 20000);
+        }, 3000);
         const { mqtt } = this.props;
         mqtt.connect(this.props.gateway, 'v1/vnet/#', true)
 
@@ -355,7 +355,7 @@ class VPN extends Component {
                             className="btn"
                             type="primary"
                             loading={start_loading}
-                            disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0 && !this.state.timer)}
+                            disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0 && this.state.timer !== undefined && !this.state.timer)}
                             style={{fontSize: 24, height: 50}}
                             onClick={()=>{
                                 this.setState({

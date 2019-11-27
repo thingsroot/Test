@@ -15,7 +15,7 @@ class ServiceState extends Component {
         apps: [],
         latestVersion: 0,
         instName: '',
-        settimer: false,
+        settimer: undefined,
         app_name: ''
     }
     componentDidMount (){
@@ -32,14 +32,28 @@ class ServiceState extends Component {
             }
         }, 5000);
         this.alive = setInterval(() => {
-            if (mqtt.client && mqtt.client.connected && this.state.settimer) {
+            if (mqtt.client && mqtt.client.connected && (this.state.settimer || this.state.settimer === undefined)) {
                 this.setState({
                     settimer: false
                 }, ()=>{
                     this.props.settimer(false)
                 })
             }
-            if (mqtt.client && !mqtt.client.connected && !this.state.settimer) {
+            // if (mqtt.client && mqtt.client.connected && this.state.settimer === undefined) {
+            //     this.setState({
+            //         settimer: false
+            //     }, ()=>{
+            //         this.props.settimer(false)
+            //     })
+            // }
+            // if (mqtt.client && !mqtt.client.connected &&  this.state.settimer === undefined) {
+            //     this.setState({
+            //         settimer: true
+            //     }, ()=>{
+            //         this.props.settimer(true)
+            //     })
+            // }
+            if (mqtt.client && !mqtt.client.connected && (!this.state.settimer || this.state.settimer === undefined)) {
                 this.setState({
                     settimer: true
                 }, ()=>{
@@ -180,7 +194,7 @@ class ServiceState extends Component {
                     <div className="flex">
                         <p>服务状态:</p>
                         <Input
-                            value={this.state.settimer ? '异常' : '正常'}
+                            value={this.state.settimer !== undefined ? this.state.settimer ? '异常' : '正常' : '加载中...'}
                         />
                         <div className="versionMsg">
                                 {
@@ -200,7 +214,7 @@ class ServiceState extends Component {
                             </div>
                     </div>
                         {
-                            this.state.settimer
+                            this.state.settimer && this.state.settimer !== undefined
                             ? <div className="prompt">
                             未能连接到远程编程服务，请确认freeioe_Rprogramming是否安装并运行。
                             <a href="http://thingscloud.oss-cn-beijing.aliyuncs.com/freeioe_Rprogramming/freeioe_Rprogramming.zip">点击下载 freeioe_Rprogramming</a>
