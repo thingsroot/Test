@@ -682,9 +682,9 @@ class GatewayMQTT {
                     message: data.message
                 })
             }
-            if (msg_topic.indexOf('v1/vnet/api/post_gate') !== -1){
-                const data = JSON.parse(msg.toString());
-            }
+            // if (msg_topic.indexOf('v1/vnet/api/post_gate') !== -1){
+            //     const data = JSON.parse(msg.toString());
+            // }
         })
     }
 }
