@@ -197,6 +197,25 @@ class AppDetails extends Component {
             sn_visible: false
         })
     }
+    sendForkCreate (record){
+        http.get('/api/gateways_app_version_latest?app=' + record.name).then(result=>{
+            if (result.ok) {
+                http.post('/api/applications_forks_create', {
+                    name: record.name,
+                    version: Number(result.data)
+                }).then(res=>{
+                    if (res.ok){
+                        message.success('应用克隆成功，即将跳转到编辑页面！')
+                        if (res.data){
+                            this.props.history.push(`/appeditorcode/${res.data.name}/${res.data.app_name}`);
+                        }
+                    } else {
+                        message.error(res.error)
+                    }
+                })
+            }
+        })
+    }
     render () {
         let { app, app_info, time, user, desc, visible, confirmLoading, ModalText } = this.state;
         return (
@@ -255,6 +274,22 @@ class AppDetails extends Component {
                             <Icon type="download" />
                             安装此应用
                         </Button>
+                        {
+                            app_info.owner !== _getCookie('user_id')
+                            ? <Button
+                                style={{
+                                    height: '35px',
+                                    marginLeft: '15px'
+                                }}
+                                onClick={()=>{
+                                    this.sendForkCreate(app_info)
+                                }}
+                              >
+                                <Icon type="fork" />
+                                克隆
+                            </Button>
+                            : ''
+                        }
                         <Link
                             className="button"
                             style={app_info.fork_from ? block : none}

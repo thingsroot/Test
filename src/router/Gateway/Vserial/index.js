@@ -79,6 +79,7 @@ class Vserial extends Component {
         DataBits: '8',
         Check: 'NONE',
         port: 0,
+        timer: false,
         flag: false,
         connect_flag: false,
         logFlag: false,
@@ -438,6 +439,11 @@ class Vserial extends Component {
             [name]: value
         })
     }
+    settimer = (val) =>{
+        this.setState({
+            timer: val
+        })
+    }
     render () {
         const { SerialPort, serviceName, flag, openLoading, stopLoading, logFlag } = this.state;
         const { mqtt } = this.props;
@@ -447,6 +453,7 @@ class Vserial extends Component {
                 <ServiceState
                     mqtt={mqtt}
                     gateway={this.props.gateway}
+                    settimer={this.settimer}
                 />
                 <div className="vserialPort">
                     <div>
@@ -545,7 +552,7 @@ class Vserial extends Component {
                                 ? <Button
                                     type="primary"
                                     loading={openLoading}
-                                    disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0)}
+                                    disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0 && !this.state.timer)}
                                     onClick={()=>{
                                         this.setState({
                                             openLoading: true,

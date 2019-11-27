@@ -588,7 +588,8 @@ class GatewayMQTT {
                         this.upgrade_status = 'failed';
                     }
                 }
-                if (data.result && data.data && data.data.length > 0){
+                console.log(data)
+                if (data.id.indexOf('server_list') !== -1 && data.result && data.data && data.data.length > 0){
                     this.onReceiveVserialMsg(data.data)
                 }
                 if (data.id.indexOf('get_new_version') !== -1 && data.result){
@@ -669,6 +670,7 @@ class GatewayMQTT {
             }
             if (msg_topic === 'v1/vnet/api/keep_alive') {
                 const data = JSON.parse(msg.toString());
+                console.log(data, 'keep_alive')
                 if (data.id.indexOf('keep_alive') !== -1) {
                     if (data.auth_code) {
                         this.auth_code = data.auth_code;

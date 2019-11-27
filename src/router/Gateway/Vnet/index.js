@@ -50,7 +50,8 @@ class VPN extends Component {
         gateStatus: '',
         chouldstatus: {},
         isShow: false,
-        pingIP: ''
+        pingIP: '',
+        timer: false
     }
     componentDidMount (){
         http.get('/api/user_token_read').then(res=>{
@@ -225,6 +226,11 @@ class VPN extends Component {
             return time
         }
     }
+    settimer = (val) =>{
+        this.setState({
+            timer: val
+        })
+    }
     render () {
         const { mqtt } = this.props;
         const { is_running } = this.props.mqtt.vnet_channel;
@@ -235,6 +241,7 @@ class VPN extends Component {
                     <ServiceState
                         mqtt={this.props.mqtt}
                         gateway={this.props.match.params.sn}
+                        settimer={this.settimer}
                     />
                 </div>
                 <div className="VPNLeft">
@@ -348,7 +355,7 @@ class VPN extends Component {
                             className="btn"
                             type="primary"
                             loading={start_loading}
-                            disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0)}
+                            disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0 && !this.state.timer)}
                             style={{fontSize: 24, height: 50}}
                             onClick={()=>{
                                 this.setState({

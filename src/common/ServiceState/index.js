@@ -21,6 +21,7 @@ class ServiceState extends Component {
     componentDidMount (){
         const { mqtt } = this.props;
         this.t1 = setInterval(() => {
+            mqtt && mqtt.client && mqtt.connected && mqtt.client.publish('v1/update/api/servers_list', JSON.stringify({'id': 'server_list/' + new Date() * 1}))
             mqtt && mqtt.client && mqtt.connected && mqtt.client.publish('v1/update/api/version', JSON.stringify({'id': 'get_new_version/' + new Date() * 1}))
             mqtt && mqtt.client && mqtt.connected && mqtt.client.publish('v1/vspax/api/list', JSON.stringify({id: 'api/list/' + new Date() * 1}))
             if (mqtt.vserial_channel.PortLength.length > 0) {
@@ -34,11 +35,15 @@ class ServiceState extends Component {
             if (mqtt.client && mqtt.client.connected && this.state.settimer) {
                 this.setState({
                     settimer: false
+                }, ()=>{
+                    this.props.settimer(false)
                 })
             }
             if (mqtt.client && !mqtt.client.connected && !this.state.settimer) {
                 this.setState({
                     settimer: true
+                }, ()=>{
+                    this.props.settimer(true)
                 })
             }
         }, 3000);
@@ -197,7 +202,8 @@ class ServiceState extends Component {
                         {
                             this.state.settimer
                             ? <div className="prompt">
-                            未能连接到远程编程服务，请确认freeioe_Rprogramming是否安装并运行。下载<a href="http://thingscloud.oss-cn-beijing.aliyuncs.com/freeioe_Rprogramming/freeioe_Rprogramming.zip">freeioe_Rprogramming</a>
+                            未能连接到远程编程服务，请确认freeioe_Rprogramming是否安装并运行。
+                            <a href="http://thingscloud.oss-cn-beijing.aliyuncs.com/freeioe_Rprogramming/freeioe_Rprogramming.zip">点击下载 freeioe_Rprogramming</a>
                           </div>
                             :  ''
                         }
