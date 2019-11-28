@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';
-import {Table, Input, Popconfirm, Form, Icon, Modal, message, Empty} from 'antd';
+import {Table, Input, Popconfirm, Form, Modal, message, Empty} from 'antd';
 import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
 import {inject, observer} from 'mobx-react';
@@ -124,9 +124,6 @@ class Edituser extends React.Component {
             }
         ];
     }
-    UNSAFE_componentWillReceiveProps (nextProps) {
-        console.log(nextProps)
-    }
     isEditing = record => {
         return record.name === this.state.editingKey
     };
@@ -224,12 +221,12 @@ class Edituser extends React.Component {
         return (
             <div className="company-name">
                 <span>{title}</span>
-                <span
+                {/* <span
                     className="add-user"
                     onClick={this.addGroup}
                 >
                     <Icon type="usergroup-add" />
-                </span>
+                </span> */}
             </div>
         )
     }
@@ -272,6 +269,7 @@ class Edituser extends React.Component {
                                         rowKey="name"
                                         components={components}
                                         dataSource={this.props.group_list}
+                                        loading={!this.props.group_list}
                                         columns={columns}
                                         rowClassName={this.setRowClassName}
                                         pagination={false}

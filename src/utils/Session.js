@@ -41,6 +41,7 @@ export function authenticateSuccess (data) {
     _setCookie('companies', data.companies[0])
     _setCookie('is_developer', data.is_developer)
     _setCookie('user_id', data.name)
+    _setCookie('is_admin', data.is_admin)
 }
 
 export function refreshToken () {

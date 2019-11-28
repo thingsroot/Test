@@ -71,6 +71,7 @@ class Editable extends Component {
             gatewayList: [],
             filterGatewayList: [],
             editingKey: '',
+            loading: true,
             columnsGateway: [
                 {
                     title: '网关序列号',
@@ -100,11 +101,11 @@ class Editable extends Component {
             ],
             columnsUser: [
                 {
-                    title: 'ID',
+                    title: '序号',
                     dataIndex: 'idx'
                 },
                 {
-                    title: '名称',
+                    title: '用户ID',
                     dataIndex: 'user',
                     editable: true
                 },
@@ -147,6 +148,7 @@ class Editable extends Component {
                                 <Button
                                     disabled={editingKey !== ''}
                                     onClick={() => this.edit(record.idx)}
+                                    style={{marginRight: '15px'}}
                                 >
                                     编辑
                                 </Button>
@@ -166,11 +168,11 @@ class Editable extends Component {
             count: 0,
             columnsDevice: [
                 {
-                    title: 'ID',
+                    title: '序号',
                     dataIndex: 'idx'
                 },
                 {
-                    title: '名称',
+                    title: '网关序列号',
                     dataIndex: 'device',
                     editable: true
                 },
@@ -243,6 +245,7 @@ class Editable extends Component {
                 http.post('/api/companies_sharedgroups_update', data).then(res=>{
                     if (res.ok) {
                         message.success('更改成员信息成功！')
+                        this.props.getdata()
                     } else {
                         message.error('更改成员信息失败！错误信息：' + res.error)
                     }
@@ -272,7 +275,7 @@ class Editable extends Component {
     addGateway = (record) => {
         const data = {
             name: this.props.activeKey,
-            device: record.dev_name
+            device: record.sn
         }
         http.post('/api/companies_sharedgroups_add_device', data).then(res=>{
             if (res.ok) {
@@ -312,13 +315,15 @@ class Editable extends Component {
     };
     templateShowDevice = ()=> {
         this.setState({
-            showTemplateSelectionDevice: true
+            showTemplateSelectionDevice: true,
+            loading: true
         }, ()=>{
             http.get('/api/gateways_list').then(res=>{
                 if (res.ok) {
                     this.setState({
                         gatewayList: res.data,
-                        filterGatewayList: res.data
+                        filterGatewayList: res.data,
+                        loading: false
                     })
                 }
             })
@@ -428,6 +433,7 @@ class Editable extends Component {
                                 dataSource={this.state.gatewayList}
                                 pagination={false}
                                 scroll={{y: 400}}
+                                loading={this.state.loading}
                             />
                         </div>
                     </Modal>

@@ -71,14 +71,18 @@ class EditableTable extends React.Component {
         this.columns = [
             {
                 title: '姓名',
-                dataIndex: 'username',
+                dataIndex: 'full_name',
+                width: '12%',
+                editable: true
+            }, {
+                title: '用户名',
+                dataIndex: 'name',
                 width: '25%',
                 editable: true
-            },
-            {
+            }, {
                 title: '手机号',
                 dataIndex: 'mobile_no',
-                width: '40%',
+                width: '28%',
                 editable: true
             },
             {
@@ -137,7 +141,6 @@ class EditableTable extends React.Component {
         ];
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
-        console.log(nextProps)
         if (nextProps.empty && this.state.loading) {
             this.setState({
                 loading: false
@@ -288,8 +291,8 @@ class EditableTable extends React.Component {
             if (this.state.status === 'updateUser') {
                 const datas = {
                     name: values.user,
-                    first_name: values.name,
-                    last_name: '',
+                    first_name: values.firstname,
+                    last_name: values.lastname,
                     mobile_no: values.phone,
                     new_password: values.password
                 }
@@ -302,10 +305,13 @@ class EditableTable extends React.Component {
                     if (res.ok) {
                         message.success('修改用户信息成功！')
                         this.props.getdata()
+                    } else {
+                        message.error(res.error)
                     }
                 })
             } else {
-                if (values.name !== undefined &&
+                if (values.firstname !== undefined &&
+                    values.lastname !== undefined &&
                     values.phone !== undefined &&
                     values.user !==  undefined &&
                     values.password !== undefined &&
@@ -318,8 +324,8 @@ class EditableTable extends React.Component {
                         user: values.user,
                         email: values.user,
                         mobile_no: values.phone,
-                        first_name: values.name,
-                        last_name: '',
+                        first_name: values.firstname,
+                        last_name: values.lastname,
                         new_password: values.password,
                         company: this.props.company
                     }
@@ -331,6 +337,8 @@ class EditableTable extends React.Component {
                                     this.props.getdata()
                                 }
                             })
+                        } else {
+                            message.error(res.error)
                         }
                     })
                     this.setState({
@@ -379,16 +387,17 @@ class EditableTable extends React.Component {
                         columns={columns}
                         rowClassName="editable-row"
                         rowKey="email"
-                        pagination={false}
+                        // pagination={false}
                         size="small"
                     />
                     <Button
                         onClick={()=>{
                             this.setState({visibleMember: true})
                         }}
-                        style={{
-                            marginTop: 20
-                        }}
+                        type="primary"
+                        // style={{
+                        //     marginTop: '20px'
+                        // }}
                         disabled={this.props.activeKey === ''}
                     >
                         添加企业成员
@@ -415,12 +424,22 @@ class EditableTable extends React.Component {
                                 ]
                             })(<Input disabled={this.state.status === 'updateUser'} />)}
                         </Form.Item>
-                        <Form.Item label="姓名">
-                            {getFieldDecorator('name', {
+                        <Form.Item label="姓">
+                            {getFieldDecorator('firstname', {
                                 rules: [
                                     {
                                         required: true,
-                                        message: '请输入姓名'
+                                        message: '请输入姓'
+                                    }
+                                ]
+                            })(<Input type="text"/>)}
+                        </Form.Item>
+                        <Form.Item label="名">
+                            {getFieldDecorator('lastname', {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: '请输入名'
                                     }
                                 ]
                             })(<Input type="text"/>)}

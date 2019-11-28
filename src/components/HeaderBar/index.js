@@ -30,7 +30,7 @@ class HeaderBar extends PureComponent {
                     </span>
                 </Menu.Item>
                 <Menu.Item
-                    key="16"
+                    key="17"
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
@@ -118,20 +118,6 @@ class HeaderBar extends PureComponent {
         const menu2 = (
             <Menu style={{width: 160}}>
                 <Menu.Item
-                    key="17"
-                    style={{lineHeight: '30px'}}
-                    onClick={
-                        ()=>{
-                            this.props.history.push('/sharegroup')
-                        }
-                    }
-                >
-                    <Icon type="share-alt"/>
-                    <span>
-                        共享组管理
-                    </span>
-                </Menu.Item>
-                <Menu.Item
                     key="18"
                     style={{lineHeight: '30px'}}
                     onClick={
@@ -145,26 +131,44 @@ class HeaderBar extends PureComponent {
                         成员管理
                     </span>
                 </Menu.Item>
+                <Menu.Item
+                    key="19"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            this.props.history.push('/sharegroup')
+                        }
+                    }
+                >
+                    <Icon type="share-alt"/>
+                    <span>
+                        共享组管理
+                    </span>
+                </Menu.Item>
             </Menu>
         )
         return (
             <div className="headerUser">
-                <Dropdown
-                    overlay={menu2}
-                    placement="bottomRight"
-                >
-                    <span
-                        className="ant-dropdown-link"
-                        style={{padding: '10px', cursor: 'pointer'}}
-                    >
-                        <Icon
-                            style={{padding: '0 4px', fontWeight: 800}}
-                            type="global"
-                        />
-                        企业
-                        <Icon type="down" />
-                    </span>
-                </Dropdown>
+                {
+                    _getCookie('is_admin') === '1'
+                    ? <Dropdown
+                        overlay={menu2}
+                        placement="bottomRight"
+                      >
+                        <span
+                            className="ant-dropdown-link"
+                            style={{padding: '10px', cursor: 'pointer'}}
+                        >
+                            <Icon
+                                style={{padding: '0 4px', fontWeight: 800}}
+                                type="global"
+                            />
+                            企业
+                            <Icon type="down" />
+                        </span>
+                    </Dropdown>
+                : ''
+                }
                 {
                     OEM.Title === '冬笋云'
                     ? <span>

@@ -1,7 +1,12 @@
 import React, {Fragment} from 'react';
 import {Table, Input,
     Popconfirm,
-    Form, Icon, Modal, message, Empty} from 'antd';
+    Form,
+    // Icon,
+    Modal,
+    message,
+    Empty
+} from 'antd';
 import {inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
@@ -218,12 +223,12 @@ class Edituser extends React.Component {
         return (
             <div className="company-name">
                 <span>{title}</span>
-                <span
+                {/* <span
                     className="add-user"
                     onClick={this.addGroup}
                 >
                     <Icon type="usergroup-add" />
-                </span>
+                </span> */}
             </div>
         )
     }
@@ -298,7 +303,7 @@ class Edituser extends React.Component {
                     cancelText="取消"
                     maskClosable={false}
                 >
-                    <div> 共享组名：
+                    <div> 成员组名称：
                         <Input
                             style={{'width': '80%'}}
                             value={this.state.groupValue}
