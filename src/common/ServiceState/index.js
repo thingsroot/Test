@@ -39,20 +39,6 @@ class ServiceState extends Component {
                     this.props.settimer(false)
                 })
             }
-            // if (mqtt.client && mqtt.client.connected && this.state.settimer === undefined) {
-            //     this.setState({
-            //         settimer: false
-            //     }, ()=>{
-            //         this.props.settimer(false)
-            //     })
-            // }
-            // if (mqtt.client && !mqtt.client.connected &&  this.state.settimer === undefined) {
-            //     this.setState({
-            //         settimer: true
-            //     }, ()=>{
-            //         this.props.settimer(true)
-            //     })
-            // }
             if (mqtt.client && !mqtt.client.connected && (!this.state.settimer || this.state.settimer === undefined)) {
                 this.setState({
                     settimer: true
