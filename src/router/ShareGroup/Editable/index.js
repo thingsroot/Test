@@ -71,6 +71,7 @@ class Editable extends Component {
             gatewayList: [],
             filterGatewayList: [],
             editingKey: '',
+            loading: true,
             columnsGateway: [
                 {
                     title: '网关序列号',
@@ -84,7 +85,6 @@ class Editable extends Component {
                 }, {
                     title: '操作',
                     render: (record)=>{
-                        // console.log(record, 'record')
                         return (
                             <Button
                                 type="primary"
@@ -101,11 +101,11 @@ class Editable extends Component {
             ],
             columnsUser: [
                 {
-                    title: 'ID',
+                    title: '序号',
                     dataIndex: 'idx'
                 },
                 {
-                    title: '名称',
+                    title: '用户ID',
                     dataIndex: 'user',
                     editable: true
                 },
@@ -148,6 +148,7 @@ class Editable extends Component {
                                 <Button
                                     disabled={editingKey !== ''}
                                     onClick={() => this.edit(record.idx)}
+                                    style={{marginRight: '15px'}}
                                 >
                                     编辑
                                 </Button>
@@ -164,22 +165,14 @@ class Editable extends Component {
                     }
                 }
             ],
-            dataSourceUser: [
-                {
-                    key: '0',
-                    name: 'Edward King 0',
-                    id: '32',
-                    remark: 'London, Park Lane no. 0'
-                }
-            ],
             count: 0,
             columnsDevice: [
                 {
-                    title: 'ID',
+                    title: '序号',
                     dataIndex: 'idx'
                 },
                 {
-                    title: '名称',
+                    title: '网关序列号',
                     dataIndex: 'device',
                     editable: true
                 },
@@ -205,7 +198,6 @@ class Editable extends Component {
                         ) : null
                 }
             ],
-            dataSourceDevice: [],
             showTemplateSelectionDevice: false
         }
     }
@@ -237,10 +229,11 @@ class Editable extends Component {
                     if (res.ok) {
                         message.success('添加成员成功！')
                         this.props.getdata()
+                    } else {
+                        message.error('添加成员失败！错误信息：' + res.error)
                     }
                 })
             } else {
-                console.log('保存', this.props, this.state)
                 const data = {
                     name: this.props.activeKey,
                     company: this.props.company,
@@ -252,6 +245,9 @@ class Editable extends Component {
                 http.post('/api/companies_sharedgroups_update', data).then(res=>{
                     if (res.ok) {
                         message.success('更改成员信息成功！')
+                        this.props.getdata()
+                    } else {
+                        message.error('更改成员信息失败！错误信息：' + res.error)
                     }
                 })
             }
@@ -279,7 +275,7 @@ class Editable extends Component {
     addGateway = (record) => {
         const data = {
             name: this.props.activeKey,
-            device: record.dev_name
+            device: record.sn
         }
         http.post('/api/companies_sharedgroups_add_device', data).then(res=>{
             if (res.ok) {
@@ -289,10 +285,12 @@ class Editable extends Component {
                     creation: record.creation,
                     idx: num,
                     modified: record.modified,
-                    comment: '测试'
+                    description: ''
                 }
                 this.props.store.groups.pushGroupsGatewaylist(obj)
                 message.success('添加设备成功')
+            } else {
+                message.error('添加设备失败！错误信息：' + res.error)
             }
         })
     }
@@ -317,13 +315,15 @@ class Editable extends Component {
     };
     templateShowDevice = ()=> {
         this.setState({
-            showTemplateSelectionDevice: true
+            showTemplateSelectionDevice: true,
+            loading: true
         }, ()=>{
             http.get('/api/gateways_list').then(res=>{
                 if (res.ok) {
                     this.setState({
                         gatewayList: res.data,
-                        filterGatewayList: res.data
+                        filterGatewayList: res.data,
+                        loading: false
                     })
                 }
             })
@@ -373,7 +373,7 @@ class Editable extends Component {
                     <Button
                         onClick={this.addUser}
                         style={{margin: '10px 0'}}
-                        disabled={this.state.editingKey === ''}
+                        disabled={this.props.activeKey === ''}
                     >
                         添加成员
                     </Button>
@@ -391,7 +391,7 @@ class Editable extends Component {
                     <Button
                         onClick={this.templateShowDevice}
                         style={{margin: '10px 0'}}
-                        disabled={this.state.editingKey === ''}
+                        disabled={this.props.activeKey === ''}
                     >
                         添加网关
                     </Button>
@@ -433,6 +433,7 @@ class Editable extends Component {
                                 dataSource={this.state.gatewayList}
                                 pagination={false}
                                 scroll={{y: 400}}
+                                loading={this.state.loading}
                             />
                         </div>
                     </Modal>

@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Carousel } from 'antd';
-//import { LazyLoad } from 'react-lazy-load';
-// import AppCard from '../../common/AppCard';
-// import Developer from '../Developer';
+import { Tag, Input, Icon, Rate  } from 'antd';
+const { Search } = Input;
 import './style.scss';
 import http from '../../utils/Server';
 @withRouter
@@ -14,179 +12,183 @@ class AppStore extends Component {
     constructor (props){
         super(props)
         this.state = {
-            data: []
+            data: [],
+            tag_list: [],
+            add_tag_list: [],
+            color: ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple', '#f50', '#2db7f5', '#87d068', '#108ee9']
         }
     }
 
     componentDidMount (){
-        // let arr = ['aaaa', 'bbb', 'eee', 'fff', 'fff', 'fff', 'fff', 'fff', 'fff', 'fff', 'fff', 'fff', 'fff', 'fff', 'fff']
-        // this.setState({data: arr})
         http.get('/api/store_list').then(res=>{
-            console.log(res)
-            this.setState({data: res.data})
-            console.log(res.data)
+            if (res.ok) {
+                this.setState({data: res.data, filterData: res.data})
+                console.log(res.data)
+            } else {
+                console.log('error')
+            }
+        })
+        http.get('/api/store_tags_list').then(res=>{
+            if (res.ok) {
+                if (res.data && res.data.length > 0) {
+                    const arr = [];
+                    res.data.map(item=>{
+                        arr.push({
+                            tag: item[0],
+                            number: item[1],
+                            color: this.state.color[this.getRandomNumber()]
+                        })
+                    })
+                    this.setState({
+                        tag_list: arr
+                    })
+                    this.getRandomNumber()
+                }
+            }
         })
     }
+    addTag = (record)=>{
+        const list = this.state.add_tag_list;
+        if (list.filter(item=>item === record).length <= 0) {
+        list.push(record)
+        this.setState({
+            add_tag_list: list
+        }, ()=>{
+            this.filterTag()
+        })
+        }
 
+    }
+    disableTag = (record)=>{
+        const lists = this.state.add_tag_list.filter(item=>item !== record)
+        this.setState({
+            add_tag_list: lists
+        }, ()=>{
+            this.filterTag()
+        })
+    }
+    newArr = (arr) => {
+        return Array.from(new Set(arr))
+    }
+    filterTag = () =>{
+        const list = this.state.filterData;
+        const tagList = this.state.add_tag_list;
+        let arr = [];
+        if (tagList.length > 0) {
+            tagList.map(item=>{
+                const newArr = list.filter(val=>val.tags.indexOf(item.tag) !== -1)
+                arr = arr.concat(newArr)
+            })
+            this.setState({
+                data: this.newArr(arr)
+            })
+        } else {
+            this.setState({
+                data: list
+            })
+        }
+    }
+    searchApp = (e) => {
+        const value = e.target.value.toLowerCase();
+        const list = this.state.filterData.filter(item => item.app_name.toLowerCase().indexOf(value) !== -1)
+        this.setState({
+            data: list
+        })
+    }
+    getRandomNumber = () => {
+        return (Math.floor(Math.random() * (this.state.color.length - 1)))
+    }
     render () {
-        const { data } = this.state;
+        const { data, tag_list, add_tag_list } = this.state;
         return (
         <div className="AppStore">
+            <div>
+                <p className="appStore_title">冬笋云平台应用市场</p>
+                <Search
+                    placeholder="请输入应用名称"
+                    onChange={e => this.searchApp(e)}
+                    style={{ width: '60%', marginLeft: '20%', height: '50px' }}
+                />
+            </div>
             <div className="search">
-                search
+                {
+                    tag_list && tag_list.length > 0 && tag_list.map((item, key)=>{
+                        return (
+                            <Tag
+                                key={key}
+                                color={item.color}
+                                onClick={()=>{
+                                    this.addTag(item)
+                                }}
+                            >{item.tag + ' (' + item.number + ')'}</Tag>
+                        )
+                    })
+                }
             </div>
-            <div>
-                <p>应用下载TOP榜</p>
-                <div>
-                    <Carousel
-                        arrows="true"
-                        dots="true"
-                        infinite="true"
-                        speed={500}
-                        slidesToShow={1}
-                        slidesToScroll={1}
-                        cssEase="linear"
-                    >
-                    <div>
-                        <h3>1</h3>
-                        </div>
-                        <div>
-                        <h3>2</h3>
-                        </div>
-                        <div>
-                        <h3>3</h3>
-                        </div>
-                        <div>
-                        <h3>4</h3>
-                    </div>
-                    </Carousel>
+            <div className="the_selected_label">
+                {
+                    add_tag_list && add_tag_list.length > 0 && add_tag_list.map((item, key)=>{
+                        return (
+                            <Tag
+                                key={key}
+                                color={item.color}
+                                closable
+                                onClose={()=>{
+                                    this.disableTag(item)
+                                }}
+                            >{item.tag + ' (' + item.number + ')'}</Tag>
+                        )
+                    })
+                }
+            </div>
+                <div className="all_app_title">
+                    全部应用
                 </div>
-            </div>
-            <div>
-                热门应用
-                <Carousel
-                    arrows="true"
-                    dots="true"
-                    infinite="true"
-                    speed={500}
-                    slidesToShow={1}
-                    slidesToScroll={1}
-                    cssEase="linear"
-                >
-                    <div>
-                        <h3>1</h3>
-                        </div>
-                        <div>
-                        <h3>2</h3>
-                        </div>
-                        <div>
-                        <h3>3</h3>
-                        </div>
-                        <div>
-                        <h3>4</h3>
-                    </div>
-                    </Carousel>
-            </div>
-            <div>
-                最新应用
-                <Carousel
-                    arrows="true"
-                    dots="true"
-                    infinite="true"
-                    speed={500}
-                    slidesToShow={1}
-                    slidesToScroll={1}
-                    cssEase="linear"
-                >
-                    <div>
-                        <h3>1</h3>
-                        </div>
-                        <div>
-                        <h3>2</h3>
-                        </div>
-                        <div>
-                        <h3>3</h3>
-                        </div>
-                        <div>
-                        <h3>4</h3>
-                    </div>
-                    </Carousel>
-            </div>
-            <div>
-                应用评分排行榜
-                <Carousel
-                    arrows="true"
-                    dots="true"
-                    infinite="true"
-                    speed={500}
-                    slidesToShow={1}
-                    slidesToScroll={1}
-                    cssEase="linear"
-                >
-                    <div>
-                        <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                        {
-                        data && data.length > 0 && data.map((val, ind)=>{
-                            if (ind < 4){
-                                return (
-                                    <div key={ind}>
-                                        <img
-                                            src={'http://ioe.thingsroot.com' + val.icon_image}
-                                            alt=""
-                                        />
-                                        <p style={{textAlign: 'center'}}>{val.app_name}</p>
-                                        {/* // <h6 style={{textAlign: 'center'}}>xxx次下载</h6> */}
-                                        <div style={{display: 'flex', justifyContent: 'space-around', paddingBottom: 5}}>
-                                            <p>评价：☆☆☆☆☆</p>
-                                            <p>价格：免费</p>
-                                        </div>
-                                        {console.log(val)}
-                                    </div>
-                                )
-                            }
-                        })
-                    }
-                        </div>
-                        </div>
-                        <div>
-                        <h3>2</h3>
-                        </div>
-                    </Carousel>
-            </div>
+            <div
+                style={{
+                    display: 'flex',
+                    flexWrap: 'wrap'
+                }}
+            >
             {
                         data && data.length > 0 && data.map((val, ind)=>{
                             return (
-                                // <LazyLoad
-                                //     key={ind}
-                                //     offsetTop={100}
-                                // >
-                                // <AppCard
-                                //     app={val}
-                                // />
-                                // </LazyLoad>
-                                // <AppCard
-                                //     app={val}
-                                //     key={ind}
-                                // />
                                 <div
+                                    className="app_items"
                                     key={ind}
-                                    style={{width: '21%', border: '1px solid #ccc', borderRadius: '5px', marginTop: 10, cursor: 'pointer', borderTop: '2px solid green'}}
+                                    onClick={()=>{
+                                        this.props.history.push('/appitems/' + val.name)
+                                    }}
                                 >
                                     <img
                                         src={'http://ioe.thingsroot.com' + val.icon_image}
-                                        style={{width: '150px', padding: '10px', height: '150px', display: 'block',  margin: '0 auto'}}
+                                        style={{width: '72px', padding: '10px', height: '72px', display: 'block',  margin: '0 auto'}}
                                         alt=""
                                     />
-                                    <h4 style={{textAlign: 'center', padding: '10px 0', borderTop: '1px solid #ccc'}}>{val.app_name}</h4>
-                                    <h6 style={{textAlign: 'center'}}>xxx次下载</h6>
-                                    <div style={{display: 'flex', justifyContent: 'space-around', paddingBottom: 5}}>
-                                        <p>评价：☆☆☆☆☆</p>
-                                        <p>价格：免费</p>
+                                    <div style={{textAlign: 'center'}}>{val.app_name}</div>
+                                    <div
+                                        className="app_item_desc"
+                                    >
+                                        <div>描述.....</div>
+                                        <div style={{textAlign: 'center'}}><Icon type="download" /> {val.installed}</div>
+                                    </div>
+                                    <div
+                                        className="stats_and_offer"
+                                    >
+                                        <p>
+                                            <Rate
+                                                value={val.star}
+                                                disabled
+                                                style={{fontSize: '7px', letteSspacing: '2px'}}
+                                            />
+                                        </p>
+                                        <span>免费</span>
                                     </div>
                                 </div>
                             )
                         })
                     }
+            </div>
         </div>
         );
     }

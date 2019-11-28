@@ -5,7 +5,7 @@ import { Switch, withRouter} from 'react-router-dom';
 import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
 import { doUpdate } from '../../utils/Action';
-import { isDeveloper } from '../../utils/Session'
+import { isDeveloper } from '../../utils/Session';
 const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
 const Dashboard = LoadableComponent(()=>import('../../router/Dashboard'));
@@ -14,8 +14,8 @@ const Developer = LoadableComponent(()=>import('../../router/Developer'));
 const AppStore = LoadableComponent(()=>import('../../router/AppStore'));
 const UserSettings = LoadableComponent(()=>import('../../router/UserSettings'));
 const AccessKeys = LoadableComponent(()=>import('../../router/AccessKeys'));
-// const ShareGroup = LoadableComponent(()=>import('../../router/ShareGroup'));
-// const MemberManage = LoadableComponent(()=>import('../../router/MemberManage'));
+const ShareGroup = LoadableComponent(()=>import('../../router/ShareGroup'));
+const MemberManage = LoadableComponent(()=>import('../../router/MemberManage'));
 const VirtualGateways = LoadableComponent(()=>import('../../router/VirtualGateways'));
 const Gateway = LoadableComponent(()=>import('../../router/Gateway'));
 //const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
@@ -25,7 +25,7 @@ const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHisto
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
 const TemplateDetails = LoadableComponent(()=>import('../../router/TemplateDetails'));
-
+const AppItems = LoadableComponent(()=>import('../../router/AppItems'))
 let timer;
 const openNotification = (title, message) => {
     notification.open({
@@ -91,6 +91,11 @@ class ContentMain extends Component {
                     title={'应用商店'}
                 />
                 <PrivateRoute
+                    path="/appitems/:name"
+                    component={AppItems}
+                    title={'应用详情'}
+                />
+                <PrivateRoute
                     path="/gateway/:sn"
                     component={Gateway}
                     title={'网关详情'}
@@ -140,7 +145,7 @@ class ContentMain extends Component {
                     component={VirtualGateways}
                     title={'虚拟网关'}
                 />
-                {/* <PrivateRoute
+                <PrivateRoute
                     path="/sharegroup"
                     component={ShareGroup}
                     title={'共享组管理'}
@@ -149,7 +154,7 @@ class ContentMain extends Component {
                     path="/member"
                     component={MemberManage}
                     title={'成员管理'}
-                /> */}
+                />
                 <PrivateRoute
                     path="/platformevents/:limitTime?"
                     component={PlatformEvents}

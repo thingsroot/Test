@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Menu, Icon } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
+import OEM from '../../assets/OEM';
 const maxSider = {
     width: '200px',
     height: '100%',
@@ -88,13 +89,13 @@ class Siders extends PureComponent {
                             style={{width: '200px',
                                 transition: 'background 0.3s, width 0.2s'}}
                           >
-                              <b>冬笋云</b>
+                              <b>{OEM.Title}</b>
                           </div>
                         : <div className="logo"
                             style={{width: '80px',
                                 transition: 'background 0.3s, width 0.2s'}}
                           >
-                              <b>冬</b>
+                              <b>{OEM.MiniTitle}</b>
                           </div>
                 }
                 <Menu theme="dark"

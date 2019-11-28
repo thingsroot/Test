@@ -65,19 +65,24 @@ class EditableTable extends React.Component {
             loading: true,
             editingKey: '',
             visibleMember: false,
-            confirmDirty: false
+            confirmDirty: false,
+            type: 'text'
         };
         this.columns = [
             {
                 title: '姓名',
-                dataIndex: 'username',
+                dataIndex: 'full_name',
+                width: '12%',
+                editable: true
+            }, {
+                title: '用户名',
+                dataIndex: 'name',
                 width: '25%',
                 editable: true
-            },
-            {
+            }, {
                 title: '手机号',
                 dataIndex: 'mobile_no',
-                width: '40%',
+                width: '28%',
                 editable: true
             },
             {
@@ -136,6 +141,11 @@ class EditableTable extends React.Component {
         ];
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
+        if (nextProps.empty && this.state.loading) {
+            this.setState({
+                loading: false
+            })
+        }
         if (nextProps.user_list !== this.props.user_list) {
             this.setState({
                 loading: true
@@ -152,6 +162,10 @@ class EditableTable extends React.Component {
             visibleMember: true,
             status: 'updateUser',
             record: record
+        }, ()=>{
+            this.props.form.setFieldsValue({
+                name: undefined
+            })
         })
     }
     mapGetUserinfo = (arr, index) => {
@@ -219,10 +233,8 @@ class EditableTable extends React.Component {
 
     edit (key) {
         this.setState({ editingKey: key });
-        console.log(this.state.record)
     }
     handleOkMember = e => {
-        console.log(this.state)
         e;
         this.setState({
             visibleMember: true
@@ -232,7 +244,12 @@ class EditableTable extends React.Component {
         e;
         this.setState({
             visibleMember: false,
-            status: ''
+            status: '',
+            type: 'text'
+        }, ()=>{
+            this.props.form.setFieldsValue({
+                name: undefined
+            })
         });
     };
     addMember=()=> {
@@ -264,6 +281,9 @@ class EditableTable extends React.Component {
     };
     handleSubmit = e => {
         e.preventDefault();
+        this.props.form.setFieldsValue({
+            name: ''
+        })
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
                 console.log('Received values of form: ', values);
@@ -271,23 +291,27 @@ class EditableTable extends React.Component {
             if (this.state.status === 'updateUser') {
                 const datas = {
                     name: values.user,
-                    first_name: values.name,
-                    last_name: '',
+                    first_name: values.firstname,
+                    last_name: values.lastname,
                     mobile_no: values.phone,
                     new_password: values.password
                 }
                 http.post('/api/companies_users_update', datas).then(res=>{
                     this.setState({
                         visibleMember: false,
-                        status: ''
+                        status: '',
+                        type: 'text'
                     })
                     if (res.ok) {
                         message.success('修改用户信息成功！')
                         this.props.getdata()
+                    } else {
+                        message.error(res.error)
                     }
                 })
             } else {
-                if (values.name !== undefined &&
+                if (values.firstname !== undefined &&
+                    values.lastname !== undefined &&
                     values.phone !== undefined &&
                     values.user !==  undefined &&
                     values.password !== undefined &&
@@ -300,8 +324,8 @@ class EditableTable extends React.Component {
                         user: values.user,
                         email: values.user,
                         mobile_no: values.phone,
-                        first_name: values.name,
-                        last_name: '',
+                        first_name: values.firstname,
+                        last_name: values.lastname,
                         new_password: values.password,
                         company: this.props.company
                     }
@@ -313,11 +337,14 @@ class EditableTable extends React.Component {
                                     this.props.getdata()
                                 }
                             })
+                        } else {
+                            message.error(res.error)
                         }
                     })
                     this.setState({
                         visibleMember: false,
-                        status: ''
+                        status: '',
+                        type: 'text'
                     })
                 }
             }
@@ -340,7 +367,6 @@ class EditableTable extends React.Component {
                 ...col,
                 onCell: record => ({
                     record,
-                    // inputType: col.dataIndex === 'age' ? 'number' : 'text',
                     inputType: 'text',
                     dataIndex: col.dataIndex,
                     title: col.title,
@@ -361,13 +387,17 @@ class EditableTable extends React.Component {
                         columns={columns}
                         rowClassName="editable-row"
                         rowKey="email"
-                        pagination={false}
+                        // pagination={false}
                         size="small"
                     />
                     <Button
                         onClick={()=>{
                             this.setState({visibleMember: true})
                         }}
+                        type="primary"
+                        // style={{
+                        //     marginTop: '20px'
+                        // }}
                         disabled={this.props.activeKey === ''}
                     >
                         添加企业成员
@@ -380,11 +410,12 @@ class EditableTable extends React.Component {
                     onCancel={this.handleCancelMember}
                     footer={null}
                     maskClosable={false}
+                    destroyOnClose
                 >
                     <Form onSubmit={this.handleSubmit} >
                         <Form.Item label="用户">
                             {getFieldDecorator('user', {
-                                initialValue: this.state.record.name,
+                                initialValue: this.state.status === 'updateUser' ? this.state.record.name : '',
                                 rules: [
                                     {
                                         required: this.state.status === 'updateUser' ? false : true,
@@ -393,15 +424,25 @@ class EditableTable extends React.Component {
                                 ]
                             })(<Input disabled={this.state.status === 'updateUser'} />)}
                         </Form.Item>
-                        <Form.Item label="姓名">
-                            {getFieldDecorator('name', {
+                        <Form.Item label="姓">
+                            {getFieldDecorator('firstname', {
                                 rules: [
                                     {
                                         required: true,
-                                        message: '请输入姓名'
+                                        message: '请输入姓'
                                     }
                                 ]
-                            })(<Input />)}
+                            })(<Input type="text"/>)}
+                        </Form.Item>
+                        <Form.Item label="名">
+                            {getFieldDecorator('lastname', {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: '请输入名'
+                                    }
+                                ]
+                            })(<Input type="text"/>)}
                         </Form.Item>
                         <Form.Item label="手机号码">
                             {getFieldDecorator('phone', {
@@ -427,7 +468,16 @@ class EditableTable extends React.Component {
                                         validator: this.validateToNextPassword
                                     }
                                 ]
-                            })(<Input.Password />)}
+                            })(
+                            <Input
+                                type={this.state.type}
+                                onClick={()=>{
+                                    this.setState({
+                                        type: 'password'
+                                    })
+                                }}
+                            />
+                                )}
                         </Form.Item>
                         <Form.Item
                             label="确认新密码"
@@ -443,7 +493,17 @@ class EditableTable extends React.Component {
                                         validator: this.compareToFirstPassword
                                     }
                                 ]
-                            })(<Input.Password onBlur={this.handleConfirmBlur} />)}
+                            })(
+                            <Input
+                                onBlur={this.handleConfirmBlur}
+                                type={this.state.type}
+                                onClick={()=>{
+                                    this.setState({
+                                        type: 'password'
+                                    })
+                                }}
+                            />
+                            )}
                         </Form.Item>
                         <Form.Item>
                             <Button

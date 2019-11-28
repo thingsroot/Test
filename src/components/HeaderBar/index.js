@@ -3,6 +3,7 @@ import { Icon, message, Menu, Dropdown } from 'antd';
 import { withRouter} from 'react-router-dom';
 import { _getCookie, isAuthenticated, authenticateClear } from '../../utils/Session';
 import http  from '../../utils/Server';
+import OEM from '../../assets/OEM';
 
 @withRouter
 class HeaderBar extends PureComponent {
@@ -29,7 +30,7 @@ class HeaderBar extends PureComponent {
                     </span>
                 </Menu.Item>
                 <Menu.Item
-                    key="16"
+                    key="17"
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
@@ -114,98 +115,108 @@ class HeaderBar extends PureComponent {
                 </Menu.Item>
             </Menu>
         );
-        // const menu2 = (
-        //     <Menu style={{width: 160}}>
-        //         <Menu.Item
-        //             key="17"
-        //             style={{lineHeight: '30px'}}
-        //             onClick={
-        //                 ()=>{
-        //                     this.props.history.push('/sharegroup')
-        //                 }
-        //             }
-        //         >
-        //             <Icon type="share-alt"/>
-        //             <span>
-        //                 共享组管理
-        //             </span>
-        //         </Menu.Item>
-        //         <Menu.Item
-        //             key="18"
-        //             style={{lineHeight: '30px'}}
-        //             onClick={
-        //                 ()=>{
-        //                     this.props.history.push('/member')
-        //                 }
-        //             }
-        //         >
-        //             <Icon type="team" />
-        //             <span>
-        //                 成员管理
-        //             </span>
-        //         </Menu.Item>
-        //     </Menu>
-        // )
+        const menu2 = (
+            <Menu style={{width: 160}}>
+                <Menu.Item
+                    key="18"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            this.props.history.push('/member')
+                        }
+                    }
+                >
+                    <Icon type="team" />
+                    <span>
+                        成员管理
+                    </span>
+                </Menu.Item>
+                <Menu.Item
+                    key="19"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            this.props.history.push('/sharegroup')
+                        }
+                    }
+                >
+                    <Icon type="share-alt"/>
+                    <span>
+                        共享组管理
+                    </span>
+                </Menu.Item>
+            </Menu>
+        )
         return (
             <div className="headerUser">
-                {/* <Dropdown
-                    overlay={menu2}
-                    placement="bottomRight"
-                >
-                    <span
-                        className="ant-dropdown-link"
-                        style={{padding: '10px', cursor: 'pointer'}}
+                {
+                    _getCookie('is_admin') === '1'
+                    ? <Dropdown
+                        overlay={menu2}
+                        placement="bottomRight"
+                      >
+                        <span
+                            className="ant-dropdown-link"
+                            style={{padding: '10px', cursor: 'pointer'}}
+                        >
+                            <Icon
+                                style={{padding: '0 4px', fontWeight: 800}}
+                                type="global"
+                            />
+                            企业
+                            <Icon type="down" />
+                        </span>
+                    </Dropdown>
+                : ''
+                }
+                {
+                    OEM.Title === '冬笋云'
+                    ? <span>
+                        <Dropdown
+                            overlay={menu1}
+                            placement="bottomRight"
+                        >
+                        <span
+                            className="ant-dropdown-link"
+                            style={{padding: '10px', cursor: 'pointer'}}
+                        >
+                            <Icon
+                                style={{padding: '0 4px', fontWeight: 800}}
+                                type="question-circle"
+                            />帮助
+                        </span>
+                    </Dropdown>
+                    <span style={{padding: '0 5px'}}> </span>
+                    <a onClick={()=>{
+                        window.open('https://freeioe.org/', '_blank')
+                    }}
                     >
                         <Icon
                             style={{padding: '0 4px', fontWeight: 800}}
-                            type="global"
+                            type="message"
                         />
-                        企业
-                        <Icon type="down" />
-                    </span>
-                </Dropdown> */}
-                <Dropdown
-                    overlay={menu1}
-                    placement="bottomRight"
-                >
-                    <span
-                        className="ant-dropdown-link"
-                        style={{padding: '10px', cursor: 'pointer'}}
+
+                        讨论
+                    </a>
+                    <span style={{padding: '0 5px'}}> </span>
+
+                    <span style={{padding: '0 5px'}}> </span>
+                    <a onClick={()=>{
+                        window.open('https://wiki.freeioe.org/', '_blank')
+                    }}
                     >
                         <Icon
                             style={{padding: '0 4px', fontWeight: 800}}
-                            type="question-circle"
-                        />帮助
+                            type="book"
+                        />
+
+                        知识库
+                    </a>
+                    <span style={{padding: '0 5px'}}> </span>
                     </span>
-                </Dropdown>
-                <span style={{padding: '0 5px'}}> </span>
-                <a onClick={()=>{
-                    window.open('https://freeioe.org/', '_blank')
-                }}
-                >
-                    <Icon
-                        style={{padding: '0 4px', fontWeight: 800}}
-                        type="message"
-                    />
 
-                    讨论
-                </a>
-                <span style={{padding: '0 5px'}}> </span>
-
-                <span style={{padding: '0 5px'}}> </span>
-                <a onClick={()=>{
-                    window.open('https://wiki.freeioe.org/', '_blank')
-                }}
-                >
-                    <Icon
-                        style={{padding: '0 4px', fontWeight: 800}}
-                        type="book"
-                    />
-
-                    知识库
-                </a>
-                <span style={{padding: '0 5px'}}> </span>
-
+                    : ''
+                }
                 <Dropdown
                     overlay={menu}
                     placement="bottomRight"

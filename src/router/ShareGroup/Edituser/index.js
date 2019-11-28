@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';
-import {Table, Input, Popconfirm, Form, Icon, Modal, message, Empty} from 'antd';
+import {Table, Input, Popconfirm, Form, Modal, message, Empty} from 'antd';
 import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
 import {inject, observer} from 'mobx-react';
@@ -133,10 +133,11 @@ class Edituser extends React.Component {
     };
     delete= (record) => {
         http.post('/api/companies_sharedgroups_remove', {name: record.name}).then(res=>{
-            console.log(res)
             if (res.ok) {
                 this.props.getdata()
                 message.success('删除共享组成功！')
+            } else {
+                message.error('删除共享组失败！错误信息：' + res.error)
             }
         })
     };
@@ -150,13 +151,14 @@ class Edituser extends React.Component {
                 name: record.name,
                 company: record.company,
                 group_name: row.group_name,
-                role: 'Admin',
-                description: ''
+                role: 'Admin'
             }
             http.post('/api/companies_sharedgroups_update', data).then(res=>{
                 if (res.ok) {
                     this.props.getdata()
                     message.success('更新共享组信息成功！')
+                } else {
+                    message.error('更新共享组信息失败！错误信息：' + res.error)
                 }
             })
                 this.setState({ editingKey: '' });
@@ -183,12 +185,10 @@ class Edituser extends React.Component {
                 key: this.state.data.length + 1
             }
             const  data = {
-                company: '测试',
+                company: this.props.company,
                 group_name: this.state.groupValue,
                 enabled: 1,
-                description: '描述',
-                uset_list: [],
-                role: 'admin'
+                role: 'Admin'
             }
             http.post('/api/companies_sharedgroups_create', data).then(res=>{
                 if (res.ok) {
@@ -196,6 +196,13 @@ class Edituser extends React.Component {
                     this.props.getdata()
                     this.setState({
                         data: [...this.state.data, list],
+                        visible: false,
+                        groupValue: ''
+                    });
+                } else {
+                    message.error('创建共享组失败！错误信息：' + res.error)
+                    this.props.getdata()
+                    this.setState({
                         visible: false,
                         groupValue: ''
                     });
@@ -214,12 +221,12 @@ class Edituser extends React.Component {
         return (
             <div className="company-name">
                 <span>{title}</span>
-                <span
+                {/* <span
                     className="add-user"
                     onClick={this.addGroup}
                 >
                     <Icon type="usergroup-add" />
-                </span>
+                </span> */}
             </div>
         )
     }
@@ -262,6 +269,7 @@ class Edituser extends React.Component {
                                         rowKey="name"
                                         components={components}
                                         dataSource={this.props.group_list}
+                                        loading={!this.props.group_list}
                                         columns={columns}
                                         rowClassName={this.setRowClassName}
                                         pagination={false}
@@ -292,6 +300,7 @@ class Edituser extends React.Component {
                     onCancel={this.handleCancel}
                     okText="确定"
                     cancelText="取消"
+                    maskClosable={false}
                 >
                     <div> 共享组名：
                         <Input
