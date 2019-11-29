@@ -72,7 +72,7 @@ class EditableTable extends React.Component {
             {
                 title: '姓名',
                 dataIndex: 'full_name',
-                width: '12%',
+                width: '15%',
                 editable: true
             }, {
                 title: '用户名',
@@ -82,12 +82,13 @@ class EditableTable extends React.Component {
             }, {
                 title: '手机号',
                 dataIndex: 'mobile_no',
-                width: '28%',
+                width: 150,
                 editable: true
             },
             {
                 title: '操作',
                 dataIndex: 'operation',
+                width: 150,
                 render: (text, record) => {
                     const { editingKey } = this.state;
                     const editable = this.isEditing(record);
@@ -119,12 +120,12 @@ class EditableTable extends React.Component {
                                 onClick={() => {
                                     this.EditUser(record)
                                 }}
-                                style={{marginRight: '20px'}}
+                                style={{marginRight: '10px'}}
                             >
                                 编辑
                             </Button>
                             <Popconfirm
-                                title="确定要删除此成员吗?"
+                                title="确定要从公司组移除此成员吗?"
                                 onConfirm={() => this.delete(record)}
                                 okText="确定"
                                 cancelText="取消"
@@ -132,7 +133,7 @@ class EditableTable extends React.Component {
                                 <Button
                                     type="danger"
                                     disabled={editingKey !== ''}
-                                >删除</Button>
+                                >移除</Button>
                             </Popconfirm>
                         </Fragment>
                     );
@@ -426,26 +427,29 @@ class EditableTable extends React.Component {
                         </Form.Item>
                         <Form.Item label="姓">
                             {getFieldDecorator('firstname', {
+                                initialValue: this.state.status === 'updateUser' ? this.state.record.first_name : '',
                                 rules: [
                                     {
-                                        required: true,
+                                        required: this.state.status === 'updateUser' ? false : true,
                                         message: '请输入姓'
                                     }
                                 ]
-                            })(<Input type="text"/>)}
+                            })(<Input type="text" disabled={this.state.status === 'updateUser'}/>)}
                         </Form.Item>
                         <Form.Item label="名">
                             {getFieldDecorator('lastname', {
+                                initialValue: this.state.status === 'updateUser' ? this.state.record.last_name : '',
                                 rules: [
                                     {
-                                        required: true,
+                                        required: this.state.status === 'updateUser' ? false : true,
                                         message: '请输入名'
                                     }
                                 ]
-                            })(<Input type="text"/>)}
+                            })(<Input type="text" disabled={this.state.status === 'updateUser'}/>)}
                         </Form.Item>
                         <Form.Item label="手机号码">
                             {getFieldDecorator('phone', {
+                                initialValue: this.state.status === 'updateUser' ? this.state.record.mobile_no : '',
                                 rules: [
                                     {
                                         required: true,

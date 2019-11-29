@@ -175,13 +175,13 @@ class AppStore extends Component {
                                     <div
                                         className="stats_and_offer"
                                     >
-                                        <p>
+                                        <div>
                                             <Rate
                                                 value={val.star}
                                                 disabled
                                                 style={{fontSize: '7px', letteSspacing: '2px'}}
                                             />
-                                        </p>
+                                        </div>
                                         <span>免费</span>
                                     </div>
                                 </div>

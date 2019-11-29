@@ -29,6 +29,26 @@ class AppItems extends PureComponent {
                 })
             }
         })
+        http.post('/api/store_favorites_list').then(res=>{
+            console.log(res)
+        })
+        const remove = {
+            app: 'APP00000017'
+        }
+        http.post('/api/store_favorites_remove', remove).then(res=>{
+            console.log(res)
+        })
+    }
+    addFavorites = () => {
+        console.log(this.state)
+        const data = {
+            app: this.state.data.name
+            // comment: '123',
+            // priority: ''
+        }
+        http.post('/api/store_favorites_add', data).then(res=>{
+            console.log(res)
+        })
     }
     render () {
         const {data, version} = this.state;
@@ -58,6 +78,7 @@ class AppItems extends PureComponent {
                             {data.protocol}
                         </div>
                         <Button
+                            onClick={this.addFavorites}
                             style={{marginLeft: '30px', marginTop: '10px', width: '100px'}}
                             type="primary"
                         >收藏</Button>

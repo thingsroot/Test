@@ -27,12 +27,14 @@ class ShareGroup extends Component {
                     company: res.data[0]
                 })
                 http.get('/api/companies_read?name=' + res.data[0]).then(data=>{
-                    this.setState({
-                        companies_list: [data.data]
-                    })
+                    if (data.ok) {
+                        this.setState({
+                            companies_list: [data.data]
+                        })
+                    }
                 })
                 http.get('/api/companies_sharedgroups_list?company=' + res.data[0]).then(data=>{
-                    if (data.ok) {
+                    if (data.ok && data.data.length > 0) {
                         this.setState({
                             group_list: data.data,
                             activeKey: data.data[0].name,
