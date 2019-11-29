@@ -13,3 +13,11 @@
         z-index: 999;
     }
 }
+.member_wrap_flex{
+    display: flex;
+    line-height: 35px;
+    margin-bottom: 10px;
+    span{
+        width: 150px;
+    }
+}

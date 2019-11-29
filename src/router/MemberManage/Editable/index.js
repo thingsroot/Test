@@ -68,7 +68,9 @@ class EditableTable extends React.Component {
             visibleMember: false,
             confirmDirty: false,
             type: 'text',
-            password_visible: false
+            password_visible: false,
+            new_password: '',
+            enter_new_password: ''
         };
         this.columns = [
             {
@@ -120,11 +122,12 @@ class EditableTable extends React.Component {
                                 type="primary"
                                 disabled={editingKey !== ''}
                                 onClick={() => {
-                                    this.EditUser(record)
+                                    // this.EditUser(record)
                                     // this.ChangeThePassword(record)
-                                    // this.setState({
-                                    //     password_visible: true
-                                    // })
+                                    this.setState({
+                                        record: record,
+                                        password_visible: true
+                                    })
                                 }}
                                 style={{marginRight: '10px'}}
                             >
@@ -286,6 +289,43 @@ class EditableTable extends React.Component {
             callback();
         }
     };
+    setNewPassword = (e, name) => {
+        const val = e.target.value;
+        this.setState({
+            [name]: val
+        })
+    }
+    ChangeThePassword = () => {
+        const {new_password, enter_new_password, record} = this.state;
+        console.log(new_password, enter_new_password)
+        if (new_password !== enter_new_password) {
+            message.error('两次密码输入不匹配！')
+            return false;
+        }
+        if (new_password.length < 6) {
+            message.error('请最少输入六位长度密码！')
+        }
+        const datas = {
+            name: record.name,
+            first_name: record.first_name,
+            last_name: record.last_name,
+            mobile_no: record.mobile_no,
+            new_password
+        }
+        http.post('/api/companies_users_update', datas).then(res=>{
+            this.setState({
+                visibleMember: false,
+                status: '',
+                type: 'text'
+            })
+            if (res.ok) {
+                message.success('修改用户信息成功！')
+                this.props.getdata()
+            } else {
+                message.error(res.error)
+            }
+        })
+    }
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.setFieldsValue({
@@ -553,17 +593,36 @@ class EditableTable extends React.Component {
                 </Modal>
                 <Modal
                     visible={this.state.password_visible}
-                    title={'修改企业成员密码'}
+                    title={'修改企业成员：' + this.state.record.name + ' 的密码'}
                     onOk={this.ChangeThePassword}
                     onCancel={()=>{
                         this.setState({password_visible: false})
                     }}
-                    // footer={null}
+                    okText="确定修改"
+                    cancelText="放弃修改"
                     maskClosable={false}
                     destroyOnClose
                 >
-                    <div className="flex"><span>请输入密码：</span><Input /></div>
-                    <div className="flex"><span>请再次输入密码：</span><Input /></div>
+                    <div className="member_wrap_flex">
+                        <span>请输入密码：</span>
+                        <Input
+                            type="password"
+                            placeholder="请输入六位以上密码"
+                            value={this.state.new_password}
+                            onChange={e => {
+                                this.setNewPassword(e, 'new_password')
+                            }}
+                        /></div>
+                    <div className="member_wrap_flex">
+                        <span>请再次输入密码：</span>
+                        <Input
+                            type="password"
+                            placeholder="请再次输入密码"
+                            value={this.state.enter_new_password}
+                            onChange={e => {
+                                this.setNewPassword(e, 'enter_new_password')
+                            }}
+                        /></div>
                 </Modal>
             </div>
 
