@@ -3,6 +3,7 @@ import {Table, Input, Popconfirm, Form, Button, Modal, message} from 'antd';
 import {inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
+import './style.scss';
 const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
@@ -378,7 +379,28 @@ class EditableTable extends React.Component {
         const { getFieldDecorator } = this.props.form;
 
         return (
-            <div>
+            <div className="member_wrap">
+                <Button
+                    icon={this.state.loading ? 'loading' : 'loading-3-quarters'}
+                    onClick={this.props.getdata}
+                    className="member_wrap_update_button"
+                    disabled={this.state.loading}
+                >
+                    刷新
+                </Button>
+                <Button
+                    onClick={()=>{
+                        this.setState({visibleMember: true})
+                    }}
+                    type="primary"
+                    className="member_wrap_add_button"
+                    // style={{
+                    //     marginTop: '20px'
+                    // }}
+                    disabled={this.props.activeKey === ''}
+                >
+                    添加组成员
+                </Button>
                 <EditableContext.Provider value={this.props.form}>
                     <Table
                         components={components}
@@ -391,18 +413,6 @@ class EditableTable extends React.Component {
                         // pagination={false}
                         size="small"
                     />
-                    <Button
-                        onClick={()=>{
-                            this.setState({visibleMember: true})
-                        }}
-                        type="primary"
-                        // style={{
-                        //     marginTop: '20px'
-                        // }}
-                        disabled={this.props.activeKey === ''}
-                    >
-                        添加企业成员
-                    </Button>
                 </EditableContext.Provider>
                 <Modal
                     title={(this.state.status === 'updateUser' ? '修改' : '添加') + '企业成员'}
@@ -434,7 +444,12 @@ class EditableTable extends React.Component {
                                         message: '请输入姓'
                                     }
                                 ]
-                            })(<Input type="text" disabled={this.state.status === 'updateUser'}/>)}
+                            })(
+                                <Input
+                                    type="text"
+                                    disabled={this.state.status === 'updateUser'}
+                                />
+                            )}
                         </Form.Item>
                         <Form.Item label="名">
                             {getFieldDecorator('lastname', {
@@ -445,7 +460,12 @@ class EditableTable extends React.Component {
                                         message: '请输入名'
                                     }
                                 ]
-                            })(<Input type="text" disabled={this.state.status === 'updateUser'}/>)}
+                            })(
+                                <Input
+                                    type="text"
+                                    disabled={this.state.status === 'updateUser'}
+                                />
+                            )}
                         </Form.Item>
                         <Form.Item label="手机号码">
                             {getFieldDecorator('phone', {

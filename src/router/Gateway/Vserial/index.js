@@ -251,6 +251,16 @@ class Vserial extends Component {
             mqtt && mqtt.client  && mqtt.client.connected && mqtt.client.publish('v1/vspax/api/list', JSON.stringify({id: 'api/list/' + new Date() * 1}))
             if (addPortData[0] && Object.keys(addPortData[0]).length > 0) {
                 this.setState({flag: false, openLoading: false})
+                // console.log(JSON.stringify(addPortData[0]))
+                const data = addPortData[0].info.com_cfg;
+                this.setState({
+                    SerialPort: data.serial,
+                    BaudRate: data.baudrate,
+                    StopBit: data.stopbit,
+                    DataBits: data.databit,
+                    Check: data.parity
+
+                })
             }
             if (addPortData[0] && Object.keys(addPortData[0]).length === 0){
                 this.setState({flag: true, stopLoading: false})
@@ -352,11 +362,11 @@ class Vserial extends Component {
     openVserial = () => {
         const { mqtt } = this.props;
         const { BaudRate, DataBits, Check, StopBit } = this.state;
-        const { PortLength} = mqtt.vserial_channel;
+        // const { PortLength} = mqtt.vserial_channel;
         let SerialPort = this.state.SerialPort;
-        if (PortLength.indexOf(SerialPort.toUpperCase()) !== -1) {
-            SerialPort = 'COM' + (parseInt(SerialPort[SerialPort.length - 1]) + 1)
-        }
+        // if (PortLength.indexOf(SerialPort.toUpperCase()) !== -1) {
+        //     SerialPort = 'COM' + (parseInt(SerialPort[SerialPort.length - 1]) + 1)
+        // }
         let params = {
             gateway: this.props.gateway,
             name: this.props.gateway + '.freeioe_Vserial',
@@ -463,7 +473,7 @@ class Vserial extends Component {
                                 <p>串口:</p>
                                 <Select
                                     disabled={!flag}
-                                    defaultValue="com1"
+                                    value={this.state.SerialPort}
                                     style={{width: 120}}
                                     onChange={(value)=>{
                                         this.changeStatus(value, 'SerialPort')
@@ -477,7 +487,7 @@ class Vserial extends Component {
                                 <p>波特率:</p>
                                 <Select
                                     disabled={!flag}
-                                    defaultValue="9600"
+                                    value={this.state.BaudRate}
                                     style={{width: 120}}
                                     onChange={(value)=>{
                                         this.changeStatus(value, 'BaudRate')
@@ -500,7 +510,7 @@ class Vserial extends Component {
                                 <p>停止位:</p>
                                 <Select
                                     disabled={!flag}
-                                    defaultValue="1"
+                                    value={this.state.StopBit}
                                     style={{width: 120}}
                                     onChange={(value)=>{
                                         this.changeStatus(value, 'StopBit')
@@ -514,7 +524,7 @@ class Vserial extends Component {
                                 <p>数据位:</p>
                                 <Select
                                     disabled={!flag}
-                                    defaultValue="8"
+                                    value={this.state.DataBits}
                                     style={{width: 120}}
                                     onChange={(value)=>{
                                         this.changeStatus(value, 'DataBits')
@@ -528,7 +538,7 @@ class Vserial extends Component {
                                 <p>校验:</p>
                                 <Select
                                     disabled={!flag}
-                                    defaultValue="NONE"
+                                    value={this.state.Check}
                                     style={{width: 120}}
                                     onChange={(value)=>{
                                         this.changeStatus(value, 'Check')
@@ -585,7 +595,7 @@ class Vserial extends Component {
                     </div>
                 </div>
                 <div className="wrapper">
-                    <p className="vserial_title">本地串口状态</p>
+                    <p className="vserial_title">本地串口： {addPortData[0].name ? addPortData[0].name : '无'}</p>
                     <Table
                         columns={this.state.cloum}
                         dataSource={addPortData}

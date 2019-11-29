@@ -89,7 +89,7 @@ class GatewayInfo {
         let self_keys = Object.getOwnPropertyNames(this.__proto__)
         for (let [k, v] of Object.entries(data)) {
             if (k === 'data') {
-                console.log(v.platform, 'plateform')
+                // console.log(v.platform, 'plateform')
                 this.data.updateStatus(v)
                 this.install_apps = dumpInstallApps(v)
             } else {

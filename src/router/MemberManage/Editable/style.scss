@@ -1,0 +1,15 @@
+.member_wrap{
+    position: relative;
+    .member_wrap_add_button{
+        position: absolute;
+        right:30px;
+        top:-40px;
+        z-index: 999;
+    }
+    .member_wrap_update_button{
+        position: absolute;
+        left:0px;
+        top:-40px;
+        z-index: 999;
+    }
+}
