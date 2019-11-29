@@ -20,7 +20,7 @@ class groups {
         this.GroupsUserlist.push(val)
         this.GroupsUserlist = [].concat(this.GroupsUserlist)
     }
-    @action handleDeleteUser (user, index, name){
+    @action handleDeleteUser (user, index, name, flag){
         const data = {
             name,
             user
@@ -29,7 +29,7 @@ class groups {
             if (res.ok) {
                 this.GroupsUserlist.splice(index, 1)
                 this.GroupsUserlist = [].concat(this.GroupsUserlist)
-                message.success('删除共享组用户成功！')
+                !flag && message.success('删除共享组用户成功！')
             }
         })
     }

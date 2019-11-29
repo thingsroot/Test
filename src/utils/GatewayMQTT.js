@@ -533,7 +533,10 @@ class GatewayMQTT {
         const url = flag ? 'ws://127.0.0.1:7884/mqtt' : 'wss://cloud.thingsroot.com/ws';
         this.client = mqtt.connect(url, options)
         this.client.on('connect', ()=>{
-            message.success('连接服务器成功')
+            if (window.location.pathname.indexOf('vnet') === -1 && window.location.pathname.indexOf('vserial') === -1) {
+                message.success('连接服务器成功')
+            }
+            // message.success('连接服务器成功')
             this.connected = true
             this.client.subscribe(topic_real, 1)
             if (topic === '/log') {

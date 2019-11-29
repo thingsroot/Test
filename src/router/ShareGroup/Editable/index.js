@@ -231,6 +231,7 @@ class Editable extends Component {
                         this.props.getdata()
                     } else {
                         message.error('添加成员失败！错误信息：' + res.error)
+                        this.props.store.groups.handleDeleteUser(record.user, index, this.props.activeKey, true)
                     }
                 })
             } else {

@@ -5,6 +5,7 @@ import {inject, observer} from 'mobx-react';
 import http from '../../utils/Server';
 import Edituser from './Edituser';
 import Editable from './Editable';
+import { _getCookie } from '../../utils/Session';
 @inject('store')
 @observer
 class ShareGroup extends Component {
@@ -18,6 +19,10 @@ class ShareGroup extends Component {
         }
     }
     componentDidMount () {
+        if (_getCookie('is_admin') !== '1') {
+            this.props.history.push('/')
+            return false;
+        }
         this.getData()
     }
     getData = () => {
@@ -41,6 +46,10 @@ class ShareGroup extends Component {
                             group_name: data.data[0].group_name
                         }, ()=>{
                             this.props.store.groups.setGroupsUserlist(data.data[0])
+                        })
+                    } else {
+                        this.setState({
+                            group_list: []
                         })
                     }
                 })

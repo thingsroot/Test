@@ -67,7 +67,8 @@ class EditableTable extends React.Component {
             editingKey: '',
             visibleMember: false,
             confirmDirty: false,
-            type: 'text'
+            type: 'text',
+            password_visible: false
         };
         this.columns = [
             {
@@ -120,10 +121,14 @@ class EditableTable extends React.Component {
                                 disabled={editingKey !== ''}
                                 onClick={() => {
                                     this.EditUser(record)
+                                    // this.ChangeThePassword(record)
+                                    // this.setState({
+                                    //     password_visible: true
+                                    // })
                                 }}
                                 style={{marginRight: '10px'}}
                             >
-                                编辑
+                                修改密码
                             </Button>
                             <Popconfirm
                                 title="确定要从公司组移除此成员吗?"
@@ -472,11 +477,16 @@ class EditableTable extends React.Component {
                                 initialValue: this.state.status === 'updateUser' ? this.state.record.mobile_no : '',
                                 rules: [
                                     {
-                                        required: true,
+                                        required: this.state.status === 'updateUser' ? false : true,
                                         message: '请输入手机号码'
                                     }
                                 ]
-                            })(<Input type="number"/>)}
+                            })(
+                                <Input
+                                    type="number"
+                                    disabled={this.state.status === 'updateUser'}
+                                />
+                            )}
                         </Form.Item>
                         <Form.Item
                             label="新密码"
@@ -540,6 +550,20 @@ class EditableTable extends React.Component {
                             <Button onClick={this.handleCancelMember}>取消</Button>
                         </Form.Item>
                     </Form>
+                </Modal>
+                <Modal
+                    visible={this.state.password_visible}
+                    title={'修改企业成员密码'}
+                    onOk={this.ChangeThePassword}
+                    onCancel={()=>{
+                        this.setState({password_visible: false})
+                    }}
+                    // footer={null}
+                    maskClosable={false}
+                    destroyOnClose
+                >
+                    <div className="flex"><span>请输入密码：</span><Input /></div>
+                    <div className="flex"><span>请再次输入密码：</span><Input /></div>
                 </Modal>
             </div>
 

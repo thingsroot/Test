@@ -4,6 +4,7 @@ import { Row, Col} from 'antd'
 import http from '../../utils/Server';
 import Editable from './Editable/index'
 import Edituser from './Edituser/index'
+import { _getCookie } from '../../utils/Session';
 class ShareGroup extends React.Component {
     constructor (props) {
         super(props)
@@ -16,6 +17,10 @@ class ShareGroup extends React.Component {
         }
     }
     componentDidMount () {
+        if (_getCookie('is_admin') !== '1') {
+            this.props.history.push('/')
+            return false;
+        }
         this.getData()
     }
     getData = () => {

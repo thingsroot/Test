@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';
-import {Table, Input, Popconfirm, Form, Modal, message, Empty} from 'antd';
+import {Table, Input, Popconfirm, Form, Modal, message, Empty, Icon} from 'antd';
 import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
 import {inject, observer} from 'mobx-react';
@@ -134,8 +134,8 @@ class Edituser extends React.Component {
     delete= (record) => {
         http.post('/api/companies_sharedgroups_remove', {name: record.name}).then(res=>{
             if (res.ok) {
-                this.props.getdata()
                 message.success('删除共享组成功！')
+                this.props.getdata()
             } else {
                 message.error('删除共享组失败！错误信息：' + res.error)
             }
@@ -221,12 +221,12 @@ class Edituser extends React.Component {
         return (
             <div className="company-name">
                 <span>{title}</span>
-                {/* <span
+                <span
                     className="add-user"
                     onClick={this.addGroup}
                 >
                     <Icon type="usergroup-add" />
-                </span> */}
+                </span>
             </div>
         )
     }
