@@ -25,7 +25,6 @@ class Sign extends PureComponent {
                     password: values.password
                 }).then(res=>{
                     if (res.ok) {
-                        console.log(res.data)
                         authenticateSuccess(res.data)
                         message.success('登录成功，正在跳转, 请稍后...', 3).then(()=>{
                             location.href = '/';
@@ -33,9 +32,13 @@ class Sign extends PureComponent {
                     } else {
                         if (res.message === 'Incorrect password') {
                             message.info('账号密码错误，请重新输入')
+                            return false;
                         }
                         if (res.message === 'User disabled or missing') {
                             message.info('用户未注册或已被禁用，请重新输入')
+                            return false;
+                        } else {
+                            message.error('用户名与密码不匹配！请重新输入！')
                         }
                     }
                 }).catch(function (error){
