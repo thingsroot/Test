@@ -316,7 +316,8 @@ class EditableTable extends React.Component {
             this.setState({
                 visibleMember: false,
                 status: '',
-                type: 'text'
+                type: 'text',
+                password_visible: false
             })
             if (res.ok) {
                 message.success('修改用户信息成功！')
