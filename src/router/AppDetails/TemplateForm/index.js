@@ -4,6 +4,7 @@ import {
 } from 'antd';
 import http from '../../../utils/Server';
 import {inject, observer} from 'mobx-react';
+import { _getCookie } from '../../../utils/Session';
 
 const TemplateForm = Form.create({ name: 'template_form' })(
     @inject('store')
@@ -36,7 +37,8 @@ const TemplateForm = Form.create({ name: 'template_form' })(
                     description: values.description,
                     type: 'Template',
                     public: values.public,
-                    owner_type: values.owner_type
+                    developer: _getCookie('user_id'),
+                    company: values.developer !== _getCookie('user_id') ? values.developer : null
                 };
                 if (params.owner_type === 'User') {
                     params['owner_id'] = this.props.store.session.user_id
@@ -46,7 +48,6 @@ const TemplateForm = Form.create({ name: 'template_form' })(
                     }
                     params['owner_id'] = this.state.userGroups[0].name
                 }
-                console.log(params);
                 http.post('/api/configurations_create', params).then(res=>{
                     if (res.ok === false) {
                         message.error('创建应用模板失败！');
@@ -96,12 +97,12 @@ const TemplateForm = Form.create({ name: 'template_form' })(
                             className="collection-create-form_last-form-item"
                             label="权限"
                         >
-                            {getFieldDecorator('owner_type', {
-                                initialValue: 'User'
+                            {getFieldDecorator('developer', {
+                                initialValue: _getCookie('user_id')
                             })(
                                 <Radio.Group>
-                                    {this.state.userGroups.length > 0 ? <Radio value="Cloud Company Group">公司</Radio> : ''}
-                                    <Radio value="User">个人</Radio>
+                                    {this.state.userGroups.length > 0 ? <Radio value={_getCookie('companies')}>公司</Radio> : ''}
+                                    <Radio value={_getCookie('user_id')}>个人</Radio>
                                 </Radio.Group>
                             )}
                         </Form.Item>

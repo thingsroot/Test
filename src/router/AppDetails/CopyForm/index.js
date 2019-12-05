@@ -4,6 +4,7 @@ import {
 } from 'antd';
 import http from '../../../utils/Server';
 import {inject, observer} from 'mobx-react';
+import { _getCookie } from '../../../utils/Session';
 
 const CopyForm = Form.create({ name: 'copy_form' })(
     @inject('store')
@@ -38,7 +39,8 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                     description: values.description,
                     type: values.type,
                     public: values.public,
-                    owner_type: values.owner_type
+                    developer: _getCookie('user_id'),
+                    company: values.developer !== _getCookie('user_id') ? values.developer : null
                 };
                 if (params.owner_type === 'User') {
                     params['owner_id'] = this.props.store.session.user_id
@@ -76,6 +78,7 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                                     })
                             }
                             message.success('新版本上传成功！');
+                            this.props.onOK();
                         }
                     });
                 } else if (this.props.type === '编辑') {
@@ -128,11 +131,12 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                             className="collection-create-form_last-form-item"
                             label="权限"
                         >
-                            {getFieldDecorator('owner_type', { initialValue: copyData.owner_type }
+                            {getFieldDecorator('developer', { initialValue: copyData.developer }
                             )(
                                 <Radio.Group>
-                                    {this.state.userGroups.length > 0 ? <Radio value="Cloud Company Group">公司</Radio> : ''}
-                                    <Radio value="User">个人</Radio>
+                                    {console.log(this.state.userGroups, '0000000', copyData)}
+                                    {this.state.userGroups.length > 0 ? <Radio value={_getCookie('companies')}>公司</Radio> : ''}
+                                    <Radio value={copyData.developer}>个人</Radio>
                                 </Radio.Group>
                             )}
                         </Form.Item>

@@ -243,7 +243,7 @@ class AppDetails extends Component {
                     <div className="appInfo">
                         <p className="appName">{app_info.app_name}</p>
                         <p className="info">
-                            <span>    发布者：{app_info.developer}</span>
+                            <span>发布者：{app_info.developer}</span>
                             <span>创建时间：{time}</span><br/>
                             <span>应用分类：{app_info.category === null ? '----' : app_info.category}</span>
                             <span>通讯协议：{app_info.protocol === null ? '----' : app_info.protocol}</span><br/>

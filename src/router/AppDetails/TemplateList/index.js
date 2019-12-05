@@ -39,11 +39,11 @@ class TemplateList extends Component {
                 },
                 {
                     title: '所有者类型',
-                    dataIndex: 'owner_type',
-                    key: 'owner_type',
+                    dataIndex: 'company',
+                    key: 'company',
                     render: (val) => {
                         return (
-                            <span>{val === 'User' ? '个人' : '公司'}</span>
+                            <span>{!val ? '个人' : '公司'}</span>
                         )
                     }
                 },
@@ -68,7 +68,7 @@ class TemplateList extends Component {
                     dataIndex: 'modified',
                     render: text => {
                         return (
-                            <span>{text.substr(0, 19)}</span>
+                            <span>{text && text.substr(0, 19)}</span>
                         )
                     }
                 },
@@ -87,7 +87,7 @@ class TemplateList extends Component {
                                 style={{cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={() => {
-                                        this.editContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 'edit')
+                                        this.editContent(record, 'edit')
                                     }}
                             >编辑</a>
                             <Divider type="vertical" />
@@ -95,7 +95,7 @@ class TemplateList extends Component {
                                 style={{cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={() => {
-                                        this.editContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 'copy')
+                                        this.editContent(record, 'copy')
                                     }}
                             >复制</a>
                             <Divider type="vertical" />
@@ -137,7 +137,7 @@ class TemplateList extends Component {
                     dataIndex: 'modified',
                     render: text => {
                         return (
-                            <span>{text.substr(0, 19)}</span>
+                            <span>{text && text.substr(0, 19)}</span>
                         )
                     }
                 },
@@ -156,7 +156,7 @@ class TemplateList extends Component {
                                 style={{cursor: 'pointer'}}
                                 className="mybutton"
                                 onClick={() => {
-                                        this.editContent(record.name, record.conf_name, record.description, record.latest_version, record.public, record.owner_type, 'copy')
+                                        this.editContent(record, 'copy')
                                     }}
                             >复制</a>
                         </span>
@@ -182,24 +182,25 @@ class TemplateList extends Component {
         this.refreshMyList()
     }
 
-    editContent = (conf, name, desc, version, publics, owner_type, type)=>{
-        let new_name = name
+    editContent = (record, type)=>{
+        let new_name = record.conf_name;
         if (type === 'copy') {
-            new_name = name + '-copy'
+            new_name = record.conf_name + '-copy'
         }
         let data = {
             conf_name: new_name,
-            description: desc,
-            public: publics,
-            owner_type: owner_type,
-            version: version
+            description: record.description,
+            public: record.public,
+            developer: record.developer,
+            company: record.company,
+            version: record.latest_version
         };
         this.setState({
             type: type === 'copy' ? '复制' : '编辑',
-            conf: conf
+            conf: record.name
         });
-        if (version !== 0) {
-            http.get('/api/configurations_version_read?conf=' + conf + '&version=' + version)
+        if (record.latest_version !== 0) {
+            http.get('/api/configurations_version_read?conf=' + record.name + '&version=' + record.latest_version)
                 .then(res=>{
                     if (res.ok) {
                         data.data = res.data;
@@ -213,11 +214,12 @@ class TemplateList extends Component {
         }
     };
 
-    handleCreateSuccess = (newData) => {
-        let newList = [...this.state.myList, newData]
-        this.setState({
-            myList: newList
-        })
+    handleCreateSuccess = () => {
+        this.refreshMyList()
+        // let newList = [...this.state.myList, newData]
+        // this.setState({
+        //     myList: newList
+        // })
         //list.unshift(res.data);
     }
 
@@ -252,6 +254,7 @@ class TemplateList extends Component {
                     message.error('删除失败，请联系管理员！')
                 } else {
                     message.success('删除成功！')
+                    this.refreshMyList()
                 }
                 this.setState({
                     visible: false,
@@ -332,7 +335,6 @@ class TemplateList extends Component {
                             rowKey="name"
                             dataSource={myList}
                         >
-
                         </Table>
                         <p
                             className="empty"
