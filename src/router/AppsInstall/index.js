@@ -47,9 +47,9 @@ class MyGatesAppsInstall extends Component {
         let app = this.props.match.params.app ? this.props.match.params.app.replace(/\*/g, '/') : ''
         let gateway_sn = this.props.match.params.sn;
         let install_step = this.props.match.params.step ? this.props.match.params.step : ''
-        if (this.props.match.params.sn && this.props.match.params.app) {
-            console.log('pushspsushdbiqgeibakbfj')
-        }
+        // if (this.props.match.params.sn && this.props.match.params.app) {
+        //     console.log('pushspsushdbiqgeibakbfj')
+        // }
         if (this.props.match.params.app !== undefined && install_step === '') {
             install_step = 'view'
         }
@@ -357,7 +357,7 @@ class MyGatesAppsInstall extends Component {
                                     <div style={{width: 500}}
                                         className="detail"
                                     >
-                                        <p>发布者： {app_info.owner}</p>
+                                        <p>发布者： {app_info.developer}</p>
                                         <p>通讯协议: {app_info.protocol}</p>
                                         <p>适配型号： {app_info.device_serial}</p>
                                     </div>

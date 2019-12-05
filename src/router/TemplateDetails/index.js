@@ -206,7 +206,7 @@ class MyTemplateDetails extends PureComponent {
                         <span>名称:</span>
                         {conf_info.conf_name}
                         <span style={{paddingLeft: '50px'}}>所有者:</span>
-                        {conf_info.owner}
+                        {conf_info.developer}
                         <span style={{paddingLeft: '50px'}}>版本列表：</span>
                         <Select
                             disabled={versionList.length > 0 ? false : true}
@@ -229,7 +229,7 @@ class MyTemplateDetails extends PureComponent {
                     </div>
                     <div>
                         <Button
-                            style={this.state.conf_info.owner === this.props.store.session.user_id ? {display: 'inline-block', marginRight: '20px'} : {display: 'none', marginRight: '20px'}}
+                            style={this.state.conf_info.developer === this.props.store.session.user_id ? {display: 'inline-block', marginRight: '20px'} : {display: 'none', marginRight: '20px'}}
                             onClick={()=>{
                                 this.setState({visibleEdit: true})
                             }}
@@ -237,11 +237,11 @@ class MyTemplateDetails extends PureComponent {
                             编辑
                         </Button>
                         <Button
-                            style={this.state.conf_info.owner === this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
+                            style={this.state.conf_info.developer === this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showModal}
                         >上传新版本</Button>
                         <Button
-                            style={this.state.conf_info.owner !== this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
+                            style={this.state.conf_info.developer !== this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showCloneModal}
                         >克隆</Button>
                         <span style={{padding: '10px'}}></span>

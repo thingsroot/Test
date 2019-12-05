@@ -88,7 +88,7 @@ class Comments extends PureComponent {
                             <Comment
                                 key={key}
                                 actions={[
-                                    item.owner === _getCookie('user_id')
+                                    item.developer === _getCookie('user_id')
                                     ? <Popconfirm
                                         title="确定要删除此次评分吗?"
                                         okText="确定"
@@ -106,9 +106,9 @@ class Comments extends PureComponent {
                                     style={{
                                         marginLeft: '10px'
                                     }}
-                                >{item.owner}</a>}
+                                >{item.developer}</a>}
                                 avatar={
-                                    <Avatar style={{ backgroundColor: '#87d068' }}>{item.owner[0].toUpperCase()}</Avatar>
+                                    <Avatar style={{ backgroundColor: '#87d068' }}>{item.developer[0].toUpperCase()}</Avatar>
                                 }
                                 content={
                                     <div

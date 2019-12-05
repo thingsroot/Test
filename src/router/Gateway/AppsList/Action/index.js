@@ -174,8 +174,7 @@ class Action extends Component {
         })
     }
     onDebug = (record) =>{
-        const {gatewayInfo} = this.props.store
-        console.log(gatewayInfo.data.enable_beta)
+        const {gatewayInfo} = this.props.store;
         if (gatewayInfo.data.enable_beta === 0) {
             message.error('网关未开启调试模式')
             return
@@ -185,11 +184,11 @@ class Action extends Component {
             let app = record.data.name.replace(/\//g, '*')
             let app_name = record.data.app_name
             let app_inst = record.inst_name
-            if (record.data.owner === user_id){
+            if (record.data.developer === user_id){
                 window.open(`/appeditorcode/${app}/${app_name}/${gatewayInfo.sn}/${app_inst}`, '_blank');
                 this.setState({appdebug: false})
             } else {
-                let url = `/api/applications_forks_list?name=${app}&version=${record.version}&owner=${user_id}`
+                let url = `/api/applications_forks_list?name=${app}&version=${record.version}&developer=${user_id}`
                 http.get(url).then(result=>{
                     if (result.ok){
                         if (result.data && result.data.length > 0){
@@ -230,7 +229,7 @@ class Action extends Component {
                         应用名称: {record.data && record.data.app_name || '本地应用'}
                     </span>
                     <span className="spanStyle">
-                        应用开发者：{record.data && record.data.owner || this.props.store.session.companies}
+                        应用开发者：{record.data && record.data.developer || this.props.store.session.companies}
                     </span>
                     <br/>
                     {

@@ -340,11 +340,11 @@ class AppConfigSection extends Component {
     //     )
     // }
     render_templates (key, config, templates, templateStore) {
-        const owner = this.props.app_info.owner ? this.props.app_info.owner : '';
+        const developer = this.props.app_info.developer ? this.props.app_info.developer : '';
         templateStore.sort(function (b, a) {
             const id = _getCookie('user_id')
-            const order = [owner, id];
-            return order.indexOf(a.owner_id) - order.indexOf(b.owner_id)
+            const order = [developer, id];
+            return order.indexOf(a.developer) - order.indexOf(b.developer)
         });
         const addTempLists = [
             {
@@ -362,8 +362,8 @@ class AppConfigSection extends Component {
             }, {
                 title: '所有者ID',
                 width: '15%',
-                dataIndex: 'owner_id',
-                key: 'owner_id',
+                dataIndex: 'developer',
+                key: 'developer',
                 render: text => <Tooltip title={text}><span className="col">{text}</span></Tooltip>
             }, {
                 title: '模板ID',
@@ -395,7 +395,7 @@ class AppConfigSection extends Component {
                         > 查看 </Button>
                         <span style={{padding: '0 1px'}}> </span>
                         {
-                            record.owner !== this.props.store.session.user_id ? (
+                            record.developer !== this.props.store.session.user_id ? (
                             <Button
                                 onClick={()=>{
                                     this.onCloneTemplate(record.name, record.latest_version)

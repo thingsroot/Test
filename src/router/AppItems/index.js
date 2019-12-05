@@ -16,10 +16,16 @@ class AppItems extends PureComponent {
         this.state = {
             data: [],
             visible: false,
-            comment: ''
+            comment: '',
+            favorites: false,
+            favorites_loading: false
         }
     }
     componentDidMount () {
+        this.getData()
+        this.getFavoritesList()
+    }
+    getData = () => {
         const {name} = this.props.match.params;
         http.get('/api/applications_read?app=' + name).then(res=>{
             if (res.ok) {
@@ -29,25 +35,44 @@ class AppItems extends PureComponent {
                 })
             }
         })
+    }
+    getFavoritesList = () => {
         http.post('/api/store_favorites_list').then(res=>{
-            console.log(res)
-        })
-        const remove = {
-            app: 'APP00000017'
-        }
-        http.post('/api/store_favorites_remove', remove).then(res=>{
-            console.log(res)
+            if (res.ok && res.data && res.data.length > 0) {
+                const {name} = this.props.match.params;
+                let favorites = false;
+                res.data.map(item=>{
+                    if (item.name === name) {
+                        favorites = true
+                    }
+                })
+                this.setState({
+                    favorites,
+                    loading: false
+                })
+            } else {
+                this.setState({
+                    favorites: false,
+                    loading: false
+                })
+            }
         })
     }
-    addFavorites = () => {
+    setFavorites = () => {
         console.log(this.state)
+        this.setState({
+            loading: true
+        })
         const data = {
             app: this.state.data.name
             // comment: '123',
-            // priority: ''
+            // priority: ''v
         }
-        http.post('/api/store_favorites_add', data).then(res=>{
-            console.log(res)
+        const url = !this.state.favorites ? '/api/store_favorites_add' : '/api/store_favorites_remove'
+        http.post(url, data).then(res=>{
+            if (res.ok) {
+                this.getFavoritesList()
+            }
         })
     }
     render () {
@@ -78,10 +103,11 @@ class AppItems extends PureComponent {
                             {data.protocol}
                         </div>
                         <Button
-                            onClick={this.addFavorites}
+                            loading={this.state.loading}
+                            onClick={this.setFavorites}
                             style={{marginLeft: '30px', marginTop: '10px', width: '100px'}}
-                            type="primary"
-                        >收藏</Button>
+                            type={!this.state.favorites ? 'primary' : 'danger'}
+                        >{this.state.favorites ? '取消收藏' : '收藏'}</Button>
                     </div>
                 </div>
                 <div className="app_info">
@@ -127,7 +153,7 @@ class AppItems extends PureComponent {
                                         <div><span className="info_title">版本:</span><span>{version}</span></div>
                                         <div><span className="info_title">发布时间:</span><span>{data.creation && data.creation.indexOf('.') !== -1 ? data.creation.split('.')[0] : ''}</span></div>
                                         <div><span className="info_title">最近更新时间:</span><span>{data.modified && data.modified.indexOf('.') !== -1 ? data.modified.split('.')[0] : ''}</span></div>
-                                        <div><span className="info_title">作者:</span><span>{data.owner}</span></div>
+                                        <div><span className="info_title">作者:</span><span>{data.developer}</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -152,4 +178,4 @@ class AppItems extends PureComponent {
     }
 }
 
-export default AppItems
+export default AppItems;

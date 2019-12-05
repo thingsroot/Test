@@ -111,6 +111,7 @@ class AppStore extends Component {
                 />
             </div>
             <div className="search">
+                <span>标签列表: &nbsp;&nbsp;</span>
                 {
                     tag_list && tag_list.length > 0 && tag_list.map((item, key)=>{
                         return (
@@ -126,6 +127,7 @@ class AppStore extends Component {
                 }
             </div>
             <div className="the_selected_label">
+            <span>已选标签: &nbsp;&nbsp;</span>
                 {
                     add_tag_list && add_tag_list.length > 0 && add_tag_list.map((item, key)=>{
                         return (

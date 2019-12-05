@@ -43,7 +43,7 @@ class Developer extends Component {
                     }
                     if (item.fork_from !== null) {
                         formData.push(item)
-                    } else if (item.owner === user) {
+                    } else if (item.developer === user) {
                         myData.push(item)
                     }
                 }));

@@ -317,7 +317,8 @@ class EditableTable extends React.Component {
                 visibleMember: false,
                 status: '',
                 type: 'text',
-                password_visible: false
+                password_visible: false,
+                new_password: ''
             })
             if (res.ok) {
                 message.success('修改用户信息成功！')
@@ -336,28 +337,28 @@ class EditableTable extends React.Component {
             if (!err) {
                 console.log('Received values of form: ', values);
             }
-            if (this.state.status === 'updateUser') {
-                const datas = {
-                    name: values.user,
-                    first_name: values.firstname,
-                    last_name: values.lastname,
-                    mobile_no: values.phone,
-                    new_password: values.password
-                }
-                http.post('/api/companies_users_update', datas).then(res=>{
-                    this.setState({
-                        visibleMember: false,
-                        status: '',
-                        type: 'text'
-                    })
-                    if (res.ok) {
-                        message.success('修改用户信息成功！')
-                        this.props.getdata()
-                    } else {
-                        message.error(res.error)
-                    }
-                })
-            } else {
+            // if (this.state.status === 'updateUser') {
+            //     const datas = {
+            //         name: values.user,
+            //         first_name: values.firstname,
+            //         last_name: values.lastname,
+            //         mobile_no: values.phone,
+            //         new_password: values.password
+            //     }
+            //     http.post('/api/companies_users_update', datas).then(res=>{
+            //         this.setState({
+            //             visibleMember: false,
+            //             status: '',
+            //             type: 'text'
+            //         })
+            //         if (res.ok) {
+            //             message.success('修改用户信息成功！')
+            //             this.props.getdata()
+            //         } else {
+            //             message.error(res.error)
+            //         }
+            //     })
+            // } else {
                 if (values.firstname !== undefined &&
                     values.lastname !== undefined &&
                     values.phone !== undefined &&
@@ -395,7 +396,7 @@ class EditableTable extends React.Component {
                         type: 'text'
                     })
                 }
-            }
+            // }
 
         });
     };

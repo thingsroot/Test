@@ -89,7 +89,11 @@ class AppDetails extends Component {
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
-            this.loadApp(this.state.name)
+            this.setState({
+                name: nextProps.match.params.name
+            }, ()=>{
+                this.loadApp(this.state.name)
+            })
         }
     }
     loadApp = (name) => {
@@ -239,7 +243,7 @@ class AppDetails extends Component {
                     <div className="appInfo">
                         <p className="appName">{app_info.app_name}</p>
                         <p className="info">
-                            <span>    发布者：{app_info.owner}</span>
+                            <span>    发布者：{app_info.developer}</span>
                             <span>创建时间：{time}</span><br/>
                             <span>应用分类：{app_info.category === null ? '----' : app_info.category}</span>
                             <span>通讯协议：{app_info.protocol === null ? '----' : app_info.protocol}</span><br/>
@@ -251,7 +255,7 @@ class AppDetails extends Component {
 
                         <Link
                             className="button"
-                            style={app_info.owner === user ? block : none}
+                            style={app_info.developer === user ? block : none}
                             to={`/appedit/${app_info.name}`}
                         >
                             <Icon type="setting" />
@@ -259,7 +263,7 @@ class AppDetails extends Component {
                         </Link>
                         <Link
                             className="button"
-                            style={app_info.owner === user ? block : none}
+                            style={app_info.developer === user ? block : none}
                             to={`/appeditorcode/${app_info.name}/${app_info.app_name}`}
                         >
                             <Icon type="edit" />
@@ -275,7 +279,7 @@ class AppDetails extends Component {
                             安装此应用
                         </Button>
                         {
-                            app_info.owner !== _getCookie('user_id')
+                            app_info.developer !== _getCookie('user_id')
                             ? <Button
                                 style={{
                                     height: '35px',
@@ -299,7 +303,7 @@ class AppDetails extends Component {
                             分支
                         </Link>
                         {
-                            app_info.owner === _getCookie('user_id')
+                            app_info.developer === _getCookie('user_id')
                             ? <Button
                                 type="danger"
                                 onClick={this.showModal}
@@ -366,7 +370,7 @@ class AppDetails extends Component {
                             initialVersion={this.state.versionLatest}
                             dataSource={this.state.versionList}
                             onUpdate={this.updateVersionList}
-                            user={app_info.owner === user ? true : false}
+                            user={app_info.developer === user ? true : false}
                         />
                     </TabPane>
                     <TabPane
