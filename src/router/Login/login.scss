@@ -10,6 +10,16 @@
     top: 0;
     left: 0;
     z-index: 99;
+    position: relative;
+    .help_link{
+      position: absolute;
+      right:60px;
+      top:25px;
+      color: #fff;
+      a{
+        color: #fff;
+      }
+    }
     >p {
       display: inline-block;
       color: #fff;
