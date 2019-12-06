@@ -487,6 +487,14 @@ class AppConfig extends Component {
                         this.onTabActiveChange(key)
                     }}
                     type="card"
+                    tabBarExtraContent={
+                        <Button
+                            icon="question-circle"
+                            onClick={()=>{
+                                window.open('https://wiki.freeioe.org/doku.php?id=apps:' + app_info.name, '_blank')
+                            }}
+                        >帮助</Button>
+                    }
                 >
                     <TabPane
                         tab="可视化编辑"

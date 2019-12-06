@@ -89,13 +89,13 @@ class Issues extends PureComponent {
                         if (obj[i].chidren === undefined) {
                             obj[i].chidren = [];
                         }
-                        obj[i].chidren.push({...item, reply_to_id: item.developer})
+                        obj[i].chidren.push({...item, reply_to_id: item.owner})
                         if (obj[i].chidren && obj[i].chidren.length > 0) {
                             obj[i].chidren.map(val=>{
                                 const chidren = arr.filter(items=> items.reply_to === val.name)
                                 if (chidren.length > 0) {
                                     chidren.map((values) => {
-                                        values.reply_to_id = item.developer;
+                                        values.reply_to_id = item.owner;
                                         const index = arr.findIndex(val=> val === values)
                                         arr.splice(index, 1)
                                     })
@@ -111,7 +111,7 @@ class Issues extends PureComponent {
                     } else {
                             obj[i].chidren && obj[i].chidren.length > 0 && obj[i].chidren.map(chidrenItem=>{
                                 if (chidrenItem.name === item.reply_to) {
-                                    obj[i].chidren.push({...item, reply_to_id: chidrenItem.developer})
+                                    obj[i].chidren.push({...item, reply_to_id: chidrenItem.owner})
                                     const index = arr.findIndex(val=> val === item)
                                     arr.splice(index, 1)
                                 }
@@ -161,7 +161,7 @@ class Issues extends PureComponent {
                                         })
                                     }}
                                 >回复</span>,
-                                item.developer === _getCookie('user_id')
+                                item.owner === _getCookie('user_id')
                                 ? <Popconfirm
                                     title="确定要删除此回复吗?"
                                     onConfirm={()=> {
@@ -175,9 +175,9 @@ class Issues extends PureComponent {
                                 </Popconfirm>
                                 : ''
                                 ]}
-                                author={<a>{item.developer}</a>}
+                                author={<a>{item.owner}</a>}
                                 avatar={
-                                <Avatar style={{ backgroundColor: '#87d068' }}>{item.developer[0].toUpperCase()}</Avatar>
+                                <Avatar style={{ backgroundColor: '#87d068' }}>{item.owner && item.owner[0].toUpperCase()}</Avatar>
                                 }
                                 content={
                                 <p>
@@ -199,7 +199,7 @@ class Issues extends PureComponent {
                                                         })
                                                     }}
                                                 >回复</span>,
-                                                val.developer === _getCookie('user_id')
+                                                val.owner === _getCookie('user_id')
                                                 ? <Popconfirm
                                                     title="确定要删除此回复吗?"
                                                     onConfirm={()=> {
@@ -213,10 +213,10 @@ class Issues extends PureComponent {
                                                 </Popconfirm>
                                                 : ''
                                             ]}
-                                            author={<a>{val.developer}</a>}
+                                            author={<a>{val.owner}</a>}
                                             avatar={
                                             <Avatar style={{ backgroundColor: '#f56a00' }}>
-                                                {val.developer[0].toUpperCase()}
+                                                {val.owner[0].toUpperCase()}
                                             </Avatar>
                                             }
                                             content={

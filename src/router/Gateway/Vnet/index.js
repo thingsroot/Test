@@ -237,6 +237,16 @@ class VPN extends Component {
         const {start_loading, stop_loading, model, isShow} = this.state;
         return (
             <div className="VPN">
+                <h2>远程编程-网络</h2>
+                <div className="help_button">
+                    <Button
+                        icon="question-circle"
+                        // style={{marginLeft: '27px', marginBottom: '4px'}}
+                        onClick={()=>{
+                            window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000135', '_blank')
+                        }}
+                    >帮助</Button>
+                </div>
                 <div className="vnetVserState">
                     <ServiceState
                         mqtt={this.props.mqtt}

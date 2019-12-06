@@ -40,14 +40,14 @@ const TemplateForm = Form.create({ name: 'template_form' })(
                     developer: _getCookie('user_id'),
                     company: values.developer !== _getCookie('user_id') ? values.developer : null
                 };
-                if (params.owner_type === 'User') {
-                    params['owner_id'] = this.props.store.session.user_id
-                } else {
-                    if (this.state.userGroups.length < 0) {
-                        return;
-                    }
-                    params['owner_id'] = this.state.userGroups[0].name
-                }
+                // if (params.owner_type === 'User') {
+                //     params['owner_id'] = this.props.store.session.user_id
+                // } else {
+                //     if (this.state.userGroups.length < 0) {
+                //         return;
+                //     }
+                //     params['owner_id'] = this.state.userGroups[0].name
+                // }
                 http.post('/api/configurations_create', params).then(res=>{
                     if (res.ok === false) {
                         message.error('创建应用模板失败！');

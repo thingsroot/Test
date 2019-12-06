@@ -329,12 +329,20 @@ class NetworkConfig extends Component {
                     loading={loading || data.length === 0}
                 >
                     <div className="title">
-                        <h2>| 网络接口</h2>
+                        <h2>网络配置</h2>
                         <div className="btn_to_set">
                         <Tooltip
                             placement="bottom"
                             title="强制网关上送最新数据"
                         >
+                                <Button
+                                    icon="question-circle"
+                                    style={{marginLeft: '27px', marginBottom: '4px'}}
+                                    onClick={()=>{
+                                        window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000115', '_blank')
+                                    }}
+                                >帮助</Button>
+                                <br/>
                                 <Button
                                     disabled={!this.state.dataFlushEnable}
                                     onClick={()=>{
@@ -350,6 +358,7 @@ class NetworkConfig extends Component {
                             </Tooltip>
                         </div>
                     </div>
+                <div className="networkpagecontent">
                 {
                     data && data.length > 0 && data.map((item, key)=>{
                         return (
@@ -438,6 +447,7 @@ class NetworkConfig extends Component {
                         )
                     })
                 }
+                </div>
                 </Card>
                 <div className="DNSinfo">
                     <Card loading={loading || data.length === 0}>

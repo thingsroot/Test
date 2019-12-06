@@ -460,6 +460,16 @@ class Vserial extends Component {
         const {  addPortData } = mqtt.vserial_channel;
         return (
             <div className="vserialWrapper">
+                <h2>远程编程-串口</h2>
+                <div className="help_button">
+                    <Button
+                        icon="question-circle"
+                        // style={{marginLeft: '27px', marginBottom: '4px'}}
+                        onClick={()=>{
+                            window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000130', '_blank')
+                        }}
+                    >帮助</Button>
+                </div>
                 <ServiceState
                     mqtt={mqtt}
                     gateway={this.props.gateway}

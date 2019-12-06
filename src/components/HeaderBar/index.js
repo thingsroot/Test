@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Icon, message, Menu, Dropdown } from 'antd';
-import { withRouter} from 'react-router-dom';
+import { withRouter, Link} from 'react-router-dom';
 import { _getCookie, isAuthenticated, authenticateClear } from '../../utils/Session';
 import http  from '../../utils/Server';
 import OEM from '../../assets/OEM';
@@ -149,6 +149,10 @@ class HeaderBar extends PureComponent {
         )
         return (
             <div className="headerUser">
+                <Link
+                    to="/appstore"
+                    style={{marginRight: '15px'}}
+                ><Icon type="appstore"/>&nbsp;&nbsp;应用市场</Link>
                 {
                     _getCookie('is_admin') === '1'
                     ? <Dropdown

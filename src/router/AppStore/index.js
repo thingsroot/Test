@@ -126,23 +126,27 @@ class AppStore extends Component {
                     })
                 }
             </div>
-            <div className="the_selected_label">
-            <span>已选标签: &nbsp;&nbsp;</span>
-                {
-                    add_tag_list && add_tag_list.length > 0 && add_tag_list.map((item, key)=>{
-                        return (
-                            <Tag
-                                key={key}
-                                color={item.color}
-                                closable
-                                onClose={()=>{
-                                    this.disableTag(item)
-                                }}
-                            >{item.tag + ' (' + item.number + ')'}</Tag>
-                        )
-                    })
-                }
-            </div>
+            {
+                add_tag_list && add_tag_list.length > 0
+                ? <div className="the_selected_label">
+                    <span>已选标签: &nbsp;&nbsp;</span>
+                    {
+                        add_tag_list && add_tag_list.length > 0 && add_tag_list.map((item, key)=>{
+                            return (
+                                <Tag
+                                    key={key}
+                                    color={item.color}
+                                    closable
+                                    onClose={()=>{
+                                        this.disableTag(item)
+                                    }}
+                                >{item.tag + ' (' + item.number + ')'}</Tag>
+                            )
+                        })
+                    }
+                  </div>
+                : ''
+            }
                 <div className="all_app_title">
                     全部应用
                 </div>
@@ -164,14 +168,13 @@ class AppStore extends Component {
                                 >
                                     <img
                                         src={'http://ioe.thingsroot.com' + val.icon_image}
-                                        style={{width: '72px', padding: '10px', height: '72px', display: 'block',  margin: '0 auto'}}
                                         alt=""
                                     />
-                                    <div style={{textAlign: 'center'}}>{val.app_name}</div>
+                                    <div style={{textAlign: 'center', fontWeight: '600'}}>{val.app_name}</div>
                                     <div
                                         className="app_item_desc"
                                     >
-                                        <div>描述.....</div>
+                                        <div>{val.tags ? val.tags : '暂无标签'}</div>
                                         <div style={{textAlign: 'center'}}><Icon type="download" /> {val.installed}</div>
                                     </div>
                                     <div
