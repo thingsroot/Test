@@ -21,10 +21,13 @@ class Comments extends PureComponent {
     getReviews = () => {
         const {name} = this.props.match.params;
         http.get('/api/store_reviews_list?app=' + name).then(res=>{
-            console.log(res)
             if (res.ok && res.data.length > 0) {
                 this.setState({
                     data: res.data
+                })
+            } else {
+                this.setState({
+                    data: []
                 })
             }
         })

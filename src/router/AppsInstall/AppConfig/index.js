@@ -489,6 +489,7 @@ class AppConfig extends Component {
                     type="card"
                     tabBarExtraContent={
                         <Button
+                            style={{position: 'absolute', right: '60px', top: '5px', zIndex: '999'}}
                             icon="question-circle"
                             onClick={()=>{
                                 window.open('https://wiki.freeioe.org/doku.php?id=apps:' + app_info.name, '_blank')

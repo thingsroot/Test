@@ -46,6 +46,10 @@ class Issues extends PureComponent {
                     }
                 })
                 this.filterComment(obj, arr)
+            } else {
+                this.setState({
+                    data: []
+                })
             }
         })
     }
@@ -109,13 +113,13 @@ class Issues extends PureComponent {
                         const index = arr.findIndex(val=> val === item)
                         arr.splice(index, 1)
                     } else {
-                            obj[i].chidren && obj[i].chidren.length > 0 && obj[i].chidren.map(chidrenItem=>{
-                                if (chidrenItem.name === item.reply_to) {
-                                    obj[i].chidren.push({...item, reply_to_id: chidrenItem.owner})
-                                    const index = arr.findIndex(val=> val === item)
-                                    arr.splice(index, 1)
-                                }
-                            })
+                        obj[i].chidren && obj[i].chidren.length > 0 && obj[i].chidren.map(chidrenItem=>{
+                            if (chidrenItem.name === item.reply_to) {
+                                obj[i].chidren.push({...item, reply_to_id: chidrenItem.owner})
+                                const index = arr.findIndex(val=> val === item)
+                                arr.splice(index, 1)
+                            }
+                        })
                     }
                 }
             })
@@ -127,8 +131,6 @@ class Issues extends PureComponent {
             })
             this.setState({
                 data
-            }, ()=>{
-                console.log(data)
             })
         }
     }
