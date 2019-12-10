@@ -86,7 +86,7 @@ class AppItems extends PureComponent {
                     <div className="app_simple_info">
                         <p>{data.app_name}</p>
                         <div className="app_simple_desc">
-                            <span>{data.name}</span>
+                            <span>{data.developer}</span>
                             <span>{data.installed}次安装</span>
                             <span>
                                 <Rate
@@ -159,7 +159,7 @@ class AppItems extends PureComponent {
                             </div>
                         </TabPane>
                         <TabPane
-                            tab="评论"
+                            tab="问与答"
                             key="2"
                         >
                             <Issues />

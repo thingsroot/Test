@@ -227,7 +227,6 @@ class GatewaySettings extends Component {
                 message.error(res.error)
                 return
             }
-            console.log(res.data, 'res.data')
             this.props.store.gatewayInfo.updateStatus(res.data);
             this.setState({loading: false})
             this.fetchFreeIOEVersion()
@@ -241,7 +240,7 @@ class GatewaySettings extends Component {
             message.error('错误的升级请求')
             return
         }
-
+        console.log(skynet_version)
         const { gatewayInfo } = this.props.store;
         this.setState({upgrading: true})
         const data = {
@@ -260,10 +259,8 @@ class GatewaySettings extends Component {
                 this.setState({skynet_latest_version: undefined}, ()=>{
                     this.fetchSkynetVersion()
                 })
-                console.log(this.props.store.gatewayInfo.data.platform, 'ssssssssssssssssssssssssssssssssssssssssss')
                 this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 3000,  (result)=> {
                     this.fetchSkynetVersion()
-                    console.log(this.props.store.gatewayInfo.data.platform, 'ssssssssssssssssssssssssssssssssssssssssss')
                     if (result.ok){
                         this.setState({showUpgrade: false, skynet_latest_version: undefined})
                     } else {
@@ -351,7 +348,7 @@ class GatewaySettings extends Component {
                             <p><b>内存容量:</b>{gatewayInfo.ram}</p>
                             <p><b>存储容量:</b>{gatewayInfo.rom}</p>
                             <p><b>操作系统:</b>{gatewayInfo.data.platform}</p>
-                            <p><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}
+                            <div className="setting_info"><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}
                             {
                                 Number(gatewayInfo.data.version) !== 0
                                 ? freeioe_upgradable
@@ -365,8 +362,8 @@ class GatewaySettings extends Component {
                                         style={{marginLeft: 15}}
                                       >已是最新版</Tag>
                                 : ''
-                            }</p>
-                            <p><b>核心软件:</b>{gatewayInfo.data && gatewayInfo.data.skynet_version}
+                            }</div>
+                            <div className="setting_info"><b>核心软件:</b>{gatewayInfo.data && gatewayInfo.data.skynet_version}
                             {
                                 Number(gatewayInfo.data.skynet_version) !== 0
                                 ? skynet_upgradable
@@ -380,7 +377,7 @@ class GatewaySettings extends Component {
                                         style={{marginLeft: 15}}
                                       >已是最新版</Tag>
                                 : ''
-                            }</p>
+                            }</div>
                             <p><b>调试模式:</b>{gatewayInfo.data && gatewayInfo.data.enable_beta === 1 ? '开启' : '关闭'}</p>
                             <p><b>数据上传:</b>{gatewayInfo.data && gatewayInfo.data.data_upload ? '开启' : '关闭'}</p>
                             <p><b>统计上传:</b>{gatewayInfo.data && gatewayInfo.data.stat_upload ? '开启' : '关闭'}</p>

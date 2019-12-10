@@ -142,7 +142,7 @@ class Issues extends PureComponent {
                     className="store_comments_add"
                     onClick={this.showModal}
                     type="primary"
-                >添加评论</Button>
+                >添加问题</Button>
                 <div className="store_comments_title">
                     评论
                 </div>
