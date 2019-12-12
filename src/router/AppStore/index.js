@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Tag, Input, Icon, Rate  } from 'antd';
+import { Tag, Input, Icon, Rate, Button  } from 'antd';
 const { Search } = Input;
 import './style.scss';
 import http from '../../utils/Server';
+import { _getCookie } from '../../utils/Session';
 @withRouter
 @inject('store')
 @observer
@@ -102,8 +103,19 @@ class AppStore extends Component {
         const { data, tag_list, add_tag_list } = this.state;
         return (
         <div className="AppStore">
+            {
+                Number(_getCookie('is_developer')) !== 1
+                ? <div className="app_developer">
+                    <Button
+                        onClick={()=>{
+                            this.props.history.push('/appdeveloper')
+                        }}
+                    >申请成为开发者</Button>
+                    </div>
+                : ''
+            }
             <div>
-                <p className="appStore_title">冬笋云平台应用市场</p>
+                <p className="appStore_title">FreeIOE应用市场</p>
                 <Search
                     placeholder="请输入应用名称"
                     onChange={e => this.searchApp(e)}

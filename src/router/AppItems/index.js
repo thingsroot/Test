@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react'
 import http from '../../utils/Server';
-import { Tabs, Button, Rate, Tag } from 'antd';
+import { Tabs, Button, Rate, Tag, Icon, message } from 'antd';
 import Description from '../AppDetails/Description';
 import Comments from './Comments';
 import Issues from './Issues';
+import {_getCookie} from '../../utils/Session';
 import './style.scss';
 const { TabPane } = Tabs;
 function callback (key) {
@@ -75,6 +76,25 @@ class AppItems extends PureComponent {
             }
         })
     }
+    sendForkCreate (record){
+        http.get('/api/gateways_app_version_latest?app=' + record.name).then(result=>{
+            if (result.ok) {
+                http.post('/api/applications_forks_create', {
+                    name: record.name,
+                    version: Number(result.data)
+                }).then(res=>{
+                    if (res.ok){
+                        message.success('应用克隆成功，即将跳转到编辑页面！')
+                        if (res.data){
+                            this.props.history.push(`/appeditorcode/${res.data.name}/${res.data.app_name}`);
+                        }
+                    } else {
+                        message.error(res.error)
+                    }
+                })
+            }
+        })
+    }
     render () {
         const {data, version} = this.state;
         return (
@@ -108,6 +128,22 @@ class AppItems extends PureComponent {
                             style={{marginLeft: '30px', marginTop: '10px', width: '100px'}}
                             type={!this.state.favorites ? 'primary' : 'danger'}
                         >{this.state.favorites ? '取消收藏' : '收藏'}</Button>
+                        {
+                            data.developer !== _getCookie('user_id') && Number(_getCookie('is_developer')) === 1
+                            ? <Button
+                                style={{
+                                    height: '35px',
+                                    marginLeft: '15px'
+                                }}
+                                onClick={()=>{
+                                    this.sendForkCreate(data)
+                                }}
+                              >
+                                <Icon type="fork" />
+                                克隆
+                            </Button>
+                            : ''
+                        }
                     </div>
                 </div>
                 <div className="app_info">

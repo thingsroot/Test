@@ -24,6 +24,7 @@ const DeviceEvents = LoadableComponent(()=>import('../../router/GatewayEvents'))
 const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHistory'));
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
+const AppDeveloper = LoadableComponent(()=>import('../../router/AppDeveloper'));
 const TemplateDetails = LoadableComponent(()=>import('../../router/TemplateDetails'));
 const AppItems = LoadableComponent(()=>import('../../router/AppItems'))
 let timer;
@@ -139,6 +140,11 @@ class ContentMain extends Component {
                     path="/accesskeys"
                     component={AccessKeys}
                     title={'访问授权码'}
+                />
+                <PrivateRoute
+                    path="/appdeveloper"
+                    component={AppDeveloper}
+                    title={'申请成为开发者'}
                 />
                 <PrivateRoute
                     path="/virtualgateways"

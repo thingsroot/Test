@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Input, Button, Spin, Tabs  } from 'antd';
+import { Input, Button, Spin, Tabs, Result  } from 'antd';
 import {Link, withRouter} from 'react-router-dom';
 import './style.scss';
 import http from '../../utils/Server';
 import {inject, observer} from 'mobx-react';
+import { _getCookie } from '../../utils/Session';
 
 const Search = Input.Search;
 
@@ -150,7 +151,7 @@ class Developer extends Component {
                             <div
                                 style={this.state.loading === false ? block : none}
                             >
-                                <ul style={myList.length > 0 ? {} : {height: '40px'}}>
+                                <ul style={myList && myList.length > 0 ? {} : {height: '40px'}}>
                                     {
                                         myList && myList.length > 0 && myList.map((v, key)=>{
                                             return (
@@ -250,12 +251,30 @@ class Developer extends Component {
                 <div
                     style={this.state.loading ? none : block}
                 >
-                    <p
-                        className="empty"
-                        style={appList.length === 0 ? block : none}
-                    >
-                        暂时没有应用！
-                    </p>
+                    {
+                        Number(_getCookie('is_developer')) !== 1
+                        ? <Result
+                            title="您还不是开发者，请先申请成为开发者！"
+                            extra={
+                                <Button
+                                    type="primary"
+                                    key="console"
+                                    onClick={()=>{
+                                        console.log(this)
+                                        this.props.history.push('/appdeveloper')
+                                    }}
+                                >
+                                    申请成为开发者
+                                </Button>
+                            }
+                          />
+                        : <p
+                            className="empty"
+                            style={appList && appList.length === 0 ? block : none}
+                          >
+                            暂时没有应用！
+                        </p>
+                    }
                 </div>
             </div>
         )

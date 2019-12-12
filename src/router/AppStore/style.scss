@@ -1,7 +1,13 @@
 .AppStore{
     max-width: 1380px;
     margin: 0 auto;
+    position: relative;
     // background: #ccc;
+    .app_developer{
+        position: absolute;
+        right: 40px;
+        top: 20px;
+    }
     .ant-tag-hidden{
         display: inline-block;
     }

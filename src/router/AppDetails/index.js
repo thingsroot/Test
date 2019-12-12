@@ -279,7 +279,7 @@ class AppDetails extends Component {
                             安装此应用
                         </Button>
                         {
-                            app_info.developer !== _getCookie('user_id')
+                            app_info.developer !== _getCookie('user_id') && Number(_getCookie('is_developer')) === 1
                             ? <Button
                                 style={{
                                     height: '35px',
