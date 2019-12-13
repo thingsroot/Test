@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react';
-import { Icon, message, Menu, Dropdown } from 'antd';
+import { Icon, message, Menu, Dropdown, Select } from 'antd';
 import { withRouter, Link} from 'react-router-dom';
 import { _getCookie, isAuthenticated, authenticateClear } from '../../utils/Session';
+import {emit} from '../../emit';
 import http  from '../../utils/Server';
 import OEM from '../../assets/OEM';
+const { Option } = Select;
 
 @withRouter
 class HeaderBar extends PureComponent {
@@ -11,6 +13,10 @@ class HeaderBar extends PureComponent {
         if (!isAuthenticated()) {
             this.props.history.push('/login')
         }
+    }
+    handleChange (val) {
+        // 发送消息
+        emit.emit('change_language', val);
     }
     render () {
         const menu1 = (
@@ -149,6 +155,14 @@ class HeaderBar extends PureComponent {
         )
         return (
             <div className="headerUser">
+                <Select
+                    defaultValue="中文"
+                    onChange={this.handleChange.bind(this)}
+                    style={{marginRight: '20px'}}
+                >
+                    <Option value="zh-CN">中文</Option>
+                    <Option value="en-US">English</Option>
+                </Select>
                 <Link
                     to="/appstore"
                     style={{marginRight: '15px'}}

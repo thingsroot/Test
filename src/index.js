@@ -6,12 +6,15 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 import { Provider} from 'mobx-react';
 import store from './store/index';
+import {IntlProvider} from 'react-intl';
     ReactDOM.render(
-        <BrowserRouter>
-            <Provider store={store}>
-                <App />
-            </Provider>
-        </BrowserRouter>,
+        <IntlProvider>
+            <BrowserRouter>
+                <Provider store={store}>
+                    <App />
+                </Provider>
+            </BrowserRouter>
+        </IntlProvider>,
     document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change

@@ -4,6 +4,7 @@ import { Layout, Icon } from 'antd';
 import ContentMain from '../ContentMain';
 import Siders from '../Siders';
 import HeaderBar from '../HeaderBar';
+import intl from 'react-intl-universal';
 const { Header, Content, Sider } = Layout;
 
 const maxHeader = {
@@ -36,13 +37,16 @@ class App extends PureComponent {
   state = {
     collapsed: true
   };
+  componentDidMount () {
+    console.log(this)
+  }
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed
     });
   };
-
   render () {
+    console.log(intl.get, '----', intl)
     return (
       <Layout style={{minHeight: '100vh'}}>
         <Sider
