@@ -105,7 +105,7 @@ class AppStore extends Component {
         <div className="AppStore">
             {
                 Number(_getCookie('is_developer')) !== 1
-                ? <div className="app_developer">
+                ? <div className="app_developer_button">
                     <Button
                         onClick={()=>{
                             this.props.history.push('/appdeveloper')

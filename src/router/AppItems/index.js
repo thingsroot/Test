@@ -99,6 +99,15 @@ class AppItems extends PureComponent {
         const {data, version} = this.state;
         return (
             <div className="app_items">
+                <div className="app_items_up_button">
+                    <Button
+                        icon="rollback"
+                        // type="primary"
+                        onClick={()=>{
+                            this.props.history.go(-1)
+                        }}
+                    >返回</Button>
+                </div>
                 <div className="app_title">
                     <div className="app_logo">
                         <img src={'http://ioe.thingsroot.com' + data.icon_image}/>

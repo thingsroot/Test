@@ -78,10 +78,14 @@ class TemplateList extends Component {
                     width: '26%',
                     render: (record) => (
                         <span>
-                            <Link
+                            <Button
+                                type="link"
                                 className="mybutton"
-                                to={`/template/${record.app}/${record.name}/${record.latest_version}`}
-                            >查看</Link>
+                                style={{color: '#000'}}
+                                onClick={()=>{
+                                    window.open(`/template/${record.app}/${record.name}/${record.latest_version}`, '_blank')
+                                }}
+                            >查看</Button>
                             <Divider type="vertical" />
                             <a
                                 style={{cursor: 'pointer'}}

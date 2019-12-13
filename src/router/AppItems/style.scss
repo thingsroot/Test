@@ -1,9 +1,16 @@
 .app_items{
+    position: relative;
     .app_desc{
         display: flex;
     }
     .appDescription{
         width: 70%;
+    }
+    .app_items_up_button{
+        color:#000;
+        position: absolute;
+        right:100px;
+        top:30px;
     }
     .app_title{
         display: flex;

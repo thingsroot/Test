@@ -159,7 +159,7 @@ class Developer extends Component {
                             <div
                                 style={this.state.loading === false ? block : none}
                             >
-                                <ul style={myList && myList.length > 0 ? {} : {height: '40px'}}>
+                                <ul>
                                     {
                                         myList && myList.length > 0 && myList.map((v, key)=>{
                                             return (
