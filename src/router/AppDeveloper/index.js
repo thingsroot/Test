@@ -155,13 +155,13 @@ class DynamicRule extends PureComponent {
                     </Form.Item>
                     <Form.Item
                         {...formItemLayout}
-                        label="电话"
+                        label="手机号"
                     >
                         {getFieldDecorator('phone', {
                             rules: [
                             {
                                 required: true,
-                                message: '请输入您的电话',
+                                message: '请输入您的手机号',
                                 pattern: /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/
                             }
                             ]
