@@ -40,16 +40,8 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                     type: values.type,
                     public: values.public,
                     developer: _getCookie('user_id'),
-                    company: values.developer !== _getCookie('user_id') ? values.developer : null
-                };
-                // if (params.owner_type === 'User') {
-                //     params['owner_id'] = this.props.store.session.user_id
-                // } else if (params.owner_type === 'Cloud Company Group') {
-                //     if (this.state.userGroups.length < 0) {
-                //         return;
-                //     }
-                //     params['owner_id'] = this.state.userGroups[0].name
-                // }
+                    company: values.developer === _getCookie('companies') ? values.developer : null
+                }
                 if (this.props.type === '复制') {
                     http.post('/api/configurations_create', params).then(res=>{
                         let conf_info = res.data;
@@ -131,11 +123,11 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                             className="collection-create-form_last-form-item"
                             label="权限"
                         >
-                            {getFieldDecorator('developer', { initialValue: copyData.developer }
+                            {getFieldDecorator('developer', { initialValue: copyData.company ? copyData.company : copyData.developer }
                             )(
                                 <Radio.Group>
                                     {this.state.userGroups.length > 0 ? <Radio value={_getCookie('companies')}>公司</Radio> : ''}
-                                    <Radio value={copyData.developer}>个人</Radio>
+                                    <Radio value={_getCookie('user_id')}>个人</Radio>
                                 </Radio.Group>
                             )}
                         </Form.Item>

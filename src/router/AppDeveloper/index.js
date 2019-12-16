@@ -48,16 +48,17 @@ class DynamicRule extends PureComponent {
         })
     }
     confirm = () => {
-        Modal.confirm({
+        Modal.success({
           title: '申请成功！',
-          content: '申请成功！等待后台审核中，请耐心等候！',
-          okText: '确认并返回'
+          content: '申请成功！等待后台审核中，大概需要1到3个工作日,请耐心等候！',
+          okText: '确认并返回',
+          onOk: () => this.props.history.go(-1)
         });
     }
     check = () => {
         this.props.form.validateFields((err, values) => {
-          if (!err) {
-            console.info('success');
+          if (err) {
+            return false;
           }
           const data = {
             user: _getCookie('user_id'),
@@ -69,7 +70,7 @@ class DynamicRule extends PureComponent {
           http.post('/api/developers_requisition_create', data).then(res=>{
               if (res.ok) {
                   this.confirm()
-                  message.success('申请成功！等待后台审核中，请耐心等候！')
+                //   message.success('申请成功！等待后台审核中，请耐心等候！')
               } else {
                   res.error && message.error('申请失败，错误信息:' + res.error)
               }
