@@ -15,7 +15,7 @@ const locales = {
   };
 class App extends PureComponent {
     state = {
-        antdLang: zh_CN  // 修改antd  组件的国际化
+        antdLang: 'zh_CN'  // 修改antd  组件的国际化
     }
     componentDidMount () {
         emit.on('change_language', lang => this.loadLocales(lang)); // 监听语言改变事件

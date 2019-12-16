@@ -9,6 +9,9 @@ const { Option } = Select;
 
 @withRouter
 class HeaderBar extends PureComponent {
+    componentDidMount () {
+        this.handleChange('zh-CN')
+    }
     UNSAFE_componentWillReceiveProps () {
         if (!isAuthenticated()) {
             this.props.history.push('/login')
@@ -157,7 +160,9 @@ class HeaderBar extends PureComponent {
             <div className="headerUser">
                 <Select
                     defaultValue="中文"
-                    onChange={this.handleChange.bind(this)}
+                    onChange={(val)=>{
+                        this.handleChange(val)
+                    }}
                     style={{marginRight: '20px'}}
                 >
                     <Option value="zh-CN">中文</Option>
