@@ -3,6 +3,7 @@ import { Icon, message, Menu, Dropdown, Select } from 'antd';
 import { withRouter, Link} from 'react-router-dom';
 import { _getCookie, isAuthenticated, authenticateClear } from '../../utils/Session';
 import {emit} from '../../emit';
+import intl from 'react-intl-universal';
 import http  from '../../utils/Server';
 import OEM from '../../assets/OEM';
 const { Option } = Select;
@@ -35,7 +36,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="monitor" />
                     <span>
-                        快速指南
+                        {intl.get('header.quick_guide')}
                     </span>
                 </Menu.Item>
                 <Menu.Item
@@ -49,7 +50,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                        应用开发手册
+                        {intl.get('header.app_manual')}
                     </span>
                 </Menu.Item>
 
@@ -68,7 +69,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="setting"/>
                     <span>
-                        个人设置
+                        {intl.get('header.personal_settings')}
                     </span>
                 </Menu.Item>
                 <Menu.Item
@@ -82,7 +83,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="laptop" />
                     <span>
-                        虚拟网关
+                        {intl.get('header.virtual_gateway')}
                     </span>
                 </Menu.Item>
 
@@ -119,7 +120,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="poweroff" />
                     <span>
-                        退出登录
+                        {intl.get('header.log_out')}
                     </span>
                 </Menu.Item>
             </Menu>
@@ -137,7 +138,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="team" />
                     <span>
-                        成员管理
+                    {intl.get('header.Members_of_the_management')}
                     </span>
                 </Menu.Item>
                 <Menu.Item
@@ -151,7 +152,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="share-alt"/>
                     <span>
-                        共享组管理
+                    {intl.get('header.Shared_group_management')}
                     </span>
                 </Menu.Item>
             </Menu>
@@ -171,7 +172,7 @@ class HeaderBar extends PureComponent {
                 <Link
                     to="/appstore"
                     style={{marginRight: '15px'}}
-                ><Icon type="appstore"/>&nbsp;&nbsp;应用市场</Link>
+                ><Icon type="appstore"/>&nbsp;&nbsp;{intl.get('header.app_store')}</Link>
                 {
                     _getCookie('is_admin') === '1'
                     ? <Dropdown
@@ -186,7 +187,7 @@ class HeaderBar extends PureComponent {
                                 style={{padding: '0 4px', fontWeight: 800}}
                                 type="global"
                             />
-                            企业
+                                {intl.get('header.enterprise')}
                             <Icon type="down" />
                         </span>
                     </Dropdown>
@@ -206,7 +207,7 @@ class HeaderBar extends PureComponent {
                             <Icon
                                 style={{padding: '0 4px', fontWeight: 800}}
                                 type="question-circle"
-                            />帮助
+                            />{intl.get('header.help')}
                         </span>
                     </Dropdown>
                     <span style={{padding: '0 5px'}}> </span>
@@ -219,7 +220,7 @@ class HeaderBar extends PureComponent {
                             type="message"
                         />
 
-                        讨论
+                        {intl.get('header.discuss')}
                     </a>
                     <span style={{padding: '0 5px'}}> </span>
 
@@ -232,8 +233,7 @@ class HeaderBar extends PureComponent {
                             style={{padding: '0 4px', fontWeight: 800}}
                             type="book"
                         />
-
-                        知识库
+                        {intl.get('header.the_knowledge_base')}
                     </a>
                     <span style={{padding: '0 5px'}}> </span>
                     </span>

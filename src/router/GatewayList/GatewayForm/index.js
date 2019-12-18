@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import http from '../../../utils/Server';
 import {  Button, message, Modal, Input, Select } from 'antd';
 import { inject, observer } from 'mobx-react';
+import intl from 'react-intl-universal';
 
 @inject('store')
 @observer
@@ -127,10 +128,10 @@ class GatewayForm extends Component {
                 confirmLoading={loading}
             >
                 <div className="inputs">
-                    <span>序号：</span>
+                    <span>{intl.get('gateway.number')}:</span>
                     <Input
                         value={sn}
-                        placeholder="必填"
+                        placeholder={intl.get('common.mandatory')}
                         disabled={type !== 'create'}
                         onChange={(e)=>{
                             this.onChanges(e, 'sn')
@@ -138,40 +139,40 @@ class GatewayForm extends Component {
                     />
                 </div>
                 <div className="inputs">
-                    <span>名称：</span>
+                    <span>{intl.get('common.name')}:</span>
                     <Input
                         value={dev_name}
-                        placeholder="必填"
+                        placeholder={intl.get('common.mandatory')}
                         onChange={(e)=>{
                             this.onChanges(e, 'dev_name')
                         }}
                     />
                 </div>
                 <div className="inputs">
-                    <span>描述：</span>
+                    <span>{intl.get('common.desc')}:</span>
                     <Input
                         value={description}
-                        placeholder="选填"
+                        placeholder={intl.get('common.optional')}
                         onChange={(e)=>{
                             this.onChanges(e, 'description')
                         }}
                     />
                 </div>
                 <div className="inputs">
-                    <span>经度：</span>
+                    <span>{intl.get('gateway.longitude')}:</span>
                     <Input
                         value={longitude}
-                        placeholder="选填"
+                        placeholder={intl.get('common.optional')}
                         onChange={(e)=>{
                             this.onChanges(e, 'longitude')
                         }}
                     />
                 </div>
                 <div className="inputs">
-                    <span>纬度：</span>
+                    <span>{intl.get('gateway.latitude')}:</span>
                     <Input
                         value={latitude}
-                        placeholder="选填"
+                        placeholder={intl.get('common.optional')}
                         onChange={(e)=>{
                             this.onChanges(e, 'latitude')
                         }}
@@ -180,7 +181,7 @@ class GatewayForm extends Component {
                 <div className="inputs"
                     style={{ display: user_groups.length !== 0 ? 'block' : 'none' }}
                 >
-                    <span>所属：</span>
+                    <span>{intl.get('gateway.affiliation')}:</span>
                     <div>
                         <Button
                             type={owner_type !== 'User' ? 'primary' : ''}
@@ -190,7 +191,7 @@ class GatewayForm extends Component {
                                     owner_id: user_groups[0].name
                                 })
                             }}
-                        >公司</Button>
+                        >{intl.get('gateway.company')}</Button>
                         <Button
                             type={owner_type === 'User' ? 'primary' : ''}
                             onClick={()=>{
@@ -199,13 +200,13 @@ class GatewayForm extends Component {
                                     owner_id: this.props.store.session.user_id
                                 })
                             }}
-                        >个人</Button>
+                        >{intl.get('gateway.individual')}</Button>
                     </div>
                 </div>
                 <div className="inputs"
                     style={{ display: owner_type !== 'User' ? 'block' : 'none' }}
                 >
-                    <span>组名：</span>
+                    <span>{intl.get('gateway.group_name')}:</span>
                     <Select
                         style={{width: '100%'}}
                         disabled

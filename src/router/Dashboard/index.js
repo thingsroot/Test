@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import './index.scss'
 import echarts from 'echarts/lib/echarts';
+import intl from 'react-intl-universal';
 import  'echarts/lib/chart/bar';
 import  'echarts/lib/chart/line';
 import  'echarts/lib/chart/pie';
@@ -19,7 +20,7 @@ const hide = {
 
 const TabPane = Tabs.TabPane;
 const todayColumns = [{
-    title: '序号',
+    title: intl.get('dashboard.the_serial_number'),
     key: 'index',
     render: (text, record, index)=>`${index + 1}`
 }, {
@@ -38,27 +39,27 @@ const todayColumns = [{
         )
     }
 }, {
-    title: '位置',
+    title: intl.get('dashboard.location'),
     dataIndex: 'position',
     className: 'thWidth',
     key: 'position'
 }, {
-    title: '最后上线时间',
+    title: intl.get('dashboard.last_on-line_time'),
     dataIndex: 'last_updated',
     className: 'longWidth',
     key: 'last_updated'
 }, {
-    title: '次数',
+    title: intl.get('dashboard.the_number_of'),
     dataIndex: 'today',
     className: 'thWidth',
     key: 'today'
 }];
 const weekColumns = [{
-    title: '序号',
+    title: intl.get('dashboard.the_serial_number'),
     key: 'index',
     render: (text, record, index)=>`${index + 1}`
 }, {
-    title: '名称',
+    title: intl.get('dashboard.name'),
     dataIndex: 'name',
     className: 'nameWidth',
     key: 'name',
@@ -73,17 +74,17 @@ const weekColumns = [{
         )
     }
 }, {
-    title: '位置',
+    title: intl.get('dashboard.location'),
     dataIndex: 'position',
     className: 'thWidth',
     key: 'position'
 }, {
-    title: '最后上线时间',
+    title: intl.get('dashboard.last_on-line_time'),
     dataIndex: 'last_updated',
     className: 'longWidth',
     key: 'last_updated'
 }, {
-    title: '次数',
+    title: intl.get('dashboard.the_serial_number'),
     dataIndex: 'total',
     className: 'thWidth',
     key: 'today'
@@ -354,7 +355,7 @@ class Dashboard extends PureComponent {
                         className="echarts"
                         style={{width: '49%'}}
                     >
-                        <p>在线统计</p>
+                        <p>{intl.get('dashboard.online_statistics')}</p>
                         <div
                             ref="onlineMain"
                             style={{width: '97%',
@@ -364,21 +365,21 @@ class Dashboard extends PureComponent {
                             className="tips"
                             style={this.state.timeData && this.state.timeData.length > 0 ? hide : show}
                         >
-                            暂时没有数据
+                            {intl.get('dashboard.no_data_at_present')}
                         </div>
                     </div>
                     <div
                         className="echarts"
                         style={{width: '49%'}}
                     >
-                        <p>故障统计</p>
+                        <p>{intl.get('dashboard.fault_statistics')}</p>
                         <div id="">
                             <Tabs
                                 onChange={callback}
                                 type="card"
                             >
                                 <TabPane
-                                    tab="前10的网关"
+                                    tab={intl.get('dashboard.top_10_gateways')}
                                     key="1"
                                 >
                                     <Table
@@ -389,11 +390,11 @@ class Dashboard extends PureComponent {
                                         style={{width: '100%'}}
                                         pagination={false}
                                         scroll={{ y: 220 }}
-                                        locale={{emptyText: '恭喜你,今天沒有发生故障'}}
+                                        locale={{emptyText: intl.get('dashboard.no_trouble')}}
                                     />
                                 </TabPane>
                                 <TabPane
-                                    tab="一周内故障最多"
+                                    tab={intl.get('dashboard.most_failures_in_a_week')}
                                     key="2"
                                 >
                                     <Table
@@ -404,7 +405,7 @@ class Dashboard extends PureComponent {
                                         style={{width: '100%'}}
                                         pagination={false}
                                         scroll={{ y: 220 }}
-                                        locale={{emptyText: '恭喜你,本周沒有发生故障'}}
+                                        locale={{emptyText: intl.get('dashboard.no_trouble')}}
                                     />
                                 </TabPane>
                             </Tabs>
@@ -414,7 +415,7 @@ class Dashboard extends PureComponent {
                         className="echarts"
                         style={{width: '49%'}}
                     >
-                        <p>网关型号统计</p>
+                        <p>{intl.get('dashboard.gateway_model_statistics')}</p>
                         <div
                             ref="gatesMain"
                             style={{width: '97%', height: 350}}
@@ -423,14 +424,14 @@ class Dashboard extends PureComponent {
                             className="tips"
                             style={this.state.pieData !== undefined ? hide : show}
                         >
-                            暂时没有数据
+                            {intl.get('dashboard.no_data_at_present')}
                         </div>
                     </div>
                     <div
                         className="echarts"
                         style={{width: '49%'}}
                     >
-                        <p>故障类型统计</p>
+                        <p>{intl.get('dashboard.fault_type_statistics')}</p>
                         <div
                             ref="faultTypeMain"
                             style={{width: '97%', height: 350}}
@@ -439,7 +440,7 @@ class Dashboard extends PureComponent {
                             className="tips"
                             style={this.state.barData && this.state.barData.length > 0 ? hide : show}
                         >
-                            暂时没有数据
+                            {intl.get('dashboard.no_data_at_present')}
                         </div>
                     </div>
                 </div>

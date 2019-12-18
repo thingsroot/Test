@@ -6,6 +6,7 @@ import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
 import { doUpdate } from '../../utils/Action';
 import { isDeveloper } from '../../utils/Session';
+import intl from 'react-intl-universal';
 const AppDetails = LoadableComponent(()=>import('../../router/AppDetails'));
 const AppEdit = LoadableComponent(()=>import('../../router/AppEdit'));
 const Dashboard = LoadableComponent(()=>import('../../router/Dashboard'));
@@ -79,12 +80,12 @@ class ContentMain extends Component {
                 <PrivateRoute
                     path="/gateways"
                     component={GatewayList}
-                    title={'我的网关'}
+                    title={intl.get('sider.my_gateway')}
                 />
                 <PrivateRoute
                     path="/developer"
                     component={Developer}
-                    title={'我的应用'}
+                    title={intl.get('sider.my_app')}
                 />
                 <PrivateRoute
                     path="/appstore"
@@ -149,37 +150,37 @@ class ContentMain extends Component {
                 <PrivateRoute
                     path="/virtualgateways"
                     component={VirtualGateways}
-                    title={'虚拟网关'}
+                    title={intl.get('sider.header.virtual_gateway')}
                 />
                 <PrivateRoute
                     path="/sharegroup"
                     component={ShareGroup}
-                    title={'共享组管理'}
+                    title={intl.get('sider.header.Shared_group_management')}
                 />
                 <PrivateRoute
                     path="/member"
                     component={MemberManage}
-                    title={'成员管理'}
+                    title={intl.get('sider.header.Members_of_the_management')}
                 />
                 <PrivateRoute
                     path="/platformevents/:limitTime?"
                     component={PlatformEvents}
-                    title={'平台消息'}
+                    title={intl.get('sider.platform_event')}
                 />
                 <PrivateRoute
                     path="/platformevent/:gateway/:limitTime?"
                     component={PlatformEvents}
-                    title={'平台消息'}
+                    title={intl.get('sider.platform_event')}
                 />
                 <PrivateRoute
                     path="/gatewayevents/:limitTime?"
                     component={DeviceEvents}
-                    title={'设备消息'}
+                    title={intl.get('sider.device_events')}
                 />
                 <PrivateRoute
                     path="/gatewayevent/:gateway/:limitTime?"
                     component={DeviceEvents}
-                    title={'设备消息'}
+                    title={intl.get('sider.device_events')}
                 />
 
                 <PrivateRoute

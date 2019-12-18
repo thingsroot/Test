@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Menu, Icon } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
+import intl from 'react-intl-universal';
 import OEM from '../../assets/OEM';
 const maxSider = {
     width: '200px',
@@ -114,26 +115,26 @@ class Siders extends PureComponent {
                     <Menu.Item key="2">
                     <Link to="/gateways">
                         <Icon type="laptop" />
-                        <span>我的网关</span>
+                            <span>{intl.get('sider.my_gateway')}</span>
                     </Link>
                     </Menu.Item>
                     <Menu.Item key="3">
                         <Link to="/developer">
                             <Icon type="appstore" />
                         {/* <span>开发者中心</span> */}
-                            <span>我的应用</span>
+                            <span>{intl.get('sider.my_app')}</span>
                         </Link>
                     </Menu.Item>
                     <Menu.Item key="4">
                         <Link to="/platformevents">
                             <Icon type="bell" />
-                            <span>平台事件</span>
+                            <span>{intl.get('sider.platform_event')}</span>
                         </Link>
                     </Menu.Item>
                     <Menu.Item key="5">
                         <Link to="/gatewayevents">
                             <Icon type="notification" />
-                            <span>设备事件</span>
+                            <span>{intl.get('sider.device_events')}</span>
                         </Link>
                     </Menu.Item>
                 </Menu>

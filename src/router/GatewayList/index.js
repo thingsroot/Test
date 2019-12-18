@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import http from '../../utils/Server';
 import { Table, Tabs, Button, Popconfirm, message, Input, Icon, Menu, Dropdown, Tag } from 'antd';
+import intl from 'react-intl-universal';
 import './style.scss';
 import { inject, observer } from 'mobx-react';
 import { Link, withRouter } from 'react-router-dom';
@@ -62,11 +63,11 @@ class MyGates extends Component {
                 width: '80px',
                 render: (record)=>{
                     if (record === 'ONLINE'){
-                        return <span className="online"><b></b>&nbsp;&nbsp;在线</span>
+                        return <span className="online"><b></b>&nbsp;&nbsp;{intl.get('gateway.online')}</span>
                     } else if (record === 'OFFLINE') {
-                        return <span className="offline"><b></b>&nbsp;&nbsp;离线</span>
+                        return <span className="offline"><b></b>&nbsp;&nbsp;{intl.get('gateway.offline')}</span>
                     } else {
-                        return <span className="notline"><b></b>&nbsp;&nbsp;未连接</span>
+                        return <span className="notline"><b></b>&nbsp;&nbsp;{intl.get('gateway.all')}</span>
                     }
                 }
               }, {
@@ -85,20 +86,21 @@ class MyGates extends Component {
                 width: '240px',
                 render: (text, record, props) => {
                     props;
+                    console.log(this)
                   return (
                       <span>
                         <Link to={{
                             pathname: `/gateway/${record.sn}/devices`
                         }}
                         >
-                            <Button key="1">设备</Button>
+                            <Button key="1">{intl.get('gateway.equipment')}</Button>
                         </Link>
                         <span style={{padding: '0 1px'}} />
                         <Link to={{
                             pathname: `/gateway/${record.sn}/apps`
                         }}
                         >
-                            <Button key="2">应用</Button>
+                <Button key="2">{intl.get('common.applications')}</Button>
                         </Link>
                         <span style={{padding: '0 1px'}} />
                         <Dropdown
@@ -114,7 +116,7 @@ class MyGates extends Component {
                                     >
                                         <span key="1"
                                             disabled={record.disabled}
-                                        >网关设置</span>
+                                        >{intl.get('gateway.gateway_set')}</span>
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="2">
@@ -126,7 +128,7 @@ class MyGates extends Component {
                                     >
                                         <span key="1"
                                             disabled={record.disabled}
-                                        >在线记录</span>
+                                        >{intl.get('gateway.online_record')}</span>
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="1">
@@ -138,7 +140,7 @@ class MyGates extends Component {
                                             visibleEdit: true
                                         })
                                     }}
-                                >网关属性</span>
+                                >{intl.get('gateway.gateway_pro')}</span>
                                 </Menu.Item>
                                 <Menu.Divider />
                                 <Menu.Item key="4">
@@ -154,7 +156,7 @@ class MyGates extends Component {
                                             disabled={record.is_shared}
                                             style={{border: 'none'}}
                                             type="danger"
-                                        >删除网关</Button>
+                                        >{intl.get('gateway.delete_gateway')}</Button>
                                     </Popconfirm>
                                 </Menu.Item>
                             </Menu>
@@ -162,7 +164,7 @@ class MyGates extends Component {
                             trigger={['click']}
                         >
                             <Button>
-                                更多<Icon type="down" />
+                                {intl.get('gateway.more')}<Icon type="down" />
                             </Button>
                         </Dropdown>
                       </span>
@@ -285,45 +287,39 @@ class MyGates extends Component {
                     position: 'relative'
                 }}
             >
-                <Button
-                    type="primary"
-                    onClick={()=>{
-                        this.setState({visible: true})
-                    }}
-                    style={{
-                        position: 'absolute',
-                        right: 130,
-                        top: 0,
-                        zIndex: 999
-                    }}
-                >添加网关</Button>
-                <Button
-                    type="primary"
-                    style={{
-                        position: 'absolute',
-                        right: 0,
-                        top: 0,
-                        zIndex: 999
-                    }}
-                    onClick={()=>{
-                        this.props.history.push('/virtualgateways')
-                    }}
-                >添加虚拟网关</Button>
                 <div
                     style={{
                         display: 'flex',
                         position: 'absolute',
-                        right: 240,
+                        right: 0,
                         top: 0,
                         zIndex: 999,
                         lineHeight: '30px'
                     }}
                 >
                     <Search
-                        placeholder="网关名称、描述、序列号"
+                        placeholder={intl.get('gateway.placeholder')}
                         onChange={this.search}
-                        style={{ width: 200 }}
+                        style={{ width: 200, marginRight: '20px' }}
                     />
+                    <Button
+                        type="primary"
+                        onClick={()=>{
+                            this.setState({visible: true})
+                        }}
+                        style={{
+                            marginRight: '20px'
+                        }}
+                    >{intl.get('gateway.add_the_gateway')}</Button>
+                    <Button
+                        type="primary"
+                        style={{
+                            marginRight: '20px'
+                        }}
+                        onClick={()=>{
+                            this.props.history.push('/virtualgateways')
+                        }}
+                    >{intl.get('gateway.add_the_vir_gayeway')}</Button>
                 </div>
                 <GatewayForm
                     visible={this.state.visible}
@@ -377,7 +373,7 @@ class MyGates extends Component {
                                 })
                             }}
                         >
-                        <TabPane tab="在线"
+                        <TabPane tab={intl.get('gateway.online')}
                             key="online"
                         >
                             <Table columns={
@@ -398,7 +394,7 @@ class MyGates extends Component {
                                     return className;
                                 }}
                             /></TabPane>
-                        <TabPane tab="离线"
+                        <TabPane tab={intl.get('gateway.offline')}
                             key="offline"
                         >
                             <Table columns={this.state.columns}
@@ -418,7 +414,7 @@ class MyGates extends Component {
                                 size="small "
                             />
                         </TabPane>
-                        <TabPane tab="全部"
+                        <TabPane tab={intl.get('gateway.all')}
                             key="all"
                         >
                             <Table columns={this.state.columns}
