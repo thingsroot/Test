@@ -14,7 +14,8 @@ class Issues extends PureComponent {
             data: [],
             visible: false,
             comment: '',
-            reply_to: null
+            reply_to: null,
+            type: ''
         }
     }
     componentDidMount () {
@@ -56,7 +57,8 @@ class Issues extends PureComponent {
     showModal = () => {
         this.setState({
           visible: true,
-          reply_to: null
+          reply_to: null,
+          type: '问题'
         });
       };
       handleOk = () => {
@@ -144,7 +146,7 @@ class Issues extends PureComponent {
                     type="primary"
                 >添加问题</Button>
                 <div className="store_comments_title">
-                    评论
+                    问与答
                 </div>
                 <div className="store_comments_content">
                 {
@@ -159,13 +161,14 @@ class Issues extends PureComponent {
                                     onClick={()=>{
                                         this.setState({
                                             reply_to: item.name,
-                                            visible: true
+                                            visible: true,
+                                            type: '回复'
                                         })
                                     }}
                                 >回复</span>,
                                 item.owner === _getCookie('user_id')
                                 ? <Popconfirm
-                                    title="确定要删除此回复吗?"
+                                    title="确定要删除吗?"
                                     onConfirm={()=> {
                                         this.commentsRemove(item)
                                     }}
@@ -203,7 +206,7 @@ class Issues extends PureComponent {
                                                 >回复</span>,
                                                 val.owner === _getCookie('user_id')
                                                 ? <Popconfirm
-                                                    title="确定要删除此回复吗?"
+                                                    title="确定要删除吗?"
                                                     onConfirm={()=> {
                                                         this.commentsRemove(val)
                                                     }}
@@ -241,13 +244,13 @@ class Issues extends PureComponent {
                             marginTop: '100px'
                         }}
                         description={
-                            <span>暂无评论！</span>
+                            <span>暂无问题！</span>
                         }
                       />
                 }
                 </div>
                 <Modal
-                    title="请输入评论"
+                    title={'请输入' + this.state.type}
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}

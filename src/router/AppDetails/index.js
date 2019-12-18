@@ -41,6 +41,7 @@ class AppDetails extends Component {
         confirmLoading: false,
         dataSource: [],
         loading: false,
+        favorites: false,
         columns: [
             {
                 title: '',
@@ -86,6 +87,7 @@ class AppDetails extends Component {
     }
     componentDidMount (){
         this.loadApp(this.state.name)
+        this.getFavoritesList()
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
@@ -95,6 +97,45 @@ class AppDetails extends Component {
                 this.loadApp(this.state.name)
             })
         }
+    }
+    getFavoritesList = () => {
+        http.post('/api/store_favorites_list').then(res=>{
+            if (res.ok && res.data && res.data.length > 0) {
+                const {name} = this.props.match.params;
+                let favorites = false;
+                res.data.map(item=>{
+                    if (item.name === name) {
+                        favorites = true
+                    }
+                })
+                this.setState({
+                    favorites,
+                    favorites_loading: false
+                })
+            } else {
+                this.setState({
+                    favorites: false,
+                    favorites_loading: false
+                })
+            }
+        })
+    }
+    setFavorites = () => {
+        console.log(this.state)
+        this.setState({
+            favorites_loading: true
+        })
+        const data = {
+            app: this.state.app_info.name
+            // comment: '123',
+            // priority: ''v
+        }
+        const url = !this.state.favorites ? '/api/store_favorites_add' : '/api/store_favorites_remove'
+        http.post(url, data).then(res=>{
+            if (res.ok) {
+                this.getFavoritesList()
+            }
+        })
     }
     loadApp = (name) => {
         let user = this.props.store.session.user_id;
@@ -294,6 +335,12 @@ class AppDetails extends Component {
                             </Button>
                             : ''
                         }
+                        <Button
+                            loading={this.state.favorites_loading}
+                            onClick={this.setFavorites}
+                            style={{marginLeft: '30px', marginTop: '10px', width: '100px', height: '35px'}}
+                            type={!this.state.favorites ? 'primary' : 'danger'}
+                        >{this.state.favorites ? '取消收藏' : '收藏'}</Button>
                         <Link
                             className="button"
                             style={app_info.fork_from ? block : none}
@@ -308,7 +355,7 @@ class AppDetails extends Component {
                                 type="danger"
                                 onClick={this.showModal}
                                 size="default"
-                                style={{height: 36, marginLeft: 15}}
+                                style={{height: 35, marginLeft: 15}}
                               >
                                 <Icon type="info-circle" />
                                 <span>删除</span>
