@@ -20,6 +20,10 @@ class ServiceState extends Component {
     }
     componentDidMount (){
         const { mqtt } = this.props;
+        this.getGateywayInfo()
+        this.setintervalGayewayInfo = setInterval(() => {
+            this.getGateywayInfo()
+        }, 5000);
         this.t1 = setInterval(() => {
             mqtt && mqtt.client && mqtt.connected && mqtt.client.publish('v1/update/api/servers_list', JSON.stringify({'id': 'server_list/' + new Date() * 1}))
             mqtt && mqtt.client && mqtt.connected && mqtt.client.publish('v1/update/api/version', JSON.stringify({'id': 'get_new_version/' + new Date() * 1}))
@@ -74,8 +78,42 @@ class ServiceState extends Component {
     componentWillUnmount (){
         clearInterval(this.t1)
         clearInterval(this.alive)
+        clearInterval(this.one_short_timer)
+        clearInterval(this.setintervalGayewayInfo)
         this.props.mqtt.vserial_channel.setProxy(null)
         this.props.mqtt.disconnect()
+    }
+    getGateywayInfo = () => {
+        http.get('/api/gateways_read?name=' + this.props.gateway).then(res=>{
+            if (res.ok) {
+                if (!res.data.data.data_upload) {
+                    if (!this.one_short_timer) {
+                        this.enableDataUploadOneShort(60)
+                        this.one_short_timer = setInterval(()=>{
+                            this.enableDataUploadOneShort(60)
+                        }, 55000)
+                    }
+                }
+            }
+        })
+    }
+    enableDataUploadOneShort (duration) {
+        const { gatewayInfo } = this.props.store;
+        const sn = this.props.gateway;
+        if (!gatewayInfo.data.data_upload) {
+            let params = {
+                name: sn,
+                duration: duration,
+                id: `enable_data_one_short/${sn}/${new Date() * 1}`
+            }
+            http.post('/api/gateways_enable_data_one_short', params).then(res => {
+                if (!res.ok) {
+                    message.error('临时数据上送指令失败:' + res.error)
+                }
+            }).catch( err => {
+                message.error('临时数据上送指令失败:' + err)
+            })
+        }
     }
     upgradeApp = () =>{
         const pathname = this.props.location.pathname.toLowerCase();

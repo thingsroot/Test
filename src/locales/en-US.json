@@ -37,6 +37,7 @@
     "gateway.offline": "offline",
     "gateway.all": "all",
     "gateway.add_the_gateway": "Add the gateway",
+    "gateway.setting_gateway": "The gateway is set",
     "gateway.add_the_vir_gayeway": "Add a virtual gateway",
     "gateway.placeholder": "Gateway name, description, serial number",
     "gateway.equipment": "equipment",

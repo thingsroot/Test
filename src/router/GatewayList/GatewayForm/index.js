@@ -116,7 +116,7 @@ class GatewayForm extends Component {
         onOK, gatewayInfo;
         return (
             <Modal
-                title={type === 'create' ? '添加网关' : '网关设置'}
+                title={type === 'create' ? intl.get('gateway.add_the_gateway') : intl.get('gateway.setting_gateway')}
                 visible={visible}
                 // okText="确定"
                 // cancelText="取消"

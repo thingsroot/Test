@@ -37,6 +37,7 @@
     "gateway.offline": "离线",
     "gateway.all": "全部",
     "gateway.add_the_gateway": "添加网关",
+    "gateway.setting_gateway": "网关设置",
     "gateway.add_the_vir_gayeway": "添加虚拟网关",
     "gateway.placeholder": "网关名称、描述、序列号",
     "gateway.equipment": "设备",
