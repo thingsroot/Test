@@ -1,11 +1,25 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Tag, Input, Icon, Rate, Button  } from 'antd';
-const { Search } = Input;
+import { Tag, Input, Icon, Rate, Button, Select } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import { _getCookie } from '../../utils/Session';
+const { Search } = Input;
+const { Option } = Select;
+      function compare (propertyName) {
+        return function (object1, object2) {
+          var value1 = object1[propertyName];
+          var value2 = object2[propertyName];
+          if (value2 < value1) {
+            return 1;
+          } else if (value2 > value1) {
+            return -1;
+          } else {
+            return 0;
+          }
+        }
+    }
 @withRouter
 @inject('store')
 @observer
@@ -23,8 +37,15 @@ class AppStore extends Component {
     componentDidMount (){
         http.get('/api/store_list').then(res=>{
             if (res.ok) {
-                this.setState({data: res.data, filterData: res.data})
-                console.log(res.data)
+                if (res.data.length > 0 ) {
+                    const arr = [];
+                    res.data.map(item=>{
+                        if (arr.indexOf(item.category) === -1 && item.category !== null) {
+                            arr.push(item.category)
+                        }
+                    })
+                    this.setState({data: res.data, filterData: res.data, category: arr})
+                }
             } else {
                 console.log('error')
             }
@@ -99,8 +120,28 @@ class AppStore extends Component {
     getRandomNumber = () => {
         return (Math.floor(Math.random() * (this.state.color.length - 1)))
     }
+    handleChange = (val) => {
+        const data = this.state.filterData.filter(item=> item)
+        if (val === 'all') {
+            this.setState({
+                data
+            })
+        } else {
+            const data = this.state.filterData.filter(item=> item.category === val)
+            this.setState({
+                data
+            })
+        }
+    }
+    dataSort = (val)=>{
+        const arr = this.state.data;
+        arr.sort(compare(val))
+        this.setState({
+            data: arr
+        })
+    }
     render () {
-        const { data, tag_list, add_tag_list } = this.state;
+        const { data, tag_list, add_tag_list, category } = this.state;
         return (
         <div className="AppStore">
             {
@@ -163,11 +204,30 @@ class AppStore extends Component {
                     全部应用
                 </div>
             <div
-                style={{
-                    display: 'flex',
-                    flexWrap: 'wrap'
-                }}
+                className="all_app_content"
             >
+                <div className="all_app_filter">
+                    <span>分类:</span>
+                    &nbsp;&nbsp;
+                    <Select defaultValue="全部" style={{ width: 120 }} onChange={this.handleChange}>
+                        <Option value="all">全部</Option>
+                        {
+                            category && category.length > 0 && category.map((item, key) => {
+                                return <Option value={item} key={key}>{item}</Option>
+                            })
+                        }
+                    </Select>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span>排序:</span>
+                    &nbsp;&nbsp;
+                    <Select defaultValue="默认排序" style={{ width: 120 }} onChange={this.dataSort}>
+                        <Option value="app_name">名称</Option>
+                        <Option value="description">描述</Option>
+                        <Option value="creation">创建时间</Option>
+                        <Option value="modified">更新时间</Option>
+                        <Option value="developer">应用开发者</Option>
+                    </Select>
+                </div>
             {
                         data && data.length > 0 && data.map((val, ind)=>{
                             return (

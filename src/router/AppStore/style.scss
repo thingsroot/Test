@@ -3,6 +3,16 @@
     margin: 0 auto;
     position: relative;
     // background: #ccc;
+    .all_app_content{
+        display: flex;
+        flex-wrap: wrap;
+        position: relative;
+        .all_app_filter{
+            position: absolute;
+            right: 190px;
+            top: -30px;
+        }
+    }
     .app_developer_button{
         position: absolute;
         right: 40px;
