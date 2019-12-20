@@ -519,6 +519,7 @@ class AppConfig extends Component {
                                 return (
                                     <AppConfigSection
                                         key={key}
+                                        config={this.state}
                                         app_info={this.state.app_info}
                                         configStore={configStore}
                                         configSection={v}

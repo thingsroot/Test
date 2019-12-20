@@ -119,6 +119,7 @@ class MyTemplateDetails extends PureComponent {
     };
 
     fileChang = (info)=>{
+        console.log(info)
         this.setState({
             file: info.file.originFileObj,
             previewCsvData: ''
@@ -173,14 +174,17 @@ class MyTemplateDetails extends PureComponent {
         http.post('/api/configurations_versions_create', params)
             .then(res=>{
                 res;
-                message.success('上传新版本成功！');
-                setTimeout(()=>{
-                    this.setState({
-                        visible: false,
-                        previewCsvData: []
-                    });
-                }, 500);
-                this.getVersionList(this.state.conf)
+                if (res.ok) {
+                    this.onVersionChange(res.data.version)
+                    message.success('上传新版本成功！');
+                    setTimeout(()=>{
+                        this.setState({
+                            visible: false,
+                            previewCsvData: []
+                        });
+                    }, 500);
+                    this.getVersionList(this.state.conf)
+                }
             })
             .catch(err=>{
                 console.log(err)
@@ -211,7 +215,7 @@ class MyTemplateDetails extends PureComponent {
                         <Select
                             disabled={versionList.length > 0 ? false : true}
                             value={show_version}
-                            style={{ width: 220 }}
+                            style={{ width: '100px' }}
                             onChange={this.onVersionChange}
                         >
                             {
@@ -239,7 +243,7 @@ class MyTemplateDetails extends PureComponent {
                         <Button
                             style={this.state.conf_info.developer === this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showModal}
-                        >上传新版本</Button>
+                        >上传</Button>
                         <Button
                             style={this.state.conf_info.developer !== this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showCloneModal}
@@ -252,7 +256,7 @@ class MyTemplateDetails extends PureComponent {
                             <CSVLink
                                 data={content}
                                 filename={conf_info.app + '-' + conf_info.name + '-' + show_version + '.csv'}
-                            >下载到本地</CSVLink>
+                            >下载</CSVLink>
                         </Button>
                         <span style={{padding: '10px'}}></span>
                         <Icon

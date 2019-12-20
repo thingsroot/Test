@@ -26,11 +26,55 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="monitor" />
                     <span>
-                        快速指南
+                        快速入门
+                    </span>
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item
+                    key="17"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/guide/', '_blank')
+                        }
+                    }
+                >
+                    <Icon type="read" />
+                    <span>
+                        产品介绍
                     </span>
                 </Menu.Item>
                 <Menu.Item
-                    key="17"
+                    key="18"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/guide/user_guide/', '_blank')
+                        }
+                    }
+                >
+                    <Icon type="read" />
+                    <span>
+                        用户指南
+                    </span>
+                </Menu.Item>
+                <Menu.Item
+                    key="19"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/guide/admin_guide/ ', '_blank')
+                        }
+                    }
+                >
+                    <Icon type="read" />
+                    <span>
+                        管理员指南
+                    </span>
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item
+                    key="20"
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
@@ -40,7 +84,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                        应用开发手册
+                        应用开发指南
                     </span>
                 </Menu.Item>
 
@@ -187,7 +231,7 @@ class HeaderBar extends PureComponent {
                             <Icon
                                 style={{padding: '0 4px', fontWeight: 800}}
                                 type="question-circle"
-                            />帮助
+                            />帮助与文档
                         </span>
                     </Dropdown>
                     <span style={{padding: '0 5px'}}> </span>

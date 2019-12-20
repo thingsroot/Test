@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import http from '../../../utils/Server';
 import { Button, message, Tabs, Modal, Table, Divider } from 'antd';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import TemplateForm from '../TemplateForm';
 import CopyForm from '../CopyForm';
+import { _getCookie } from '../../../utils/Session';
 const TabPane = Tabs.TabPane;
 const block = {
     display: 'block'
@@ -151,10 +152,14 @@ class TemplateList extends Component {
                     width: '20%',
                     render: (record) => (
                         <span>
-                            <Link
+                            <Button
+                                type="link"
                                 className="mybutton"
-                                to={`/template/${record.app}/${record.name}/${record.latest_version}`}
-                            >查看</Link>
+                                style={{color: '#000'}}
+                                onClick={()=>{
+                                    window.open(`/template/${record.app}/${record.name}/${record.latest_version}`, '_blank')
+                                }}
+                            >查看</Button>
                             <Divider type="vertical" />
                             <a
                                 style={{cursor: 'pointer'}}
@@ -196,9 +201,10 @@ class TemplateList extends Component {
             description: record.description,
             public: record.public,
             developer: record.developer,
-            company: record.company,
+            company: _getCookie('companies') !== undefined ? record.company : null,
             version: record.latest_version
         };
+        console.log(data)
         this.setState({
             type: type === 'copy' ? '复制' : '编辑',
             conf: record.name

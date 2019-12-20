@@ -305,6 +305,14 @@ class MyGatesAppsInstall extends Component {
                                 <Icon type="appstore" />
                                 查看应用列表
                             </li>
+                            <li
+                                onClick={()=>{
+                                    window.location.href = `/gateway/${gateway_sn}/devices`
+                                }}
+                            >
+                                <Icon type="unordered-list" />
+                                查看设备列表
+                            </li>
                         </ul>
 
                     </Modal>

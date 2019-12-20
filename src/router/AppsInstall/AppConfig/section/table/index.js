@@ -303,20 +303,21 @@ class EditableTable extends React.Component {
         });
         return (
         <div>
-            <Button onClick={this.handleAdd}
-                type="primary"
-                style={{ marginBottom: 16 }}
-            >
-                添加
-            </Button>
             <Table
                 rowKey="key"
                 components={components}
                 rowClassName={() => 'editable-row'}
                 bordered
+                pagination={false}
                 dataSource={dataSource}
                 columns={columns}
             />
+            <Button onClick={this.handleAdd}
+                type="primary"
+                style={{ margin: '10px 0' }}
+            >
+                添加
+            </Button>
         </div>
         );
     }

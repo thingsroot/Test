@@ -44,6 +44,9 @@
     }
     .app_desc_right{
         padding-left: 20px;
+        >div{
+            margin-bottom: 20px;
+        }
         p{
             vertical-align: inherit; 
             // box-sizing: border-box;

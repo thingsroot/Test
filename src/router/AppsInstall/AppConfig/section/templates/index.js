@@ -1,4 +1,5 @@
 import React from 'react'
+import {withRouter} from 'react-router-dom';
 import './style.scss';
 import { Table, Input, InputNumber, Popconfirm, Form, Button, Select } from 'antd';
 
@@ -70,7 +71,7 @@ class EditableCell extends React.Component {
     return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
   }
 }
-
+@withRouter
 class EditorTemplates extends React.Component {
   constructor (props) {
     super(props);
@@ -121,6 +122,13 @@ class EditorTemplates extends React.Component {
                 </span>
             ) : (
               <div disabled={editingKey !== ''}>
+                <Button
+                    onClick={()=>{
+                      window.open(`/template/${this.props.match.params.app}/${record.id}/${record.ver}`, '_blank')
+                    }}
+                >
+                    查看
+                </Button>
                 <Button
                     onClick={() => this.edit(record.key)}
                 >
@@ -217,12 +225,10 @@ class EditorTemplates extends React.Component {
             rowKey="key"
             components={components}
             bordered
+            pagination={false}
             dataSource={this.props.dataSource}
             columns={columns}
             rowClassName="editable-row"
-            pagination={{
-                onChange: this.cancel
-            }}
         />
       </EditableContext.Provider>
     );

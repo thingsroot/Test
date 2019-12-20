@@ -84,10 +84,7 @@ class AppItems extends PureComponent {
                     version: Number(result.data)
                 }).then(res=>{
                     if (res.ok){
-                        message.success('应用克隆成功，即将跳转到编辑页面！')
-                        if (res.data){
-                            this.props.history.push(`/appeditorcode/${res.data.name}/${res.data.app_name}`);
-                        }
+                        message.success('应用克隆成功！')
                     } else {
                         message.error(res.error)
                     }
@@ -169,7 +166,7 @@ class AppItems extends PureComponent {
                                 <Description source={data.description}/>
                                 <div className="app_desc_right">
                                     <div>
-                                        <p>分类工具</p>
+                                        <p>分类</p>
                                     </div>
                                     <div>
                                         <p>标签</p>
@@ -187,12 +184,12 @@ class AppItems extends PureComponent {
                                             }
                                         </div>
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <p>适用于</p>
                                         <Tag>
                                             {data.device_serial === 'ALL' ? '全部' : data.device_serial}
                                         </Tag>
-                                    </div>
+                                    </div> */}
                                     <div className="info_details">
                                         <p>更多信息</p>
                                         <div><span className="info_title">版本:</span><span>{version}</span></div>

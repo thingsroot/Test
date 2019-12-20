@@ -287,9 +287,9 @@ class AppDetails extends Component {
                             <span>发布者：{app_info.developer}</span>
                             <span>创建时间：{time}</span><br/>
                             <span>应用分类：{app_info.category === null ? '----' : app_info.category}</span>
-                            <span>通讯协议：{app_info.protocol === null ? '----' : app_info.protocol}</span><br/>
+                            {/* <span>通讯协议：{app_info.protocol === null ? '----' : app_info.protocol}</span><br/>
                             <span>适配型号：{app_info.device_serial === null ? '----' : app_info.device_serial}</span>
-                            <span>设备厂商：{app_info.device_supplier === null ? '----' : app_info.device_supplier}</span>
+                            <span>设备厂商：{app_info.device_supplier === null ? '----' : app_info.device_supplier}</span> */}
                         </p>
                     </div>
                     <div className="btnGroup">
