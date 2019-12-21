@@ -20,7 +20,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.open('http://help.cloud.thingsroot.com/quick_start/', '_blank')
+                            window.open('http://help.cloud.thingsroot.com/guide/quick_start/', '_blank')
                         }
                     }
                 >
