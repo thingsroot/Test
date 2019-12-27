@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Button, Spin, Tabs, Result  } from 'antd';
+import { Input, Button, Spin, Tabs, Result, Icon  } from 'antd';
 import {Link, withRouter} from 'react-router-dom';
 import './style.scss';
 import http from '../../utils/Server';
@@ -118,7 +118,7 @@ class Developer extends Component {
         }
     };
     render () {
-        const { appList, myList, forkList, collectList } = this.state;
+        const { myList, forkList, collectList } = this.state;
         return (
             <div className="appList">
 
@@ -156,12 +156,28 @@ class Developer extends Component {
                             tab="原创应用"
                             key="1"
                         >
-                            <div
-                                style={this.state.loading === false ? block : none}
-                            >
+                            {
+                                Number(_getCookie('is_developer')) !== 1
+                                ? <Result
+                                    title="您还不是开发者，请先申请成为开发者！"
+                                    extra={
+                                        <Button
+                                            type="primary"
+                                            key="console"
+                                            onClick={()=>{
+                                                console.log(this)
+                                                this.props.history.push('/appdeveloper')
+                                            }}
+                                        >
+                                            申请成为开发者
+                                        </Button>
+                                    }
+                                  />
+                                : <div>
                                 <ul>
                                     {
-                                        myList && myList.length > 0 && myList.map((v, key)=>{
+                                        myList && myList.length > 0
+                                        ? myList.map((v, key)=>{
                                             return (
                                                 <li key={key}>
                                                     <div className="appImg">
@@ -184,52 +200,105 @@ class Developer extends Component {
                                                 </li>
                                             )
                                         })
+                                        : <Result
+                                            icon={
+                                                <Icon
+                                                    type="smile"
+                                                    theme="twoTone"
+                                                />
+                                            }
+                                            title="您还没有应用，点击创建新应用"
+                                            extra={
+                                            <Link to={'/appnew'}>
+                                                <Button
+                                                    type="primary"
+                                                    style={{margin: '0 20px'}}
+                                                >创建新应用</Button>
+                                            </Link>}
+                                          />
                                     }
-                                </ul>
-                        </div>
+                                    </ul>
+                                </div>
+                            }
                     </TabPane>
-                    <TabPane
-                        tab="克隆应用"
-                        key="2"
-                    >
-                        <div
-                            style={this.state.loading === false ? block : none}
+                        <TabPane
+                            tab="克隆应用"
+                            key="2"
                         >
-                            <ul>
-                                {
-                                    forkList && forkList.length > 0 && forkList.map((v, key)=>{
-                                        return <li key={key}>
-                                            <div className="appImg">
-                                                <Link to={`/appdetails/${v.name}`}>
-                                                    <img
-                                                        src={`/store_assets${v.icon_image}`}
-                                                        alt=""
-                                                    />
-                                                </Link>
-                                            </div>
-                                            <div className="appInfo">
-                                                <p className="appName">{v.app_name}</p>
-                                                <p className="info">
-                                                    <span>生产日期：{v.modified.substr(0, 11)}</span>
-                                                    <span>应用分类：{v.category === null ? '----' : v.category}</span><br/>
-                                                    <span>通讯协议：{v.protocol === null ? '----' : v.protocol}</span>
-                                                    <span>设备厂商：{v.device_supplier === null ? '----' : v.device_supplier}</span>
-                                                </p>
-                                            </div>
-                                        </li>
-                                    })
-                                }
-                            </ul>
-                        </div>
-                    </TabPane>
-                    <TabPane
-                        tab="收藏应用"
-                        key="3"
-                    >
+                            {
+                                 Number(_getCookie('is_developer')) !== 1
+                                 ? <Result
+                                     title="您还不是开发者，请先申请成为开发者！"
+                                     extra={
+                                         <Button
+                                             type="primary"
+                                             key="console"
+                                             onClick={()=>{
+                                                 console.log(this)
+                                                 this.props.history.push('/appdeveloper')
+                                             }}
+                                         >
+                                             申请成为开发者
+                                         </Button>
+                                     }
+                                   />
+                                : <div
+                                    style={this.state.loading === false ? block : none}
+                                  >
+                                 <ul>
+                                     {
+                                        forkList && forkList.length > 0
+                                        ? forkList.map((v, key)=>{
+                                            return <li key={key}>
+                                                <div className="appImg">
+                                                    <Link to={`/appdetails/${v.name}`}>
+                                                        <img
+                                                            src={`/store_assets${v.icon_image}`}
+                                                            alt=""
+                                                        />
+                                                    </Link>
+                                                </div>
+                                                <div className="appInfo">
+                                                    <p className="appName">{v.app_name}</p>
+                                                    <p className="info">
+                                                        <span>生产日期：{v.modified.substr(0, 11)}</span>
+                                                        <span>应用分类：{v.category === null ? '----' : v.category}</span><br/>
+                                                        <span>通讯协议：{v.protocol === null ? '----' : v.protocol}</span>
+                                                        <span>设备厂商：{v.device_supplier === null ? '----' : v.device_supplier}</span>
+                                                    </p>
+                                                </div>
+                                            </li>
+                                        })
+                                        : <Result
+                                            icon={
+                                                <Icon
+                                                    type="smile"
+                                                    theme="twoTone"
+                                                />
+                                            }
+                                            title="您还没有克隆应用，点击跳转到应用市场"
+                                            extra={
+                                            <Link to={'/appstore'}>
+                                                <Button
+                                                    type="primary"
+                                                    style={{margin: '0 20px'}}
+                                                >应用市场</Button>
+                                            </Link>}
+                                          />
+                                     }
+                                 </ul>
+                             </div>
+                            }
+                        </TabPane>
+                        <TabPane
+                            tab="收藏应用"
+                            key="3"
+                        >
                         <div style={this.state.loading === false ? block : none}>
                            <ul>
                                {
-                                   collectList && collectList.length > 0 && collectList.map((v, key)=>{
+                                   collectList && collectList.length > 0
+                                   ? collectList.map((v, key)=>{
                                        return <li key={key}>
                                            <div className="appImg">
                                                <Link to={`/appdetails/${v.name}`}>
@@ -250,16 +319,32 @@ class Developer extends Component {
                                             </div>
                                        </li>
                                    })
+                                    : <Result
+                                        icon={
+                                            <Icon
+                                                type="smile"
+                                                theme="twoTone"
+                                            />
+                                        }
+                                        title="您还没有收藏应用，点击跳转到应用市场"
+                                        extra={
+                                        <Link to={'/appstore'}>
+                                            <Button
+                                                type="primary"
+                                                style={{margin: '0 20px'}}
+                                            >应用市场</Button>
+                                        </Link>}
+                                      />
                                }
                            </ul>
                         </div>
                     </TabPane>
                 </Tabs>
                 }
-                <div
+                {/* <div
                     style={this.state.loading ? none : block}
-                >
-                    {
+                > */}
+                    {/* {
                         Number(_getCookie('is_developer')) !== 1
                         ? <Result
                             title="您还不是开发者，请先申请成为开发者！"
@@ -276,14 +361,24 @@ class Developer extends Component {
                                 </Button>
                             }
                           />
-                        : <p
+                        : <div
                             className="empty"
                             style={appList && appList.length === 0 ? block : none}
                           >
-                            暂时没有应用！
-                        </p>
-                    }
-                </div>
+                            <Result
+                                icon={<Icon type="smile" theme="twoTone" />}
+                                title="您还没有应用，点击创建新应用"
+                                extra={
+                                <Link to={'/appnew'}>
+                                    <Button
+                                        type="primary"
+                                        style={{margin: '0 20px'}}
+                                    >创建新应用</Button>
+                                </Link>}
+                            />
+                        </div>
+                    } */}
+                {/* </div> */}
             </div>
         )
     }

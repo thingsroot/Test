@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Icon, Tabs, message, Button, Modal, Table, Tag, Radio } from 'antd';
+import { Icon, Tabs, message, Button, Modal, Table, Tag, Radio, Input, Collapse } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import VersionList from './VersionList';
@@ -8,7 +8,7 @@ import TemplateList from './TemplateList';
 import AppDescription from './Description';
 import {inject, observer} from 'mobx-react';
 import { _getCookie } from '../../utils/Session';
-
+const { Panel } = Collapse;
 const TabPane = Tabs.TabPane;
 const block = {
     display: 'inline-block',
@@ -24,9 +24,13 @@ const none = {
 class AppDetails extends Component {
     state = {
         user: '',
+        tag: '',
         app_info: '',
         versionList: [],
+        select_the_label: [],
+        tags_list: [],
         versionLatest: 0,
+        is_fork: false,
         time: '',
         app: '',
         desc: '',
@@ -38,8 +42,10 @@ class AppDetails extends Component {
         sn: '',
         ModalText: '确认删除此应用？',
         visible: false,
+        visible_tags: false,
         confirmLoading: false,
         dataSource: [],
+        filterDataSource: [],
         loading: false,
         favorites: false,
         columns: [
@@ -97,6 +103,22 @@ class AppDetails extends Component {
                 this.loadApp(this.state.name)
             })
         }
+    }
+    CheckForCloning = () => {
+        http.get('/api/applications_forks_list?name=' + this.props.match.params.name).then(res=>{
+            console.log(res)
+            if (res.ok) {
+                if (res.data.length > 0) {
+                    res.data.map(item=>{
+                        if (item.fork_version === this.state.versionLatest) {
+                           this.setState({
+                               is_fork: true
+                           })
+                        }
+                    })
+                }
+            }
+        })
     }
     getFavoritesList = () => {
         http.post('/api/store_favorites_list').then(res=>{
@@ -171,6 +193,8 @@ class AppDetails extends Component {
                 versionLatest: res.data.versionLatest,
                 desc: res.data.data.description,
                 time: res.data.data.modified.substr(0, 11)
+            }, ()=>{
+                this.CheckForCloning()
             });
             sessionStorage.setItem('app_name', res.data.data.app_name);
         });
@@ -226,6 +250,7 @@ class AppDetails extends Component {
         http.get('/api/gateways_list?status=online').then(res=>{
             this.setState({
                 dataSource: res.data,
+                filterDataSource: res.data,
                 loading: false
             })
         })
@@ -261,8 +286,101 @@ class AppDetails extends Component {
             }
         })
     }
+    saveTags = () => {
+        const {select_the_label} = this.state;
+        const data = {
+            name: this.props.match.params.name,
+            tags: select_the_label.join(',')
+        }
+        // console.log(data)
+        http.post('/api/applications_update', data).then(res=>{
+            console.log(res)
+            if (res.ok) {
+                message.success('更改标签成功，请等待后台审核！')
+                this.setVisibleTags()
+            }
+        })
+    }
+    filterGateway = (e) => {
+        const value = e.target.value.toLowerCase();
+        const data = this.state.filterDataSource.filter(item=> item.description.toLowerCase().indexOf(value) !== -1 || item.dev_name.toLowerCase().indexOf(value) !== -1 || item.name.indexOf(value) !== -1)
+        this.setState({
+            dataSource: data
+        })
+    }
+    getTags = () => {
+        http.get('/api/store_tags_list').then(res=>{
+            if (res.ok) {
+                const tags_list = []
+                if (res.data.length > 0) {
+                    res.data.map(item=>{
+                        tags_list.push(item[0])
+                    })
+                }
+                const {tags} = this.state.app_info;
+                const select_the_label = tags !== '' ? tags.split(',') : []
+                this.setState({
+                    tags_list,
+                    select_the_label
+                })
+            }
+        })
+        this.setState({visible_tags: true})
+    }
+    setVisibleTags = () => {
+        this.setState({
+            visible_tags: false
+        })
+    }
+    addTag = (item) =>{
+        const {select_the_label} = this.state;
+        if (select_the_label.indexOf(item) === -1) {
+            if (select_the_label.length < 20) {
+                select_the_label.push(item)
+                this.setState({
+                    select_the_label
+                })
+            } else {
+                message.error('数量已满！')
+            }
+        } else {
+            message.error('请勿重复添加同一标签！')
+        }
+    }
+    addCustomTag = () => {
+        if (this.state.tag !== ''){
+            const {select_the_label} = this.state;
+            if (select_the_label.indexOf(this.state.tag) === -1) {
+                if (select_the_label.length < 20) {
+                    if (this.state.tag.length < 8) {
+                        select_the_label.push(this.state.tag)
+                        this.setState({
+                            select_the_label,
+                            tag: ''
+                        })
+                    } else {
+                        message.error('字符最大长度为八位！')
+                    }
+                } else {
+                    message.error('数量已满！')
+                }
+            } else {
+                message.error('请勿重复添加同一标签！')
+            }
+        } else {
+            message.error('请输入标签内容！')
+        }
+    }
+    deleteTag = (item)=>{
+        const {select_the_label} = this.state;
+        const ind = select_the_label.indexOf(item)
+        select_the_label.splice(ind, 1)
+        this.setState({
+            select_the_label
+        })
+    }
     render () {
-        let { app, app_info, time, user, desc, visible, confirmLoading, ModalText } = this.state;
+        let { app, app_info, time, user, desc, visible, confirmLoading, ModalText, visible_tags, select_the_label, tags_list } = this.state;
         return (
             <div className="myAppDetails">
                 <div className="header">
@@ -282,15 +400,60 @@ class AppDetails extends Component {
                         />
                     </div>
                     <div className="appInfo">
-                        <p className="appName">{app_info.app_name}</p>
-                        <p className="info">
+                        <div className="appName">{app_info.app_name}</div>
+                        {
+                            app_info.fork_from && <p>fork_form: {app_info.fork_from}</p>
+                        }
+                        <div className="info">
                             <span>发布者：{app_info.developer}</span>
                             <span>创建时间：{time}</span><br/>
-                            <span>应用分类：{app_info.category === null ? '----' : app_info.category}</span>
-                            {/* <span>通讯协议：{app_info.protocol === null ? '----' : app_info.protocol}</span><br/>
-                            <span>适配型号：{app_info.device_serial === null ? '----' : app_info.device_serial}</span>
-                            <span>设备厂商：{app_info.device_supplier === null ? '----' : app_info.device_supplier}</span> */}
-                        </p>
+                            <span>应用分类：{app_info.category === null ? '----' : app_info.category}</span><br/>
+                            {/* {console.log(app_info.tags.split(','))} */}
+                            <div className="appdetail_tags">标签：
+                                {
+                                        <Collapse
+                                            className="appdetail_tags_coll"
+                                            bordered={false}
+                                            expandIconPosition="right"
+                                            disabled={app_info && app_info.tags.length > 0 && app_info.tags.split(',').length > 2}
+                                        >
+                                            <Panel
+                                                style={{borderBottom: 'none'}}
+                                                header={
+                                                    app_info.tags && app_info.tags.length > 0
+                                                    ? app_info.tags.split(',').map((item, key)=>{
+                                                        if (key < 2) {
+                                                            return (
+                                                                <Tag key={key}>{item}</Tag>
+                                                            )
+                                                        }
+                                                    })
+                                                    : ''
+                                                }
+                                                key="1"
+                                            >
+                                                {
+                                                    app_info.tags && app_info.tags.split(',').length > 0 && app_info.tags.split(',').map((item, key)=>{
+                                                            return (
+                                                                <div key={key}>
+                                                                    <Tag >{item}</Tag><Tag >{item}</Tag><Tag >{item}</Tag><Tag >{item}</Tag>
+                                                                </div>
+                                                            )
+                                                    })
+                                                }
+                                            </Panel>
+                                        </Collapse>
+                                }
+                                {
+                                    app_info.developer === _getCookie('user_id') &&
+                                    <Button
+                                        type="link"
+                                        className="app_details_tags_set"
+                                        onClick={this.getTags}
+                                    >修改</Button>
+                                }
+                            </div>
+                        </div>
                     </div>
                     <div className="btnGroup">
 
@@ -323,15 +486,20 @@ class AppDetails extends Component {
                             app_info.developer !== _getCookie('user_id') && Number(_getCookie('is_developer')) === 1
                             ? <Button
                                 style={{
-                                    height: '35px',
+                                    height: '34px',
                                     marginLeft: '15px'
                                 }}
+                                disabled={this.state.is_fork}
                                 onClick={()=>{
                                     this.sendForkCreate(app_info)
                                 }}
                               >
                                 <Icon type="fork" />
-                                克隆
+                                {
+                                    this.state.is_fork
+                                    ? '已克隆'
+                                    : '克隆'
+                                }
                             </Button>
                             : ''
                         }
@@ -341,14 +509,6 @@ class AppDetails extends Component {
                             style={{marginLeft: '30px', marginTop: '10px', width: '100px', height: '35px'}}
                             type={!this.state.favorites ? 'primary' : 'danger'}
                         >{this.state.favorites ? '取消收藏' : '收藏'}</Button>
-                        <Link
-                            className="button"
-                            style={app_info.fork_from ? block : none}
-                            to={`/appdetails/${app_info.fork_from}`}
-                        >
-                            <Icon type="share-alt" />
-                            分支
-                        </Link>
                         {
                             app_info.developer === _getCookie('user_id')
                             ? <Button
@@ -374,6 +534,76 @@ class AppDetails extends Component {
                             <p>{ModalText}</p>
                         </Modal>
                         <Modal
+                            title={<span><Icon type="info-circle" /> 编辑标签</span>}
+                            visible={visible_tags}
+                            onOk={this.saveTags}
+                            // confirmLoading={confirmLoading}
+                            onCancel={this.setVisibleTags}
+                            cancelText="取消"
+                            okText="确定"
+                        >
+                            <div>
+                                <div className="Select_the_label">
+                                    {
+                                        select_the_label.length > 0 && select_the_label.map((item, key) => {
+                                            return (
+                                                <Tag
+                                                    key={key}
+                                                    closable
+                                                    onClose={()=>{
+                                                        this.deleteTag(item)
+                                                    }}
+                                                >{item}</Tag>
+                                            )
+                                        })
+                                    }
+                                </div>
+                                <div>
+                                    注：每个资源最多绑定20个标签，单次操作绑定/解绑标签的数量分别不能超过20个
+                                </div>
+                                <div>
+                                <Tabs defaultActiveKey="1">
+                                    <TabPane
+                                        tab="已有标签"
+                                        key="1"
+                                    >
+                                    {
+                                        tags_list.length > 0 && tags_list.map((item, key) => {
+                                            return (
+                                                <Tag
+                                                    key={key}
+                                                    onClick={()=>{
+                                                        this.addTag(item)
+                                                    }}
+                                                >{item}</Tag>
+                                            )
+                                        })
+                                    }
+                                    </TabPane>
+                                    <TabPane
+                                        tab="新建标签"
+                                        key="2"
+                                    >
+                                        <div className="add_tags">
+                                            新建标签：
+                                            <Input
+                                                value={this.state.tag}
+                                                onChange={(e)=>{
+                                                    this.setState({tag: e.target.value})
+                                                }}
+                                            />
+                                            <Button
+                                                onClick={()=>{
+                                                    this.addCustomTag
+                                                }}
+                                            >添加</Button>
+                                        </div>
+                                    </TabPane>
+                                </Tabs>
+                                </div>
+                            </div>
+                        </Modal>
+                        <Modal
                             title={<span><Icon type="download" /> 请选择要安装到的网关</span>}
                             visible={this.state.sn_visible}
                             onOk={this.JumpToInstall}
@@ -383,6 +613,15 @@ class AppDetails extends Component {
                             okText="确定"
                             width="1024px"
                         >
+                            <Input.Search
+                                placeholder="请输入网关序列号，名称，描述"
+                                onChange={this.filterGateway}
+                                style={{
+                                    width: '70%',
+                                    marginLeft: '15%',
+                                    marginBottom: '15px'
+                                }}
+                            />
                             <Table
                                 dataSource={this.state.dataSource}
                                 columns={this.state.columns}

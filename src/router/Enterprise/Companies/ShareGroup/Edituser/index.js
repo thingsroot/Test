@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import {Table, Input, Popconfirm, Form, Modal, message, Empty, Icon} from 'antd';
 import { withRouter } from 'react-router-dom';
-import http from '../../../utils/Server';
+import http from '../../../../../utils/Server';
 import {inject, observer} from 'mobx-react';
 import './index.scss'
 const data = [];

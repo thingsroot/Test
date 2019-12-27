@@ -159,64 +159,59 @@ class HeaderBar extends PureComponent {
                 </Menu.Item>
             </Menu>
         );
-        const menu2 = (
-            <Menu style={{width: 160}}>
-                <Menu.Item
-                    key="18"
-                    style={{lineHeight: '30px'}}
-                    onClick={
-                        ()=>{
-                            this.props.history.push('/member')
-                        }
-                    }
-                >
-                    <Icon type="team" />
-                    <span>
-                        成员管理
-                    </span>
-                </Menu.Item>
-                <Menu.Item
-                    key="19"
-                    style={{lineHeight: '30px'}}
-                    onClick={
-                        ()=>{
-                            this.props.history.push('/sharegroup')
-                        }
-                    }
-                >
-                    <Icon type="share-alt"/>
-                    <span>
-                        共享组管理
-                    </span>
-                </Menu.Item>
-            </Menu>
-        )
+        // const menu2 = (
+        //     <Menu style={{width: 160}}>
+        //         <Menu.Item
+        //             key="18"
+        //             style={{lineHeight: '30px'}}
+        //             onClick={
+        //                 ()=>{
+        //                     this.props.history.push('/member')
+        //                 }
+        //             }
+        //         >
+        //             <Icon type="team" />
+        //             <span>
+        //                 成员管理
+        //             </span>
+        //         </Menu.Item>
+        //         <Menu.Item
+        //             key="19"
+        //             style={{lineHeight: '30px'}}
+        //             onClick={
+        //                 ()=>{
+        //                     this.props.history.push('/sharegroup')
+        //                 }
+        //             }
+        //         >
+        //             <Icon type="share-alt"/>
+        //             <span>
+        //                 共享组管理
+        //             </span>
+        //         </Menu.Item>
+        //     </Menu>
+        // )
         return (
             <div className="headerUser">
                 <Link
                     to="/appstore"
                     style={{marginRight: '15px'}}
                 ><Icon type="appstore"/>&nbsp;&nbsp;应用市场</Link>
-                {
-                    _getCookie('is_admin') === '1'
-                    ? <Dropdown
-                        overlay={menu2}
-                        placement="bottomRight"
-                      >
-                        <span
-                            className="ant-dropdown-link"
-                            style={{padding: '10px', cursor: 'pointer'}}
-                        >
-                            <Icon
-                                style={{padding: '0 4px', fontWeight: 800}}
-                                type="global"
-                            />
-                            企业
-                            <Icon type="down" />
-                        </span>
-                    </Dropdown>
-                : ''
-                }
+                <Link
+                    to="/enterprise"
+                    style={{marginRight: '15px'}}
+                >
+                    <span
+                        className="ant-dropdown-link"
+                        style={{padding: '10px', cursor: 'pointer'}}
+                    >
+                        <Icon
+                            style={{padding: '0 4px', fontWeight: 800}}
+                            type="global"
+                        />
+                        企业
+                    </span>
+                </Link>
                 {
                     OEM.Title === '冬笋云'
                     ? <span>

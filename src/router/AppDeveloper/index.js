@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import {Form, Input, Button, message, Result, Skeleton, Modal} from 'antd';
 import http from '../../utils/Server';
 import './style.scss';
-import { _getCookie } from '../../utils/Session';
+import { _getCookie, _setCookie } from '../../utils/Session';
 const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 8 }
@@ -29,6 +29,11 @@ class DynamicRule extends PureComponent {
                     res.data.map(item=>{
                         if (item.docstatus === 0) {
                             status = 0;
+                        }
+                        if (item.docstatus === 1 && status !== 0) {
+                            message.success('您的申请已经成功，即将为您跳转到应用市场页面！')
+                            _setCookie('is_developer', '1')
+                            this.props.history.push('/appstore')
                         }
                         if (item.docstatus === 2 && status !== 0) {
                             status = 2;

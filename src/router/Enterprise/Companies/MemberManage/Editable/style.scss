@@ -2,7 +2,13 @@
     position: relative;
     .member_wrap_add_button{
         position: absolute;
-        right:30px;
+        right:0px;
+        top:-40px;
+        z-index: 999;
+    }
+    .member_wrap_invitation_button{
+        position: absolute;
+        right:130px;
         top:-40px;
         z-index: 999;
     }

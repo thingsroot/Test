@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import './index.scss'
 import { Row, Col} from 'antd'
 import {inject, observer} from 'mobx-react';
-import http from '../../utils/Server';
+import http from '../../../../utils/Server';
 import Edituser from './Edituser';
 import Editable from './Editable';
-import { _getCookie } from '../../utils/Session';
 @inject('store')
 @observer
 class ShareGroup extends Component {
@@ -19,10 +18,6 @@ class ShareGroup extends Component {
         }
     }
     componentDidMount () {
-        if (_getCookie('is_admin') !== '1') {
-            this.props.history.push('/')
-            return false;
-        }
         this.getData()
     }
     getData = () => {

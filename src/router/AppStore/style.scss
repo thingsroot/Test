@@ -13,6 +13,16 @@
             top: -30px;
         }
     }
+    .app_title_and_developer{
+        text-align: center;
+        p{
+            font-weight: 600;
+        }
+        span{
+            font-size: 12px;
+            color: #ccc;
+        }
+    }
     .app_developer_button{
         position: absolute;
         right: 40px;
@@ -71,7 +81,7 @@
         margin-right: 20px;
         margin-top: 10px;
         width: 182px;
-        height: 200px;
+        height: 225px;
         border: 1px solid #ccc;
         border-radius: 5px;
         cursor: pointer;

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Button, Divider, Input, Modal, Popconfirm, Table, Form, message} from 'antd';
 import { inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import http from '../../../utils/Server';
+import http from '../../../../../utils/Server';
 
 const EditableContext = React.createContext();
 

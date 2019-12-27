@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import http from '../../utils/Server';
 import { withRouter, Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
-import { Drawer } from 'antd';  //
+import { Drawer, Input } from 'antd';  //
 import './style.scss';
 // import {Drawer} from "antd";
 
@@ -31,7 +31,10 @@ class GatewaysDrawer extends Component {
         // FIXME: Save localStorage about user accessed gateways..
         http.get('/api/gateways_list?status=online').then(res=>{
             if (res.ok) {
-                this.setState({gateways: res.data})
+                this.setState({
+                    gateways: res.data,
+                    filterDataSource: res.data
+                })
             }
         })
     };
@@ -48,7 +51,13 @@ class GatewaysDrawer extends Component {
             this.props.onClose()
         }, 500)
     }
-
+    filterGateway = (e) => {
+        const value = e.target.value.toLowerCase();
+        const data = this.state.filterDataSource.filter(item=> item.description.toLowerCase().indexOf(value) !== -1 || item.dev_name.toLowerCase().indexOf(value) !== -1 || item.name.indexOf(value) !== -1)
+        this.setState({
+            gateways: data
+        })
+    }
     render () {
         const { gateways, status, gateway_sn } = this.state;
         status, gateway_sn;
@@ -62,8 +71,16 @@ class GatewaysDrawer extends Component {
                 closable={false}
                 onClose={this.onClose}
                 visible={visible}
-                width="400"
+                width="500"
             >
+                <Input.Search
+                    placeholder="请输入网关序列号，名称，描述"
+                    onChange={this.filterGateway}
+                    style={{
+                        width: '70%',
+                        marginLeft: '15%'
+                    }}
+                />
                 <ul>
                     {
                         gateways && gateways.length > 0 && gateways.map((v, i)=>{
@@ -78,7 +95,7 @@ class GatewaysDrawer extends Component {
                                         className={gateway === v.sn ? 'gateslist gateslistactive' : 'gateslist'}
                                     >
                                         <span></span>
-                                        <p>{v.dev_name}(&nbsp;<i>{v.description}</i>&nbsp;)</p>
+                                        <p>{v.dev_name}&nbsp;(&nbsp;<i>{v.description}</i>&nbsp;)<br />&nbsp;序列号:{v.name}</p>
                                     </li>
                                 </Link>
                             )

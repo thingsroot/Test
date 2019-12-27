@@ -51,12 +51,12 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                             conf_name = res.data.name;
                             if (this.props.copyData.version !== 0) {
                                 const data = this.props.csvData ? this.props.csvData.join('\n') : this.props.copyData
-
+                                console.log(data, 'data', typeof(data), this.props.csvData, this.props.copyData)
                                 let params = {
                                     conf: conf_name,
                                     version: 1,
                                     comment: 'V1',
-                                    data: data
+                                    data: data.data ? data.data : data
                                 };
                                 http.post('/api/configurations_versions_create', params)
                                     .then(res=>{

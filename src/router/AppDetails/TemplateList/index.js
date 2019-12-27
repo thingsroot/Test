@@ -194,7 +194,7 @@ class TemplateList extends Component {
     editContent = (record, type)=>{
         let new_name = record.conf_name;
         if (type === 'copy') {
-            new_name = record.conf_name + '-copy'
+            new_name = record.conf_name
         }
         let data = {
             conf_name: new_name,

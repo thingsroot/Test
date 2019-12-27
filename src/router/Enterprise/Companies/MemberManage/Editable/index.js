@@ -2,8 +2,9 @@ import React, {Fragment} from 'react';
 import {Table, Input, Popconfirm, Form, Button, Modal, message} from 'antd';
 import {inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import http from '../../../utils/Server';
+import http from '../../../../../utils/Server';
 import './style.scss';
+import { _getCookie } from '../../../../../utils/Session';
 const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
@@ -66,11 +67,13 @@ class EditableTable extends React.Component {
             loading: true,
             editingKey: '',
             visibleMember: false,
+            visible: false,
             confirmDirty: false,
             type: 'text',
             password_visible: false,
             new_password: '',
-            enter_new_password: ''
+            enter_new_password: '',
+            user: ''
         };
         this.columns = [
             {
@@ -400,7 +403,20 @@ class EditableTable extends React.Component {
 
         });
     };
-
+    invitation = () => {
+        const data = {
+            company: _getCookie('companies'),
+            user: this.state.user
+        }
+        http.post('/api/companies_employees_invite', data).then(res=>{
+            if (res.ok) {
+                message.success('邀请成功，请等待用户接受邀请！')
+            }
+            this.setState({
+                visible: false
+            })
+        })
+    }
     render () {
         const components = {
             body: {
@@ -447,6 +463,19 @@ class EditableTable extends React.Component {
                     disabled={this.props.activeKey === ''}
                 >
                     添加组成员
+                </Button>
+                <Button
+                    onClick={()=>{
+                        this.setState({visible: true})
+                    }}
+                    type="primary"
+                    className="member_wrap_invitation_button"
+                    // style={{
+                    //     marginTop: '20px'
+                    // }}
+                    disabled={this.props.activeKey === ''}
+                >
+                    邀请成员加入
                 </Button>
                 <EditableContext.Provider value={this.props.form}>
                     <Table
@@ -592,6 +621,28 @@ class EditableTable extends React.Component {
                             <Button onClick={this.handleCancelMember}>取消</Button>
                         </Form.Item>
                     </Form>
+                </Modal>
+                <Modal
+                    visible={this.state.visible}
+                    title="邀请用户加入公司组"
+                    onOk={this.invitation}
+                    onCancel={()=>{
+                        this.setState({visible: false})
+                    }}
+                    okText="确定"
+                    cancelText="放弃"
+                    maskClosable={false}
+                    destroyOnClose
+                >
+                    <span>用户名:</span>
+                    <Input
+                        placeholder="请输入要邀请的成员账户"
+                        onChange={(e)=>{
+                            this.setState({
+                                user: e.target.value
+                            })
+                        }}
+                    />
                 </Modal>
                 <Modal
                     visible={this.state.password_visible}

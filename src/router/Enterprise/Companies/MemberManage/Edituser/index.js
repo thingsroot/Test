@@ -9,7 +9,7 @@ import {Table, Input,
 } from 'antd';
 import {inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import http from '../../../utils/Server';
+import http from '../../../../../utils/Server';
 import './index.scss'
 const data = [];
 const EditableContext = React.createContext();

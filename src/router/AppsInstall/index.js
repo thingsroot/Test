@@ -270,14 +270,6 @@ class MyGatesAppsInstall extends Component {
                         onCancel={()=>{
                             this.setState({install_step: 'view', showLinkSelection: false})
                         }}
-                        footer={[
-                            // <Button key="back" onClick={this.handleCancel}>
-                            // Return
-                            // </Button>,
-                            // <Button key="submit" type="primary" loading={loading} onClick={this.handleOk}>
-                            // Submit
-                            // </Button>,
-                        ]}
                     >
                         <ul className="linkSelection">
                             <li

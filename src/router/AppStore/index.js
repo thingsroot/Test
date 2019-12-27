@@ -209,23 +209,36 @@ class AppStore extends Component {
                 <div className="all_app_filter">
                     <span>分类:</span>
                     &nbsp;&nbsp;
-                    <Select defaultValue="全部" style={{ width: 120 }} onChange={this.handleChange}>
+                    <Select
+                        defaultValue="全部"
+                        style={{ width: 120 }}
+                        onChange={this.handleChange}
+                    >
                         <Option value="all">全部</Option>
                         {
                             category && category.length > 0 && category.map((item, key) => {
-                                return <Option value={item} key={key}>{item}</Option>
+                                return (
+                                    <Option
+                                        value={item}
+                                        key={key}
+                                    >{item}</Option>
+                                )
                             })
                         }
                     </Select>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <span>排序:</span>
                     &nbsp;&nbsp;
-                    <Select defaultValue="默认排序" style={{ width: 120 }} onChange={this.dataSort}>
+                    <Select
+                        defaultValue="默认排序"
+                        style={{ width: 120 }}
+                        onChange={this.dataSort}
+                    >
                         <Option value="app_name">名称</Option>
-                        <Option value="description">描述</Option>
+                        {/* <Option value="description">描述</Option> */}
                         <Option value="creation">创建时间</Option>
                         <Option value="modified">更新时间</Option>
-                        <Option value="developer">应用开发者</Option>
+                        {/* <Option value="developer">应用开发者</Option> */}
                     </Select>
                 </div>
             {
@@ -242,11 +255,25 @@ class AppStore extends Component {
                                         src={'http://ioe.thingsroot.com' + val.icon_image}
                                         alt=""
                                     />
-                                    <div style={{textAlign: 'center', fontWeight: '600'}}>{val.app_name}</div>
+                                    <div className="app_title_and_developer">
+                                        <p>{val.app_name}</p>
+                                        <span>{val.developer}</span>
+                                    </div>
                                     <div
                                         className="app_item_desc"
                                     >
-                                        <div>{val.tags ? val.tags : '暂无标签'}</div>
+                                        <div>
+                                            {
+                                                val.tags && val.tags.split(',').length > 0 && val.tags.split(',').map((item, key)=>{
+                                                    return (
+                                                        <Tag
+                                                            color="gold"
+                                                            key={key}
+                                                        >{item}</Tag>
+                                                    )
+                                                })
+                                            }
+                                        </div>
                                         <div style={{textAlign: 'center'}}><Icon type="download" /> {val.installed}</div>
                                     </div>
                                     <div
@@ -256,7 +283,7 @@ class AppStore extends Component {
                                             <Rate
                                                 value={val.star}
                                                 disabled
-                                                style={{fontSize: '7px', letteSspacing: '2px'}}
+                                                style={{fontSize: '10px', letteSspacing: '2px'}}
                                             />
                                         </div>
                                         <span>免费</span>

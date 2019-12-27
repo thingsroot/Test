@@ -18,6 +18,7 @@ class AppItems extends PureComponent {
             data: [],
             visible: false,
             comment: '',
+            is_fork: false,
             favorites: false,
             favorites_loading: false
         }
@@ -26,6 +27,22 @@ class AppItems extends PureComponent {
         this.getData()
         this.getFavoritesList()
     }
+    CheckForCloning = () => {
+        http.get('/api/applications_forks_list?name=' + this.props.match.params.name).then(res=>{
+            console.log(res)
+            if (res.ok) {
+                if (res.data.length > 0) {
+                    res.data.map(item=>{
+                        if (item.fork_version === this.state.version) {
+                           this.setState({
+                               is_fork: true
+                           })
+                        }
+                    })
+                }
+            }
+        })
+    }
     getData = () => {
         const {name} = this.props.match.params;
         http.get('/api/applications_read?app=' + name).then(res=>{
@@ -33,6 +50,8 @@ class AppItems extends PureComponent {
                 this.setState({
                     data: res.data.data,
                     version: res.data.versionLatest
+                }, ()=>{
+                    this.CheckForCloning()
                 })
             }
         })
@@ -144,9 +163,14 @@ class AppItems extends PureComponent {
                                 onClick={()=>{
                                     this.sendForkCreate(data)
                                 }}
+                                disabled={this.state.is_fork}
                               >
                                 <Icon type="fork" />
-                                克隆
+                                {
+                                    this.state.is_fork
+                                    ? '已克隆'
+                                    : '克隆'
+                                }
                             </Button>
                             : ''
                         }
@@ -167,6 +191,19 @@ class AppItems extends PureComponent {
                                 <div className="app_desc_right">
                                     <div>
                                         <p>分类</p>
+                                        <div>
+                                            {
+                                                data.category &&
+                                                data.category.length > 0 &&
+                                                data.category.split(',').map((item, key)=>{
+                                                    return (
+                                                        <Tag key={key}>
+                                                            {item}
+                                                        </Tag>
+                                                    )
+                                                })
+                                            }
+                                        </div>
                                     </div>
                                     <div>
                                         <p>标签</p>
