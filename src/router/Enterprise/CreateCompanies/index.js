@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import http from '../../../utils/Server';
 import { _getCookie, _setCookie } from '../../../utils/Session';
 import reqwest from 'reqwest';
+import { withRouter } from 'react-router-dom';
 import {
     Button,
     Form,
@@ -98,6 +99,7 @@ import {
           }
         },
       );
+      @withRouter
 class CreateCompanies extends PureComponent {
     constructor (props) {
         super(props)
@@ -109,7 +111,6 @@ class CreateCompanies extends PureComponent {
     }
     componentDidMount () {
         http.get('/api/user_company_invitations_list').then(res=>{
-            console.log(res)
             if (res.ok && res.data.length > 0) {
                 res.data.map(item=>{
                     if (item.docstatus === 0 && _getCookie('companies') === 'undefined') {
@@ -122,7 +123,6 @@ class CreateCompanies extends PureComponent {
             }
         })
         http.get('/api/companies_requisition_list').then(res=>{
-            console.log(res)
             if (res.ok && res.data.length > 0) {
                 res.data.map(item=>{
                     if (item.docstatus === 0) {
@@ -135,7 +135,8 @@ class CreateCompanies extends PureComponent {
                             status: 'true'
                         })
                         message.success('您的申请已经成功，即将为您跳转到企业页面，请稍等！')
-                        // _setCookie('companies', )
+                        _setCookie('companies', item.comp_name)
+                        this.props.history.push('/enterprise/shared')
                     }
                     if (item.docstatus === 2 && this.state.status !== 'processing') {
                         this.setState({
@@ -151,7 +152,6 @@ class CreateCompanies extends PureComponent {
             name
         }
         http.post('/api/user_company_invitations_accept', data).then(res=>{
-            console.log(res)
             if (res.ok) {
                 message.success('您已成功加入该公司！')
                 _setCookie('companies', company)
@@ -163,7 +163,9 @@ class CreateCompanies extends PureComponent {
             name
         }
         http.post('/api/user_company_invitations_reject', data).then(res=>{
-            console.log(res)
+            if (res.ok) {
+              message.error('您已拒绝加入该公司！')
+            }
         })
     }
     showConfirm = (record) => {
@@ -208,17 +210,19 @@ class CreateCompanies extends PureComponent {
                     formData.append(item, values[item]);
                 }
             })
-            console.log(formData.get('business_license_file'))
             reqwest({
                 url: '/api/companies_requisition_create',
                 method: 'post',
                 processData: false,
                 data: formData,
                 success: () => {
-                    message.success('上传成功.');
+                    message.success('资料提交成功，请耐心等待后台审核，预计需要1-3个工作日...');
+                    this.setState({
+                      visible: false
+                    })
                 },
                 error: () => {
-                  message.error('上传失败.');
+                  message.error('资料提交失败，请重试！');
                 }
               });
             form.resetFields();
@@ -280,6 +284,17 @@ class CreateCompanies extends PureComponent {
                                 />
                             }
                             title="您的申请正在处理中，请耐心等待!"
+                            extra={
+                              <Button
+                                  type="primary"
+                                  key="console"
+                                  onClick={()=>{
+                                    this.props.history.go(-1)
+                                  }}
+                              >
+                                  点击返回
+                              </Button>
+                            }
                         />
                     </div>
                     : ''
