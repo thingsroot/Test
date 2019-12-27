@@ -435,8 +435,10 @@ class AppDetails extends Component {
                                                 {
                                                     app_info.tags && app_info.tags.split(',').length > 0 && app_info.tags.split(',').map((item, key)=>{
                                                             return (
-                                                                <div key={key}>
-                                                                    <Tag >{item}</Tag><Tag >{item}</Tag><Tag >{item}</Tag><Tag >{item}</Tag>
+                                                                <div
+                                                                    key={key}
+                                                                >
+                                                                    <Tag >{item}</Tag>
                                                                 </div>
                                                             )
                                                     })
@@ -593,9 +595,7 @@ class AppDetails extends Component {
                                                 }}
                                             />
                                             <Button
-                                                onClick={()=>{
-                                                    this.addCustomTag
-                                                }}
+                                                onClick={this.addCustomTag}
                                             >添加</Button>
                                         </div>
                                     </TabPane>
