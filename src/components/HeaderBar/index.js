@@ -159,38 +159,6 @@ class HeaderBar extends PureComponent {
                 </Menu.Item>
             </Menu>
         );
-        // const menu2 = (
-        //     <Menu style={{width: 160}}>
-        //         <Menu.Item
-        //             key="18"
-        //             style={{lineHeight: '30px'}}
-        //             onClick={
-        //                 ()=>{
-        //                     this.props.history.push('/member')
-        //                 }
-        //             }
-        //         >
-        //             <Icon type="team" />
-        //             <span>
-        //                 成员管理
-        //             </span>
-        //         </Menu.Item>
-        //         <Menu.Item
-        //             key="19"
-        //             style={{lineHeight: '30px'}}
-        //             onClick={
-        //                 ()=>{
-        //                     this.props.history.push('/sharegroup')
-        //                 }
-        //             }
-        //         >
-        //             <Icon type="share-alt"/>
-        //             <span>
-        //                 共享组管理
-        //             </span>
-        //         </Menu.Item>
-        //     </Menu>
-        // )
         return (
             <div className="headerUser">
                 <Link
@@ -199,7 +167,6 @@ class HeaderBar extends PureComponent {
                 ><Icon type="appstore"/>&nbsp;&nbsp;应用市场</Link>
                 <Link
                     to="/enterprise"
-                    style={{marginRight: '15px'}}
                 >
                     <span
                         className="ant-dropdown-link"

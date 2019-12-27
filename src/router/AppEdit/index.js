@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import {Form, Row, Col, Input, Button, Select, Tabs, message, Checkbox, Icon } from 'antd';
+import {Form, Row, Col, Input, Button, Select, Tabs, message, Checkbox, Icon, Collapse, Modal, Tag } from 'antd';
 import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
 import reqwest from 'reqwest';
-
+import './style.scss';
+const { Panel } = Collapse;
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 
@@ -31,7 +32,10 @@ class AppEdit extends Component {
         app_info: {},
         description: '',
         conf_template: '',
-        pre_configuration: ''
+        pre_configuration: '',
+        select_the_label: [],
+        visible_tags: false,
+        tags_list: []
     };
     componentDidMount (){
         const app = this.props.match.params.name && this.props.match.params.name.indexOf('*') !== -1 ? this.props.match.params.name.replace(/\*/g, '/') : this.props.match.params.name
@@ -87,7 +91,7 @@ class AppEdit extends Component {
         })
     };
     handleSubmit = (e) => {
-        const { app_info, description, conf_template, pre_configuration } = this.state;
+        const { app_info, description, conf_template, pre_configuration, select_the_label } = this.state;
         app_info;
         e.preventDefault();
         if (this.props.store.session.is_developer === '1') {
@@ -111,7 +115,8 @@ class AppEdit extends Component {
                     license_type: 'Open',
                     description: description,
                     conf_template: conf_template_str,
-                    pre_configuration: pre_configuration_str
+                    pre_configuration: pre_configuration_str,
+                    tags: select_the_label.join(',')
                 };
                 if (conf_template && conf_template !== '') {
                     params['has_conf_template'] = 1
@@ -211,12 +216,104 @@ class AppEdit extends Component {
             e.target.value = 0
         }
     };
-
+    saveTags = () => {
+        // const {select_the_label} = this.state;
+        // const data = {
+        //     name: this.props.match.params.name,
+        //     tags: select_the_label.join(',')
+        // }
+        // console.log(data)
+        // http.post('/api/applications_update', data).then(res=>{
+        //     console.log(res)
+        //     if (res.ok) {
+                // message.success('更改标签成功，请等待后台审核！')
+                this.setVisibleTags()
+        //     }
+        // })
+    }
+    filterGateway = (e) => {
+        const value = e.target.value.toLowerCase();
+        const data = this.state.filterDataSource.filter(item=> item.description.toLowerCase().indexOf(value) !== -1 || item.dev_name.toLowerCase().indexOf(value) !== -1 || item.name.indexOf(value) !== -1)
+        this.setState({
+            dataSource: data
+        })
+    }
+    getTags = () => {
+        http.get('/api/store_tags_list').then(res=>{
+            if (res.ok) {
+                const tags_list = []
+                if (res.data.length > 0) {
+                    res.data.map(item=>{
+                        tags_list.push(item[0])
+                    })
+                }
+                // const {tags} = this.state.app_info;
+                // const select_the_label = tags !== '' ? tags.split(',') : []
+                this.setState({
+                    tags_list
+                    // select_the_label
+                })
+            }
+        })
+        this.setState({visible_tags: true})
+    }
+    setVisibleTags = () => {
+        this.setState({
+            visible_tags: false
+        })
+    }
+    addTag = (item) =>{
+        const {select_the_label} = this.state;
+        if (select_the_label.indexOf(item) === -1) {
+            if (select_the_label.length < 20) {
+                select_the_label.push(item)
+                this.setState({
+                    select_the_label
+                })
+            } else {
+                message.error('数量已满！')
+            }
+        } else {
+            message.error('请勿重复添加同一标签！')
+        }
+    }
+    addCustomTag = () => {
+        if (this.state.tag !== ''){
+            const {select_the_label} = this.state;
+            if (select_the_label.indexOf(this.state.tag) === -1) {
+                if (select_the_label.length < 20) {
+                    if (this.state.tag.length < 8) {
+                        select_the_label.push(this.state.tag)
+                        this.setState({
+                            select_the_label,
+                            tag: ''
+                        })
+                    } else {
+                        message.error('字符最大长度为八位！')
+                    }
+                } else {
+                    message.error('数量已满！')
+                }
+            } else {
+                message.error('请勿重复添加同一标签！')
+            }
+        } else {
+            message.error('请输入标签内容！')
+        }
+    }
+    deleteTag = (item)=>{
+        const {select_the_label} = this.state;
+        const ind = select_the_label.indexOf(item)
+        select_the_label.splice(ind, 1)
+        this.setState({
+            select_the_label
+        })
+    }
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { app_info, description, conf_template, pre_configuration } = this.state;
+        const { app_info, description, conf_template, pre_configuration, select_the_label, visible_tags, tags_list } = this.state;
         return (
-            <div>
+            <div className="appedit_wrap">
                 <Icon
                     className="rollback"
                     style={{top: 85, right: 40}}
@@ -307,6 +404,54 @@ class AppEdit extends Component {
                                     )}
                                 </Form.Item>
                             </Col>
+                            <Col span={24}>
+                                <div className="appdetail_tags">标签：
+                                {
+                                    select_the_label.length > 0
+                                    ? <Collapse
+                                        className="appdetail_tags_coll"
+                                        bordered={false}
+                                        expandIconPosition="right"
+                                      >
+                                    <Panel
+                                        style={{borderBottom: 'none'}}
+                                        header={
+                                            select_the_label && select_the_label.length > 0
+                                            ? select_the_label.map((item, key)=>{
+                                                if (key < 2) {
+                                                    return (
+                                                        <Tag key={key}>{item}</Tag>
+                                                    )
+                                                }
+                                            })
+                                            : ''
+                                        }
+                                        key="1"
+                                    >
+                                        <div className="tags_list">
+                                        {
+                                            select_the_label && select_the_label.length > 0 && select_the_label.map((item, key)=>{
+                                                    return (
+                                                        <div
+                                                            key={key}
+                                                        >
+                                                            <Tag >{item}</Tag>
+                                                        </div>
+                                                    )
+                                            })
+                                        }
+                                        </div>
+                                    </Panel>
+                                </Collapse>
+                                : ''
+                                }
+                                <Button
+                                    type="link"
+                                    className="app_details_tags_set"
+                                    onClick={this.getTags}
+                                >修改标签</Button>
+                                </div>
+                            </Col>
                         </Col>
                     </Row>
                 </Form>
@@ -359,6 +504,80 @@ class AppEdit extends Component {
                 >
                     取消
                 </Button>
+                <Modal
+                    title={<span><Icon type="info-circle" /> 编辑标签</span>}
+                    visible={visible_tags}
+                    onOk={this.saveTags}
+                    // confirmLoading={confirmLoading}
+                    onCancel={()=>{
+                        this.setState({
+                            select_the_label: []
+                        }, ()=>{
+                            this.setVisibleTags()
+                        })
+                    }}
+                    cancelText="取消所有"
+                    okText="确定"
+                >
+                    <div>
+                        <div className="Select_the_label">
+                            {
+                                select_the_label.length > 0 && select_the_label.map((item, key) => {
+                                    return (
+                                        <Tag
+                                            key={key}
+                                            closable
+                                            onClose={()=>{
+                                                this.deleteTag(item)
+                                            }}
+                                        >{item}</Tag>
+                                    )
+                                })
+                            }
+                        </div>
+                        <div>
+                            注：每个资源最多绑定20个标签，单次操作绑定/解绑标签的数量分别不能超过20个
+                        </div>
+                        <div>
+                        <Tabs defaultActiveKey="1">
+                            <TabPane
+                                tab="已有标签"
+                                key="1"
+                            >
+                            {
+                                tags_list.length > 0 && tags_list.map((item, key) => {
+                                    return (
+                                        <Tag
+                                            key={key}
+                                            onClick={()=>{
+                                                this.addTag(item)
+                                            }}
+                                        >{item}</Tag>
+                                    )
+                                })
+                            }
+                            </TabPane>
+                            <TabPane
+                                tab="新建标签"
+                                key="2"
+                            >
+                                <div className="add_tags">
+                                    新建标签：
+                                    <Input
+                                        value={this.state.tag}
+                                        onChange={(e)=>{
+                                            this.setState({tag: e.target.value})
+                                        }}
+                                    />
+                                    <Button
+                                        onClick={this.addCustomTag}
+                                    >添加</Button>
+                                </div>
+                            </TabPane>
+                        </Tabs>
+                        </div>
+                    </div>
+                </Modal>
             </div>
         )
     }

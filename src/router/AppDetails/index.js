@@ -411,40 +411,42 @@ class AppDetails extends Component {
                             {/* {console.log(app_info.tags.split(','))} */}
                             <div className="appdetail_tags">标签：
                                 {
-                                        <Collapse
-                                            className="appdetail_tags_coll"
-                                            bordered={false}
-                                            expandIconPosition="right"
-                                            disabled={app_info && app_info.tags.length > 0 && app_info.tags.split(',').length > 2}
-                                        >
-                                            <Panel
-                                                style={{borderBottom: 'none'}}
-                                                header={
-                                                    app_info.tags && app_info.tags.length > 0
-                                                    ? app_info.tags.split(',').map((item, key)=>{
-                                                        if (key < 2) {
-                                                            return (
-                                                                <Tag key={key}>{item}</Tag>
-                                                            )
-                                                        }
-                                                    })
-                                                    : ''
+                                    app_info.tags && app_info.tags.length > 0
+                                    ? <Collapse
+                                        className="appdetail_tags_coll"
+                                        bordered={false}
+                                        expandIconPosition="right"
+                                        disabled={app_info && app_info.tags.length > 0 && app_info.tags.split(',').length > 2}
+                                      >
+                                    <Panel
+                                        style={{borderBottom: 'none'}}
+                                        header={
+                                            app_info.tags && app_info.tags.length > 0
+                                            ? app_info.tags.split(',').map((item, key)=>{
+                                                if (key < 2) {
+                                                    return (
+                                                        <Tag key={key}>{item}</Tag>
+                                                    )
                                                 }
-                                                key="1"
-                                            >
-                                                {
-                                                    app_info.tags && app_info.tags.split(',').length > 0 && app_info.tags.split(',').map((item, key)=>{
-                                                            return (
-                                                                <div
-                                                                    key={key}
-                                                                >
-                                                                    <Tag >{item}</Tag>
-                                                                </div>
-                                                            )
-                                                    })
-                                                }
-                                            </Panel>
-                                        </Collapse>
+                                            })
+                                            : ''
+                                        }
+                                        key="1"
+                                    >
+                                        {
+                                            app_info.tags && app_info.tags.split(',').length > 0 && app_info.tags.split(',').map((item, key)=>{
+                                                    return (
+                                                        <div
+                                                            key={key}
+                                                        >
+                                                            <Tag >{item}</Tag>
+                                                        </div>
+                                                    )
+                                            })
+                                        }
+                                    </Panel>
+                                </Collapse>
+                                : ''
                                 }
                                 {
                                     app_info.developer === _getCookie('user_id') &&
