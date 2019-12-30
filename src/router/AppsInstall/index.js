@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';     //
-import {Input, Icon, Button, message, notification, Rate, Modal } from 'antd';  //
+import {Input, Icon, Button, message, notification, Rate, Modal, Tag } from 'antd';  //
 import { inject, observer} from 'mobx-react';
 import GatewayStatus from '../../common/GatewayStatus';
 import http from '../../utils/Server';
@@ -424,6 +424,7 @@ class MyGatesAppsInstall extends Component {
                                             <div
                                                 className="item"
                                             >
+                                                <span className="price">免费</span>
                                                 <Link
                                                     to={
                                                         this.setUrl(val.name)
@@ -442,29 +443,44 @@ class MyGatesAppsInstall extends Component {
                                                 </Link>
                                                 <div className="apptitle">
                                                     <p>{val.app_name}</p>
-                                                    <div>
-                                                        <Rate
-                                                            disabled
-                                                            defaultValue={val.star}
-                                                            size="small"
-                                                        />
-                                                        <span onClick={()=>{
-                                                            this.setState({
-                                                                install_step: 'install',
-                                                                app_info: val
-                                                            })
-                                                        }}
-                                                        >
-                                                            <Link
-                                                                to={
-                                                                    this.setUrl(val.name, 'install')
-                                                                }
+                                                    <span>{val.developer}</span>
+                                                    <div className="app_footer">
+                                                        <div className="app_footer_tags">
+                                                            {
+                                                                val.tags && val.tags.split(',').length > 0 && val.tags.split(',').map((item, key)=>{
+                                                                    return (
+                                                                        <Tag
+                                                                            color="gold"
+                                                                            key={key}
+                                                                        >{item}</Tag>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </div>
+                                                        <div className="app_footer_rate">
+                                                            <Rate
+                                                                disabled
+                                                                defaultValue={val.star}
+                                                                size="small"
+                                                            />
+                                                            <span onClick={()=>{
+                                                                this.setState({
+                                                                    install_step: 'install',
+                                                                    app_info: val
+                                                                })
+                                                            }}
                                                             >
-                                                                <Icon
-                                                                    type="cloud-download"
-                                                                />
-                                                            </Link>
-                                                        </span>
+                                                                <Link
+                                                                    to={
+                                                                        this.setUrl(val.name, 'install')
+                                                                    }
+                                                                >
+                                                                    <Icon
+                                                                        type="cloud-download"
+                                                                    />
+                                                                </Link>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

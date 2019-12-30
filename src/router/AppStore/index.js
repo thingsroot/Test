@@ -283,7 +283,8 @@ class AppStore extends Component {
                                             <Rate
                                                 value={val.star}
                                                 disabled
-                                                style={{fontSize: '10px', letteSspacing: '2px'}}
+                                                size="small"
+                                                style={{fontSize: '14px', letteSspacing: '2px'}}
                                             />
                                         </div>
                                         <span>免费</span>
