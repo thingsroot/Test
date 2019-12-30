@@ -15,10 +15,24 @@ class Companies extends PureComponent {
             index: 1
         }
     }
+    componentDidMount () {
+        this.ModifyTheRule()
+    }
     setIndex = (i) => {
         this.setState({
             index: i
         })
+    }
+    ModifyTheRule = () => {
+        let { pathname } = this.props.location;
+        pathname = pathname.toLowerCase()
+        if (pathname.indexOf('shared') !== -1) {
+            this.setIndex(2)
+        } else if (pathname.indexOf('members') !== -1) {
+            this.setIndex(1)
+        } else {
+            this.setIndex(4)
+        }
     }
     render () {
         const { path } = this.props.match;

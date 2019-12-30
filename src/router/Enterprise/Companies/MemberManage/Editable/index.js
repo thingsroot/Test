@@ -462,7 +462,7 @@ class EditableTable extends React.Component {
                     // }}
                     disabled={this.props.activeKey === ''}
                 >
-                    添加组成员
+                    新建账户
                 </Button>
                 <Button
                     onClick={()=>{
@@ -475,7 +475,7 @@ class EditableTable extends React.Component {
                     // }}
                     disabled={this.props.activeKey === ''}
                 >
-                    邀请成员加入
+                    邀请平台账户加入
                 </Button>
                 <EditableContext.Provider value={this.props.form}>
                     <Table

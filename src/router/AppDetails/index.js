@@ -292,11 +292,14 @@ class AppDetails extends Component {
             name: this.props.match.params.name,
             tags: select_the_label.join(',')
         }
-        // console.log(data)
-        http.post('/api/applications_update', data).then(res=>{
+        http.post('/api/applications_tags_update', data).then(res=>{
             console.log(res)
-            if (res.ok) {
-                message.success('更改标签成功，请等待后台审核！')
+            if (res.ok && res.data === 'done') {
+                message.success('更改标签成功！')
+                this.setVisibleTags()
+                this.loadApp(this.state.name)
+            } else {
+                message.error('更改标签失败，错误信息：' + res.error)
                 this.setVisibleTags()
             }
         })
