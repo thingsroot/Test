@@ -75,6 +75,7 @@ class Companies extends PureComponent {
                     ? <Button
                         type="danger"
                         onClick={this.showConfirm}
+                        style={{margin: '15px'}}
                       >
                         退出公司
                       </Button>

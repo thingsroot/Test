@@ -112,24 +112,26 @@ class Edituser extends React.Component {
                     ) : (
                         record.group_name !== 'root'
                         ? <Fragment>
-                        <a
-                            disabled={editingKey !== ''}
-                            onClick={() => this.edit(record.name)}
-                            style={{marginRight: '20px'}}
-                        >
-                            编辑
-                        </a>
-                        <Popconfirm
-                            title="确定要删除此成员组吗?"
-                            okText="确定"
-                            cancelText="取消"
-                            onConfirm={() => this.delete(record)}
-                        >
+                        {/* <div style={{minWidth: '95px'}}> */}
                             <a
-                                type="danger"
                                 disabled={editingKey !== ''}
-                            >删除</a>
-                        </Popconfirm>
+                                onClick={() => this.edit(record.name)}
+                                style={{marginRight: '20px'}}
+                            >
+                                编辑
+                            </a>
+                            <Popconfirm
+                                title="确定要删除此成员组吗?"
+                                okText="确定"
+                                cancelText="取消"
+                                onConfirm={() => this.delete(record)}
+                            >
+                                <a
+                                    type="danger"
+                                    disabled={editingKey !== ''}
+                                >删除</a>
+                            </Popconfirm>
+                        {/* </div> */}
                     </Fragment>
                     : ''
                     );

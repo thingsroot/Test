@@ -98,26 +98,28 @@ class Edituser extends React.Component {
             </span>
                     ) : (
                         <Fragment>
-                            <a
-                                disabled={editingKey !== ''}
-                                onClick={() => {
-                                    this.edit(record)
-                                }}
-                                style={{marginRight: '20px'}}
-                            >
-                                编辑
-                            </a>
-                            <Popconfirm
-                                title="确定要删除此共享组吗?"
-                                onConfirm={() => this.delete(record)}
-                                okText="确定"
-                                cancelText="取消"
-                            >
+                            <div style={{minWidth: '95px'}}>
                                 <a
-                                    type="danger"
                                     disabled={editingKey !== ''}
-                                >删除</a>
-                            </Popconfirm>
+                                    onClick={() => {
+                                        this.edit(record)
+                                    }}
+                                    style={{marginRight: '20px'}}
+                                >
+                                    编辑
+                                </a>
+                                <Popconfirm
+                                    title="确定要删除此共享组吗?"
+                                    onConfirm={() => this.delete(record)}
+                                    okText="确定"
+                                    cancelText="取消"
+                                >
+                                    <a
+                                        type="danger"
+                                        disabled={editingKey !== ''}
+                                    >删除</a>
+                                </Popconfirm>
+                            </div>
                         </Fragment>
                     );
                 }

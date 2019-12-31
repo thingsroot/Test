@@ -95,7 +95,7 @@ class EditableTable extends React.Component {
             {
                 title: '操作',
                 dataIndex: 'operation',
-                width: 150,
+                width: '150px',
                 render: (text, record) => {
                     const { editingKey } = this.state;
                     const editable = this.isEditing(record);
@@ -120,7 +120,7 @@ class EditableTable extends React.Component {
               </Popconfirm>
             </span>
                     ) : (
-                        <Fragment>
+                        <Fragment style={{width: '150px'}}>
                             <Button
                                 type="primary"
                                 disabled={editingKey !== ''}

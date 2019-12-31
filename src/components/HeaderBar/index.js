@@ -166,7 +166,7 @@ class HeaderBar extends PureComponent {
                     style={{marginRight: '15px'}}
                 ><Icon type="appstore"/>&nbsp;&nbsp;应用市场</Link>
                 <Link
-                    to="/enterprise"
+                    to="/enterprise/members"
                 >
                     <span
                         className="ant-dropdown-link"

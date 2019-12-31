@@ -30,8 +30,10 @@ class Companies extends PureComponent {
             this.setIndex(2)
         } else if (pathname.indexOf('members') !== -1) {
             this.setIndex(1)
-        } else {
+        } else if (pathname.indexOf('companiesinfo') !== -1) {
             this.setIndex(4)
+        } else {
+            return false;
         }
     }
     render () {
@@ -103,7 +105,7 @@ class Companies extends PureComponent {
                             title=""
                         />
                         <Redirect from={path}
-                            to={`${path}/shared`}
+                            to={`${path}/members`}
                         />
                     </Switch>
                 </div>
