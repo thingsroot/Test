@@ -104,6 +104,7 @@ class AppItems extends PureComponent {
                 }).then(res=>{
                     if (res.ok){
                         message.success('应用克隆成功！')
+                        this.CheckForCloning()
                     } else {
                         message.error(res.error)
                     }
