@@ -565,6 +565,7 @@ class AppEdit extends Component {
                                     新建标签：
                                     <Input
                                         value={this.state.tag}
+                                        placeholder="请输入自定义标签"
                                         onChange={(e)=>{
                                             this.setState({tag: e.target.value})
                                         }}
