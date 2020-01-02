@@ -238,7 +238,7 @@ class MyTemplateDetails extends PureComponent {
                                 this.setState({visibleEdit: true})
                             }}
                         >
-                            编辑
+                            属性修改
                         </Button>
                         <Button
                             style={this.state.conf_info.developer === this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
