@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { Icon, Tabs, message, Button, Modal, Table, Tag, Radio, Input, Collapse } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
@@ -11,9 +11,8 @@ import { _getCookie } from '../../utils/Session';
 const { Panel } = Collapse;
 const TabPane = Tabs.TabPane;
 const block = {
-    display: 'inline-block',
-    margin: '0 10px',
-    textDecoration: 'none'
+    height: '35px',
+    margin: '0 5px'
 };
 const none = {
     display: 'none'
@@ -405,7 +404,15 @@ class AppDetails extends Component {
                     <div className="appInfo">
                         <div className="appName">{app_info.app_name}</div>
                         {
-                            app_info.fork_from && <p>fork_form: {app_info.fork_from}</p>
+                            app_info.fork_from && <p>fork_form: {app_info.fork_from}
+                            <Button
+                                type="link"
+                                onClick={()=>{
+                                    window.open('/appdetails/' + app_info.fork_from)
+                                }}
+                            >
+                            查看
+                            </Button></p>
                         }
                         <div className="info">
                             <span>发布者：{app_info.developer}</span>
@@ -463,28 +470,31 @@ class AppDetails extends Component {
                         </div>
                     </div>
                     <div className="btnGroup">
-
-                        <Link
-                            className="button"
+                        <Button
                             style={app_info.developer === user ? block : none}
-                            to={`/appedit/${app_info.name}`}
+                            // href={`/appedit/${app_info.name}`}
+                            onClick={()=>{
+                                this.props.history.push(`/appedit/${app_info.name}`)
+                            }}
                         >
                             <Icon type="setting" />
                             设置
-                        </Link>
-                        <Link
-                            className="button"
+                        </Button>
+                        <Button
                             style={app_info.developer === user ? block : none}
-                            to={`/appeditorcode/${app_info.name}/${app_info.app_name}`}
+                            // href={`/appeditorcode/${app_info.name}/${app_info.app_name}`}
+                            onClick={()=>{
+                                this.props.history.push(`/appeditorcode/${app_info.name}/${app_info.app_name}`)
+                            }}
                         >
                             <Icon type="edit" />
                             代码编辑
-                        </Link>
+                        </Button>
                         <Button
                             onClick={()=>{
                                 this.getGatewayList()
                             }}
-                            style={{height: '35px'}}
+                            style={{height: '35px', marginRight: '10px', marginLeft: '5px'}}
                         >
                             <Icon type="download" />
                             安装此应用
@@ -493,8 +503,8 @@ class AppDetails extends Component {
                             app_info.developer !== _getCookie('user_id') && Number(_getCookie('is_developer')) === 1
                             ? <Button
                                 style={{
-                                    height: '34px',
-                                    marginLeft: '15px'
+                                    height: '35px',
+                                    marginRight: '10px'
                                 }}
                                 disabled={this.state.is_fork}
                                 onClick={()=>{
@@ -513,7 +523,7 @@ class AppDetails extends Component {
                         <Button
                             loading={this.state.favorites_loading}
                             onClick={this.setFavorites}
-                            style={{marginLeft: '30px', marginTop: '10px', width: '100px', height: '35px'}}
+                            style={{ marginBottom: '10px', marginRight: '5px', width: '100px', height: '35px'}}
                             type={!this.state.favorites ? 'primary' : 'danger'}
                         >{this.state.favorites ? '取消收藏' : '收藏'}</Button>
                         {
@@ -522,7 +532,7 @@ class AppDetails extends Component {
                                 type="danger"
                                 onClick={this.showModal}
                                 size="default"
-                                style={{height: 35, marginLeft: 15}}
+                                style={{height: 35, marginLeft: 5, marginRight: '5px'}}
                               >
                                 <Icon type="info-circle" />
                                 <span>删除</span>

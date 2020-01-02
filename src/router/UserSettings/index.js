@@ -73,7 +73,7 @@ class UserSettings extends PureComponent {
         this.formRef = formRef;
     };
     render () {
-        const { info, company, isAdmin } = this.state;
+        const { info, company } = this.state;
         return (
             <div className="userSettings">
                 <div>
@@ -100,7 +100,7 @@ class UserSettings extends PureComponent {
                 <div>
                     <p><span>|</span>公司信息</p>
                     <p><span>所属公司：</span><span>{company}</span></p>
-                    <p><span>身份角色：</span><span>{isAdmin ? '管理员' : '普通用户'}</span></p>
+                    <p><span>身份角色：</span><span>{info.is_admin === 1 ? '管理员' : '普通用户'}</span></p>
                 </div>
             </div>
         );

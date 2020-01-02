@@ -22,7 +22,7 @@ class Siders extends PureComponent {
         super(props)
         this.state = {
             collapsed: this.props.collapsed,
-            key: '1'
+            key: '99'
         }
     }
     UNSAFE_componentWillMount () {
@@ -87,20 +87,23 @@ class Siders extends PureComponent {
                     !this.props.collapsed
                         ? <div className="logo"
                             style={{width: '200px',
-                                transition: 'background 0.3s, width 0.2s'}}
+                                transition: 'background 0.3s, width 0.2s'
+                            }}
                           >
                               <b>{OEM.Title}</b>
                           </div>
                         : <div className="logo"
                             style={{width: '80px',
-                                transition: 'background 0.3s, width 0.2s'}}
+                                transition: 'background 0.3s, width 0.2s'
+                            }}
                           >
                               <b>{OEM.MiniTitle}</b>
                           </div>
                 }
                 <Menu theme="dark"
                     mode="inline"
-                    defaultSelectedKeys={[this.state.key]}
+                    // selectedKeys={this.state.key}
+                    defaultOpenKeys={[this.state.key]}
                 >
                     <Menu.Item key="1">
                     <Link to="/dashboard">

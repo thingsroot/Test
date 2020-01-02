@@ -97,7 +97,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.location.href = '/account'
+                            this.props.history.push('/account')
                         }
                     }
                 >
@@ -111,7 +111,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.location.href = '/virtualgateways'
+                            this.props.history.push('/virtualgateways')
                         }
                     }
                 >
@@ -126,7 +126,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.location.href = '/accesskeys'
+                            this.props.history.push('/accesskeys')
                         }
                     }
                 >
@@ -166,7 +166,7 @@ class HeaderBar extends PureComponent {
                     style={{marginRight: '15px'}}
                 ><Icon type="appstore"/>&nbsp;&nbsp;应用市场</Link>
                 <Link
-                    to="/enterprise/members"
+                    to="/enterprise/shared"
                 >
                     <span
                         className="ant-dropdown-link"

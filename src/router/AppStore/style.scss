@@ -6,10 +6,11 @@
     .all_app_content{
         display: flex;
         flex-wrap: wrap;
+        width: 1214px;
         position: relative;
         .all_app_filter{
             position: absolute;
-            right: 190px;
+            right: 23px;
             top: -30px;
         }
     }
@@ -37,13 +38,13 @@
         padding: 10px 0;
     }
     .search{
-        width:80%;
+        width:100%;
         // height: 60px;
         // border: 1px solid #ccc;
         border-radius: 5px;
         margin-bottom: 15px;
-        margin: 10px auto;
-        padding-left: 140px;
+        margin-top: 10px;
+        padding-left: 20%;
     }
     .all_app_title{
         height: 30px;

@@ -91,7 +91,7 @@ class ContentMain extends Component {
                 <PrivateRoute
                     path="/appstore"
                     component={AppStore}
-                    title={'应用商店'}
+                    title={'应用市场'}
                 />
                 <PrivateRoute
                     path="/appitems/:name"
