@@ -49,7 +49,7 @@ class Companies extends PureComponent {
         const { data } = this.state;
         return (
             <div className="companies_info">
-                <p>您的账户已加入如下组织:</p>
+                <p>您已加入如下组织:</p>
                 <div>
                     <span>公司简称:</span>
                     <span>{data !== undefined && data.comp_name}</span>
