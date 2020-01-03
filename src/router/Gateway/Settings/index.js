@@ -329,11 +329,11 @@ class GatewaySettings extends Component {
                                 style={{ width: '100%' }}
                                 loading={loading}
                             >
-                            <p><b>序列号:</b>{gatewayInfo.sn}</p>
-                            <p><b>型号:</b>{gatewayInfo.model}</p>
-                            <p><b>名称:</b>{gatewayInfo.dev_name}</p>
-                            <p><b>描述:</b>{gatewayInfo.description}</p>
-                            <p><b>位置:</b>{gatewayInfo.address} </p>
+                            <p className="gateway_info"><b>序列号:</b><span>{gatewayInfo.sn}</span></p>
+                            <p className="gateway_info"><b>型号:</b><span>{gatewayInfo.model}</span></p>
+                            <p className="gateway_info"><b>名称:</b><span>{gatewayInfo.dev_name}</span></p>
+                            <p className="gateway_info"><b>描述:</b><span>{gatewayInfo.description}</span></p>
+                            <p className="gateway_info"><b>位置:</b><span>{gatewayInfo.address}</span> </p>
                             </Card>
                             <Card title={
                                 <div>
@@ -344,11 +344,11 @@ class GatewaySettings extends Component {
                                 style={{ width: '100%' }}
                                 loading={loading}
                             >
-                            <p><b>CPU型号:</b>{gatewayInfo.cpu}</p>
-                            <p><b>内存容量:</b>{gatewayInfo.ram}</p>
-                            <p><b>存储容量:</b>{gatewayInfo.rom}</p>
-                            <p><b>操作系统:</b>{gatewayInfo.data.platform}</p>
-                            <div className="setting_info"><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}
+                            <p className="gateway_info"><b>CPU型号:</b><span>{gatewayInfo.cpu}</span></p>
+                            <p className="gateway_info"><b>内存容量:</b><span>{gatewayInfo.ram}</span></p>
+                            <p className="gateway_info"><b>存储容量:</b><span>{gatewayInfo.rom}</span></p>
+                            <p className="gateway_info"><b>操作系统:</b><span>{gatewayInfo.data.platform}</span></p>
+                            <div className="setting_info"><b>业务软件:</b><span>{gatewayInfo.data && gatewayInfo.data.version}</span>
                             {
                                 Number(gatewayInfo.data.version) !== 0
                                 ? freeioe_upgradable

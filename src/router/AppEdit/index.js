@@ -35,7 +35,8 @@ class AppEdit extends Component {
         pre_configuration: '',
         select_the_label: [],
         visible_tags: false,
-        tags_list: []
+        tags_list: [],
+        categories_list: []
     };
     componentDidMount (){
         const app = this.props.match.params.name && this.props.match.params.name.indexOf('*') !== -1 ? this.props.match.params.name.replace(/\*/g, '/') : this.props.match.params.name
@@ -75,6 +76,14 @@ class AppEdit extends Component {
     }
 
     getDetails = ()=>{
+        http.get('/api/applications_categories_list').then(res=>{
+            console.log(res)
+            if (res.ok) {
+                this.setState({
+                    categories_list: res.data
+                })
+            }
+        })
         http.get('/api/applications_details?name=' + this.state.app).then(res=>{
             if (!res.ok) {
                 message.error('获取应用信息失败:' + res.error)
@@ -116,7 +125,8 @@ class AppEdit extends Component {
                     description: description,
                     conf_template: conf_template_str,
                     pre_configuration: pre_configuration_str,
-                    tags: select_the_label.join(',')
+                    tags: select_the_label.join(','),
+                    category: values.category
                 };
                 if (conf_template && conf_template !== '') {
                     params['has_conf_template'] = 1
@@ -311,7 +321,7 @@ class AppEdit extends Component {
     }
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { app_info, description, conf_template, pre_configuration, select_the_label, visible_tags, tags_list } = this.state;
+        const { app_info, description, conf_template, pre_configuration, select_the_label, visible_tags, tags_list, categories_list } = this.state;
         return (
             <div className="appedit_wrap">
                 <Icon
@@ -349,7 +359,7 @@ class AppEdit extends Component {
                             </div>
                         </Col>
                         <Col span={21}>
-                            <Col span={7}>
+                            <Col span={9}>
                                 <Form.Item label="应用名称">
                                     {getFieldDecorator('app_name', {
                                         rules: [{ required: true, message: '不能为空！' }],
@@ -361,7 +371,7 @@ class AppEdit extends Component {
                                     )}
                                 </Form.Item>
                             </Col>
-                            <Col span={7}>
+                            <Col span={9}>
                                 <Form.Item label="应用ID">
                                     {getFieldDecorator('code_name', {
                                         rules: [{ required: true, message: '不能为空！' }, {
@@ -377,7 +387,30 @@ class AppEdit extends Component {
                                     )}
                                 </Form.Item>
                             </Col>
-                            <Col span={7}>
+                            <Col span={9}>
+                                <Form.Item label="应用分类">
+                                    {getFieldDecorator('category', {
+                                        rules: [{ required: true, message: '不能为空！' }],
+                                        initialValue: app_info.category !== null ? app_info.license_type : '默认分类'
+                                    })(
+                                        <Select
+                                            style={{ width: 240 }}
+                                        >
+                                            {
+                                                categories_list && categories_list.length > 0 && categories_list.map((item, key)=>{
+                                                    return (
+                                                        <Option
+                                                            value={item.name}
+                                                            key={key}
+                                                        >{item.name}</Option>
+                                                    )
+                                                })
+                                            }
+                                        </Select>
+                                    )}
+                                </Form.Item>
+                            </Col>
+                            <Col span={9}>
                                 <Form.Item label="授权类型">
                                     {getFieldDecorator('license_type', {
                                         rules: [{ required: true, message: '不能为空！' }],

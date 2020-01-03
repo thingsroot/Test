@@ -25,6 +25,16 @@
         .border{
             border: 1px solid #eee;
             border-radius: 5px;
+            .gateway_info{
+                display: flex;
+                b{
+                    display: block;
+                }
+                span{
+                    display: block;
+                    flex: 1;
+                }
+            }
         }
         .rightecharts{
             flex: 1;
