@@ -13,12 +13,15 @@
   .appdetail_tags{
     position: relative;
     height: 100px;
+    display: flex;
+    flex-wrap: wrap;
     .ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header{
       padding: 0 35px 0 0;
     }
     .app_details_tags_set{
-      right: -200px!important;
-      top:1px!important;
+      position: absolute;
+      left: -15px;
+      top:30px;
     }
     .appdetail_tags_coll{
       position: absolute;

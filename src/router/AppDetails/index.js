@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Icon, Tabs, message, Button, Modal, Table, Tag, Radio, Input, Collapse } from 'antd';
+import { Icon, Tabs, message, Button, Modal, Table, Tag, Radio, Input } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import VersionList from './VersionList';
 import TemplateList from './TemplateList';
 import AppDescription from './Description';
+import TagsEdit from '../../common/TagsEdit';
 import {inject, observer} from 'mobx-react';
 import { _getCookie } from '../../utils/Session';
-const { Panel } = Collapse;
+// const { Panel } = Collapse;
 const TabPane = Tabs.TabPane;
 const block = {
     height: '35px',
@@ -419,8 +420,10 @@ class AppDetails extends Component {
                             <span>创建时间：{time}</span><br/>
                             <span>应用分类：{app_info.category === null ? '----' : app_info.category}</span><br/>
                             {/* {console.log(app_info.tags.split(','))} */}
-                            <div className="appdetail_tags">标签：
-                                {
+                            <div className="appdetail_tags">
+                                    <span>标签：</span>
+                                    <TagsEdit tags_list={app_info.tags}/>
+                                {/* {
                                     app_info.tags && app_info.tags.length > 0
                                     ? <Collapse
                                         className="appdetail_tags_coll"
@@ -457,7 +460,7 @@ class AppDetails extends Component {
                                     </Panel>
                                 </Collapse>
                                 : ''
-                                }
+                                } */}
                                 {
                                     app_info.developer === _getCookie('user_id') &&
                                     <Button
