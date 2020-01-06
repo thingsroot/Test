@@ -4,28 +4,24 @@ import './style.scss';
 class TagsEdit extends PureComponent {
     constructor (props) {
         super(props)
-
         this.state = {
-            tags_list: this.props.tags_list,
-            visible: true
+            tags_list: [],
+            visible: false
         }
     }
-
     render () {
         const {tags_list} = this.props;
-        console.log(tags_list)
         return (
             <div
                 className="tags_edit_wrap"
             >
                 <div className="tags_title">
                     {
-                        tags_list && tags_list.length > 0 && tags_list.split(',').length > 3
+                        tags_list && tags_list.length > 0 && tags_list.split(',').length > 4
                         ? <div
                             className="tags_icon"
                             style={{cursor: 'pointer'}}
                             onClick={()=>{
-
                                 this.setState({
                                     visible: !this.state.visible
                                 })

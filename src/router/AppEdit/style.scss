@@ -5,10 +5,11 @@
   .ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header{
     padding: 0 35px 0 0;
   }
-  .app_details_tags_set{
-    right: 57px;
-    top:30px;
-  }
+  // .app_details_tags_set,.ant-btn-link{
+  //   right: 57px;
+  //   top:30px;
+  //   padding: 0px !important;
+  // }
   .appdetail_tags_coll{
     position: absolute;
     left:70px;
@@ -34,6 +35,19 @@
     }
   }
 }
+.app_details_tags_wrap{
+  position: relative;
+  display: flex;
+  .app_details_tags_set{
+    position: absolute;
+    left:0;
+    top:35px;
+    cursor: pointer;
+    color: #40a9ff;
+    display: block;
+  }
+}
+
 .ant-form-item{
   display: flex!important;
 }

@@ -156,7 +156,11 @@ class Editable extends Component {
                                 title="确定要删除此用户吗?"
                                 okText="确定"
                                 cancelText="取消"
-                                onConfirm={() => this.props.store.groups.handleDeleteUser(record.user, index, this.props.activeKey)}
+                                onConfirm={() => {
+                                    this.props.store.groups.handleDeleteUser(record.user, index, this.props.activeKey).then(()=>{
+                                        this.props.getdata()
+                                    })
+                                }}
                             >
                                 <Button type="danger" >删除</Button>
                             </Popconfirm>

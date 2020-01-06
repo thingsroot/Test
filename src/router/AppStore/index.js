@@ -30,6 +30,7 @@ class AppStore extends Component {
             data: [],
             tag_list: [],
             add_tag_list: [],
+            visivle: false,
             color: ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple', '#f50', '#2db7f5', '#87d068', '#108ee9']
         }
     }
@@ -164,20 +165,61 @@ class AppStore extends Component {
                 />
             </div>
             <div className="search">
-                <span>标签列表: &nbsp;&nbsp;</span>
                 {
-                    tag_list && tag_list.length > 0 && tag_list.map((item, key)=>{
-                        return (
-                            <Tag
-                                key={key}
-                                color={item.color}
-                                onClick={()=>{
-                                    this.addTag(item)
-                                }}
-                            >{item.tag + ' (' + item.number + ')'}</Tag>
-                        )
-                    })
+                    tag_list && tag_list.length >= 8
+                    ? <div
+                        className="tags_icon"
+                        style={{cursor: 'pointer'}}
+                        onClick={()=>{
+                            this.setState({
+                                visible: !this.state.visible
+                            })
+                        }}
+                    >
+                            查看更多&nbsp;&nbsp;
+                            <Icon type={this.state.visible ? 'down' : 'right'}/>
+                    </div>
+                    : ''
                 }
+                <div className="appstore_tags_list">
+                    <div className="appstore_tags_list_min">
+                        <span>标签:</span>
+                        <div>
+                            {
+                                tag_list && tag_list.length > 0 && tag_list.map((item, key)=>{
+                                    if (key < 8) {
+                                        return (
+                                            <Tag
+                                                key={key}
+                                                color={item.color}
+                                                onClick={()=>{
+                                                    this.addTag(item)
+                                                }}
+                                            >{item.tag + ' (' + item.number + ')'}</Tag>
+                                        )
+                                    }
+                                })
+                            }
+                        </div>
+                    </div>
+                    <div className={!this.state.visible ? 'appstore_tags_list_max' : ''}>
+                    {
+                        tag_list && tag_list.length > 0 && tag_list.map((item, key)=>{
+                            if (key >= 10) {
+                                return (
+                                    <Tag
+                                        key={key}
+                                        color={item.color}
+                                        onClick={()=>{
+                                            this.addTag(item)
+                                        }}
+                                    >{item.tag + ' (' + item.number + ')'}</Tag>
+                                )
+                            }
+                        })
+                    }
+                    </div>
+                </div>
             </div>
             {
                 add_tag_list && add_tag_list.length > 0
@@ -257,7 +299,7 @@ class AppStore extends Component {
                                     />
                                     <div className="app_title_and_developer">
                                         <p>{val.app_name}</p>
-                                        <span>{val.developer}</span>
+                                        <span>{val.user_info.dev_name}</span>
                                     </div>
                                     <div
                                         className="app_item_desc"

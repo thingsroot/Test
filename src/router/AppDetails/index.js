@@ -106,7 +106,6 @@ class AppDetails extends Component {
     }
     CheckForCloning = () => {
         http.get('/api/applications_forks_list?name=' + this.props.match.params.name).then(res=>{
-            console.log(res)
             if (res.ok) {
                 if (res.data.length > 0) {
                     res.data.map(item=>{
@@ -143,7 +142,6 @@ class AppDetails extends Component {
         })
     }
     setFavorites = () => {
-        console.log(this.state)
         this.setState({
             favorites_loading: true
         })
@@ -293,7 +291,6 @@ class AppDetails extends Component {
             tags: select_the_label.join(',')
         }
         http.post('/api/applications_tags_update', data).then(res=>{
-            console.log(res)
             if (res.ok && res.data === 'done') {
                 message.success('更改标签成功！')
                 this.setVisibleTags()
@@ -419,48 +416,9 @@ class AppDetails extends Component {
                             <span>发布者：{app_info.developer}</span>
                             <span>创建时间：{time}</span><br/>
                             <span>应用分类：{app_info.category === null ? '----' : app_info.category}</span><br/>
-                            {/* {console.log(app_info.tags.split(','))} */}
                             <div className="appdetail_tags">
                                     <span>标签：</span>
                                     <TagsEdit tags_list={app_info.tags}/>
-                                {/* {
-                                    app_info.tags && app_info.tags.length > 0
-                                    ? <Collapse
-                                        className="appdetail_tags_coll"
-                                        bordered={false}
-                                        expandIconPosition="right"
-                                        disabled={app_info && app_info.tags.length > 0 && app_info.tags.split(',').length > 2}
-                                      >
-                                    <Panel
-                                        style={{borderBottom: 'none'}}
-                                        header={
-                                            app_info.tags && app_info.tags.length > 0
-                                            ? app_info.tags.split(',').map((item, key)=>{
-                                                if (key < 2) {
-                                                    return (
-                                                        <Tag key={key}>{item}</Tag>
-                                                    )
-                                                }
-                                            })
-                                            : ''
-                                        }
-                                        key="1"
-                                    >
-                                        {
-                                            app_info.tags && app_info.tags.split(',').length > 0 && app_info.tags.split(',').map((item, key)=>{
-                                                    return (
-                                                        <div
-                                                            key={key}
-                                                        >
-                                                            <Tag >{item}</Tag>
-                                                        </div>
-                                                    )
-                                            })
-                                        }
-                                    </Panel>
-                                </Collapse>
-                                : ''
-                                } */}
                                 {
                                     app_info.developer === _getCookie('user_id') &&
                                     <Button
@@ -475,7 +433,6 @@ class AppDetails extends Component {
                     <div className="btnGroup">
                         <Button
                             style={app_info.developer === user ? block : none}
-                            // href={`/appedit/${app_info.name}`}
                             onClick={()=>{
                                 this.props.history.push(`/appedit/${app_info.name}`)
                             }}
@@ -485,7 +442,6 @@ class AppDetails extends Component {
                         </Button>
                         <Button
                             style={app_info.developer === user ? block : none}
-                            // href={`/appeditorcode/${app_info.name}/${app_info.app_name}`}
                             onClick={()=>{
                                 this.props.history.push(`/appeditorcode/${app_info.name}/${app_info.app_name}`)
                             }}

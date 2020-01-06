@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import {Form, Row, Col, Input, Button, Select, Tabs, message, Checkbox, Icon, Collapse, Modal, Tag } from 'antd';
+import {Form, Row, Col, Input, Button, Select, Tabs, message, Checkbox, Icon, Modal, Tag } from 'antd';
 import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
 import reqwest from 'reqwest';
+import TagEdit from '../../common/TagsEdit';
 import './style.scss';
-const { Panel } = Collapse;
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 
@@ -77,7 +77,6 @@ class AppEdit extends Component {
 
     getDetails = ()=>{
         http.get('/api/applications_categories_list').then(res=>{
-            console.log(res)
             if (res.ok) {
                 this.setState({
                     categories_list: res.data
@@ -89,7 +88,6 @@ class AppEdit extends Component {
                 message.error('获取应用信息失败:' + res.error)
                 return
             }
-            console.log(res.data.conf_template)
             this.setState({
                 app_info: res.data,
                 description: res.data.description,
@@ -227,19 +225,18 @@ class AppEdit extends Component {
         }
     };
     saveTags = () => {
-        // const {select_the_label} = this.state;
-        // const data = {
-        //     name: this.props.match.params.name,
-        //     tags: select_the_label.join(',')
-        // }
-        // console.log(data)
-        // http.post('/api/applications_update', data).then(res=>{
-        //     console.log(res)
-        //     if (res.ok) {
-                // message.success('更改标签成功，请等待后台审核！')
+        const {select_the_label} = this.state;
+        const data = {
+            name: this.props.match.params.name,
+            tags: select_the_label.join(',')
+        }
+        http.post('/api/applications_tags_update', data).then(res=>{
+            if (res.ok) {
+                message.success('更改标签成功！')
+                this.getDetails();
                 this.setVisibleTags()
-        //     }
-        // })
+            }
+        })
     }
     filterGateway = (e) => {
         const value = e.target.value.toLowerCase();
@@ -251,17 +248,16 @@ class AppEdit extends Component {
     getTags = () => {
         http.get('/api/store_tags_list').then(res=>{
             if (res.ok) {
-                const tags_list = []
+                const tags_list = this.state.app_info.tags.length > 0 ? this.state.app_info.tags.split(',') : [];
+                const select_the_label = this.state.select_the_label.concat(tags_list)
                 if (res.data.length > 0) {
                     res.data.map(item=>{
                         tags_list.push(item[0])
                     })
                 }
-                // const {tags} = this.state.app_info;
-                // const select_the_label = tags !== '' ? tags.split(',') : []
                 this.setState({
-                    tags_list
-                    // select_the_label
+                    tags_list,
+                    select_the_label
                 })
             }
         })
@@ -391,7 +387,7 @@ class AppEdit extends Component {
                                 <Form.Item label="应用分类">
                                     {getFieldDecorator('category', {
                                         rules: [{ required: true, message: '不能为空！' }],
-                                        initialValue: app_info.category !== null ? app_info.license_type : '默认分类'
+                                        initialValue: app_info.category !== null ? app_info.category : '默认分类'
                                     })(
                                         <Select
                                             style={{ width: 240 }}
@@ -438,51 +434,21 @@ class AppEdit extends Component {
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <div className="appdetail_tags">标签：
-                                {
-                                    select_the_label.length > 0
-                                    ? <Collapse
-                                        className="appdetail_tags_coll"
-                                        bordered={false}
-                                        expandIconPosition="right"
-                                      >
-                                    <Panel
-                                        style={{borderBottom: 'none'}}
-                                        header={
-                                            select_the_label && select_the_label.length > 0
-                                            ? select_the_label.map((item, key)=>{
-                                                if (key < 2) {
-                                                    return (
-                                                        <Tag key={key}>{item}</Tag>
-                                                    )
-                                                }
-                                            })
+                                <div>
+                                    <div className="app_details_tags_wrap">
+                                        <span>标签:</span>&nbsp;&nbsp;
+                                        <TagEdit tags_list={app_info.tags}/>
+                                        
+                                        {
+                                            this.props.location.pathname.toLowerCase().indexOf('appnew') === -1
+                                            ? <span
+                                                type="link"
+                                                className="app_details_tags_set"
+                                                onClick={this.getTags}
+                                            >修改</span>
                                             : ''
                                         }
-                                        key="1"
-                                    >
-                                        <div className="tags_list">
-                                        {
-                                            select_the_label && select_the_label.length > 0 && select_the_label.map((item, key)=>{
-                                                    return (
-                                                        <div
-                                                            key={key}
-                                                        >
-                                                            <Tag >{item}</Tag>
-                                                        </div>
-                                                    )
-                                            })
-                                        }
-                                        </div>
-                                    </Panel>
-                                </Collapse>
-                                : ''
-                                }
-                                <Button
-                                    type="link"
-                                    className="app_details_tags_set"
-                                    onClick={this.getTags}
-                                >修改标签</Button>
+                                    </div>
                                 </div>
                             </Col>
                         </Col>

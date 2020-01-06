@@ -114,6 +114,7 @@ class AppItems extends PureComponent {
     }
     render () {
         const {data, version} = this.state;
+        console.log(data)
         return (
             <div className="app_items">
                 <div className="app_items_up_button">
@@ -132,7 +133,7 @@ class AppItems extends PureComponent {
                     <div className="app_simple_info">
                         <p>{data.app_name}</p>
                         <div className="app_simple_desc">
-                            <span>{data.developer}</span>
+                            <span>{data.user_info && data.user_info.dev_name}</span>
                             <span>{data.installed}次安装</span>
                             <span>
                                 <Rate
@@ -233,7 +234,7 @@ class AppItems extends PureComponent {
                                         <div><span className="info_title">版本:</span><span>{version}</span></div>
                                         <div><span className="info_title">发布时间:</span><span>{data.creation && data.creation.indexOf('.') !== -1 ? data.creation.split('.')[0] : ''}</span></div>
                                         <div><span className="info_title">最近更新时间:</span><span>{data.modified && data.modified.indexOf('.') !== -1 ? data.modified.split('.')[0] : ''}</span></div>
-                                        <div><span className="info_title">作者:</span><span>{data.developer}</span></div>
+                                        <div><span className="info_title">作者:</span><span>{data.user_info && data.user_info.dev_name}</span></div>
                                     </div>
                                 </div>
                             </div>

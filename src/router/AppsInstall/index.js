@@ -354,7 +354,7 @@ class MyGatesAppsInstall extends Component {
                                     <div style={{width: 500}}
                                         className="detail"
                                     >
-                                        <p>发布者： {app_info.developer}</p>
+                                        <p>发布者： {app_info.user_info && app_info.user_info.dev_name}</p>
                                         <p>通讯协议: {app_info.protocol}</p>
                                         <p>适配型号： {app_info.device_serial}</p>
                                     </div>
@@ -443,7 +443,7 @@ class MyGatesAppsInstall extends Component {
                                                 </Link>
                                                 <div className="apptitle">
                                                     <p>{val.app_name}</p>
-                                                    <span>{val.developer}</span>
+                                                    <span>{val.user_info.dev_name}</span>
                                                     <div className="app_footer">
                                                         <div className="app_footer_tags">
                                                             {
