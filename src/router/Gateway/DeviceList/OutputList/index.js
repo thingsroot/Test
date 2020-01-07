@@ -98,7 +98,10 @@ class OutputList extends Component {
     componentDidMount (){
         this.setState({data: this.props.outputs})
 
-        const { regFilterChangeCB } = this.props;
+        const { regFilterChangeCB, filterText } = this.props;
+        if (filterText) {
+            this.applyFilter()
+        }
         if (regFilterChangeCB) {
             regFilterChangeCB(()=>{
                 this.applyFilter()
@@ -115,6 +118,7 @@ class OutputList extends Component {
                 newData.push(item)
             }
         });
+        console.log(newData)
         this.setState({data: newData})
     }
 

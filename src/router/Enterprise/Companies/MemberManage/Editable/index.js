@@ -95,7 +95,7 @@ class EditableTable extends React.Component {
             {
                 title: '操作',
                 dataIndex: 'operation',
-                width: '150px',
+                width: '180px',
                 render: (text, record) => {
                     const { editingKey } = this.state;
                     const editable = this.isEditing(record);
@@ -132,7 +132,7 @@ class EditableTable extends React.Component {
                                         password_visible: true
                                     })
                                 }}
-                                style={{marginRight: '10px'}}
+                                style={{marginRight: '20px'}}
                             >
                                 修改密码
                             </Button>

@@ -50,8 +50,9 @@ class groups {
             device: arr[0].device
         }
         http.post('/api/companies_sharedgroups_remove_device', data).then(res=>{
-            console.log(res)
-            message.success('删除共享设备成功！')
+            if (res.ok) {
+                message.success('删除共享设备成功！')
+            }
         })
     }
 }

@@ -519,7 +519,7 @@ class AppDetails extends Component {
                             okText="确定"
                         >
                             <div>
-                                <div className="Select_the_label">
+                                <div className="Select_the_label the_select_tag">
                                     {
                                         select_the_label.length > 0 && select_the_label.map((item, key) => {
                                             return (
@@ -543,18 +543,20 @@ class AppDetails extends Component {
                                         tab="已有标签"
                                         key="1"
                                     >
-                                    {
-                                        tags_list.length > 0 && tags_list.map((item, key) => {
-                                            return (
-                                                <Tag
-                                                    key={key}
-                                                    onClick={()=>{
-                                                        this.addTag(item)
-                                                    }}
-                                                >{item}</Tag>
-                                            )
-                                        })
-                                    }
+                                    <div className="the_select_tag">
+                                        {
+                                            tags_list.length > 0 && tags_list.map((item, key) => {
+                                                return (
+                                                    <Tag
+                                                        key={key}
+                                                        onClick={()=>{
+                                                            this.addTag(item)
+                                                        }}
+                                                    >{item}</Tag>
+                                                )
+                                            })
+                                        }
+                                    </div>
                                     </TabPane>
                                     <TabPane
                                         tab="新建标签"

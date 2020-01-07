@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {notification } from 'antd';  //
+import { Redirect } from 'react-router';
 import { Switch, withRouter} from 'react-router-dom';
 import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
@@ -158,16 +159,6 @@ class ContentMain extends Component {
                     component={VirtualGateways}
                     title={'虚拟网关'}
                 />
-                {/* <PrivateRoute
-                    path="/sharegroup"
-                    component={ShareGroup}
-                    title={'共享组管理'}
-                />
-                <PrivateRoute
-                    path="/member"
-                    component={MemberManage}
-                    title={'成员管理'}
-                /> */}
                 <PrivateRoute
                     path="/platformevents/:limitTime?"
                     component={PlatformEvents}
@@ -194,11 +185,15 @@ class ContentMain extends Component {
                     component={BrowsingHistory}
                     title={'设备数据 · 历史浏览'}
                 />
-                <PrivateRoute
+                <Redirect
+                    from="/"
+                    to="/dashboard"
+                />
+                {/* <PrivateRoute
                     path="/"
                     component={Dashboard}
                     title={'Dashboard'}
-                />
+                /> */}
             </Switch>
         );
     }

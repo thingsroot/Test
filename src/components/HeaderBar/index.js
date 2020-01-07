@@ -11,7 +11,7 @@ class HeaderBar extends PureComponent {
         page: ''
     }
     componentDidMount () {
-        if (this.props.location.pathname.indexOf('appstore') !== -1) {
+        if (this.props.location.pathname.indexOf('appstore') !== -1 || this.props.location.pathname.indexOf('appitems') !== -1) {
             this.setState({
                 page: 'appstore'
             })
@@ -23,10 +23,14 @@ class HeaderBar extends PureComponent {
         }
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
-        console.log(nextProps, nextProps.location.pathname.indexOf('appstore'))
         if (nextProps.location.pathname.indexOf('appstore') === -1 && nextProps.location.pathname.indexOf('enterprise') === -1) {
             this.setState({
                 page: ''
+            })
+        }
+        if (nextProps.location.pathname.indexOf('appitems') !== -1) {
+            this.setState({
+                page: 'appstore'
             })
         }
         if (!isAuthenticated()) {

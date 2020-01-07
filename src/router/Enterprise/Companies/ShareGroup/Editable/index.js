@@ -102,7 +102,8 @@ class Editable extends Component {
             columnsUser: [
                 {
                     title: '序号',
-                    dataIndex: 'idx'
+                    dataIndex: 'idx',
+                    width: '100px'
                 },
                 {
                     title: '用户ID',
@@ -173,7 +174,8 @@ class Editable extends Component {
             columnsDevice: [
                 {
                     title: '序号',
-                    dataIndex: 'idx'
+                    dataIndex: 'idx',
+                    width: '100px'
                 },
                 {
                     title: '网关序列号',

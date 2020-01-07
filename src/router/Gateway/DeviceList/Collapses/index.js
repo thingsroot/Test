@@ -91,7 +91,7 @@ class Collapses extends Component {
                             <p className="collapseHead">
                                 <span>数据浏览</span>
                                 <Input
-                                    style={{marginLeft: '50%', maxWidth: '300px'}}
+                                    style={{marginLeft: '70%', maxWidth: '300px'}}
                                     type="text"
                                     allowClear
                                     placeholder="搜索名称、描述"
@@ -144,7 +144,7 @@ class Collapses extends Component {
                                 {
                                     this.props.outputs && Object.keys(this.props.outputs).length > 0
                                     ? <Input
-                                        style={{marginLeft: '50%', maxWidth: '300px'}}
+                                        style={{marginLeft: '70%', maxWidth: '300px'}}
                                         type="text"
                                         allowClear
                                         placeholder="搜索名称、描述"
@@ -177,7 +177,7 @@ class Collapses extends Component {
                                 {
                                     this.props.commands && Object.keys(this.props.commands).length > 0
                                     ? <Input
-                                        style={{marginLeft: '50%', maxWidth: '300px'}}
+                                        style={{marginLeft: '70%', maxWidth: '300px'}}
                                         type="text"
                                         allowClear
                                         placeholder="搜索名称、描述"

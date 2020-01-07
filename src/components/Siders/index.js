@@ -68,6 +68,11 @@ class Siders extends PureComponent {
                 key: '0'
             })
         }
+        if (pathname.indexOf('/dashboard') !== -1 && this.state.key !== '1'){
+            this.setState({
+                key: '1'
+            })
+        }
         this.setState({
             collapsed: props.collapsed
         })
