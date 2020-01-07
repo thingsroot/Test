@@ -438,14 +438,13 @@ class AppEdit extends Component {
                                     <div className="app_details_tags_wrap">
                                         <span>标签:</span>&nbsp;&nbsp;
                                         <TagEdit tags_list={app_info.tags}/>
-                                        
                                         {
                                             this.props.location.pathname.toLowerCase().indexOf('appnew') === -1
                                             ? <span
                                                 type="link"
                                                 className="app_details_tags_set"
                                                 onClick={this.getTags}
-                                            >修改</span>
+                                              >修改</span>
                                             : ''
                                         }
                                     </div>

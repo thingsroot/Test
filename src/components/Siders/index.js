@@ -22,7 +22,7 @@ class Siders extends PureComponent {
         super(props)
         this.state = {
             collapsed: this.props.collapsed,
-            key: '99'
+            key: '0'
         }
     }
     UNSAFE_componentWillMount () {
@@ -35,45 +35,39 @@ class Siders extends PureComponent {
             this.setState({
                 key: '2'
             })
-        } else if (pathname.indexOf('/developer') !== -1) {
-            this.setState({
-                key: '3'
-            })
         } else if (pathname.indexOf('/platformevents') !== -1) {
             this.setState({
                 key: '4'
             })
-        } else if (pathname.indexOf('/gatewayevents') !== -1) {
+        } else if (pathname.indexOf('/gatewayevents') !== -1 || pathname.indexOf('/gatewayevent') !== -1) {
             this.setState({
                 key: '5'
             })
-        } else if (pathname.indexOf('/gatewayevent') !== -1) {
-            this.setState({
-                key: '5'
-            })
-        } else if (pathname.indexOf('/appeditorcode') !== -1) {
-            this.setState({
-                key: '3'
-            })
-        } else if (pathname.indexOf('/appnew') !== -1) {
-            this.setState({
-                key: '3'
-            })
-        } else if (pathname.indexOf('/appedit') !== -1) {
-            this.setState({
-                key: '3'
-            })
-        } else if (pathname.indexOf('/appdetails') !== -1) {
+        } else if (pathname.indexOf('/appeditorcode') !== -1 || pathname.indexOf('/appedit') !== -1 || pathname.indexOf('/appnew') !== -1 || pathname.indexOf('/appdetails') !== -1 || pathname.indexOf('/developer') !== -1 || pathname.indexOf('template') !== -1) {
             this.setState({
                 key: '3'
             })
         } else {
             this.setState({
-                key: '1'
+                key: '0'
+            })
+        }
+    }
+    componentDidMount () {
+        const pathname = this.props.location.pathname.toLowerCase();
+        if (pathname.indexOf('/appstore') !== -1 || pathname.indexOf('/enterprise') !== -1){
+            this.setState({
+                key: '0'
             })
         }
     }
     UNSAFE_componentWillReceiveProps (props){
+        const pathname = props.location.pathname.toLowerCase();
+        if (pathname.indexOf('/appstore') !== -1 || pathname.indexOf('/enterprise') !== -1){
+            this.setState({
+                key: '0'
+            })
+        }
         this.setState({
             collapsed: props.collapsed
         })
@@ -102,8 +96,10 @@ class Siders extends PureComponent {
                 }
                 <Menu theme="dark"
                     mode="inline"
-                    // selectedKeys={this.state.key}
-                    defaultOpenKeys={[this.state.key]}
+                    selectedKeys={this.state.key}
+                    onClick={(val)=>{
+                        this.setState({key: val.key})
+                    }}
                 >
                     <Menu.Item key="1">
                     <Link to="/dashboard">

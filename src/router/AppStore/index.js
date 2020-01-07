@@ -175,7 +175,7 @@ class AppStore extends Component {
                                 visible: !this.state.visible
                             })
                         }}
-                    >
+                      >
                             查看更多&nbsp;&nbsp;
                             <Icon type={this.state.visible ? 'down' : 'right'}/>
                     </div>

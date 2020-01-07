@@ -7,12 +7,34 @@ import OEM from '../../assets/OEM';
 
 @withRouter
 class HeaderBar extends PureComponent {
-    UNSAFE_componentWillReceiveProps () {
+    state = {
+        page: ''
+    }
+    componentDidMount () {
+        if (this.props.location.pathname.indexOf('appstore') !== -1) {
+            this.setState({
+                page: 'appstore'
+            })
+        }
+        if (this.props.location.pathname.indexOf('enterprise') !== -1) {
+            this.setState({
+                page: 'enterprise'
+            })
+        }
+    }
+    UNSAFE_componentWillReceiveProps (nextProps) {
+        console.log(nextProps, nextProps.location.pathname.indexOf('appstore'))
+        if (nextProps.location.pathname.indexOf('appstore') === -1 && nextProps.location.pathname.indexOf('enterprise') === -1) {
+            this.setState({
+                page: ''
+            })
+        }
         if (!isAuthenticated()) {
             this.props.history.push('/login')
         }
     }
     render () {
+        const {page} = this.state;
         const menu1 = (
             <Menu>
                 <Menu.Item
@@ -164,9 +186,21 @@ class HeaderBar extends PureComponent {
                 <Link
                     to="/appstore"
                     style={{marginRight: '15px'}}
+                    className={page === 'appstore' ? 'the_selected' : ''}
+                    onClick={()=>{
+                        this.setState({
+                            page: 'appstore'
+                        })
+                    }}
                 ><Icon type="appstore"/>&nbsp;&nbsp;应用市场</Link>
                 <Link
                     to="/enterprise/shared"
+                    className={page === 'enterprise' ? 'the_selected' : ''}
+                    onClick={()=>{
+                        this.setState({
+                            page: 'enterprise'
+                        })
+                    }}
                 >
                     <span
                         className="ant-dropdown-link"
