@@ -15,14 +15,10 @@ const Developer = LoadableComponent(()=>import('../../router/Developer'));
 const AppStore = LoadableComponent(()=>import('../../router/AppStore'));
 const UserSettings = LoadableComponent(()=>import('../../router/UserSettings'));
 const AccessKeys = LoadableComponent(()=>import('../../router/AccessKeys'));
-// const ShareGroup = LoadableComponent(()=>import('../../router/ShareGroup'));
-// const MemberManage = LoadableComponent(()=>import('../../router/MemberManage'));
 const VirtualGateways = LoadableComponent(()=>import('../../router/VirtualGateways'));
 const Gateway = LoadableComponent(()=>import('../../router/Gateway'));
-//const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
 const PlatformEvents = LoadableComponent(()=>import('../../router/PlatformEvents'));
 const DeviceEvents = LoadableComponent(()=>import('../../router/GatewayEvents'));
-// const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHistory'));
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
 const AppDeveloper = LoadableComponent(()=>import('../../router/AppDeveloper'));
@@ -179,20 +175,10 @@ class ContentMain extends Component {
                     component={DeviceEvents}
                     title={'设备消息'}
                 />
-                {/* <PrivateRoute
-                    path="/browsinghistory/:sn/:vsn/:input?"
-                    component={BrowsingHistory}
-                    title={'设备数据 · 历史浏览'}
-                /> */}
                 <Redirect
                     from="/"
                     to="/dashboard"
                 />
-                {/* <PrivateRoute
-                    path="/"
-                    component={Dashboard}
-                    title={'Dashboard'}
-                /> */}
             </Switch>
         );
     }

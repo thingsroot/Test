@@ -5,7 +5,7 @@ export const IconIOT = Icon.createFromIconfontCN({
     scriptUrl: '//at.alicdn.com/t/font_1264846_5k3w4zshzzg.js'
 })
 export const IconVnet = Icon.createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/font_1163855_v0zrjr2i1em.js'
+    scriptUrl: '//at.alicdn.com/t/font_1163855_n8fi51qi5vl.js'
 })
 
 export const IconCloud = Icon.createFromIconfontCN({

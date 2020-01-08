@@ -31,7 +31,7 @@ const newNodeItem = (title, isLeaf, type, key, icon) => {
             this.isLeaf = !value.children
             this.type = value.type
             this.key = value.id,
-                this.icon = value.icon.substr(value.icon.indexOf('.') + 1, value.icon.length)
+            this.icon = value.icon.substr(value.icon.indexOf('.') + 1, value.icon.length)
         },
         addChild (item) {
             item.parent = this
@@ -434,22 +434,24 @@ class MyTree extends Component {
     };
     renderTreeNodes = data =>
         data.map(item => {
+            console.log(item)
             let icon = item.icon;
             if (item.title === 'version') {
                 icon =  'txt'
             }
+            const arr = ['txt', 'css', 'xml', 'html', 'py', 'rb', 'js', 'json', 'java', 'folder', 'md', 'lua']
             if (item.children) {
-                console.log(icon, '---')
                 return (
                     <TreeNode
                         icon={
-                            icon === 'csv'
-                            ? <IconVnet
-                                type="icon-CSV"
-                              />
-                            : <IconEditor
+                            arr.indexOf(icon) !== -1
+                            ? <IconEditor
                                 style={{fontSize: 20}}
                                 type={'icon-' + icon}
+                              />
+                            : <IconVnet
+                                style={{fontSize: '18px'}}
+                                type={icon === 'csv' ? 'icon-CSV' : 'icon-file'}
                               />
                         }
                         title={item.title}
@@ -558,7 +560,7 @@ class MyTree extends Component {
         return (
             <div className="fileTree">
                 <div className="iconGroup">
-                    <p style={{width: '220px'}}>
+                    <div style={{width: '220px'}}>
                         <Tooltip title="新建文件" >
                             <Icon
                                 type="file-add"
@@ -586,7 +588,7 @@ class MyTree extends Component {
                                 onClick={this.deleteFileShow}
                             />
                         </Tooltip>
-                    </p>
+                    </div>
                 </div>
                 <div>
                     {
