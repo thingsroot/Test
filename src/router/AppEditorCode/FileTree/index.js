@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { Tree, Icon, Modal, message, Input, Tooltip } from 'antd';
 import { observer, inject } from 'mobx-react';
 import http from '../../../utils/Server';
-import {IconEditor} from '../../../utils/iconfont';
+import {IconEditor, IconVnet} from '../../../utils/iconfont';
 
 const confirm = Modal.confirm;
 const { TreeNode } = Tree;
@@ -432,7 +432,6 @@ class MyTree extends Component {
             // })
         }
     };
-
     renderTreeNodes = data =>
         data.map(item => {
             let icon = item.icon;
@@ -440,13 +439,18 @@ class MyTree extends Component {
                 icon =  'txt'
             }
             if (item.children) {
+                console.log(icon, '---')
                 return (
                     <TreeNode
                         icon={
-                            <IconEditor
+                            icon === 'csv'
+                            ? <IconVnet
+                                type="icon-CSV"
+                              />
+                            : <IconEditor
                                 style={{fontSize: 20}}
                                 type={'icon-' + icon}
-                            />
+                              />
                         }
                         title={item.title}
                         key={item.key}

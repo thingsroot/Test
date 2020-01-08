@@ -327,8 +327,17 @@ class Editable extends Component {
         }, ()=>{
             http.get('/api/gateways_list').then(res=>{
                 if (res.ok) {
+                    const data = res.data;
+                    const gatewayList = [];
+                    if (data.length > 0) {
+                        data.map(item=>{
+                            if (item.owner_type === 'Cloud Company Group') {
+                                gatewayList.push(item)
+                            }
+                        })
+                    }
                     this.setState({
-                        gatewayList: res.data,
+                        gatewayList,
                         filterGatewayList: res.data,
                         loading: false
                     })

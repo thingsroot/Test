@@ -20,7 +20,6 @@ import 'brace/mode/json';//
 import 'brace/mode/css';//
 import 'brace/mode/typescript';
 import 'brace/theme/monokai';//
-
 const confirm = Modal.confirm;
 const Option = Select.Option;
 const { TextArea } = Input;
@@ -124,7 +123,6 @@ class MyCode extends Component {
                 case 'json' : mode = 'json'; break;
                 case 'ts' : mode = 'typescript'; break;
                 case 'css' : mode = 'css'; break;
-                case 'csv' : mode = 'csv'; break;
                 case '' : mode = 'javascript'; break;
                 default : mode = 'text'
             }
@@ -394,7 +392,7 @@ class MyCode extends Component {
         return (
             <div className="codeEditor">
                 <div className="iconGroup">
-                    <p style={{width: 'auto', position: 'resolute'}}>
+                    <div style={{width: 'auto', position: 'resolute'}}>
                         <Divider type="vertical" />
                         <Tooltip title="保存修改代码" >
                             <Icon
@@ -460,7 +458,7 @@ class MyCode extends Component {
                             }}
                         />
 
-                    </p>
+                    </div>
                 </div>
                 <div className="myCode">
                     {
