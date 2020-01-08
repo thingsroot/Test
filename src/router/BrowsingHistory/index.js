@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Table, Select, Button, Icon } from 'antd';
+import { Input, Table, Select, Button } from 'antd';
 import { inject, observer } from 'mobx-react';
 import GatewayStatus from '../../common/GatewayStatus';
 import axios from 'axios';
@@ -89,21 +89,29 @@ class BrowsingHistory extends Component {
         device_sn: ''
       };
       componentDidMount () {
+        console.log(this.props)
         this.setState({
-          gateway: this.props.match.params.sn,
-          device_sn: this.props.match.params.vsn,
-          input: this.props.match.params.input
+          gateway: this.props.record.sn,
+          device_sn: this.props.record.vsn,
+          input: this.props.record.name
         }, () =>{
           this.fetch();
         })
+        // this.setState({
+        //   gateway: this.props.match.params.sn,
+        //   device_sn: this.props.match.params.vsn,
+        //   input: this.props.match.params.input
+        // }, () =>{
+        //   this.fetch();
+        // })
         this.props.store.timer.setGateStatusLast(0)
       }
       UNSAFE_componentWillReceiveProps (nextProps){
-        if (this.props.match.params.sn !== nextProps.match.params.sn){
+        if (this.props.record.sn !== nextProps.record.sn){
           this.setState({
-            gateway: this.props.match.params.sn,
-            device_sn: this.props.match.params.vsn,
-            input: this.props.match.params.input
+            gateway: this.props.record.sn,
+            device_sn: this.props.record.vsn,
+            input: this.props.record.name
           }, () =>{
             this.fetch();
           })
@@ -259,18 +267,19 @@ class BrowsingHistory extends Component {
                 <div className="history">
                     <div className="historyleft">
                         <div style={{display: 'flex'}}>
-                            选中变量：
+                            <span style={{lineHeight: '30px', marginRight: '10px'}}>选中变量:</span>
                             <Input disabled
                                 value={this.state.defaultvalue}
                                 style={{width: 300}}
                             />
                         </div>
-                        <div>
-                        <Search
-                            placeholder="input search text"
-                            onSearch={this.searchVariable}
-                            style={{ width: 200 }}
-                        />
+                        <div style={{margin: '10px 0'}}>
+                          <span style={{marginRight: '10px'}}>查找变量:</span>
+                          <Search
+                              placeholder="input search text"
+                              onSearch={this.searchVariable}
+                              style={{ width: 200 }}
+                          />
                         </div>
                         <Table
                             columns={columns}
@@ -287,16 +296,19 @@ class BrowsingHistory extends Component {
                     </div>
                     <div className="historyright">
                         <Button
-                            style={{position: 'absolute', right: 20, top: 5}}
+                            style={{position: 'absolute', right: 10, top: 20}}
                             onClick={()=>{
-                              this.props.history.go(-1)
+                              // this.props.history.go(-1)
+                              this.props.closewindows()
                             }}
                         >
-                          后退
-                          <Icon type="rollback"/>
+                          关闭
+                          {/* <Icon type="rollback"/> */}
                         </Button>
-                        <div>
-                          取值方式：
+                        <div
+                            style={{margin: '10px 0'}}
+                        >
+                          <span>取值方式：</span>
                             <Select defaultValue="raw"
                                 disabled={this.state.vt === 'string'}
                                 style={{ width: 120 }}
@@ -311,7 +323,7 @@ class BrowsingHistory extends Component {
                               <Option value="sum">总和</Option>
                               <Option value="count">个数</Option>
                             </Select>
-                          统计时域：
+                          <span style={{marginLeft: '10px'}}>统计时域：</span>
                             <Select defaultValue="5m"
                                 style={{ width: 120 }}
                                 disabled={this.state.value_function === 'raw' ? true : false}
@@ -329,7 +341,7 @@ class BrowsingHistory extends Component {
                               <Option value="1h">一小时</Option>
                               <Option value="1d">一天</Option>
                             </Select>
-                          时间范围：
+                          <span style={{marginLeft: '10px'}}>时间范围：</span>
                           <Select defaultValue="1h"
                               style={{ width: 120 }}
                               onChange={(value)=>{

@@ -7,6 +7,7 @@ import 'echarts/lib/component/tooltip';
 import { Table, Button, Modal } from 'antd';
 import { withRouter } from 'react-router-dom';
 import http from '../../../../utils/Server';
+import Browsinghistory from '../../../BrowsingHistory';
 import './style.scss';
 let myFaultTypeChart;
 
@@ -211,6 +212,12 @@ class ExpandedRowRender extends PureComponent {
             myFaultTypeChart.dispose();
         }
     }
+    closewindows = () => {
+        this.setState({
+            Moreandmore: false
+            // visible: true
+        })
+    }
     render () {
         return (
             <div>
@@ -243,7 +250,13 @@ class ExpandedRowRender extends PureComponent {
                         >关闭</Button>,
                         <Button key="submit"
                             type="primary"
-                            onClick={this.handleOk}
+                            // onClick={this.handleOk}
+                            onClick={()=>{
+                                this.setState({
+                                    Moreandmore: true,
+                                    visible: false
+                                })
+                            }}
                         >
                         更多历史数据
                         </Button>
@@ -255,6 +268,24 @@ class ExpandedRowRender extends PureComponent {
                         style={{width: '100%', height: 400, textAlign: 'center', fontSize: 30}}
                     ></div>
                 </Modal>
+                {
+                    this.state.Moreandmore
+                    ? <div
+                        className="modal_browsinghistory"
+                        // onClick={()=>{
+                        //     this.setState({
+                        //         Moreandmore: false,
+                        //         visible: true
+                        //     })
+                        // }}
+                      >
+                        <Browsinghistory
+                            closewindows={this.closewindows}
+                            record={this.state.record}
+                        />
+                      </div>
+                    : ''
+                }
             </div>
         );
     }

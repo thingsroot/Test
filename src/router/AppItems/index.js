@@ -119,6 +119,13 @@ class AppItems extends PureComponent {
             <div className="app_items">
                 <div className="app_items_up_button">
                     <Button
+                        icon="question-circle"
+                        style={{marginRight: '10px'}}
+                        onClick={()=>{
+                            window.open('https://wiki.freeioe.org/doku.php?id=apps:' + this.props.match.params.name, '_blank')
+                        }}
+                    >帮助</Button>
+                    <Button
                         icon="rollback"
                         // type="primary"
                         onClick={()=>{

@@ -306,21 +306,28 @@ class MyGatesAppsInstall extends Component {
 
                     </Modal>
                     <div className={install_step === '' ? 'hide appsdetail' : 'show appsdetail'}>
-                    <Button
-                        className="installbtn"
-                        type="primary"
-                        onClick={()=>{
-                            if (install_step === 'install') {
-                                this.setState({install_step: 'view'})
-                            } else {
-                                this.setState({install_step: 'install'})
+                        <Button
+                            style={{position: 'absolute', right: '205px', top: '10px', zIndex: '999'}}
+                            icon="question-circle"
+                            onClick={()=>{
+                                window.open('https://wiki.freeioe.org/doku.php?id=apps:' + app_info.name, '_blank')
+                            }}
+                        >帮助</Button>
+                        <Button
+                            className="installbtn"
+                            type="primary"
+                            onClick={()=>{
+                                if (install_step === 'install') {
+                                    this.setState({install_step: 'view'})
+                                } else {
+                                    this.setState({install_step: 'install'})
+                                }
+                            }}
+                        >
+                            {
+                                install_step === 'install' ? '查看应用描述' : '安装到网关'
                             }
-                        }}
-                    >
-                        {
-                            install_step === 'install' ? '查看应用描述' : '安装到网关'
-                        }
-                    </Button>
+                        </Button>
                         <Link
                             to={
                                 this.setUrl()

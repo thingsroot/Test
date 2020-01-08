@@ -10,3 +10,16 @@ table td{
 .light-row{
     background:#f9f9f9;
 }
+.modal_browsinghistory{
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: #fff;
+    z-index: 999;
+    box-sizing: border-box;
+    padding: 50px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+}

@@ -124,6 +124,7 @@ class MyCode extends Component {
                 case 'json' : mode = 'json'; break;
                 case 'ts' : mode = 'typescript'; break;
                 case 'css' : mode = 'css'; break;
+                case 'csv' : mode = 'csv'; break;
                 case '' : mode = 'javascript'; break;
                 default : mode = 'text'
             }
