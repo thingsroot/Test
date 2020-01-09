@@ -118,7 +118,6 @@ class OutputList extends Component {
                 newData.push(item)
             }
         });
-        console.log(newData)
         this.setState({data: newData})
     }
 

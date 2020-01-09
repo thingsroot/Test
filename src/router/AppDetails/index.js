@@ -395,7 +395,7 @@ class AppDetails extends Component {
                 <div className="details">
                     <div className="appImg">
                         <img
-                            src={`/store_assets${app_info.icon_image}`}
+                            src={app_info.icon_image ? `/store_assets${app_info.icon_image}` : ''}
                             alt="图片"
                         />
                     </div>

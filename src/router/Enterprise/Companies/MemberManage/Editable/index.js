@@ -240,7 +240,7 @@ class EditableTable extends React.Component {
                 role: 'Admin',
                 description: ''
             }
-            console.log(data, record)
+            data;
         });
     }
 
@@ -300,7 +300,6 @@ class EditableTable extends React.Component {
     }
     ChangeThePassword = () => {
         const {new_password, enter_new_password, record} = this.state;
-        console.log(new_password, enter_new_password)
         if (new_password !== enter_new_password) {
             message.error('两次密码输入不匹配！')
             return false;

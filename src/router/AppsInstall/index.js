@@ -257,7 +257,7 @@ class MyGatesAppsInstall extends Component {
                         onClose={this.onClose}
                         onChange={this.onChangeGateway}
                         visible={this.state.gateway_list_visible}
-                    ></GatewaysDrawer>
+                    />
                     <Modal
                         visible={showLinkSelection}
                         title="快捷选择"

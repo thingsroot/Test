@@ -62,8 +62,9 @@ const CollectionCreateForm = Form.create()(
         };
 
         checkChange = (e)=>{
-            console.log(e.target.checked);
-            console.log(this)
+            e;
+            // console.log(e.target.checked);
+            // console.log(this)
         };
 
         render () {

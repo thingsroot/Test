@@ -240,7 +240,6 @@ class GatewaySettings extends Component {
             message.error('错误的升级请求')
             return
         }
-        console.log(skynet_version)
         const { gatewayInfo } = this.props.store;
         this.setState({upgrading: true})
         const data = {

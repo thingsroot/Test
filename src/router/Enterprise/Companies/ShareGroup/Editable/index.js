@@ -211,8 +211,7 @@ class Editable extends Component {
     save (record, form) {
         form.validateFields((error, row) => {
             if (error){
-                console.log(error)
-                return;
+                return false;
             }
             const newData = this.props.store.groups.GroupsUserlist;
             const index = newData.findIndex(item => record.idx === item.idx);

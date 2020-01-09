@@ -204,7 +204,6 @@ class TemplateList extends Component {
             company: _getCookie('companies') !== undefined ? record.company : null,
             version: record.latest_version
         };
-        console.log(data)
         this.setState({
             type: type === 'copy' ? '复制' : '编辑',
             conf: record.name
