@@ -89,7 +89,6 @@ class BrowsingHistory extends Component {
         device_sn: ''
       };
       componentDidMount () {
-        console.log(this.props)
         this.setState({
           gateway: this.props.record.sn,
           device_sn: this.props.record.vsn,

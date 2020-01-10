@@ -3,6 +3,7 @@ import {Button, Divider, Input, Modal, Popconfirm, Table, Form, message} from 'a
 import { inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../../../../utils/Server';
+import { _getCookie } from '../../../../../utils/Session';
 
 const EditableContext = React.createContext();
 
@@ -330,14 +331,17 @@ class Editable extends Component {
                     const gatewayList = [];
                     if (data.length > 0) {
                         data.map(item=>{
-                            if (item.owner_type === 'Cloud Company Group') {
+                            if (item.owner_type === 'Cloud Company Group' && item.company === _getCookie('companies')) {
                                 gatewayList.push(item)
                             }
                         })
                     }
+                    gatewayList.sort((a, b)=>{
+                        return a.device_status - b. device_status
+                    })
                     this.setState({
                         gatewayList,
-                        filterGatewayList: res.data,
+                        filterGatewayList: gatewayList,
                         loading: false
                     })
                 }
@@ -414,9 +418,13 @@ class Editable extends Component {
                         className="templateList"
                         title={<h3>查找网关</h3>}
                         maskClosable={false}
+                        footer={
+                            <Button
+                                type="primary"
+                                onClick={this.handleCancelAddTempListDevice}
+                            >关闭</Button>
+                        }
                         visible={this.state.showTemplateSelectionDevice}
-                        onOk={this.handleCancelAddTempListDevice}
-                        onCancel={this.handleCancelAddTempListDevice}
                         wrapClassName={'templatesModal'}
                         okText="确定"
                         cancelText="取消"
@@ -434,7 +442,7 @@ class Editable extends Component {
                         >
                             <span style={{padding: '0 20px'}}> </span>
                             <Input.Search
-                                placeholder="ID，名称"
+                                placeholder="请输入序列号、网关名称"
                                 onChange={(e)=>{
                                     this.filterGateway(e.target.value.toLocaleLowerCase())
                                 }}

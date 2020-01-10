@@ -320,11 +320,12 @@ class EditableTable extends React.Component {
                 status: '',
                 type: 'text',
                 password_visible: false,
-                new_password: ''
+                new_password: '',
+                enter_new_password: ''
             })
             if (res.ok) {
-                message.success('修改用户信息成功！')
-                this.props.getdata()
+                message.success('修改用户密码成功！')
+                // this.props.getdata()
             } else {
                 message.error(res.error)
             }

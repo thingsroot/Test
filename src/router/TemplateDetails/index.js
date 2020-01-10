@@ -48,17 +48,17 @@ class MyTemplateDetails extends PureComponent {
     UpdateFetchData = () => {
         let app = this.props.match.params.app;
         let conf = this.props.match.params.name;
-        let version = this.props.match.params.version
+        // let version = this.props.match.params.version
         let action = this.props.match.params.action;
-        if (version === undefined) {
-            version = 0
-        } else {
-            version = Number(version) ? Number(version) : 0
-        }
+        // if (version === undefined) {
+        //     version = 0
+        // } else {
+        //     version = Number(version) ? Number(version) : 0
+        // }
         this.setState({
             app: app,
             conf: conf,
-            show_version: version,
+            // show_version: version,
             action: action
         }, ()=>{
             this.fetchInfo();
@@ -88,7 +88,8 @@ class MyTemplateDetails extends PureComponent {
                     list.push(v.version);
                 });
                 if (list.length > 0) {
-                    let show_version = this.state.show_version !== 0 ? this.state.show_version : list[0]
+                    console.log(list)
+                    let show_version = list[0]
                     this.setState({
                         versionList: list,
                         maxVersion: list[0],
@@ -119,7 +120,6 @@ class MyTemplateDetails extends PureComponent {
     };
 
     fileChang = (info)=>{
-        console.log(info)
         this.setState({
             file: info.file.originFileObj,
             previewCsvData: ''
@@ -279,7 +279,8 @@ class MyTemplateDetails extends PureComponent {
                     >
                         <tbody>
                             {
-                                csvData && csvData.length > 0 && csvData.map((v, key)=>{
+                                csvData && csvData.length > 0
+                                ? csvData.map((v, key)=>{
                                     if (v.length > 1) {
                                         return <tr key={key}>
                                             {
@@ -297,6 +298,7 @@ class MyTemplateDetails extends PureComponent {
                                         </tr>
                                     }
                                 })
+                                : <tr></tr>
                             }
                         </tbody>
                     </table>

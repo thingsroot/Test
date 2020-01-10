@@ -84,7 +84,7 @@ class TemplateList extends Component {
                                 className="mybutton"
                                 style={{color: '#000'}}
                                 onClick={()=>{
-                                    window.open(`/template/${record.app}/${record.name}/${record.latest_version}`, '_blank')
+                                    window.open(`/template/${record.app}/${record.name}`, '_blank')
                                 }}
                             >查看</Button>
                             <Divider type="vertical" />
