@@ -1,11 +1,52 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon, Tooltip, Button } from 'antd';
+import { Icon, Tooltip, Button, Table, Form, Input, message, Select } from 'antd';
 import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
+const { Option } = Select;
+import {IconIOT, IconCloud, IconVnet} from '../../utils/iconfont';
 
-import {IconIOT, IconCloud} from '../../utils/iconfont';
+const EditableContext = React.createContext();
+
+class EditableCell extends React.Component {
+
+  renderCell = ({ getFieldDecorator }) => {
+    const {
+      editing,
+      dataIndex,
+      title,
+    //   inputType,
+      record,
+    //   index,
+      children,
+      ...restProps
+    } = this.props;
+    return (
+      <td {...restProps}>
+        {editing ? (
+          <Form.Item style={{ margin: 0 }}>
+            {getFieldDecorator(dataIndex, {
+              rules: [
+                {
+                  required: true,
+                  message: `Please Input ${title}!`
+                }
+              ],
+              initialValue: record[dataIndex]
+            })(<Input />)}
+          </Form.Item>
+        ) : (
+          children
+        )}
+      </td>
+    );
+  };
+  render () {
+    return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
+  }
+}
+
 
 @withRouter
 @inject('store')
@@ -15,7 +56,86 @@ class Status extends Component {
         super(props);
         this.timer = undefined
         this.state = {
-            gateway: ''
+            gateway: '',
+            shares_data: [],
+            editingKey: '',
+            end_time: '1',
+            shares_columns: [
+                {
+                    title: '用户',
+                    dataIndex: 'share_to',
+                    editable: true
+                }, {
+                    title: '有效日期',
+                    dataIndex: 'end_time',
+                    render: (record, result)=>{
+                        if (result.key !== this.state.editingKey) {
+                            return <span>{record}</span>
+                        } else {
+                            return (
+                                <Select
+                                    defaultValue="1"
+                                    style={{ width: 120 }}
+                                    onChange={this.handleChange}
+                                >
+                                    <Option value="1">1天</Option>
+                                    <Option value="3">3天</Option>
+                                    <Option value="7">7天</Option>
+                                </Select>
+                            )
+                        }
+                    }
+                }, {
+                    title: '操作',
+                    render: (record)=>{
+                        return (
+                            record.key !== this.state.editingKey
+                            ? (
+                                <div>
+                                    <Button
+                                        onClick={()=>{
+                                            this.edit(record.key)
+                                        }}
+                                        style={{marginRight: '5px'}}
+                                    >
+                                        延期
+                                    </Button>
+                                    <Button
+                                        onClick={()=>{
+                                            this.deleteShare(record)
+                                        }}
+                                    >
+                                        删除
+                                    </Button>
+                                </div>
+                            )
+                            : (
+                                <div>
+                                    <EditableContext.Consumer>
+                                    {
+                                        form => (
+                                            <Button
+                                                onClick={() => this.save(form, record.key)}
+                                                style={{marginRight: '5px'}}
+                                            >
+                                                保存
+                                            </Button>
+                                        )
+                                    }
+                                    </EditableContext.Consumer>
+                                    <Button
+                                        onClick={()=>{
+                                            this.deleteShare(record, true)
+                                        }}
+                                    >
+                                        取消
+                                    </Button>
+                                </div>
+                            )
+                        )
+                    }
+                }
+            ]
         }
     }
     componentDidMount (){
@@ -33,6 +153,67 @@ class Status extends Component {
     }
     componentWillUnmount (){
         clearInterval(this.timer);
+    }
+    isEditing = record => record.key === this.state.editingKey;
+    edit = (key)=> {
+        this.setState({ editingKey: key, end_time: 1 });
+    }
+    save (form) {
+        form.validateFields((error, row) => {
+            if (error) {
+            return;
+            }
+            let dateTime = new Date();
+            dateTime = dateTime.setDate(dateTime.getDate() + Number(this.state.end_time));
+            function timestamp (timestamp){
+                const d = new Date(timestamp);    //根据时间戳生成的时间对象
+                const date = (d.getFullYear()) + '-' +
+                          (d.getMonth() + 1) + '-' +
+                          (d.getDate()) + ' ' +
+                          (d.getHours()) + ':' +
+                          (d.getMinutes()) + ':' +
+                          (d.getSeconds())
+                return date
+            }
+            const data = {
+                device: this.props.match.params.sn,
+                end_time: timestamp(dateTime),
+                share_to: row.share_to
+            }
+            const {shares_data} = this.state;
+            const index = shares_data.findIndex(item=> item.share_to === row.share_to);
+            if (index === -1) {
+                http.post('/api/gateways_shares_create', data).then(res=>{
+                    if (res.ok) {
+                        message.success('设备共享成功！')
+                        this.showShare()
+                        this.setState({
+                            editingKey: ''
+                        })
+                    } else {
+                        message.error(res.error)
+                    }
+                })
+            } else {
+                data.name = shares_data[index].name
+                http.post('/api/gateways_shares_update', data).then(res=>{
+                    if (res.ok) {
+                        message.success('更新设备共享成功！')
+                        this.showShare()
+                        this.setState({
+                            editingKey: ''
+                        })
+                    } else {
+                        message.error(res.error)
+                    }
+                })
+            }
+        });
+    }
+    handleChange = (val) => {
+        this.setState({
+            end_time: val
+        })
     }
     startTimer (){
         this.timer = setInterval(() => {
@@ -61,8 +242,101 @@ class Status extends Component {
             }
         });
     }
+    deleteShare = (record, type) =>{
+        if (type) {
+            const {shares_data} = this.state;
+            const index = shares_data.indexOf(record)
+            if (!record.name){
+                shares_data.splice(index, 1)
+            }
+            const unfinished = shares_data.findIndex(item => item.name === undefined)
+            if (unfinished !== -1) {
+                unfinished.splice(index, 1)
+            }
+            this.setState({
+                editingKey: '',
+                shares_data
+            })
+            return false;
+        }
+        if (record.name) {
+            const data = {
+                name: record.name
+            }
+            http.post('/api/gateways_shares_remove', data).then(res=>{
+                if (res.ok) {
+                    message.success('删除临时共享成功！')
+                    this.showShare()
+                } else {
+                    message.error(res.error)
+                }
+            })
+        }
+    }
+    showShare = ()=>{
+        http.get('/api/gateways_shares_list?name=' + this.props.match.params.sn).then(res=>{
+            if (res.ok && res.data.length > 0) {
+                const shares_data = res.data;
+                shares_data.map((item, key)=>{
+                    item.key = key;
+                })
+                this.setState({
+                    shares_data
+                })
+            }
+        })
+    }
+    addShares = () => {
+        const {shares_data} = this.state;
+        const key = shares_data.length;
+        const addIndex = () => {
+            let ind = shares_data.findIndex(item=> item.key === key)
+            if (ind !== -1) {
+                ind = ind + 1;
+                this.addIndex()
+            } else {
+                return ind
+            }
+        }
+        addIndex()
+        const obj = {
+            share_to: '',
+            end_time: '',
+            key
+        }
+        const index = shares_data.findIndex(item=> !item.name)
+        if (index === 0) {
+            return false;
+        }
+        shares_data.unshift(obj)
+        this.setState({
+            shares_data
+        }, ()=> {
+            this.edit(key)
+        })
+    }
     render () {
         const { device_status, dev_name, description, data } = this.props.store.gatewayInfo;
+        const components = {
+            body: {
+              cell: EditableCell
+            }
+          };
+          const columns = this.state.shares_columns.map(col => {
+            if (!col.editable) {
+              return col;
+            }
+            return {
+              ...col,
+              onCell: record => ({
+                record,
+                // inputType: col.dataIndex === 'age' ? 'number' : 'text',
+                dataIndex: col.dataIndex,
+                title: col.title,
+                editing: this.isEditing(record)
+              })
+            };
+          });
         return (
             <div className="GatesStatusWrap">
                 <div
@@ -140,6 +414,59 @@ class Status extends Component {
                                         />安装新应用
                                     </Button>
                                 </Link>
+                                <Button
+                                    type="link"
+                                    onClick={()=>{
+                                        this.setState({
+                                            share_visible: !this.state.share_visible
+                                        }, () => {
+                                            this.showShare()
+                                        })
+                                    }}
+                                >
+                                    <IconVnet type="icon-icon_share"/>
+                                </Button>
+                                {
+                                    this.state.share_visible
+                                    ? <div className="share_devece">
+                                        <Button
+                                            type="link"
+                                            // icon="close"
+                                            className="share_devece_close"
+                                            onClick={()=>{
+                                                this.setState({
+                                                    share_visible: false
+                                                })
+                                            }}
+                                        >
+                                            关闭
+                                        </Button>
+                                        <EditableContext.Provider
+                                            value={this.props.form}
+                                        >
+                                            <div
+                                                style={{height: '350px', overflowY: 'auto'}}
+                                            >
+                                                <Table
+                                                    rowKey="share_to"
+                                                    components={components}
+                                                    rowClassName={() => 'editable-row'}
+                                                    bordered
+                                                    columns={columns}
+                                                    dataSource={this.state.shares_data}
+                                                    pagination={false}
+                                                />
+                                            </div>
+                                        </EditableContext.Provider>
+                                        <Button
+                                            onClick={this.addShares}
+                                            style={{marginLeft: '15px'}}
+                                        >
+                                            添加用户
+                                        </Button>
+                                      </div>
+                                    : ''
+                                }
                             </div>
                             : ''
                         }
@@ -151,4 +478,5 @@ class Status extends Component {
         );
     }
 }
-export default Status;
+const EditableFormTable = Form.create()(Status);
+export default EditableFormTable;

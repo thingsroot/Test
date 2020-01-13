@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react';
 import { inject, observer} from 'mobx-react';
 import Papa from 'papaparse';
+import Wps from './Wps';
 import { Select, Button, Upload, Icon, Modal, message } from 'antd';
 import { CSVLink } from 'react-csv';
 import http from '../../utils/Server';
 import './style.scss';
-import CopyForm from '../AppDetails/CopyForm'
+import CopyForm from '../AppDetails/CopyForm';
 
 const Dragger = Upload.Dragger;
 const Option = Select.Option;
@@ -39,7 +40,8 @@ class MyTemplateDetails extends PureComponent {
             file: '',        //文件流
             previewData: '',  //预览数据原型
             previewCsvData: '', //预览csv数据
-            maxVersion: 0
+            maxVersion: 0,
+            edit_template_visible: false //显示编辑wps
         }
     }
     componentDidMount () {
@@ -88,7 +90,6 @@ class MyTemplateDetails extends PureComponent {
                     list.push(v.version);
                 });
                 if (list.length > 0) {
-                    console.log(list)
                     let show_version = list[0]
                     this.setState({
                         versionList: list,
@@ -200,9 +201,12 @@ class MyTemplateDetails extends PureComponent {
         this.props.history.push('/template/' + conf_info.app + '/' + conf_info.name + '/1')
         this.UpdateFetchData()
     }
-
+    closeWps = () => {
+        this.setState({edit_template_visible: false})
+        this.UpdateFetchData()
+    }
     render () {
-        const { conf_info, content, csvData, versionList, previewCsvData, show_version } = this.state;
+        const { conf_info, content, csvData, versionList, previewCsvData, show_version, edit_template_visible } = this.state;
         return (
             <div className="MyTemplateDetails">
                 <div className="title">
@@ -238,7 +242,15 @@ class MyTemplateDetails extends PureComponent {
                                 this.setState({visibleEdit: true})
                             }}
                         >
-                            属性修改
+                            设置
+                        </Button>
+                        <Button
+                            style={this.state.conf_info.developer === this.props.store.session.user_id ? {display: 'inline-block', marginRight: '20px'} : {display: 'none', marginRight: '20px'}}
+                            onClick={()=>{
+                                this.setState({edit_template_visible: true})
+                            }}
+                        >
+                            编辑
                         </Button>
                         <Button
                             style={this.state.conf_info.developer === this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
@@ -407,6 +419,24 @@ class MyTemplateDetails extends PureComponent {
                     copyData={conf_info}
                     csvData={csvData}
                 />
+                {
+                    edit_template_visible
+                    ? <div
+                        className="edit_template_wps"
+                      >
+                        <Button
+                            className="edit_template_wps_close"
+                            type="link"
+                            onClick={this.closeWps}
+                        >
+                            关闭
+                        </Button>
+                        <Wps
+                            version={this.state.maxVersion}
+                        />
+                    </div>
+                    : ''
+                }
             </div>
         );
     }
