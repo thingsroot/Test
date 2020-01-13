@@ -65,7 +65,6 @@ class AppEditorCode extends Component {
         http.get('/apis/api/method/app_center.api.get_latest_version?app=' + app + '&beta=' + 1)
         .then(data=>{
             let latestVersion = data.message;
-            console.log(latestVersion);
             this.setState({latestVersion: latestVersion})
             if (latestVersion === undefined || latestVersion === 0){
                 this.info('版本提示', '应用还没有发布任何版本!');

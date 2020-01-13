@@ -165,7 +165,6 @@ class Developer extends Component {
                                             type="primary"
                                             key="console"
                                             onClick={()=>{
-                                                console.log(this)
                                                 this.props.history.push('/appdeveloper')
                                             }}
                                         >
@@ -234,7 +233,6 @@ class Developer extends Component {
                                              type="primary"
                                              key="console"
                                              onClick={()=>{
-                                                 console.log(this)
                                                  this.props.history.push('/appdeveloper')
                                              }}
                                          >
@@ -341,44 +339,6 @@ class Developer extends Component {
                     </TabPane>
                 </Tabs>
                 }
-                {/* <div
-                    style={this.state.loading ? none : block}
-                > */}
-                    {/* {
-                        Number(_getCookie('is_developer')) !== 1
-                        ? <Result
-                            title="您还不是开发者，请先申请成为开发者！"
-                            extra={
-                                <Button
-                                    type="primary"
-                                    key="console"
-                                    onClick={()=>{
-                                        console.log(this)
-                                        this.props.history.push('/appdeveloper')
-                                    }}
-                                >
-                                    申请成为开发者
-                                </Button>
-                            }
-                          />
-                        : <div
-                            className="empty"
-                            style={appList && appList.length === 0 ? block : none}
-                          >
-                            <Result
-                                icon={<Icon type="smile" theme="twoTone" />}
-                                title="您还没有应用，点击创建新应用"
-                                extra={
-                                <Link to={'/appnew'}>
-                                    <Button
-                                        type="primary"
-                                        style={{margin: '0 20px'}}
-                                    >创建新应用</Button>
-                                </Link>}
-                            />
-                        </div>
-                    } */}
-                {/* </div> */}
             </div>
         )
     }

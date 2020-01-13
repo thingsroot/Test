@@ -11,9 +11,6 @@ import './style.scss';
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 
-function callback (key) {
-    console.log(key);
-}
 
 @withRouter
 @inject('store')
@@ -217,7 +214,6 @@ class AppEdit extends Component {
     }
 
     checkChange = (e)=>{
-        console.log(e.target.value);
         if (e.target.value === '0') {
             e.target.value = 1
         } else {
@@ -461,7 +457,6 @@ class AppEdit extends Component {
                     </Row>
 
                 <Tabs
-                    onChange={callback}
                     type="card"
                 >
                     <TabPane

@@ -7,9 +7,6 @@ import Issues from './Issues';
 import {_getCookie} from '../../utils/Session';
 import './style.scss';
 const { TabPane } = Tabs;
-function callback (key) {
-    console.log(key);
-  }
 class AppItems extends PureComponent {
     constructor (props) {
         super(props)
@@ -29,7 +26,6 @@ class AppItems extends PureComponent {
     }
     CheckForCloning = () => {
         http.get('/api/applications_forks_list?name=' + this.props.match.params.name).then(res=>{
-            console.log(res)
             if (res.ok) {
                 if (res.data.length > 0) {
                     res.data.map(item=>{
@@ -79,7 +75,6 @@ class AppItems extends PureComponent {
         })
     }
     setFavorites = () => {
-        console.log(this.state)
         this.setState({
             loading: true
         })
@@ -114,7 +109,6 @@ class AppItems extends PureComponent {
     }
     render () {
         const {data, version} = this.state;
-        console.log(data)
         return (
             <div className="app_items">
                 <div className="app_items_up_button">
@@ -189,7 +183,6 @@ class AppItems extends PureComponent {
                     <div className="app_info_left">
                     <Tabs
                         defaultActiveKey="1"
-                        onChange={callback}
                     >
                         <TabPane
                             tab="总览"

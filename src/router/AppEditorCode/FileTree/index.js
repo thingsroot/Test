@@ -434,7 +434,6 @@ class MyTree extends Component {
     };
     renderTreeNodes = data =>
         data.map(item => {
-            console.log(item)
             let icon = item.icon;
             if (item.title === 'version') {
                 icon =  'txt'
@@ -480,7 +479,8 @@ class MyTree extends Component {
         });
 
     onDragEnter = info => {
-        console.log(info);
+        info;
+        // console.log(info);
         // expandedKeys 需要受控时设置
         // this.setState({
         //   expandedKeys: info.expandedKeys,
@@ -527,7 +527,6 @@ class MyTree extends Component {
             loop(data, dropKey, item => {
                 item.children = item.children || [];
                 // where to insert 示例添加到尾部，可以是随意位置
-                console.log(item)
                 if (item.type === 'file') {
                     item.children.unshift(dragObj);
                 } else {

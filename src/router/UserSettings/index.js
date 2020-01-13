@@ -59,7 +59,6 @@ class UserSettings extends PureComponent {
                 this.props.store.session.setSid('Guest')
                 this.props.store.session.setCSRFToken('')
                 message.success('修改密码成功，请重新登陆！', 1.5).then(()=>{
-                    console.log('Logout')
                     location.href = '/';
                 })
             }).catch(err=>{

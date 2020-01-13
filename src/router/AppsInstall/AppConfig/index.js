@@ -420,7 +420,6 @@ class AppConfig extends Component {
             try {
                 this.props.configStore.setValue(pre_configuration)
             } catch ( e ) {
-                console.log(e)
                 message.error(e)
             }
         } else {
