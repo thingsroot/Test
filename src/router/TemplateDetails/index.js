@@ -41,7 +41,8 @@ class MyTemplateDetails extends PureComponent {
             previewData: '',  //预览数据原型
             previewCsvData: '', //预览csv数据
             maxVersion: 0,
-            edit_template_visible: false //显示编辑wps
+            edit_template_visible: false, //显示编辑wps,
+            newVersion: 0
         }
     }
     componentDidMount () {
@@ -94,6 +95,7 @@ class MyTemplateDetails extends PureComponent {
                     this.setState({
                         versionList: list,
                         maxVersion: list[0],
+                        newVersion: list[0],
                         show_version: show_version,
                         dataList: res.data
                     });
@@ -433,6 +435,7 @@ class MyTemplateDetails extends PureComponent {
                         </Button>
                         <Wps
                             version={this.state.maxVersion}
+                            newVersion={this.state.newVersion}
                         />
                     </div>
                     : ''

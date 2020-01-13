@@ -11,8 +11,8 @@ class Wps extends PureComponent {
         }
     }
     componentDidMount () {
-        const {version} = this.props;
-        http.get('/api/get_wps_url?conf=' + this.props.match.params.name + '&version=' + version + '&version_new=' + (version + 1)).then(res=>{
+        const {version, newVersion} = this.props;
+        http.get('/api/get_wps_url?conf=' + this.props.match.params.name + '&version=' + version + '&version_new=' + (newVersion + 1)).then(res=>{
             if (res.ok) {
                 this.setState({
                     url: res.url

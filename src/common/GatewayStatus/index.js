@@ -173,7 +173,7 @@ class Status extends Component {
                           (d.getHours()) + ':' +
                           (d.getMinutes()) + ':' +
                           (d.getSeconds())
-                return date
+                return date;
             }
             const data = {
                 device: this.props.match.params.sn,
