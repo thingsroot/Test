@@ -59,12 +59,15 @@ class Status extends Component {
             gateway: '',
             shares_data: [],
             editingKey: '',
-            end_time: '1',
+            end_time: 1,
             shares_columns: [
                 {
                     title: '用户',
                     dataIndex: 'share_to',
-                    editable: true
+                    editable: true,
+                    render: (record)=>{
+                        return (<Tooltip title={record}>{record}</Tooltip>)
+                    }
                 }, {
                     title: '有效日期',
                     dataIndex: 'end_time',
@@ -74,13 +77,13 @@ class Status extends Component {
                         } else {
                             return (
                                 <Select
-                                    defaultValue="1"
+                                    defaultValue={1}
                                     style={{ width: 120 }}
                                     onChange={this.handleChange}
                                 >
-                                    <Option value="1">1天</Option>
-                                    <Option value="3">3天</Option>
-                                    <Option value="7">7天</Option>
+                                    <Option value={1}>1天</Option>
+                                    <Option value={3}>3天</Option>
+                                    <Option value={7}>7天</Option>
                                 </Select>
                             )
                         }
@@ -148,6 +151,7 @@ class Status extends Component {
         if (nextProps.gateway !== this.state.gateway) {
             this.setState({gateway: nextProps.gateway}, () => {
                 this.gatewayRead()
+                this.showShare()
             })
         }
     }
@@ -176,7 +180,7 @@ class Status extends Component {
                 return date;
             }
             const data = {
-                device: this.props.match.params.sn,
+                device: this.state.gateway,
                 end_time: timestamp(dateTime),
                 share_to: row.share_to
             }
@@ -198,7 +202,7 @@ class Status extends Component {
                 data.name = shares_data[index].name
                 http.post('/api/gateways_shares_update', data).then(res=>{
                     if (res.ok) {
-                        message.success('更新设备共享成功！')
+                        message.success('设备共享延期成功！')
                         this.showShare()
                         this.setState({
                             editingKey: ''
@@ -274,7 +278,7 @@ class Status extends Component {
         }
     }
     showShare = ()=>{
-        http.get('/api/gateways_shares_list?name=' + this.props.match.params.sn).then(res=>{
+        http.get('/api/gateways_shares_list?name=' + this.state.gateway).then(res=>{
             if (res.ok && res.data.length > 0) {
                 const shares_data = res.data;
                 shares_data.map((item, key)=>{
@@ -282,6 +286,10 @@ class Status extends Component {
                 })
                 this.setState({
                     shares_data
+                })
+            } else {
+                this.setState({
+                    shares_data: []
                 })
             }
         })
@@ -424,6 +432,7 @@ class Status extends Component {
                                         })
                                     }}
                                 >
+                                {console.log((this.props))}
                                     <IconVnet type="icon-icon_share"/>
                                 </Button>
                                 {
