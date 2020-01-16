@@ -33,7 +33,7 @@ class MyGates extends Component {
                 title: '名称',
                 dataIndex: 'dev_name',
                 key: 'dev_name',
-                width: '400px',
+                width: '380px',
                 sorter: (a, b) => a.dev_name.length - b.dev_name.length,
                 render: (props, record)=>{
                     return (
@@ -64,7 +64,7 @@ class MyGates extends Component {
                 title: '序列号',
                 dataIndex: 'sn',
                 key: 'sn',
-                width: '320px',
+                width: '220px',
                 sorter: (a, b) => a.sn && b.sn && a.sn.length - b.sn.length
               }, {
                 title: '上线时间',
@@ -90,16 +90,16 @@ class MyGates extends Component {
                 title: '设备数',
                 key: 'device_devs_num',
                 dataIndex: 'device_devs_num',
-                width: '85px'
+                width: '65px'
                 }, {
                 title: '应用数',
                 key: 'device_apps_num',
                 dataIndex: 'device_apps_num',
-                width: '85px'
+                width: '65px'
                 }, {
                 title: '操作',
                 key: 'action',
-                width: '260px',
+                width: '240px',
                 render: (text, record, props) => {
                     props;
                   return (
