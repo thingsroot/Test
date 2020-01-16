@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon, Tooltip, Button, Table, Form, Input, message, Select } from 'antd';
+import { Icon, Tooltip, Button, Table, Form, Input, message, Select, Tag } from 'antd';
 import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
 const { Option } = Select;
 import {IconIOT, IconCloud, IconVnet} from '../../utils/iconfont';
+import { _getCookie } from '../../utils/Session';
 
 const EditableContext = React.createContext();
 
@@ -59,6 +60,7 @@ class Status extends Component {
             gateway: '',
             shares_data: [],
             editingKey: '',
+            data: {},
             end_time: 1,
             shares_columns: [
                 {
@@ -242,6 +244,9 @@ class Status extends Component {
         }
         http.get('/api/gateways_read?name=' + this.state.gateway).then(res=>{
             if (res.ok) {
+                this.setState({
+                    data: res.data
+                })
                 if (res.data.sn !== this.state.gateway) {
                     console.log('Delayed data arrived!!', res.data, this.state.gateway)
                     return
@@ -355,9 +360,13 @@ class Status extends Component {
                     className="status"
                     style={{width: '200px', marginRight: '20px'}}
                 >
+                    <div style={{marginRight: '5px', display: 'inline-block'}}>
+                            {this.state.data.owner_type === 'Cloud Company Group' && this.state.data.company === _getCookie('companies')
+                            ? <Tag color="cyan" >公司</Tag>
+                            : this.state.data.owner_type === 'User' && this.state.data.owner_id === _getCookie('user_id') ? <Tag color="lime" >个人</Tag>
+                            : <Tag color="orange" >分享</Tag>}
+                    </div>
                     <Tooltip title="在线状态" >
-                        {/* <span className={device_status === 'ONLINE' ? 'online' : 'offline'}><b></b></span>
-                        <span style={{padding: '0 5px'}} /> */}
                         <IconIOT
                             style={{fontSize: 22, color: device_status === 'ONLINE' ? '#3c763d' : '#f39c12'}}
                             type={device_status === 'ONLINE' ? 'icon-charulianjie' : 'icon-quxiaolianjie'}
@@ -428,6 +437,7 @@ class Status extends Component {
                                 </Link>
                                 <Button
                                     type="link"
+                                    disabled={(this.state.data.owner_type === 'User' && this.state.data.owner_id !== _getCookie('user_id')) || (this.state.data.owner_type === 'Cloud Company Group' && this.state.data.company !== _getCookie('companies'))}
                                     onClick={()=>{
                                         this.setState({
                                             share_visible: !this.state.share_visible

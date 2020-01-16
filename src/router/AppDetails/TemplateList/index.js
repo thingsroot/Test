@@ -94,7 +94,7 @@ class TemplateList extends Component {
                                 onClick={() => {
                                         this.editContent(record, 'edit')
                                     }}
-                            >编辑</a>
+                            >设置</a>
                             <Divider type="vertical" />
                             <a
                                 style={{cursor: 'pointer'}}
