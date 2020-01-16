@@ -27,6 +27,17 @@ class AppConfigSection extends Component {
             tempList: []
         }
     }
+    componentDidMount () {
+        console.log(this.props)
+    }
+    UNSAFE_componentWillReceiveProps (nextProps){
+        if (JSON.stringify(nextProps.templatesSource) !== JSON.stringify(this.props.templatesSource)) {
+            this.setState({
+                TheBackupappTemplateList: nextProps.templatesSource,
+                tempList: nextProps.templatesSource
+            })
+        }
+    }
     search = (value) => {
         if (value) {
             const newList = this.state.TheBackupappTemplateList.filter(item=>item.name.toLocaleLowerCase().indexOf(value) !== -1 || item.description.indexOf(value) !== -1 || item.conf_name.toLocaleLowerCase().indexOf(value) !== -1)
@@ -221,6 +232,7 @@ class AppConfigSection extends Component {
                         value={config.value}
                         style={{width: 300}}
                         onChange={(value)=>{
+                            console.log(value, config)
                             config.depends && config.depends.length > 0 && config.depends.map( (dep, dep_key) => {
                                 this.props.configStore.setHide(dep, dep_key === value)
                             })
@@ -402,19 +414,21 @@ class AppConfigSection extends Component {
                             }}
                         > 查看 </Button>
                         <span style={{padding: '0 1px'}}> </span>
-                        {
-                            record.developer !== this.props.store.session.user_id ? (
+                        {/* {
+                            record.developer !== this.props.store.session.user_id ? ( */}
                             <Button
                                 onClick={()=>{
                                     this.onCloneTemplate(record.name, record.latest_version)
                                 }}
-                            > 克隆 </Button> ) : null
-                        }
+                            > 克隆 </Button>
+                             {/* ) : null
+                        } */}
                         <span style={{padding: '0 1px'}}> </span>
                         <Button
                             disabled={this.props.configStore.templates.filter(item=> item.name === record.name).length > 0 ? true : false}
                             type="primary"
                             onClick={()=>{
+                                console.log(record)
                                 this.onAddTemplate(config, record.name, record.conf_name, record.description, record.latest_version)
                             }}
                         > 添加 </Button>
@@ -495,6 +509,7 @@ class AppConfigSection extends Component {
                         columns={addTempLists}
                         pagination={false}
                         scroll={{ y: 240 }}
+                        loading={this.props.loading}
                     />
                 </Modal>
             </div>

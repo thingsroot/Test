@@ -100,6 +100,7 @@ class EditorTemplates extends React.Component {
         }, {
             title: '操作',
             dataIndex: 'operation',
+            width: '270px',
             render: (text, record) => {
             const { editingKey } = this.state;
             const editable = this.isEditing(record);
@@ -130,10 +131,19 @@ class EditorTemplates extends React.Component {
                     查看
                 </Button>
                 <Button
+                    disabled={this.props.configStore.templatesList.filter(item=>item.name === record.id).length > 0 && this.props.configStore.templatesList.filter(item=>item.name === record.id)[0].latest_version === record.ver}
+                    onClick={()=>{
+                      this.updateNew(record.id)
+                    }}
+                    style={{margin: '0 10px'}}
+                >
+                    升级最新
+                </Button>
+                {/* <Button
                     onClick={() => this.edit(record.key)}
                 >
                     编辑
-                </Button>
+                </Button> */}
                 <Popconfirm title="Sure to delete?"
                     onConfirm={()=> this.delete(record.key)}
                 >
@@ -149,6 +159,7 @@ class EditorTemplates extends React.Component {
 
   componentDidMount () {
     const {dataSource} = this.props
+    console.log(this.props)
     if (dataSource !== undefined) {
         this.setState({count: dataSource.length})
     }
@@ -158,7 +169,22 @@ class EditorTemplates extends React.Component {
   cancel = () => {
     this.setState({ editingKey: '' });
   };
-
+  updateNew (id) {
+    const newData = [...this.props.dataSource];
+    const index = newData.findIndex(item => id === item.id);
+    if (index > -1) {
+        const item = this.props.configStore.templatesList.filter(item=> item.name === id)[0]
+        const obj = {
+          key: newData[index].key,
+          id: id,
+          name: newData[index].name,
+          ver: item.latest_version
+        }
+        newData.splice(index, 1, obj);
+        console.log(newData)
+        this.props.config.setValue(newData)
+    }
+  }
   save (form, key) {
     form.validateFields((error, row) => {
       if (error) {

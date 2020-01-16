@@ -202,7 +202,8 @@ class AppConfig extends Component {
             activeKey: 'json', // Tab Active
             uiEnabled: false, // 可视化是否加载
             configValue: '',
-            valueChange: false
+            valueChange: false,
+            loading: true
         };
     }
 
@@ -252,8 +253,9 @@ class AppConfig extends Component {
     }
 
     refreshTemplateList = () => {
-        this.setState({appTemplateList: []})
+        this.setState({appTemplateList: [], loading: true})
         let app = this.state.app_info ? this.state.app_info.name : undefined
+        console.log(app)
         if (app === undefined) {
             return
         }
@@ -267,8 +269,10 @@ class AppConfig extends Component {
                 }
             });
             this.setState({
-                appTemplateList: list
+                appTemplateList: list,
+                loading: false
             });
+            this.props.configStore.setTemplatesList(list)
         });
         http.get('/api/user_configurations_list?conf_type=Template&app=' + app)
             .then(res=>{
@@ -280,8 +284,10 @@ class AppConfig extends Component {
                         }
                     });
                     this.setState({
-                        appTemplateList: list
+                        appTemplateList: list,
+                        loading: false
                     });
+                    this.props.configStore.setTemplatesList(list)
                 }
             });
     }
@@ -364,6 +370,7 @@ class AppConfig extends Component {
                         child: [v]
                     }
                     sections.push(cur_section);
+                    console.log(sections, 'sections')
                 } else if (v.type === 'table') {
                     v.cols = v.cols === undefined ? [] : v.cols
                     // if (cur_section.type === 'section') {
@@ -515,6 +522,7 @@ class AppConfig extends Component {
                                         configSection={v}
                                         templatesSource={this.state.appTemplateList}
                                         refreshTemplateList={this.refreshTemplateList}
+                                        loading={this.state.loading}
                                         onChange={()=>{
                                             this.onConfigChange()
                                         }}

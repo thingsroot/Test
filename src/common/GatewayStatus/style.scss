@@ -28,13 +28,27 @@
             z-index: 999;
             background: #fff;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            width: 500px;
-            height:400px;
+            width: 520px;
+            min-height:400px;
+            max-height: 80%;
+            max-width: 100%;
+            overflow-y: auto;
             .share_devece_close{
                 position: absolute;
                 right:10px;
                 top:10px;
                 z-index: 999;
+            }
+            .shares_list_wrap{
+                // height: '350px';
+                overflow-y: 'auto';
+                position: 'absolute';
+                top: '0px';
+                left: '0px';
+            }
+            .shares_list{
+                min-height: 380px;
+                height: 100%;
             }
         }
     }

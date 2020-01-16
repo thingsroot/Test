@@ -30,7 +30,7 @@ class EditableCell extends React.Component {
               rules: [
                 {
                   required: true,
-                  message: `Please Input ${title}!`
+                  message: `请输入${title}!`
                 }
               ],
               initialValue: record[dataIndex]
@@ -69,24 +69,28 @@ class Status extends Component {
                         return (<Tooltip title={record}>{record}</Tooltip>)
                     }
                 }, {
-                    title: '有效日期',
+                    title: '结束日期',
                     dataIndex: 'end_time',
                     render: (record, result)=>{
-                        if (result.key !== this.state.editingKey) {
-                            return <span>{record}</span>
-                        } else {
-                            return (
-                                <Select
-                                    defaultValue={1}
-                                    style={{ width: 120 }}
-                                    onChange={this.handleChange}
-                                >
-                                    <Option value={1}>1天</Option>
-                                    <Option value={3}>3天</Option>
-                                    <Option value={7}>7天</Option>
-                                </Select>
-                            )
-                        }
+                            if (result.key !== this.state.editingKey) {
+                                if (new Date(record) * 1 > new Date() * 1) {
+                                    return <span>{record}</span>
+                                } else {
+                                    return <span style={{color: 'red'}}>{record ? '已失效' : ''}</span>
+                                }
+                            } else {
+                                return (
+                                    <Select
+                                        defaultValue={1}
+                                        style={{ width: 120 }}
+                                        onChange={this.handleChange}
+                                    >
+                                        <Option value={1}>1天</Option>
+                                        <Option value={3}>3天</Option>
+                                        <Option value={7}>7天</Option>
+                                    </Select>
+                                )
+                            }
                     }
                 }, {
                     title: '操作',
@@ -316,7 +320,7 @@ class Status extends Component {
         if (index === 0) {
             return false;
         }
-        shares_data.unshift(obj)
+        shares_data.push(obj)
         this.setState({
             shares_data
         }, ()=> {
@@ -432,47 +436,65 @@ class Status extends Component {
                                         })
                                     }}
                                 >
-                                {console.log((this.props))}
                                     <IconVnet type="icon-icon_share"/>
                                 </Button>
                                 {
                                     this.state.share_visible
-                                    ? <div className="share_devece">
-                                        <Button
-                                            type="link"
-                                            // icon="close"
-                                            className="share_devece_close"
-                                            onClick={()=>{
-                                                this.setState({
-                                                    share_visible: false
-                                                })
-                                            }}
+                                    ? <div
+                                        style={{
+                                            position: 'fixed',
+                                            top: 0,
+                                            left: 0,
+                                            bottom: 0,
+                                            right: 0,
+                                            background: 'rgba(0, 0, 0, 0)',
+                                            zIndex: 998
+                                        }}
+                                        onClick={()=>{
+                                            this.setState({
+                                                share_visible: false
+                                            })
+                                        }}
+                                      >
+                                        <div
+                                            className="share_devece"
                                         >
-                                            关闭
-                                        </Button>
-                                        <EditableContext.Provider
-                                            value={this.props.form}
-                                        >
-                                            <div
-                                                style={{height: '350px', overflowY: 'auto'}}
+                                            <EditableContext.Provider
+                                                value={this.props.form}
                                             >
-                                                <Table
-                                                    rowKey="share_to"
-                                                    components={components}
-                                                    rowClassName={() => 'editable-row'}
-                                                    bordered
-                                                    columns={columns}
-                                                    dataSource={this.state.shares_data}
-                                                    pagination={false}
-                                                />
-                                            </div>
-                                        </EditableContext.Provider>
-                                        <Button
-                                            onClick={this.addShares}
-                                            style={{marginLeft: '15px'}}
-                                        >
-                                            添加用户
-                                        </Button>
+                                                <div>
+                                                    <div
+                                                        className="shares_list_wrap"
+                                                        onClick={(event)=>{
+                                                            event.stopPropagation()
+                                                        }}
+                                                    >
+                                                        <Table
+                                                            rowKey="share_to"
+                                                            className="shares_list"
+                                                            components={components}
+                                                            rowClassName={() => 'editable-row'}
+                                                            bordered
+                                                            columns={columns}
+                                                            dataSource={this.state.shares_data}
+                                                            pagination={false}
+                                                        />
+                                                        <div
+                                                            style={{
+                                                                padding: '10px 0'
+                                                            }}
+                                                        >
+                                                            <Button
+                                                                onClick={this.addShares}
+                                                                style={{marginLeft: '15px'}}
+                                                            >
+                                                                添加用户
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </EditableContext.Provider>
+                                        </div>
                                       </div>
                                     : ''
                                 }

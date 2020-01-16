@@ -216,7 +216,7 @@ const newAppConfigTemplate = (name, conf_name, description, version) => {
 export class ConfigStore {
     @observable sections = []
     @observable templates = []
-
+    @observable templatesList = [];
     @action addSection (section) {
         let item = new ConfigSection()
         item.fromObject(section)
@@ -237,7 +237,9 @@ export class ConfigStore {
     @action delTemplate (index) {
         this.templates.splice(index, 1)
     }
-
+    @action setTemplatesList (templates) {
+        this.templatesList = templates
+    }
     @action delTemplateByName (name) {
         this.templates.splice(this.templates.findIndex(item => name === item.name), 1)
     }
@@ -273,10 +275,14 @@ export class ConfigStore {
     @action setValue (value){
         let val = value ? value : {}
         this.sections.map( (section, index) => {
-            if (index === 0 || section.type === 'fake_section') {
-                section.setValue(val)
-            } else {
-                section.setValue(val[section.name])
+            try {
+                if (index === 0 || section.type === 'fake_section') {
+                    section.setValue(val)
+                } else {
+                    section.setValue(val[section.name])
+                }
+            } catch (e) {
+                console.log(e)
             }
         })
     }

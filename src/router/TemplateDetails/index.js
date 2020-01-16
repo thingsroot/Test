@@ -332,22 +332,35 @@ class MyTemplateDetails extends PureComponent {
                     wrapClassName={'web'}
                 >
                     <div style={previewCsvData.length > 0
-                        ? {display: 'none'}
-                        : {width: '100%', height: '100%', display: 'block'}}
+                        ? {opacity: '0', position: 'absolute', width: '90%', height: '80%', left: '5%', top: '0'}
+                        : {width: '90%', height: '80%', display: 'block', position: 'relative', zIndex: '999', left: '5%'}}
                     >
                         <Dragger
-                            style={{width: '100%', height: '100%'}}
+                            style={{width: '100%'}}
                             accept=".csv"
                             onChange={this.fileChang}
                         >
-                            <p className="ant-upload-drag-icon">
-                                <Icon type="inbox" />
-                            </p>
-                            <p className="ant-upload-text">将文件拖拽至此或点击添加</p>
+                            <div
+                                style={{position: 'absolute', top: '0px', left: '0px', width: '100%', height: '100%', padding: '16px', opacity: previewCsvData.length > 0 ? '0' : '1'}}
+                                onClick={(e)=>{
+                                    if (previewCsvData.length > 0) {
+                                        e.stopPropagation()
+                                    }
+                                    return false;
+                                }}
+                            >
+                                <p
+                                    className="ant-upload-drag-icon"
+                                    style={{marginTop: '175px'}}
+                                >
+                                    <Icon type="inbox" />
+                                </p>
+                                <p className="ant-upload-text">将文件拖拽至此或点击添加</p>
+                            </div>
                         </Dragger>
                     </div>
                     <div style={previewCsvData.length > 0
-                        ? {width: '100%', height: '100%', overflow: 'auto', display: 'block'}
+                        ? {width: '100%', height: '100%', overflow: 'auto', display: 'block', zIndex: '0'}
                         : {display: 'none'}}
                     >
                         <table
@@ -356,7 +369,8 @@ class MyTemplateDetails extends PureComponent {
                         >
                             <tbody>
                             {
-                                previewCsvData && previewCsvData.length > 0 && previewCsvData.map((v, key)=>{
+                                previewCsvData && previewCsvData.length > 0
+                                ? previewCsvData.map((v, key)=>{
                                     if (v.length > 1) {
                                         return (
                                             <tr key={key}>
@@ -376,6 +390,7 @@ class MyTemplateDetails extends PureComponent {
                                         )
                                     }
                                 })
+                                : <tr></tr>
                             }
                             </tbody>
                         </table>
