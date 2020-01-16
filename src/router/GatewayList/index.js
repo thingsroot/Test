@@ -33,22 +33,39 @@ class MyGates extends Component {
                 title: '名称',
                 dataIndex: 'dev_name',
                 key: 'dev_name',
+                width: '400px',
                 sorter: (a, b) => a.dev_name.length - b.dev_name.length,
                 render: (props, record)=>{
                     return (
-                        <div style={{lineHeight: '45px'}}>
-                            {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >公司</Tag> : null}
-                            {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >个人</Tag> : null}
-                            {record.is_shared ? <Tag color="orange" >分享</Tag> : null}
-                            {record.dev_name}
+                        <div
+                            className="dev_name"
+                        >
+                            <div style={{lineHeight: '30px'}}>
+                                {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >公司</Tag> : null}
+                                {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >个人</Tag> : null}
+                                {record.is_shared ? <Tag color="orange" >分享</Tag> : null}
+                            </div>
+                            <div
+                                style={{fontSize: '14px'}}
+                            >
+                                {record.dev_name}
+                                <br />
+                                <span
+                                    style={{
+                                        color: 'rgb(162, 159, 159)',
+                                        fontSize: '12px'
+                                    }}
+                                >{record.description}</span>
+                            </div>
                         </div>
                     )
                 }
               }, {
-                title: '描述',
-                dataIndex: 'description',
-                key: 'description',
-                sorter: (a, b) => a.description && b.description && a.description.length - b.description.length
+                title: '序列号',
+                dataIndex: 'sn',
+                key: 'sn',
+                width: '320px',
+                sorter: (a, b) => a.sn && b.sn && a.sn.length - b.sn.length
               }, {
                 title: '上线时间',
                 dataIndex: 'last_updated',
@@ -73,16 +90,16 @@ class MyGates extends Component {
                 title: '设备数',
                 key: 'device_devs_num',
                 dataIndex: 'device_devs_num',
-                width: '65px'
+                width: '85px'
                 }, {
                 title: '应用数',
                 key: 'device_apps_num',
                 dataIndex: 'device_apps_num',
-                width: '65px'
+                width: '85px'
                 }, {
                 title: '操作',
                 key: 'action',
-                width: '240px',
+                width: '260px',
                 render: (text, record, props) => {
                     props;
                   return (

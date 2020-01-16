@@ -7,6 +7,22 @@
     border-bottom: 1px solid #e8e8e8;
     .status{
         text-align: center;
+        display: flex;
+    }
+    .status_tag{
+        margin-right: 5px;
+        width: 0px;
+        height:25px;
+        display: inline-block;
+        position: relative;
+        .ant-tag{
+            position: absolute;
+            height: 25px;
+            line-height: 25px;
+            top: 5px;
+            left: 0px;
+        }
+
     }
     .gateDesc{
         width: 70%;

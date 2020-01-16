@@ -360,12 +360,17 @@ class Status extends Component {
                     className="status"
                     style={{width: '200px', marginRight: '20px'}}
                 >
-                    <div style={{marginRight: '5px', display: 'inline-block'}}>
+                    <div
+                        className="status_tag"
+                    >
                             {this.state.data.owner_type === 'Cloud Company Group' && this.state.data.company === _getCookie('companies')
                             ? <Tag color="cyan" >公司</Tag>
                             : this.state.data.owner_type === 'User' && this.state.data.owner_id === _getCookie('user_id') ? <Tag color="lime" >个人</Tag>
                             : <Tag color="orange" >分享</Tag>}
                     </div>
+                    <div
+                        style={{flex: '1'}}
+                    >
                     <Tooltip title="在线状态" >
                         <IconIOT
                             style={{fontSize: 22, color: device_status === 'ONLINE' ? '#3c763d' : '#f39c12'}}
@@ -395,6 +400,7 @@ class Status extends Component {
                             </span>
                         ) : null
                     }
+                    </div>
                 </div>
                 <div className="gateDesc">
                     <Tooltip title={dev_name ? dev_name : ''}>
