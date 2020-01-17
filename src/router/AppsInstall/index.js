@@ -84,12 +84,15 @@ class MyGatesAppsInstall extends Component {
     }
 
     searchApp (value){
-        let { app_list } = this.state;
-        let newdata = [];
-        newdata = app_list.filter((item)=>item.app_name.toLowerCase().indexOf(value.toLowerCase()) !== -1);
-        this.setState({
-            app_show: newdata
-        })
+        this.inputFilterTimer && clearTimeout(this.inputFilterTimer)
+        this.inputFilterTimer = setTimeout(()=>{
+            let { app_list } = this.state;
+            let newdata = [];
+            newdata = app_list.filter((item)=>item.app_name.toLowerCase().indexOf(value.toLowerCase()) !== -1);
+            this.setState({
+                app_show: newdata
+            })
+        }, 200)
     }
 
     setUrl = (name, step) => {
@@ -406,8 +409,8 @@ class MyGatesAppsInstall extends Component {
                                <Search
                                    key="33"
                                    placeholder="搜索应用名"
-                                   onSearch={(value)=>{
-                                       this.searchApp(value)
+                                   onChange={(e)=>{
+                                       this.searchApp(e.target.value)
                                    }}
                                    style={{ width: 200, marginRight: 80}}
                                />

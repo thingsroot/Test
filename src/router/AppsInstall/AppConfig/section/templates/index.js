@@ -174,11 +174,13 @@ class EditorTemplates extends React.Component {
     const index = newData.findIndex(item => id === item.id);
     if (index > -1) {
         const item = this.props.configStore.templatesList.filter(item=> item.name === id)[0]
+        console.log(item, 'item')
         const obj = {
           key: newData[index].key,
           id: id,
           name: newData[index].name,
-          ver: item.latest_version
+          ver: item.latest_version,
+          description: item.description
         }
         newData.splice(index, 1, obj);
         console.log(newData)

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon, Tooltip, Button, Table, Form, Input, message, Select, Tag } from 'antd';
+import { Icon, Tooltip, Button, Table, Form, Input, message, Select, Tag, Spin } from 'antd';
 import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
@@ -363,10 +363,13 @@ class Status extends Component {
                     <div
                         className="status_tag"
                     >
-                            {this.state.data.owner_type === 'Cloud Company Group' && this.state.data.company === _getCookie('companies')
-                            ? <Tag color="cyan" >公司</Tag>
-                            : this.state.data.owner_type === 'User' && this.state.data.owner_id === _getCookie('user_id') ? <Tag color="lime" >个人</Tag>
-                            : <Tag color="orange" >分享</Tag>}
+                            {
+                                this.state.data.owner_type === 'Cloud Company Group' && this.state.data.company === _getCookie('companies')
+                                ? <Tag color="cyan" >公司</Tag>
+                                : this.state.data.owner_type === 'User' && this.state.data.owner_id === _getCookie('user_id')
+                                    ? <Tag color="lime" >个人</Tag>
+                                    : JSON.stringify(this.state.data) === '{}' ? <Spin /> : <Tag color="orange" >分享</Tag>
+                            }
                     </div>
                     <div
                         style={{flex: '1'}}
