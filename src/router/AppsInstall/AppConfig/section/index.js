@@ -27,9 +27,6 @@ class AppConfigSection extends Component {
             tempList: []
         }
     }
-    componentDidMount () {
-        console.log(this.props)
-    }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (JSON.stringify(nextProps.templatesSource) !== JSON.stringify(this.props.templatesSource)) {
             this.setState({
@@ -232,7 +229,6 @@ class AppConfigSection extends Component {
                         value={config.value}
                         style={{width: 300}}
                         onChange={(value)=>{
-                            console.log(value, config)
                             config.depends && config.depends.length > 0 && config.depends.map( (dep, dep_key) => {
                                 this.props.configStore.setHide(dep, dep_key === value)
                             })
@@ -428,7 +424,6 @@ class AppConfigSection extends Component {
                             disabled={this.props.configStore.templates.filter(item=> item.name === record.name).length > 0 ? true : false}
                             type="primary"
                             onClick={()=>{
-                                console.log(record)
                                 this.onAddTemplate(config, record.name, record.conf_name, record.description, record.latest_version)
                             }}
                         > 添加 </Button>
@@ -542,6 +537,7 @@ class AppConfigSection extends Component {
                             return this.render_text(key, v)
                         }
                         if (v.type === 'dropdown') {
+                            // return false
                             return this.render_dropdown(key, v)
                         }
                         if (v.type === 'table') {

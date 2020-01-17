@@ -177,7 +177,8 @@ class ConfigSection {
             return
         }
         let item = this.child.find(item => item.name === key)
-        if (item !== undefined) {
+        const text = JSON.stringify(item)
+        if (item !== undefined && (text === 'true' || text === 'false')) {
             item.setHide(value)
         }
     }
@@ -245,6 +246,9 @@ export class ConfigStore {
     }
 
     @action setHide (key, value) {
+        if (key === true || key === false){
+            return false;
+        }
         let arr = key.split('/');
         let section = this.sections.find(item => item.name === arr[0])
         if (section) {

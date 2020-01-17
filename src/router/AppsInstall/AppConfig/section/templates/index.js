@@ -131,7 +131,11 @@ class EditorTemplates extends React.Component {
                     查看
                 </Button>
                 <Button
-                    disabled={this.props.configStore.templatesList.filter(item=>item.name === record.id).length > 0 && this.props.configStore.templatesList.filter(item=>item.name === record.id)[0].latest_version === record.ver}
+                    disabled={
+                      this.props.configStore.templatesList.filter(item=>item.name === record.id).length > 0
+                      ? this.props.configStore.templatesList.filter(item=>item.name === record.id)[0].latest_version === record.ver
+                      : true
+                    }
                     onClick={()=>{
                       this.updateNew(record.id)
                     }}
@@ -139,11 +143,6 @@ class EditorTemplates extends React.Component {
                 >
                     升级最新
                 </Button>
-                {/* <Button
-                    onClick={() => this.edit(record.key)}
-                >
-                    编辑
-                </Button> */}
                 <Popconfirm title="Sure to delete?"
                     onConfirm={()=> this.delete(record.key)}
                 >
@@ -159,7 +158,6 @@ class EditorTemplates extends React.Component {
 
   componentDidMount () {
     const {dataSource} = this.props
-    console.log(this.props)
     if (dataSource !== undefined) {
         this.setState({count: dataSource.length})
     }
@@ -174,17 +172,17 @@ class EditorTemplates extends React.Component {
     const index = newData.findIndex(item => id === item.id);
     if (index > -1) {
         const item = this.props.configStore.templatesList.filter(item=> item.name === id)[0]
-        console.log(item, 'item')
-        const obj = {
-          key: newData[index].key,
-          id: id,
-          name: newData[index].name,
-          ver: item.latest_version,
-          description: item.description
+        if (item) {
+          const obj = {
+            key: newData[index].key,
+            id: id,
+            name: newData[index].name,
+            ver: item.latest_version,
+            description: item.description
+          }
+          newData.splice(index, 1, obj);
+          this.props.config.setValue(newData)
         }
-        newData.splice(index, 1, obj);
-        console.log(newData)
-        this.props.config.setValue(newData)
     }
   }
   save (form, key) {
