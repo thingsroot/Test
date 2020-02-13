@@ -404,6 +404,8 @@ class Action extends Component {
                         visible={setName}
                         confirmLoading={setNameConfirmLoading}
                         title="更改实例名"
+                        okText="更改"
+                        cancelText="取消"
                         onOk={()=>{
                             if (nameValue === undefined || nameValue === record.inst_name) {
                                 message.error('实例名未修改！')

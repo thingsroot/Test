@@ -10,22 +10,23 @@ isAuthenticated;
 axios.defaults.timeout = 100000;
 
 // 配置请求拦截
-/*
-axios.interceptors.request.use((config) => {
+// /*
+// axios.interceptors.request.use((config) => {
   // config.headers.common['auto_token'] = _getCookie('auto_token');
   // config.headers.common['full_name'] = _getCookie('full_name');
   // config.headers.common['sid'] = _getCookie('sid');
   // config.headers.common['system'] = _getCookie('system');
   // config.headers.common['user_id'] = _getCookie('user_id');
   // config.headers.common['user_image'] = _getCookie('user_image');
-  return config;
-});
-*/
+//   console.log(config, 'config')
+//   return config;
+// });
+// */
 
 // 添加响应拦截器
-// axios.interceptors.response.use(
-//   function (response) {
-
+axios.interceptors.response.use(
+  function (response) {
+    console.log(response)
 //     if (!isAuthenticated() || response.data.error && response.data.error === 'auth_code_missing'){
 //       window.location.href = '/login'
 //     }
@@ -34,8 +35,8 @@ axios.interceptors.request.use((config) => {
 //   function (error) {
 //     // 对响应错误做点什么
 //     return Promise.reject(error);
-//   }
-// );
+  }
+);
 /**
  * get请求
  * @method get
