@@ -1,6 +1,7 @@
 import React from 'react';
 import './style.scss';
 import { Table, Input, Select, Button, Form, message } from 'antd';
+import intl from 'react-intl-universal';
 
 const EditableContext = React.createContext();
 
@@ -44,7 +45,7 @@ class EditableCell extends React.Component {
                     onChange={this.save}
                 />
                 <Select
-                    defaultValue="请选择模板"
+                    defaultValue={intl.get('appsinstall.please_select_a_template')}
                     style={{width: '95%'}}
                 >
                     {colRef.map((item)=>{
@@ -205,7 +206,7 @@ class EditableTable extends React.Component {
             })
         })
         copy_columns.push({
-            title: '操作',
+            title: intl.get('common.operation'),
             dataIndex: '___operation',
             render: (text, record) =>
                 this.props.dataSource.length >= 1 ? (
@@ -214,7 +215,7 @@ class EditableTable extends React.Component {
                         onClick={()=>{
                             this.handleDelete(record.key)
                         }}
-                    >删除</Button>
+                    >{intl.get('appdetails.delete')}</Button>
                 ) : null
         })
         this.columns = copy_columns
@@ -233,7 +234,7 @@ class EditableTable extends React.Component {
         const { tableColumns, dataSource } = this.props;
 
         if (this.props.config.Limit !== 0 && this.props.config.Limit <= this.props.config.Value.length) {
-            message.error('已达到可选模板的数量上限')
+            message.error(intl.get('appsinstall.the_maximum_number_of_optional_templates_has_been_reached'))
             return
         }
 
@@ -245,7 +246,7 @@ class EditableTable extends React.Component {
                     newData[col.dataIndex] = col.default
                 } else {
                     if (col.columnType === 'template') {
-                        newData[col.dataIndex] = '请选择模板'
+                        newData[col.dataIndex] = intl.get('appsinstall.please_select_a_template')
                     } else if (col.columnType === 'number') {
                         newData[col.dataIndex] = 0
                     } else {
@@ -307,7 +308,7 @@ class EditableTable extends React.Component {
                 type="primary"
                 style={{ marginBottom: 16 }}
             >
-                添加
+                {intl.get('appsinstall_add')}
             </Button>
             <Table
                 rowKey="key"

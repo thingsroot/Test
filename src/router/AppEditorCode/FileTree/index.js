@@ -5,6 +5,7 @@ import { Tree, Icon, Modal, message, Input, Tooltip } from 'antd';
 import { observer, inject } from 'mobx-react';
 import http from '../../../utils/Server';
 import {IconEditor} from '../../../utils/iconfont';
+import intl from 'react-intl-universal';
 
 const confirm = Modal.confirm;
 const { TreeNode } = Tree;
@@ -154,7 +155,7 @@ class MyTree extends Component {
 
     get SelectedNodeBasePath () {
         if (this.SelectedNodeID === undefined) {
-            message.error('没有选中的节点')
+            message.error(intl.get('appeditorcode.no_selected_node'))
         }
 
         if (this.SelectedNodeID === '#') {
@@ -189,7 +190,7 @@ class MyTree extends Component {
 
     onShowNewFile = ()=>{
         if (this.SelectedNodeID === undefined) {
-            message.error('请先选择一个目录')
+            message.error(intl.get('appeditorcode.please_select_a_directory_first'))
             return
         }
         this.setState({
@@ -229,9 +230,9 @@ class MyTree extends Component {
                         showNewFileModal: false
                     });
                     folder_node.addChild(newItem);
-                    message.success('创建文件成功');
+                    message.success(intl.get('appeditorcode.file_created_successfully'));
                 } else {
-                    message.error('创建文件失败')
+                    message.error(intl.get('appeditorcode.failed_to_create_file'))
                 }
             });
         // this.findChild(this.state.root[0], new_id).then(node=>{
@@ -246,7 +247,7 @@ class MyTree extends Component {
     //添加文件夹
     onShowNewFolder = ()=>{
         if (this.SelectedNodeID === undefined) {
-            message.error('请先选择一个目录')
+            message.error(intl.get('appeditorcode.please_select_a_directory_first'))
             return
         }
         this.setState({
@@ -281,9 +282,9 @@ class MyTree extends Component {
                         showNewFolderModal: false
                     });
                     folder_node.addChild(newItem);
-                    message.success('创建文件夹成功');
+                    message.success(intl.get('appeditorcode.file_created_successfully'));
                 } else {
-                    message.error('创建文件夹失败')
+                    message.error(intl.get('appeditorcode.failed_to_create_file'))
                 }
             });
         // this.findChild(this.state.root[0], new_id).then(node=>{
@@ -313,16 +314,16 @@ class MyTree extends Component {
                 .then(res=>{
                     if (res.status === 'OK') {
                         this.deleteNode(folder_node.children, child_node)
-                        message.success('删除成功！');
+                        message.success(intl.get('appeditorcode.delete_successfully'));
                     } else {
-                        message.error('删除失败！')
+                        message.error(intl.get('appeditorcode.delete_failed'))
                     }
                 });
         };
         confirm({
-            title: `确定要删除${this.SelectedNodeText}[${to_delete_id}]`,
-            okText: '确定',
-            cancelText: '取消',
+            title: `${intl.get('')}${this.SelectedNodeText}[${to_delete_id}]`,
+            okText: intl.get('common.sure'),
+            cancelText: intl.get('common.cancel'),
             content: content,
             onOk () {
                 delete_node()
@@ -351,9 +352,9 @@ class MyTree extends Component {
             return
         }
         if (this.SelectedNodeType === 'folder') {
-            this.showConfirm('确认删除此文件夹？')
+            this.showConfirm(intl.get(''))
         } else if (this.SelectedNodeType === 'file') {
-            this.showConfirm('确认删除此文件？')
+            this.showConfirm(intl.get('appeditorcode.Are_you_sure_you_want_to_delete_this_file'))
         }
     };
 
@@ -377,7 +378,7 @@ class MyTree extends Component {
             this.setState({
                 showRenameModal: false
             })
-            message.warning('节点不存在')
+            message.warning(intl.get('appeditorcode.node_does_not_exist'))
             return
         }
 
@@ -397,16 +398,16 @@ class MyTree extends Component {
                         expandedKeys: [...this.state.expandedKeys]
                     })
                     this.setState({ showRenameModal: false })
-                    message.success('更改名称成功')
+                    message.success(intl.get(''))
                     cur_node.setKey(res.id)
                     cur_node.setTitle(params.text)
                 } else {
-                    message.error('更改名称失败');
+                    message.error(intl.get('appeditorcode.failed_to_change_name'));
                 }
             })
             .catch(err=>{
                 err;
-                message.error('更改名称失败');
+                message.error(intl.get('appeditorcode.failed_to_change_name'));
             })
     };
     onExpand = (expandedKeys) => {
@@ -555,28 +556,28 @@ class MyTree extends Component {
             <div className="fileTree">
                 <div className="iconGroup">
                     <p style={{width: '220px'}}>
-                        <Tooltip title="新建文件" >
+                        <Tooltip title={intl.get('appeditorcode.new_file')} >
                             <Icon
                                 type="file-add"
                                 onClick={this.onShowNewFile}
                             />
                         </Tooltip>
                         <span style={{padding: '0 2px'}} />
-                        <Tooltip title="新建文件夹" >
+                        <Tooltip title={intl.get('appeditorcode.new_folder')} >
                             <Icon
                                 type="folder-add"
                                 onClick={this.onShowNewFolder}
                             />
                         </Tooltip>
                         <span style={{padding: '0 2px'}} />
-                        <Tooltip title="更改文件(夹)名称" >
+                        <Tooltip title={intl.get('appeditorcode.change_file_name')} >
                             <Icon
                                 type="edit"
                                 onClick={this.onShowEditName}
                             />
                         </Tooltip>
                         <span style={{padding: '0 2px'}} />
-                        <Tooltip title="删除文件(夹)名称" >
+                        <Tooltip title={intl.get('appeditorcode.delete_file_name')} >
                             <Icon
                                 type="delete"
                                 onClick={this.deleteFileShow}
@@ -604,7 +605,7 @@ class MyTree extends Component {
                     }
                 </div>
                 <Modal
-                    title="新建文件"
+                    title={intl.get('appeditorcode.new_file')}
                     visible={this.state.showNewFileModal}
                     onOk={this.onAddNewFile}
                     onCancel={()=> {
@@ -612,10 +613,10 @@ class MyTree extends Component {
                             showNewFileModal: false
                         })
                     }}
-                    okText="确认"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                 >
-                    <span style={{padding: '0 20px'}}>文件名</span>
+                    <span style={{padding: '0 20px'}}>{intl.get('appeditorcode.file_name')}</span>
                     <Input
                         type="text"
                         value={this.state.newInputValue}
@@ -626,7 +627,7 @@ class MyTree extends Component {
                     />
                 </Modal>
                 <Modal
-                    title="更改名称"
+                    title={intl.get('appeditorcode.change_nam')}
                     visible={this.state.showRenameModal}
                     onOk={this.onChangeNodeName}
                     onCancel={()=> {
@@ -634,10 +635,10 @@ class MyTree extends Component {
                             showRenameModal: false
                         })
                     }}
-                    okText="确认"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                 >
-                    <span style={{padding: '0 20px'}}>重命名</span>
+                    <span style={{padding: '0 20px'}}>{intl.get('appeditorcode.rename')}</span>
                     <Input
                         type="text"
                         value={this.state.newInputValue}
@@ -648,7 +649,7 @@ class MyTree extends Component {
                     />
                 </Modal>
                 <Modal
-                    title="新建文件夹"
+                    title={intl.get('appeditorcode.new_folder')}
                     visible={this.state.showNewFolderModal}
                     onOk={this.onAddNewFolder}
                     onCancel={()=> {
@@ -656,10 +657,10 @@ class MyTree extends Component {
                             showNewFolderModal: false
                         })
                     }}
-                    okText="确认"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                 >
-                    <span style={{padding: '0 20px'}}>文件夹名</span>
+                    <span style={{padding: '0 20px'}}>{intl.get('appeditorcode.folder_name')}</span>
                     <Input
                         type="text"
                         value={this.state.newInputValue}

@@ -6,6 +6,7 @@ import { CSVLink } from 'react-csv';
 import http from '../../utils/Server';
 import './style.scss';
 import CopyForm from '../AppDetails/CopyForm'
+import intl from 'react-intl-universal';
 
 const Dragger = Upload.Dragger;
 const Option = Select.Option;
@@ -70,12 +71,12 @@ class MyTemplateDetails extends PureComponent {
                 this.setState({conf_info: res.data})
                 this.getVersionList()
             } else {
-                message.error('无法获取配置信息。错误:' + res.error)
+                message.error(`${intl.get('templatedetails.unable_to_get_configuration_information')}: ` + res.error)
                 this.props.history.push('/')
             }
         }).catch((err)=>{
             err;
-            message.error('读取模板信息失败')
+            message.error(intl.get('templatedetails.failed_to_read_template_information'))
             this.props.history.push('/')
         })
     }
@@ -173,7 +174,7 @@ class MyTemplateDetails extends PureComponent {
         http.post('/api/configurations_versions_create', params)
             .then(res=>{
                 res;
-                message.success('上传新版本成功！');
+                message.success(intl.get('templatedetails.upload_new_version_succeeded'));
                 setTimeout(()=>{
                     this.setState({
                         visible: false,
@@ -203,11 +204,11 @@ class MyTemplateDetails extends PureComponent {
             <div className="MyTemplateDetails">
                 <div className="title">
                     <div>
-                        <span>名称:</span>
+                        <span>{intl.get('common.name')}:</span>
                         {conf_info.conf_name}
-                        <span style={{paddingLeft: '50px'}}>所有者:</span>
+                        <span style={{paddingLeft: '50px'}}>{intl.get('appdetails.owner')}:</span>
                         {conf_info.developer}
-                        <span style={{paddingLeft: '50px'}}>版本列表：</span>
+                        <span style={{paddingLeft: '50px'}}>{intl.get('appdetails.version_list')}：</span>
                         <Select
                             disabled={versionList.length > 0 ? false : true}
                             value={show_version}
@@ -225,7 +226,7 @@ class MyTemplateDetails extends PureComponent {
                                 })
                             }
                         </Select>
-                        <span style={{paddingLeft: '50px'}}>关联应用：{conf_info.app}</span>
+                        <span style={{paddingLeft: '50px'}}>{intl.get('templatedetails.correlation_application')}：{conf_info.app}</span>
                     </div>
                     <div>
                         <Button
@@ -234,16 +235,16 @@ class MyTemplateDetails extends PureComponent {
                                 this.setState({visibleEdit: true})
                             }}
                         >
-                            编辑
+                            {intl.get('appdetails.edit')}
                         </Button>
                         <Button
                             style={this.state.conf_info.developer === this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showModal}
-                        >上传新版本</Button>
+                        >{intl.get('appdetails.upload_new_version')}</Button>
                         <Button
                             style={this.state.conf_info.developer !== this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showCloneModal}
-                        >克隆</Button>
+                        >{intl.get('appdetails.clone')}</Button>
                         <span style={{padding: '10px'}}></span>
                         <Button
                             type="primary"
@@ -252,7 +253,7 @@ class MyTemplateDetails extends PureComponent {
                             <CSVLink
                                 data={content}
                                 filename={conf_info.app + '-' + conf_info.name + '-' + show_version + '.csv'}
-                            >下载到本地</CSVLink>
+                            >{intl.get('templatedetails.download_to_local')}</CSVLink>
                         </Button>
                         <span style={{padding: '10px'}}></span>
                         <Icon
@@ -300,13 +301,13 @@ class MyTemplateDetails extends PureComponent {
                 <div
                     style={versionList.length > 0 ? none : block}
                 >
-                    <p className="empty">当前模板未包含数据</p>
+                    <p className="empty">{intl.get('templatedetails.the_current_template_does_not_contain_data')}</p>
                 </div>
                 <Modal
-                    title="上传新版本"
+                    title={intl.get('appdetails.upload_new_version')}
                     visible={this.state.visible}
-                    okText="确定"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     wrapClassName={'web'}
@@ -323,7 +324,7 @@ class MyTemplateDetails extends PureComponent {
                             <p className="ant-upload-drag-icon">
                                 <Icon type="inbox" />
                             </p>
-                            <p className="ant-upload-text">将文件拖拽至此或点击添加</p>
+                            <p className="ant-upload-text">{intl.get('templatedetails.drag_the_file_here_or_click_Add')}</p>
                         </Dragger>
                     </div>
                     <div style={previewCsvData.length > 0
@@ -367,12 +368,12 @@ class MyTemplateDetails extends PureComponent {
                         accept=".csv"
                     >
                         <Button>
-                            <Icon type="upload" /> 重选文件
+                            <Icon type="upload" /> {intl.get('templatedetails.Re-election_file')}
                         </Button>
                     </Upload>
                 </Modal>
                 <CopyForm
-                    type={'复制'}
+                    type={intl.get('appdetails.copy')}
                     conf={this.state.conf}
                     visible={this.state.visibleClone}
                     onCancel={() => {
@@ -387,7 +388,7 @@ class MyTemplateDetails extends PureComponent {
                     csvData={csvData}
                 />
                 <CopyForm
-                    type={'编辑'}
+                    type={intl.get('appdetails.edit')}
                     conf={this.state.conf}
                     visible={this.state.visibleEdit}
                     onCancel={() => {

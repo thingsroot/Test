@@ -3,6 +3,7 @@ import {inject, observer} from 'mobx-react';
 import {Input} from 'antd';
 import {withRouter} from 'react-router-dom'
 import http from '../../../utils/Server';
+import intl from 'react-intl-universal';
 
 @withRouter
 @inject('store')
@@ -13,7 +14,7 @@ class Inst extends React.Component {
     }
     instBlur = ()=>{
         if (this.props.inst_name === '' || this.props.inst_name === undefined) {
-            this.setState({errorMessage: '实例名不能为空'})
+            this.setState({errorMessage: intl.get('appsinstall.instance_name_cannot_be_empty')})
         } else {
             this.setState({errorMessage: ''})
         }
@@ -37,7 +38,7 @@ class Inst extends React.Component {
                 let names = Object.keys(res.data);
                 names && names.length > 0 && names.map(item=>{
                     if (this.props.inst_name === item) {
-                        this.setState({errorMessage: '实例名' + item + '已经存在!'})
+                        this.setState({errorMessage: intl.get('appsinstall.instance_name') + item + `${intl.get('appsinstall.already_exist')}!`})
                     }
                 })
             }
@@ -50,7 +51,7 @@ class Inst extends React.Component {
         return (
             <div className="Inst">
                 <p style={{lineHeight: '50px'}}>
-                    <span className="spanStyle">实例名：</span>
+                    <span className="spanStyle">{intl.get('appsinstall.instance_name')}：</span>
                     <Input
                         disabled={editable !== true}
                         type="text"

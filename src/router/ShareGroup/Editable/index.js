@@ -3,6 +3,7 @@ import {Button, Divider, Input, Modal, Popconfirm, Table, Form, message} from 'a
 import { inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
+import intl from 'react-intl-universal';
 
 const EditableContext = React.createContext();
 
@@ -43,7 +44,7 @@ class EditableCell extends React.Component {
               rules: [
                 {
                   required: true,
-                  message: `请输入${title}!`
+                  message: `${intl.get('gatewayappinstall.please_input')}${title}!`
                 }
               ],
               initialValue: record[dataIndex]
@@ -74,16 +75,16 @@ class Editable extends Component {
             loading: true,
             columnsGateway: [
                 {
-                    title: '网关序列号',
+                    title: intl.get('sharegroup.gateway_serial_number'),
                     dataIndex: 'sn'
                 }, {
-                    title: '网关名称',
+                    title: intl.get('sharegroup.gateway_name'),
                     dataIndex: 'dev_name'
                 }, {
-                    title: '描述',
+                    title: intl.get('common.name'),
                     dataIndex: 'description'
                 }, {
-                    title: '操作',
+                    title: intl.get('common.operation'),
                     render: (record)=>{
                         return (
                             <Button
@@ -93,7 +94,7 @@ class Editable extends Component {
                                 }}
                                 disabled={this.props.store.groups.GroupsGatewaylist.filter(item=>item.device === record.dev_name).length > 0}
                             >
-                                添加
+                                {intl.get('appsinstall_add')}
                             </Button>
                         )
                     }
@@ -101,22 +102,22 @@ class Editable extends Component {
             ],
             columnsUser: [
                 {
-                    title: '序号',
+                    title: intl.get('dashboard.the_serial_number'),
                     dataIndex: 'idx'
                 },
                 {
-                    title: '用户ID',
+                    title: intl.get('sharegroup.user_ID'),
                     dataIndex: 'user',
                     editable: true
                 },
                 {
-                    title: '备注',
+                    title: intl.get('sharegroup.remarks'),
                     dataIndex: 'comment',
                     width: '30%',
                     editable: true
                 },
                 {
-                    title: '操作',
+                    title: intl.get('common.operation'),
                     dataIndex: 'operation',
                     render: (text, record, index) => {
                         const { editingKey } = this.state;
@@ -130,17 +131,17 @@ class Editable extends Component {
                                     style={{ marginRight: 8 }}
                                     type="primary"
                                 >
-                                    保存
+                                    {intl.get('appsinstall.save')}
                                 </Button>
                                 )}
                             </EditableContext.Consumer>
                             <Popconfirm
-                                title="确定要放弃修改吗?"
-                                okText="确定"
-                                cancelText="取消"
+                                title={`${intl.get('sharegroup.are_you_sure_you_want_to_discard_the_changes')}?`}
+                                okText={intl.get('common.sure')}
+                                cancelText={intl.get('common.cancel')}
                                 onConfirm={() => this.cancel(record)}
                             >
-                                <Button>取消</Button>
+                                <Button>{intl.get('common.cancel')}</Button>
                             </Popconfirm>
                             </span>
                         ) : (
@@ -150,15 +151,15 @@ class Editable extends Component {
                                     onClick={() => this.edit(record.idx)}
                                     style={{marginRight: '15px'}}
                                 >
-                                    编辑
+                                    {intl.get('appdetails.edit')}
                                 </Button>
                             <Popconfirm
-                                title="确定要删除此用户吗?"
-                                okText="确定"
-                                cancelText="取消"
+                                title={`${intl.get('sharegroup.are_you_sure_you_want_to_delete_this_user')}?`}
+                                okText={intl.get('common.sure')}
+                                cancelText={intl.get('common.cancel')}
                                 onConfirm={() => this.props.store.groups.handleDeleteUser(record.user, index, this.props.activeKey)}
                             >
-                                <Button type="danger" >删除</Button>
+                                <Button type="danger" >{intl.get('appdetails.delete')}</Button>
                             </Popconfirm>
                             </div>
                         );
@@ -168,32 +169,32 @@ class Editable extends Component {
             count: 0,
             columnsDevice: [
                 {
-                    title: '序号',
+                    title: intl.get('dashboard.the_serial_number'),
                     dataIndex: 'idx'
                 },
                 {
-                    title: '网关序列号',
+                    title: intl.get('sharegroup.gateway_serial_number'),
                     dataIndex: 'device',
                     editable: true
                 },
                 {
-                    title: '备注',
+                    title: intl.get('sharegroup.remarks'),
                     dataIndex: 'comment',
                     width: '30%',
                     editable: true
                 },
                 {
-                    title: '操作',
+                    title: intl.get('common.operation'),
                     dataIndex: 'operation',
                     render: (text, record) =>
                         this.props.store.groups.GroupsGatewaylist.length >= 1 ? (
                             <Popconfirm
-                                title="确定要删除此网关吗?"
-                                okText="确定"
-                                cancelText="取消"
+                                title={`${intl.get('sharegroup.are_you_sure_you_want_to_delete_this_gateway')}?`}
+                                okText={intl.get('common.sure')}
+                                cancelText={intl.get('common.cancel')}
                                 onConfirm={() => this.props.store.groups.handleDeleteDevice(record.idx, this.props.activeKey)}
                             >
-                                <Button type="danger" >删除</Button>
+                                <Button type="danger" >{intl.get('appdetails.delete')}</Button>
                             </Popconfirm>
                         ) : null
                 }
@@ -227,10 +228,10 @@ class Editable extends Component {
                 }
                 http.post('/api/companies_sharedgroups_add_user', data).then(res=>{
                     if (res.ok) {
-                        message.success('添加成员成功！')
+                        message.success(intl.get('sharegroup.member_added_successfully'))
                         this.props.getdata()
                     } else {
-                        message.error('添加成员失败！错误信息：' + res.error)
+                        message.error(`${intl.get('sharegroup.failed_to_add_member')}: ` + res.error)
                         this.props.store.groups.handleDeleteUser(record.user, index, this.props.activeKey, true)
                     }
                 })
@@ -245,10 +246,10 @@ class Editable extends Component {
                 }
                 http.post('/api/companies_sharedgroups_update', data).then(res=>{
                     if (res.ok) {
-                        message.success('更改成员信息成功！')
+                        message.success(intl.get('sharegroup.change_member_information_succeeded'))
                         this.props.getdata()
                     } else {
-                        message.error('更改成员信息失败！错误信息：' + res.error)
+                        message.error(`${intl.get('sharegroup.failed_to_change_member_information')}: ` + res.error)
                     }
                 })
             }
@@ -289,9 +290,9 @@ class Editable extends Component {
                     description: ''
                 }
                 this.props.store.groups.pushGroupsGatewaylist(obj)
-                message.success('添加设备成功')
+                message.success(intl.get('sharegroup.device_added_successfully'))
             } else {
-                message.error('添加设备失败！错误信息：' + res.error)
+                message.error(`${intl.get('sharegroup.failed_to_add_device')}: ` + res.error)
             }
         })
     }
@@ -361,7 +362,7 @@ class Editable extends Component {
         return (
             <div>
                 <div>
-                    <Divider orientation="left">共享组用户</Divider>
+                    <Divider orientation="left">{intl.get('sharegroup.shared_group_users')}</Divider>
                     <Table
                         columns={columns}
                         dataSource={this.props.store.groups.GroupsUserlist}
@@ -376,11 +377,11 @@ class Editable extends Component {
                         style={{margin: '10px 0'}}
                         disabled={this.props.activeKey === ''}
                     >
-                        添加成员
+                        {intl.get('sharegroup.add_member')}
                     </Button>
                 </div>
                 <div>
-                    <Divider orientation="left">共享组网关</Divider>
+                    <Divider orientation="left">{intl.get('sharegroup.shared_group_gateway')}</Divider>
                     <Table
                         columns={columnsDevice}
                         components={components}
@@ -394,18 +395,18 @@ class Editable extends Component {
                         style={{margin: '10px 0'}}
                         disabled={this.props.activeKey === ''}
                     >
-                        添加网关
+                        {intl.get('gateway.add_the_gateway')}
                     </Button>
                     <Modal
                         className="templateList"
-                        title={<h3>查找网关</h3>}
+                        title={<h3>{intl.get('sharegroup.search_gateway')}</h3>}
                         maskClosable={false}
                         visible={this.state.showTemplateSelectionDevice}
                         onOk={this.handleCancelAddTempListDevice}
                         onCancel={this.handleCancelAddTempListDevice}
                         wrapClassName={'templatesModal'}
-                        okText="确定"
-                        cancelText="取消"
+                        okText={intl.get('common.sure')}
+                        cancelText={intl.get('common.cancel')}
                         width="60vw"
                     >
                         <div
@@ -420,7 +421,7 @@ class Editable extends Component {
                         >
                             <span style={{padding: '0 20px'}}> </span>
                             <Input.Search
-                                placeholder="ID，名称"
+                                placeholder={intl.get('sharegroup.ID_name')}
                                 onChange={(e)=>{
                                     this.filterGateway(e.target.value.toLocaleLowerCase())
                                 }}

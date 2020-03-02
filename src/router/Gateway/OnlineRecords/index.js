@@ -3,6 +3,7 @@ import http from '../../../utils/Server';
 import { formatTime } from '../../../utils/time';
 import { Table, Tabs  } from 'antd';
 import { withRouter} from 'react-router-dom';
+import intl from 'react-intl-universal';
 const TabPane = Tabs.TabPane;
 
 function callback (key) {
@@ -26,14 +27,14 @@ class GatewayOnlineRecord extends Component {
             gateway: undefined,
             activeKey: 'gate_wanip',
             columns: [{
-                title: '时间',
+                title: intl.get('common.time'),
                 dataIndex: 'time',
                 key: 'time',
                 defaultSortOrder: 'descend',
                 width: 300,
                 sorter: (a, b) => a.timestamp && b.timestamp && a.timestamp - b.timestamp
             }, {
-                title: '数值',
+                title: intl.get('common.number'),
                 dataIndex: 'number',
                 key: 'number'
             }]
@@ -94,7 +95,7 @@ class GatewayOnlineRecord extends Component {
                     type="card"
                 >
                     <TabPane
-                        tab="联网IP记录"
+                        tab={intl.get('gateway.networking_IP_records')}
                         key="gate_wanip"
                     >
                         <Table
@@ -105,7 +106,7 @@ class GatewayOnlineRecord extends Component {
                         />
                     </TabPane>
                     <TabPane
-                        tab="网关重连记录"
+                        tab={intl.get('gateway.gateway_reconnect_record')}
                         key="gate_fault"
                     >
                         <Table
@@ -116,7 +117,7 @@ class GatewayOnlineRecord extends Component {
                         />
                     </TabPane>
                     <TabPane
-                        tab="IP变化记录"
+                        tab={intl.get('gateway.IP_change_record')}
                         key="gate_ipchange"
                     >
                         <Table

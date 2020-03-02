@@ -21,7 +21,7 @@ class App extends PureComponent {
         emit.on('change_language', lang => this.loadLocales(lang)); // 监听语言改变事件
         this.loadLocales(); // 初始化语言
       }
-    loadLocales (lang = 'zh-CN') {
+    loadLocales (lang = localStorage.getItem('i18n') ? localStorage.getItem('i18n') : 'zh_CN') {
     intl.init({
         currentLocale: lang,  // 设置初始语音
         locales

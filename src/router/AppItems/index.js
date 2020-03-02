@@ -5,6 +5,7 @@ import Description from '../AppDetails/Description';
 import Comments from './Comments';
 import Issues from './Issues';
 import {_getCookie} from '../../utils/Session';
+import intl from 'react-intl-universal';
 import './style.scss';
 const { TabPane } = Tabs;
 function callback (key) {
@@ -84,7 +85,7 @@ class AppItems extends PureComponent {
                     version: Number(result.data)
                 }).then(res=>{
                     if (res.ok){
-                        message.success('应用克隆成功，即将跳转到编辑页面！')
+                        message.success(intl.get('appitems.apply_clone_successfully'))
                         if (res.data){
                             this.props.history.push(`/appeditorcode/${res.data.name}/${res.data.app_name}`);
                         }
@@ -107,7 +108,7 @@ class AppItems extends PureComponent {
                         <p>{data.app_name}</p>
                         <div className="app_simple_desc">
                             <span>{data.developer}</span>
-                            <span>{data.installed}次安装</span>
+                            <span>{data.installed}{intl.get('appitems.times')}{intl.get('appitems.install')}</span>
                             <span>
                                 <Rate
                                     disabled
@@ -115,7 +116,7 @@ class AppItems extends PureComponent {
                                     style={{fontSize: '16px'}}
                                 />
                             </span>
-                            <span>免费</span>
+                            <span>{intl.get('appedit.free')}</span>
                         </div>
                         <div
                             style={{marginLeft: '20px', marginTop: '10px'}}
@@ -127,7 +128,7 @@ class AppItems extends PureComponent {
                             onClick={this.setFavorites}
                             style={{marginLeft: '30px', marginTop: '10px', width: '100px'}}
                             type={!this.state.favorites ? 'primary' : 'danger'}
-                        >{this.state.favorites ? '取消收藏' : '收藏'}</Button>
+                        >{this.state.favorites ? intl.get('appitems.cancel_collection') : intl.get('appitems.collection')}</Button>
                         {
                             data.developer !== _getCookie('user_id') && Number(_getCookie('is_developer')) === 1
                             ? <Button
@@ -140,7 +141,7 @@ class AppItems extends PureComponent {
                                 }}
                               >
                                 <Icon type="fork" />
-                                克隆
+                                {intl.get('appdetails.clone')}
                             </Button>
                             : ''
                         }
@@ -153,17 +154,17 @@ class AppItems extends PureComponent {
                         onChange={callback}
                     >
                         <TabPane
-                            tab="总览"
+                            tab={intl.get('appitems.overview')}
                             key="1"
                         >
                             <div className="app_desc">
                                 <Description source={data.description}/>
                                 <div className="app_desc_right">
                                     <div>
-                                        <p>分类工具</p>
+                                        <p>{intl.get('appitems.classification_tool')}</p>
                                     </div>
                                     <div>
-                                        <p>标签</p>
+                                        <p>{intl.get('appitems.label')}</p>
                                         <div>
                                             {
                                                 data.tags &&
@@ -179,29 +180,29 @@ class AppItems extends PureComponent {
                                         </div>
                                     </div>
                                     <div>
-                                        <p>适用于</p>
+                                        <p>{intl.get('appitems.apply_to')}</p>
                                         <Tag>
-                                            {data.device_serial === 'ALL' ? '全部' : data.device_serial}
+                                            {data.device_serial === 'ALL' ? intl.get('common.all') : data.device_serial}
                                         </Tag>
                                     </div>
                                     <div className="info_details">
-                                        <p>更多信息</p>
-                                        <div><span className="info_title">版本:</span><span>{version}</span></div>
-                                        <div><span className="info_title">发布时间:</span><span>{data.creation && data.creation.indexOf('.') !== -1 ? data.creation.split('.')[0] : ''}</span></div>
-                                        <div><span className="info_title">最近更新时间:</span><span>{data.modified && data.modified.indexOf('.') !== -1 ? data.modified.split('.')[0] : ''}</span></div>
-                                        <div><span className="info_title">作者:</span><span>{data.developer}</span></div>
+                                        <p>{intl.get('appitems.more_information')}</p>
+                                        <div><span className="info_title">{intl.get('appdetails.version')}:</span><span>{version}</span></div>
+                                        <div><span className="info_title">{intl.get('appitems.release_time')}:</span><span>{data.creation && data.creation.indexOf('.') !== -1 ? data.creation.split('.')[0] : ''}</span></div>
+                                        <div><span className="info_title">{intl.get('appitems.last_updated')}:</span><span>{data.modified && data.modified.indexOf('.') !== -1 ? data.modified.split('.')[0] : ''}</span></div>
+                                        <div><span className="info_title">{intl.get('appitems.autho')}:</span><span>{data.developer}</span></div>
                                     </div>
                                 </div>
                             </div>
                         </TabPane>
                         <TabPane
-                            tab="问与答"
+                            tab={intl.get('appitems.question_and_answer')}
                             key="2"
                         >
                             <Issues />
                         </TabPane>
                         <TabPane
-                            tab="评分与评论"
+                            tab={intl.get('appitems.ratings_and_comments')}
                             key="3"
                         >
                             <Comments />

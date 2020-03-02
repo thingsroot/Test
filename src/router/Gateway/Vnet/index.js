@@ -6,17 +6,18 @@ import {_getCookie} from '../../../utils/Session';
 import http from '../../../utils/Server';
 import ServiceState from '../../../common/ServiceState';
 import JSONPretty from 'react-json-pretty';
+import intl from 'react-intl-universal';
 import './style.scss';
 const Option = Select.Option;
 const { Panel } = Collapse;
 const columns = [{
-    title: '服务名称',
+    title: intl.get('gateway.service_name'),
     dataIndex: 'name',
     key: 'name',
     width: '150px'
   },
   {
-    title: '状态',
+    title: intl.get('common.state'),
     dataIndex: 'status',
     key: 'status',
     width: '140px'
@@ -106,7 +107,7 @@ class VPN extends Component {
             //     mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
             // }, 5000);
         } else {
-            message.warning('您的账户暂无AccessKey,将为您自动创建AccessKey。', 3)
+            message.warning(intl.get('gateway.your_account_does_not_have_an_accessKey_at_present'), 3)
             http.post('/api/user_token_create').then(res=>{
                 if (res.ok){
                     this.setState({
@@ -119,7 +120,7 @@ class VPN extends Component {
                         start_loading: false,
                         stop_loading: false
                     })
-                    message.error('AccessKey创建失败，请重试！')
+                    message.error(intl.get('gateway.accessKey_creation_failed'))
                 }
             })
         }
@@ -237,7 +238,7 @@ class VPN extends Component {
         const {start_loading, stop_loading, model, isShow} = this.state;
         return (
             <div className="VPN">
-                <h2>远程编程-网络</h2>
+                <h2>{intl.get('gateway.Remote_programming-network')}</h2>
                 <div className="help_button">
                     <Button
                         icon="question-circle"
@@ -245,7 +246,7 @@ class VPN extends Component {
                         onClick={()=>{
                             window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000135', '_blank')
                         }}
-                    >帮助</Button>
+                    >{intl.get('header.help')}</Button>
                 </div>
                 <div className="vnetVserState">
                     <ServiceState
@@ -255,15 +256,15 @@ class VPN extends Component {
                     />
                 </div>
                 <div className="VPNLeft">
-                    <p className="vnet_title">运行参数</p>
+                    <p className="vnet_title">{intl.get('gateway.operation_parameters')}</p>
                     <div className="VPNlist">
-                        <p>网关状态：</p>
+                        <p>{intl.get('gateway.gateway_state')}：</p>
                         <Input
                             value={this.props.store.gatewayInfo.device_status}
                         />
                     </div>
                     <div className="VPNlist">
-                        <p>网络模式：</p>
+                        <p>{intl.get('gateway.network_mode')}：</p>
                         <Button
                             type={this.state.model === 'bridge' ? 'primary' : ''}
                             disabled={is_running}
@@ -273,7 +274,7 @@ class VPN extends Component {
                                     this.setState({model: 'bridge', port: '665', tap_ip: Num})
                                 }
                             }}
-                        >桥接模式</Button>
+                        >{intl.get('gateway.bridging_mode')}</Button>
                         <Button
                             type={this.state.model === 'router' ? 'primary' : ''}
                             disabled={is_running}
@@ -283,10 +284,10 @@ class VPN extends Component {
                                     this.setState({model: 'router', port: '666', tap_ip: Num})
                                 }
                             }}
-                        >路由模式</Button>
+                        >{intl.get('gateway.routing_mode')}</Button>
                     </div>
                     <div className="VPNlist">
-                        <p>传输协议：</p>
+                        <p>{intl.get('gateway.transport_protocol')}：</p>
                         <Button
                             type={this.state.agreement === 'tcp' ? 'primary' : ''}
                             disabled={is_running}
@@ -306,8 +307,8 @@ class VPN extends Component {
                         <p>
                             {
                                 model === 'bridge'
-                                ? '虚拟网卡IP:'
-                                : '目标主机网络'
+                                ? `${intl.get('gateway.virtual_network_card_IP')}:`
+                                : intl.get('gateway.target_host_network')
                             }
                         </p>
                         <Input
@@ -321,7 +322,7 @@ class VPN extends Component {
                         />
                     </div>
                     <div className="VPNlist">
-                        <p>子网掩码:</p>
+                        <p>{intl.get('gateway.subnet_mask')}:</p>
                         <Select
                             defaultValue="255.255.255.0"
                             disabled={is_running}
@@ -339,7 +340,7 @@ class VPN extends Component {
                         </Select>
                     </div>
                     <div className="VPNlist">
-                        <p>网关IP：</p>
+                        <p>{intl.get('gateway.gateway_IP')}：</p>
                         <Input
                             value={this.state.lan_ip}
                             disabled
@@ -347,7 +348,7 @@ class VPN extends Component {
                         />
                     </div>
                     <div className="VPNlist">
-                        <p>Ping目标IP：</p>
+                        <p>{intl.get('gateway.ping_target_IP')}：</p>
                         <Input
                             value={this.state.pingIP}
                             style={{marginRight: 15}}
@@ -375,7 +376,7 @@ class VPN extends Component {
                                     this.startVnet()
                                 })
                             }}
-                          >启动</Button>
+                          >{intl.get('gateway.start_up')}</Button>
                     : <Button
                         className="btn"
                         type="danger"
@@ -389,7 +390,7 @@ class VPN extends Component {
                                 this.stopVnet()
                             })
                         }}
-                      >停止</Button>
+                      >{intl.get('gateway.stop')}</Button>
                     }
                 </div>
                 <div className="VPNRight">
@@ -399,12 +400,12 @@ class VPN extends Component {
                         </p>
                         <span>{mqtt.connected ? '运行环境正常' : '运行环境异常'}</span>
                     </div> */}
-                    <p className="vnet_title">运行状态</p>
+                    <p className="vnet_title">{intl.get('gateway.running_state')}</p>
                     <div className="VPNlist">
                         <p>
-                            本地连接状态：
+                            {intl.get('gateway.local_connection_status')}：
                         </p>
-                        <span>{is_running ? '正常' : '------'}</span>
+                        <span>{is_running ? intl.get('gateway.normal') : '------'}</span>
                         <div
                             className="statusDetail"
                             style={{cursor: 'pointer', color: '#ccc'}}
@@ -414,7 +415,7 @@ class VPN extends Component {
                             onMouseOut={()=>{
                                 this.setState({isShow: false})
                             }}
-                        >详情</div>
+                        >{intl.get('gateway.detail')}</div>
                         <div
                             className="isShow"
                         >
@@ -433,30 +434,30 @@ class VPN extends Component {
                     </div>
                     <div className="VPNlist">
                         <p>
-                            云端隧道状态：
+                            {intl.get('gateway.cloud_tunnel_status')}：
                         </p>
                         <span>{
-                            is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.cur_conns && parseInt(mqtt.vnet_channel.serviceState.cur_conns) > 0 ? '正常' : '异常' : '------'
+                            is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.cur_conns && parseInt(mqtt.vnet_channel.serviceState.cur_conns) > 0 ? intl.get('gateway.normal') : intl.get('gateway.abnormal') : '------'
                             }</span>
                     </div>
                     {
                         model === 'bridge'
                         ? <div className="VPNlist">
                             <p>
-                                网关隧道状态：
+                                {intl.get('gateway.gateway_tunnel_status')}：
                             </p>
-                            <span>{this.state.bridge_run === 'running' ? '正常' : '异常'}</span>
+                            <span>{this.state.bridge_run === 'running' ? intl.get('gateway.normal') : intl.get('gateway.abnormal')}</span>
                         </div>
                         : <div className="VPNlist">
                             <p>
-                            网关隧道状态：
+                            {intl.get('gateway.gateway_tunnel_status')}：
                         </p>
                         <span>{this.state.router_run}</span>
                         </div>
                     }
                     <div className="VPNlist">
                         <p>
-                            本次启动时间：
+                            {intl.get('gateway.starting_time_of_this_time')}：
                         </p>
                         <span>{
                             is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.last_start_time ? mqtt.vnet_channel.serviceState.last_start_time : '------' : '------'
@@ -464,7 +465,7 @@ class VPN extends Component {
                     </div>
                     <div className="VPNlist">
                         <p>
-                            今日流量消耗：
+                            {intl.get('gateway.Todays_traffic_consumption')}：
                         </p>
                         <span>{
                             is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.today_traffic_in && mqtt.vnet_channel.serviceState.today_traffic_out ? Math.ceil((mqtt.vnet_channel.serviceState.today_traffic_in + mqtt.vnet_channel.serviceState.today_traffic_out) / 1024) + ' KB' : '0KB' : '------'
@@ -472,32 +473,32 @@ class VPN extends Component {
                     </div>
                     <div className="VPNlist">
                         <p>
-                            Ping目标IP状态：
+                            {intl.get('gateway.ping_target_IP_status')}：
                         </p>
-                        <span>{is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.message ? mqtt.vnet_channel.serviceState.message === 'online' ? '正常' : '异常' : '------' : '------'}</span>
+                        <span>{is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.message ? mqtt.vnet_channel.serviceState.message === 'online' ? intl.get('gateway.normal') : intl.get('gateway.abnormal') : '------' : '------'}</span>
                     </div>
                     <div className="VPNlist">
                         <p>
-                            Ping目标IP延迟：
+                            {intl.get('gateway.ping_target_IP_latency')}：
                         </p>
                         <span>{is_running ? mqtt.vnet_channel.serviceState && mqtt.vnet_channel.serviceState.delay ? mqtt.vnet_channel.serviceState.delay : '------' : '------'}</span>
                     </div>
                 </div>
                 <div className="vnet_message">
-                    <p className="vnet_title">消息</p>
+                    <p className="vnet_title">{intl.get('gateway.news')}</p>
                     <span className="vnet_remove_message">
                         <Button
                             onClick={()=>{
                                 mqtt.vnet_message = []
                             }}
-                        >清除</Button>
+                        >{intl.get('gateway.eliminate')}</Button>
                     </span>
                     <div>
                     <Collapse
                         expandIconPosition="right"
                     >
                         <Panel
-                            header="消息列表"
+                            header={intl.get('gateway.message_list')}
                             key="1"
                         >
                         {
@@ -507,10 +508,10 @@ class VPN extends Component {
                                         key={key}
                                         className="vnet_message_item"
                                     >
-                                        时间:
+                                        {intl.get('common.time')}:
                                         {this.getDate(item)}
                                         <br />
-                                        内容:
+                                        {intl.get('appitems.content')}:
                                         <JSONPretty
                                             id="json-pretty"
                                             data={JSON.stringify(item)}

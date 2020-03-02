@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Editor from 'for-editor'
 import {inject, observer} from 'mobx-react';
+import intl from 'react-intl-universal';
 
 const block = {
     display: 'block'
@@ -30,7 +31,7 @@ class AppDescription extends Component {
                     className="empty"
                     style={this.props.source !== '' ? none : block}
                 >
-                    暂时没有描述！
+                    {`${intl.get('appdetails.no_description_at_present')}!`}
                 </div>
             </div>
         );

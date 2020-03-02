@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { inject, observer} from 'mobx-react';
 import { Button, Icon, Timeline, Tooltip, Switch, Card } from 'antd';
+import intl from 'react-intl-universal';
 
 
 @inject('store')
@@ -17,7 +18,7 @@ class GatewayUpgrade extends Component {
         let skynet_upgradable = data.skynet_version !== undefined && skynet_latest_version !== undefined && data.skynet_version < skynet_latest_version;
         return (
             <Card
-                title="固件升级"
+                title={intl.get('gateway.firmware_update')}
                 bordered={false}
                 extra={
                     <Button
@@ -31,12 +32,12 @@ class GatewayUpgrade extends Component {
                             <Icon type="setting" />
                         </div>
                         <div>
-                            <h3>业务软件(FreeIOE)</h3>
+                            <h3>{intl.get('gateway.business_software')}(FreeIOE)</h3>
                             <p>
-                                <span> 当前版本: {data.version}  </span>
+                                <span> {intl.get('gateway.current_version')}: {data.version}  </span>
                             </p>
                             <span>
-                                {freeioe_upgradable ? '可升级至: ' + freeioe_latest_version : '已经是最新版'}
+                                {freeioe_upgradable ?  `${intl.get('gateway.scalable_to')}: ` + freeioe_latest_version : intl.get('gateway.Its_the_latest_version')}
                             </span>
                         </div>
                         <div style={{display: 'flex'}}>
@@ -48,12 +49,12 @@ class GatewayUpgrade extends Component {
                             <div>
                                 <Tooltip placement="bottom"
                                     title={data.platform}
-                                > <h3>核心软件(SKYNET)</h3> </Tooltip>
+                                > <h3>{intl.get('gateway.core_software')}(SKYNET)</h3> </Tooltip>
                                 <p>
-                                    <span> 当前版本: {data.skynet_version} </span>
+                                    <span> {intl.get('gateway.current_version')}: {data.skynet_version} </span>
                                 </p>
                                 <span>
-                                    {skynet_upgradable ? '可升级至: ' + skynet_latest_version : '已经是最新版'}
+                                    {skynet_upgradable ? `${intl.get('gateway.scalable_to')}: ` + skynet_latest_version : intl.get('gateway.Its_the_latest_version')}
                                 </span>
                             </div>
                         </div>
@@ -75,15 +76,15 @@ class GatewayUpgrade extends Component {
                             }}
                           >
                         {
-                            freeioe_upgradable && skynet_upgradable ?  ( this.state.with_skynet ? '升级软件' : '升级业务软件' ) : null
+                            freeioe_upgradable && skynet_upgradable ?  ( this.state.with_skynet ? intl.get('gateway.upgrade_software') : intl.get('gateway.upgrade_business_software') ) : null
                         }
                         {
-                            freeioe_upgradable && !skynet_upgradable ?  '升级软件' : null
+                            freeioe_upgradable && !skynet_upgradable ?  intl.get('gateway.upgrade_software') : null
                         }
                         {
-                            !freeioe_upgradable && skynet_upgradable ?  '升级核心软件' : null
+                            !freeioe_upgradable && skynet_upgradable ?  intl.get('gateway.upgrade_core_software') : null
                         }
-                        </Button> : <Button onClick={onCheckUpgrade}>检查更新</Button>
+                        </Button> : <Button onClick={onCheckUpgrade}>{intl.get('gateway.check_update')}</Button>
                     }
                     {
                         freeioe_upgradable && skynet_upgradable
@@ -102,7 +103,7 @@ class GatewayUpgrade extends Component {
                     {
                         freeioe_upgradable
                         ? <Card
-                            title="业务软件更新历史"
+                            title={intl.get('gateway.business_software_update_history')}
                             bordered={false}
                             style={{width: '50%'}}
                           >
@@ -129,7 +130,7 @@ class GatewayUpgrade extends Component {
                             title={
                                 <Tooltip placement="bottom"
                                     title={data.platform}
-                                >核心软件更新历史</Tooltip>
+                                >{intl.get('gateway.core_software_update_history')}</Tooltip>
                             }
                             bordered={false}
                             style={{width: '50%'}}

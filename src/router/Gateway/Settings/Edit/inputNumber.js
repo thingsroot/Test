@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { InputNumber, Button, Modal } from 'antd';
+import intl from 'react-intl-universal';
 
 const confirm = Modal.confirm
 
@@ -55,8 +56,8 @@ class EditSwitch extends Component {
     showConfirm (value) {
         let self = this;
         confirm({
-            title: '是否显示最新的数据？',
-            content: '您正在修改的数据发生了变化，最新的值为:' + String(value),
+            title: intl.get('gateway.show_the_latest_data'),
+            content: `${intl.get('gateway.the_data_you_are_modifying_has_changed')}: ` + String(value),
             onOk () {
                 self.setState({ _value: value })
             },
@@ -130,7 +131,7 @@ class EditSwitch extends Component {
                                 this.onApplyChange()
                             })
                         }}
-                      >保存</Button>
+                      >{intl.get('appsinstall.save')}</Button>
                     : ''
                 }
             </div>

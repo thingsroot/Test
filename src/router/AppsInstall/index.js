@@ -10,6 +10,7 @@ import GatewaysDrawer from '../../common/GatewaysDrawer';
 import AppConfig from './AppConfig'
 import LazyLoad from 'react-lazy-load';
 import {ConfigStore} from '../../utils/ConfigUI'
+import intl from 'react-intl-universal';
 
 const Search = Input.Search;
 const openNotification = (title, message) => {
@@ -128,9 +129,9 @@ class MyGatesAppsInstall extends Component {
             version = res.data;
             if (version > 0) {
                 if (enable_beta === 1) {
-                    message.success(`网关安装当前应用最新beta版本[${version}]!`);
+                    message.success(`${intl.get('appsinstall.gateway_installs_the_latest_beta_version_of_the_current_application')}[${version}]!`);
                 } else {
-                    message.success(`网关安装当前应用最新版本[${version}]!`);
+                    message.success(`${intl.get('appsinstall.gateway_installs_the_latest_version_of_the_current_application')}[${version}]!`);
                 }
 
                 let params = {
@@ -143,12 +144,12 @@ class MyGatesAppsInstall extends Component {
                 };
                 this.appInstall(params, sn)
             } else {
-                message.error('应用暂时没有版本，无法安装！');
+                message.error(intl.get('appsinstall.the_app_has_no_version_at_present'));
                 this.setState({ installing: false })
             }
         }).catch(err=> {
             err;
-            message.error('安装应用最新版本失败!')
+            message.error(intl.get('appsinstall.failed_to_install_the_latest_version_of_app'))
             this.setState({ installing: false })
         })
     };
@@ -156,13 +157,13 @@ class MyGatesAppsInstall extends Component {
     //安装应用
     appInstall = (params, sn)=>{
         http.post('/api/gateways_applications_install', params).then(res=>{
-            openNotification('提交任务成功', '网关' + sn + '安装' + params.inst + '应用.')
+            openNotification(intl.get('appsinstall.task_submitted_successfully'), intl.get('appsinstall.gateway') + sn + intl.get('appsinstall.install') + params.inst + `${intl.get('common.applications')}.`)
             if (res.ok === true) {
                 let info = {
                     gateway: sn,
                     params: params
                 }
-                this.props.store.action.pushAction(res.data, '网关' + sn + '安装应用' + params.inst, '', info, 30000,  (result)=> {
+                this.props.store.action.pushAction(res.data, intl.get('appsinstall.gateway') + sn + intl.get('appsinstall.installation_and_Application') + params.inst, '', info, 30000,  (result)=> {
                     if (result) {
                         this.setState({ showLinkSelection: true, installing: false })
                     } else {
@@ -171,11 +172,11 @@ class MyGatesAppsInstall extends Component {
                 })
             } else {
                 this.setState({ installing: false });
-                openNotification('安装应用' + this.refs.inst.value + '失败', '' + res.data.message);
+                openNotification(intl.get('appsinstall.installation_and_Application') + this.refs.inst.value + intl.get('common.fail'), '' + res.data.message);
             }
         }).catch( (err)=> {
             err;
-            openNotification('提交任务失败', '网关' + sn + '安装' + params.inst + '应用.')
+            openNotification(intl.get('appsinstall.task_submitted_successfully'), intl.get('appsinstall.gateway') + sn + intl.get('appsinstall.install') + params.inst + `${intl.get('common.applications')}.`)
             this.setState({ installing: false });
         })
     };
@@ -194,7 +195,7 @@ class MyGatesAppsInstall extends Component {
                 if (!fond_dumplicate) {
                     resolve()
                 } else {
-                    reject('实例名重复')
+                    reject(intl.get('appsinstall.duplicate_instance_name'))
                 }
             }
         }).catch(err=> {
@@ -204,7 +205,7 @@ class MyGatesAppsInstall extends Component {
 
     onInstallSubmit = (inst_name, app_info, configuration)=>{
         if (inst_name === '' || inst_name === undefined) {
-            message.error('实例名不能为空！');
+            message.error(intl.get('appsinstall.instance_name_cannot_be_empty'));
             return;
         } else {
             this.setState({
@@ -263,7 +264,7 @@ class MyGatesAppsInstall extends Component {
                     ></GatewaysDrawer>
                     <Modal
                         visible={showLinkSelection}
-                        title="快捷选择"
+                        title={intl.get('appsinstall.shortcut_selection')}
                         closable={false}
                         keyboard
                         wrapClassName={'linkSelectionWeb'}
@@ -289,13 +290,13 @@ class MyGatesAppsInstall extends Component {
                                 }}
                             >
                                 <Icon type="laptop" />
-                                安装到其他网关
+                                {intl.get('appsinstall.install_to_another_gateway')}
                             </li>
                             <li
                                 onClick={this.onInstallCancel}
                             >
                                 <Icon type="download" />
-                                继续安装其他应用
+                                {intl.get('appsinstall.continue_to_install_other_apps')}
                             </li>
                             <li
                                 onClick={()=>{
@@ -303,7 +304,7 @@ class MyGatesAppsInstall extends Component {
                                 }}
                             >
                                 <Icon type="appstore" />
-                                查看应用列表
+                                {intl.get('appsinstall.view_app_list')}
                             </li>
                         </ul>
 
@@ -321,7 +322,7 @@ class MyGatesAppsInstall extends Component {
                         }}
                     >
                         {
-                            install_step === 'install' ? '查看应用描述' : '安装到网关'
+                            install_step === 'install' ? intl.get('appsinstall.view_app_description') : intl.get('appsinstall.install_to_gateway')
                         }
                     </Button>
                         <Link
@@ -342,7 +343,7 @@ class MyGatesAppsInstall extends Component {
                                 }}
                             />
                         </Link>
-                        <h2 style={{borderBottom: '1px solid #ccc', padding: 10}}>安装 {app_info.app_name} 到 {this.state.gateway_sn}</h2>
+                        <h2 style={{borderBottom: '1px solid #ccc', padding: 10}}>{intl.get('appsinstall.install')} {app_info.app_name} {intl.get('appsinstall.to')} {this.state.gateway_sn}</h2>
                         <div className={install_step !== 'install' ? 'show' : 'hide'}>
                             <div style={{display: 'flex' }}>
                                 {
@@ -357,14 +358,14 @@ class MyGatesAppsInstall extends Component {
                                     <div style={{width: 500}}
                                         className="detail"
                                     >
-                                        <p>发布者： {app_info.developer}</p>
-                                        <p>通讯协议: {app_info.protocol}</p>
-                                        <p>适配型号： {app_info.device_serial}</p>
+                                        <p>{intl.get('appdetails.publisher')}： {app_info.developer}</p>
+                                        <p>{intl.get('appdetails.communication_protocol')}: {app_info.protocol}</p>
+                                        <p>{intl.get('appdetails.adapter_type')}： {app_info.device_serial}</p>
                                     </div>
                                     <div  className="detail">
-                                        <p>应用分类： {app_info.category}</p>
-                                        <p>设备厂家: {app_info.device_supplier}</p>
-                                        <p>应用价格： 免费</p>
+                                        <p>{intl.get('developer.application_of_classification')}： {app_info.category}</p>
+                                        <p>{intl.get('appsinstall.equipment_manufacturer')}: {app_info.device_supplier}</p>
+                                        <p>{intl.get('appsinstall.applied_price')}： {intl.get('appedit.free')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -401,7 +402,7 @@ class MyGatesAppsInstall extends Component {
                            <div className="searchlist">
                                <Search
                                    key="33"
-                                   placeholder="搜索应用名"
+                                   placeholder={intl.get('appsinstall.search_app_name')}
                                    onSearch={(value)=>{
                                        this.searchApp(value)
                                    }}

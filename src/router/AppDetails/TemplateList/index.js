@@ -4,6 +4,8 @@ import { Button, message, Tabs, Modal, Table, Divider } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import TemplateForm from '../TemplateForm';
 import CopyForm from '../CopyForm';
+import intl from 'react-intl-universal';
+
 const TabPane = Tabs.TabPane;
 const block = {
     display: 'block'
@@ -28,42 +30,42 @@ class TemplateList extends Component {
             copyData: {},
             columns: [
                 {
-                    title: '模板名称',
+                    title: intl.get('appdetails.template_name'),
                     dataIndex: 'conf_name',
                     key: 'conf_name'
                 },
                 {
-                    title: '描述',
+                    title: intl.get('common.desc'),
                     dataIndex: 'description',
                     key: 'description'
                 },
                 {
-                    title: '所有者类型',
+                    title: intl.get('appdetails.owner_type'),
                     dataIndex: 'company',
                     key: 'company',
                     render: (val) => {
                         return (
-                            <span>{!val ? '个人' : '公司'}</span>
+                            <span>{!val ? intl.get('gateway.individual') : intl.get('gateway.company')}</span>
                         )
                     }
                 },
                 {
-                    title: '访问权限',
+                    title: intl.get('appdetails.access_right'),
                     dataIndex: 'public',
                     key: 'public',
                     render: (val) => {
                         return (
-                            <span>{val === 0 ? '个人' : '公开'}</span>
+                            <span>{val === 0 ? intl.get('gateway.individual') : intl.get('appdetails.public')}</span>
                         )
                     }
                 },
                 {
-                    title: '版本',
+                    title: intl.get('appdetails.version'),
                     dataIndex: 'latest_version',
                     key: 'latest_version'
                 },
                 {
-                    title: '修改时间',
+                    title: intl.get('appdetails.modification_time'),
                     key: 'modified',
                     dataIndex: 'modified',
                     render: text => {
@@ -73,7 +75,7 @@ class TemplateList extends Component {
                     }
                 },
                 {
-                    title: '操作',
+                    title: intl.get('common.operation'),
                     key: 'action',
                     width: '26%',
                     render: (record) => (
@@ -81,7 +83,7 @@ class TemplateList extends Component {
                             <Link
                                 className="mybutton"
                                 to={`/template/${record.app}/${record.name}/${record.latest_version}`}
-                            >查看</Link>
+                            >{intl.get('appdetails.see')}</Link>
                             <Divider type="vertical" />
                             <a
                                 style={{cursor: 'pointer'}}
@@ -89,7 +91,7 @@ class TemplateList extends Component {
                                 onClick={() => {
                                         this.editContent(record, 'edit')
                                     }}
-                            >编辑</a>
+                            >{intl.get('appdetails.edit')}</a>
                             <Divider type="vertical" />
                             <a
                                 style={{cursor: 'pointer'}}
@@ -97,7 +99,7 @@ class TemplateList extends Component {
                                 onClick={() => {
                                         this.editContent(record, 'copy')
                                     }}
-                            >复制</a>
+                            >{intl.get('appdetails.copy')}</a>
                             <Divider type="vertical" />
                             <a
                                 style={{cursor: 'pointer'}}
@@ -105,34 +107,34 @@ class TemplateList extends Component {
                                 onClick={()=>{
                                     this.deleteTemplate(record.name)
                                 }}
-                            >删除</a>
+                            >{intl.get('appdetails.delete')}</a>
                         </span>
                     )
                 }
             ],
             columns2: [
                 {
-                    title: '模板名称',
+                    title: intl.get('appdetails.template_name'),
                     dataIndex: 'conf_name',
                     key: 'conf_name'
                 },
                 {
-                    title: '描述',
+                    title: intl.get('common.desc'),
                     dataIndex: 'description',
                     key: 'description'
                 },
                 {
-                    title: '所有者',
+                    title: intl.get('appdetails.owner'),
                     dataIndex: 'owner_id',
                     key: 'owner_id'
                 },
                 {
-                    title: '版本',
+                    title: intl.get('appdetails.version'),
                     dataIndex: 'latest_version',
                     key: 'latest_version'
                 },
                 {
-                    title: '修改时间',
+                    title: intl.get('appdetails.modification_time'),
                     key: 'modified',
                     dataIndex: 'modified',
                     render: text => {
@@ -142,7 +144,7 @@ class TemplateList extends Component {
                     }
                 },
                 {
-                    title: '操作',
+                    title: intl.get('common.operation'),
                     key: 'action',
                     width: '20%',
                     render: (record) => (
@@ -150,7 +152,7 @@ class TemplateList extends Component {
                             <Link
                                 className="mybutton"
                                 to={`/template/${record.app}/${record.name}/${record.latest_version}`}
-                            >查看</Link>
+                            >{intl.get('appdetails.see')}</Link>
                             <Divider type="vertical" />
                             <a
                                 style={{cursor: 'pointer'}}
@@ -158,7 +160,7 @@ class TemplateList extends Component {
                                 onClick={() => {
                                         this.editContent(record, 'copy')
                                     }}
-                            >复制</a>
+                            >{intl.get('appdetails.copy')}</a>
                         </span>
                     )
                 }
@@ -196,7 +198,7 @@ class TemplateList extends Component {
             version: record.latest_version
         };
         this.setState({
-            type: type === 'copy' ? '复制' : '编辑',
+            type: type === 'copy' ? intl.get('appdetails.copy') : intl.get('appdetails.edit'),
             conf: record.name
         });
         if (record.latest_version !== 0) {
@@ -251,9 +253,9 @@ class TemplateList extends Component {
         http.post('/api/configurations_remove', {name: this.state.deleteName})
             .then(res=>{
                 if (res.ok === false) {
-                    message.error('删除失败，请联系管理员！')
+                    message.error(`${intl.get('appdetails.failed_to_delete')}!`)
                 } else {
-                    message.success('删除成功！')
+                    message.success(`${intl.get('appdetails.delete_successful')}!`)
                     this.refreshMyList()
                 }
                 this.setState({
@@ -280,7 +282,7 @@ class TemplateList extends Component {
                         this.setState({showNew: true})
                     }}
                 >
-                    新建模板
+                    {intl.get('appdetails.new_template')}
                 </Button>
                 <TemplateForm
                     type={type}
@@ -312,21 +314,21 @@ class TemplateList extends Component {
                     copyData={copyData}
                 />
                 <Modal
-                    title="提示信息"
-                    okText="确定"
-                    cancelText="取消"
+                    title={intl.get('appdetails.prompt_information')}
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                     visible={this.state.visible}
                     onOk={this.handleDelete}
                     onCancel={this.cancelDelete}
                 >
-                    <p>确认删除此模板？</p>
+                    <p>{`${intl.get('appdetails.confirm_to_delete_this_template')}?`}</p>
                 </Modal>
                 <Tabs
                     defaultActiveKey={defaultActiveKey}
                     onChange={this.callback}
                 >
                     <TabPane
-                        tab="我的"
+                        tab={intl.get('appdetails.my')}
                         key="private"
                     >
                         <Table
@@ -340,11 +342,11 @@ class TemplateList extends Component {
                             className="empty"
                             style={myList.length > 0 ? none : block}
                         >
-                            暂时没有上传模板！
+                            {intl.get('appdetails.no_template_has_been_uploaded_yet')}
                         </p>
                     </TabPane>
                     <TabPane
-                        tab="所有"
+                        tab={intl.get('appdetails.all')}
                         key="store"
                     >
                         <Table
@@ -359,7 +361,7 @@ class TemplateList extends Component {
                             className="empty"
                             style={templateList && templateList.length > 0 ? none : block}
                         >
-                            暂时没有模板！
+                            {intl.get('appdetails.no_template_for_now')}
                         </p>
                     </TabPane>
                 </Tabs>

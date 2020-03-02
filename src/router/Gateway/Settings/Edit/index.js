@@ -6,6 +6,7 @@ import EditSwitch from './switch'
 import EditInputNumber from './inputNumber'
 
 import http from '../../../../utils/Server';
+import intl from 'react-intl-universal';
 
 @inject('store')
 @observer
@@ -27,7 +28,7 @@ class GatewaySettingsEdit extends Component {
             }
             http.post('/api/gateways_applications_install', params).then(res=>{
                 if (res.ok) {
-                    message.info(title + '请求成功. 等待网关响应!')
+                    message.info(title + `${intl.get('gateway.request_succeeded')} ${intl.get('gateway.wait_for_gateway_response')}!`)
                     this.props.store.action.pushAction(res.data, title, '', params, 30000,  (result)=> {
                         resolve(result, 60000)
                         this.props.refreshGatewayData();
@@ -38,7 +39,7 @@ class GatewaySettingsEdit extends Component {
                 }
             }).catch(err=>{
                 reject(err)
-                message.error(title + '发送请求失败：' + err)
+                message.error(title + `${intl.get('gateway.send_request_failed')}: ` + err)
             })
         })
     }
@@ -52,7 +53,7 @@ class GatewaySettingsEdit extends Component {
             }
             http.post('/api/gateways_applications_remove', params).then(res=>{
                 if (res.ok) {
-                    message.info(title + '请求成功. 等待网关响应!')
+                    message.info(title + `${intl.get('gateway.request_succeeded')} ${intl.get('gateway.wait_for_gateway_response')}`)
                     this.props.store.action.pushAction(res.data, title, '', params, 10000,  (result)=> {
                         resolve(result, 60000)
                         this.props.refreshGatewayData();
@@ -63,7 +64,7 @@ class GatewaySettingsEdit extends Component {
                 }
             }).catch(err=>{
                 reject(err)
-                message.error(title + '发送请求失败：' + err)
+                message.error(title + `${intl.get('gateway.send_request_failed')}: ` + err)
             })
         })
     }
@@ -76,7 +77,7 @@ class GatewaySettingsEdit extends Component {
         }
         http.post('/api/gateways_' + url, data).then(res=>{
             if (res.ok){
-                message.success('重启成功，请稍等...')
+                message.success(intl.get('gateway.restart_successful'))
                 if (url === 'restart') {
                     let no_gap_time = 10000; // 10 seconds
                     setTimeout(()=>{
@@ -84,7 +85,7 @@ class GatewaySettingsEdit extends Component {
                     }, 5000)
                 }
             } else {
-                message.error('重启失败，请重试...')
+                message.error(intl.get('gateway.restart_failed'))
             }
         })
     }
@@ -97,9 +98,9 @@ class GatewaySettingsEdit extends Component {
                 enable: value,
                 id: `enable_data/${gateway}/${value}/${new Date() * 1}`
             }
-            let title = value === 1 ? '开启数据上送' : '关闭数据上送'
+            let title = value === 1 ? intl.get('gateway.enable_data_upload') : intl.get('gateway.turn_off_data_upload')
             http.post('/api/gateways_data_enable', params).then(res=>{
-                message.success(title + '发送请求成功')
+                message.success(title + intl.get('gateway.send_request_successfully'))
                 if (res.ok) {
                     this.props.store.action.pushAction(res.data, title, '', params, 5000, (result) => {
                         resolve(result, 60000)
@@ -107,11 +108,11 @@ class GatewaySettingsEdit extends Component {
                     })
                 } else {
                     resolve(false)
-                    message.error(title + '失败：' + res.error)
+                    message.error(title + `${intl.get('common.error')}: ` + res.error)
                 }
             }).catch(err=>{
                 reject(err)
-                message.error(title + '发送请求失败：' + err)
+                message.error(title + `${intl.get('gateway.send_request_failed')}: ` + err)
             })
         })
     }
@@ -124,9 +125,9 @@ class GatewaySettingsEdit extends Component {
                 enable: value,
                 id: `enable_stat/${gateway}/${value}/${new Date() * 1}`
             }
-            let title = value === 1 ? '开启统计数据上送' : '关闭统计数据上送'
+            let title = value === 1 ? intl.get('gateway.enable_statistics_upload') : intl.get('gateway.turn_off_statistics_upload')
             http.post('/api/gateways_stat_enable', params).then(res=>{
-                message.success(title + '发送请求成功')
+                message.success(title + intl.get('gateway.send_request_successfully'))
                 if (res.ok) {
                     this.props.store.action.pushAction(res.data, title, '', params, 5000, (result) => {
                         resolve(result, 60000)
@@ -134,11 +135,11 @@ class GatewaySettingsEdit extends Component {
                     })
                 } else {
                     resolve(false)
-                    message.error(title + '失败：' + res.error)
+                    message.error(title +  `${intl.get('common.error')}: ` + res.error)
                 }
             }).catch(err=>{
                 reject(err)
-                message.error(title + '发送请求失败：' + err)
+                message.error(title + `${intl.get('gateway.send_request_failed')}: ` + err)
             })
         })
     }
@@ -147,8 +148,8 @@ class GatewaySettingsEdit extends Component {
             if (checked) {
                 Modal.confirm({
                     icon: <Icon type="warning"></Icon>,
-                    title: '开启开发调试模式会影响设备保修条款',
-                    content: '请阅读具体条款',
+                    title: intl.get('gateway.opening_the_development'),
+                    content: intl.get('gateway.please_read_the_specific_terms'),
                     onOk () {
                         resolve(checked)
                     },
@@ -170,9 +171,9 @@ class GatewaySettingsEdit extends Component {
                 beta: value,
                 id: `enable_beta/${gateway}/${value}/${new Date() * 1}`
             }
-            let title = value === 1 ? '开启开发调试模式' : '关闭开发调试模式'
+            let title = value === 1 ? intl.get('gateway.open_development_and_debugging_mode') : intl.get('gateway.turn_off_development_debugging_mode')
             http.post('/api/gateways_beta_enable', params).then(res=>{
-                message.success(title + '发送请求成功')
+                message.success(title + intl.get('gateway.send_request_successfully'))
                 if (res.ok) {
                     this.props.store.action.pushAction(res.data, title, '', params, 5000, (result) => {
                         resolve(result, 60000)
@@ -180,11 +181,11 @@ class GatewaySettingsEdit extends Component {
                     })
                 } else {
                     resolve(false)
-                    message.error(title + '失败：' + res.error)
+                    message.error(title + `${intl.get('common.error')}: ` + res.error)
                 }
             }).catch(err=>{
                 reject(err)
-                message.error(title + '发送请求失败：' + err)
+                message.error(title +  `${intl.get('gateway.send_request_failed')}: ` + err)
             })
         })
     }
@@ -198,18 +199,18 @@ class GatewaySettingsEdit extends Component {
                 id: `enable_event/${gateway}/min${value}/${new Date() * 1}`
             }
             http.post('/api/gateways_enable_event', params).then(res=>{
-                message.success('发送更改事件上送等级请求成功')
+                message.success(intl.get('gateway.send_change_event_send_level_request_succeeded'))
                 if (res.ok) {
-                    this.props.store.action.pushAction(res.data, '更改事件上送等级', '', params, 5000, (result) => {
+                    this.props.store.action.pushAction(res.data, intl.get('gateway.change_event_escalation_level'), '', params, 5000, (result) => {
                         resolve(result, 60000)
                         this.props.store.timer.setGateStatusNoGapTime(10000)
                     })
                 } else {
                     resolve(false)
-                    message.success('发送更改事件上送等级请求失败：' + res.error)
+                    message.success(`${intl.get('gateway.failed_to_send_change_event_level_up_request')}: ` + res.error)
                 }
             }).catch(err=>{
-                message.success('发送更改事件上送等级请求失败：' + err)
+                message.success(`${intl.get('gateway.failed_to_send_change_event_level_up_request')}: ` + err)
                 reject(err)
             })
         })
@@ -226,18 +227,18 @@ class GatewaySettingsEdit extends Component {
                 id: `set/${gateway}/${key}/${value}/${new Date() * 1}`
             }
             http.post('/api/gateways_cloud_conf', params).then(res=>{
-                message.success('更改设置成功请求成功')
+                message.success(intl.get('gateway.change_settings_successful_request_succeeded'))
                 if (res.ok) {
-                    this.props.store.action.pushAction(res.data, '更改设置', '', params, 5000, (result) => {
+                    this.props.store.action.pushAction(res.data, intl.get('gateway.change_setting'), '', params, 5000, (result) => {
                         resolve(result, 60000)
                         this.props.store.timer.setGateStatusNoGapTime(10000)
                     })
                 } else {
                     resolve(false)
-                    message.success('更改设置失败:' + res.error)
+                    message.success(`${intl.get('gateway.failed_to_change_settings')}: ` + res.error)
                 }
             }).catch(err=>{
-                message.success('更改设置成功请求失败：' + err)
+                message.success(`${intl.get('gateway.change_settings_successful_request_failed')}: ` + err)
                 reject(err)
             })
         })
@@ -248,7 +249,7 @@ class GatewaySettingsEdit extends Component {
         refreshGatewayData;
         return (
             <Card
-                title="高级设置"
+                title={intl.get('gateway.advanced_setting')}
                 extra={
                     <Button
                         onClick={onClose}
@@ -258,7 +259,7 @@ class GatewaySettingsEdit extends Component {
             >
                 <div className="list">
                     <span>
-                        调试模式 [*开启后可安装开发版本软件]
+                        {intl.get('gateway.debug_mode')} {intl.get('gateway.development_version_software_can_be_installed_after_opening')}
                     </span>
                     <EditSwitch
                         checked={gatewayInfo.data && gatewayInfo.data.enable_beta === 1}
@@ -278,7 +279,7 @@ class GatewaySettingsEdit extends Component {
                 </div>
                 <div className="list">
                     <span>
-                        数据上传 [*开启后设备数据会传到当前平台]
+                        {intl.get('gateway.data_upload')} {intl.get('gateway.after_opening')}
                     </span>
                     <EditSwitch
                         checked={gatewayInfo.data && gatewayInfo.data.data_upload}
@@ -293,7 +294,7 @@ class GatewaySettingsEdit extends Component {
                 </div>
                 <div className="list">
                     <span>
-                        统计上传 [*开启后统计数据传到当前平台]
+                        {intl.get('gateway.statistical_upload')} {intl.get('gateway.after_opening_the_statistical')}
                     </span>
                     <EditSwitch
                         checked={gatewayInfo.data && gatewayInfo.data.stat_upload}
@@ -308,7 +309,7 @@ class GatewaySettingsEdit extends Component {
                 </div>
                 <div className="list">
                     <span>
-                        变化数据上送间隔（ms） [*程序会重启]
+                        {intl.get('gateway.change_data_delivery_interval')}（ms） {intl.get('gateway.the_program_will_restart')}
                     </span>
                     <div style={{position: 'relative'}}>
                         <EditInputNumber
@@ -325,7 +326,7 @@ class GatewaySettingsEdit extends Component {
                 </div>
                 <div className="list">
                     <span>
-                        全量数据上送间隔（s） [*程序会重启]
+                        {intl.get('gateway.full_data_delivery_interval')}（s） {intl.get('gateway.the_program_will_restart')}
                     </span>
                     <div style={{position: 'relative'}}>
                         <EditInputNumber
@@ -342,7 +343,7 @@ class GatewaySettingsEdit extends Component {
                 </div>
                 <div className="list">
                     <span>
-                        事件上传等级 [*事件上传的最低等级]
+                        {intl.get('gateway.event_upload_level')} {intl.get('gateway.minimum_level_of_event_upload')}
                     </span>
                     <div style={{position: 'relative'}}>
                         <EditInputNumber
@@ -359,25 +360,25 @@ class GatewaySettingsEdit extends Component {
                 </div>
                 <div className="list">
                     <span>
-                        重启FreeIOE [*FreeIOE重启会导致5秒左右的离线]
+                        {intl.get('gateway.restart_FreeIOE')} {intl.get('gateway.restart_will_cause_about_5_seconds_offline')}
                     </span>
                     <Button
                         disabled={!gatewayInfo.actionEnable}
                         onClick={()=>{
                             this.restart('restart')
                         }}
-                    >程序重启</Button>
+                    >{intl.get('gateway.program_reset')}</Button>
                 </div>
                 <div className="list">
                     <span>
-                        重启网关 [*网关重启会导致60秒左右的离线]
+                        {intl.get('gateway.restart_gateway')} {intl.get('gateway.gateway_restart_will_lead_to_about_60_seconds_offline')}
                     </span>
                     <Button
                         disabled={!gatewayInfo.actionEnable}
                         onClick={()=>{
                             this.restart('reboot')
                         }}
-                    >网关重启</Button>
+                    >{intl.get('gateway.gateway_restart')}</Button>
                 </div>
             </Card>
         )

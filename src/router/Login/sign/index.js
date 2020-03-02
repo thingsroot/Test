@@ -7,6 +7,7 @@ import http  from '../../../utils/Server';
 import { authenticateSuccess } from '../../../utils/Session';
 import Cookies from 'js-cookie'
 import OEM from '../../../assets/OEM';
+import intl from 'react-intl-universal';
 
 @withRouter
 class Sign extends PureComponent {
@@ -26,24 +27,24 @@ class Sign extends PureComponent {
                 }).then(res=>{
                     if (res.ok) {
                         authenticateSuccess(res.data)
-                        message.success('登录成功，正在跳转, 请稍后...', 3).then(()=>{
+                        message.success(intl.get('login.login_succeeded'), 3).then(()=>{
                             location.href = '/';
                         })
                     } else {
                         if (res.message === 'Incorrect password') {
-                            message.info('账号密码错误，请重新输入')
+                            message.info(intl.get('login.account_password_error'))
                             return false;
                         }
                         if (res.message === 'User disabled or missing') {
-                            message.info('用户未注册或已被禁用，请重新输入')
+                            message.info(intl.get('login.the_user_is_not_registered_or_disabled'))
                             return false;
                         } else {
-                            message.error('用户名与密码不匹配！请重新输入！')
+                            message.error(intl.get('login.user_name_and_password_do_not_match'))
                         }
                     }
                 }).catch(function (error){
                     if (error){
-                        message.info('系统错误，请稍后重试')
+                        message.info(intl.get('login.system_error'))
                     }
                 })
             }
@@ -53,32 +54,32 @@ class Sign extends PureComponent {
         const { getFieldDecorator } = this.props.form;
         return (
             <div>
-                <p className="title">密码登录</p>
+                <p className="title">{intl.get('login.password_login')}</p>
                 <Form onSubmit={this.handleSubmit}
                     className="login-form"
                 >
                     <Form.Item>
                         {getFieldDecorator('userName', {
-                            rules: [{ required: true, message: '请输入用户名' }]
+                            rules: [{ required: true, message: intl.get('login.enter_one_user_name') }]
                         })(
                             <Input prefix={
                                 <Icon type="user"
                                     style={{ color: 'rgba(0,0,0,.25)' }}
                                 />}
-                                placeholder="邮件地址或用户名"
+                                placeholder={intl.get('login.email_address_or_user_name')}
                             />
                         )}
                     </Form.Item>
                     <Form.Item>
                         {getFieldDecorator('password', {
-                            rules: [{ required: true, message: '请输入密码!' }]
+                            rules: [{ required: true, message: `${intl.get('login.please_input_a_password')}!` }]
                         })(
                             <Input prefix={
                                 <Icon type="lock"
                                     style={{ color: 'rgba(0,0,0,.25)' }}
                                 />}
                                 type="password"
-                                placeholder="密码"
+                                placeholder={intl.get('login.password')}
                             />
                         )}
                     </Form.Item>
@@ -87,26 +88,26 @@ class Sign extends PureComponent {
                             valuePropName: 'checked',
                             initialValue: true
                         })(
-                            <Checkbox>记住我！</Checkbox>
+                            <Checkbox>{intl.get('login.Remember_me')}</Checkbox>
                         )}
                         {
-                            OEM.Title === '冬笋云'
+                            OEM.Title === intl.get('login.winter_bamboo_shoots_cloud')
                             ? <Link className="login-form-forgot"
                                 style={{float: 'right'}}
                                 to="/login/retrieve"
-                              >忘记密码</Link>
+                              >{intl.get('login.forget_password')}</Link>
                             : ''
                         }
                         <Button type="primary"
                             htmlType="submit"
                             className="login-form-button"
                             style={{width: '100%'}}
-                        >登录</Button>
+                        >{intl.get('login.login')}</Button>
                         {
-                            OEM.Title === '冬笋云'
+                            OEM.Title === intl.get('login.winter_bamboo_shoots_cloud')
                             ? <Link to="/login/register"
-                                style={{display: OEM.Title === '冬笋云' ? 'block' : 'none', height: '60px', float: 'right'}}
-                              >免费注册</Link>
+                                style={{display: OEM.Title === intl.get('login.winter_bamboo_shoots_cloud') ? 'block' : 'none', height: '60px', float: 'right'}}
+                              >{intl.get('login.free_registration')}</Link>
                             : <div style={{height: '60px'}}></div>
                         }
                     </Form.Item>

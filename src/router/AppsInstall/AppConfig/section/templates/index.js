@@ -1,6 +1,7 @@
 import React from 'react'
 import './style.scss';
 import { Table, Input, InputNumber, Popconfirm, Form, Button, Select } from 'antd';
+import intl from 'react-intl-universal';
 
 const EditableContext = React.createContext();
 
@@ -77,27 +78,27 @@ class EditorTemplates extends React.Component {
     this.state = { editingKey: '', count: 0 };
     this.columns = [
         {
-            title: '名称',
+            title: intl.get('common.name'),
             dataIndex: 'name',
             key: 'template_name',
             editable: true
         }, {
-            title: '描述',
+            title: intl.get('common.desc'),
             dataIndex: 'description',
             key: 'description',
             editable: true
         }, {
-            title: '模板ID',
+            title: intl.get('appsinstall.Template_ID'),
             dataIndex: 'id',
             key: 'conf_id',
             editable: false
         }, {
-            title: '版本',
+            title: intl.get('appdetails.version'),
             key: 'version',
             dataIndex: 'ver',
             editable: true
         }, {
-            title: '操作',
+            title: intl.get('common.operation'),
             dataIndex: 'operation',
             render: (text, record) => {
             const { editingKey } = this.state;
@@ -109,14 +110,14 @@ class EditorTemplates extends React.Component {
                     <Button
                         onClick={() => this.save(form, record.key)}
                     >
-                        保存
+                        {intl.get('appsinstall.save')}
                     </Button>
                     )}
                 </EditableContext.Consumer>
                 <Popconfirm title="Sure to cancel?"
                     onConfirm={() => this.cancel(record.key)}
                 >
-                    <Button>取消</Button>
+                    <Button>{intl.get('common.cancel')}</Button>
                 </Popconfirm>
                 </span>
             ) : (
@@ -124,12 +125,12 @@ class EditorTemplates extends React.Component {
                 <Button
                     onClick={() => this.edit(record.key)}
                 >
-                    编辑
+                    {intl.get('appdetails.edit')}
                 </Button>
                 <Popconfirm title="Sure to delete?"
                     onConfirm={()=> this.delete(record.key)}
                 >
-                  <Button>删除</Button>
+                  <Button>{intl.get('appdetails.delete')}</Button>
                 </Popconfirm>
               </div>
             );

@@ -5,6 +5,8 @@ import {Button, Checkbox, Input, Modal, Select, Table, Divider, message, Tooltip
 import { _getCookie } from '../../../../utils/Session';
 import EditableTable from './table';
 import EditableTemplates from './templates';
+import intl from 'react-intl-universal';
+
 const Option = Select.Option;
 const { TextArea } = Input;
 
@@ -30,7 +32,7 @@ class AppConfigSection extends Component {
     onAddTemplate = (config, name, conf_name, desc, version)=>{
         let val = config.Value
         if (config.Limit !== 0 && config.Limit <= val.length) {
-            message.error('已达到可选模板的数量上限')
+            message.error(intl.get('appsinstall.the_maximum_number_of_optional_templates_has_been_reached'))
             return
         }
         this.props.configStore.addTemplate(name, conf_name, desc, version)
@@ -348,35 +350,35 @@ class AppConfigSection extends Component {
         });
         const addTempLists = [
             {
-                title: '名称',
+                title: intl.get('common.name'),
                 width: '20%',
                 dataIndex: 'conf_name',
                 key: 'conf_name',
                 render: text => <Tooltip title={text}><span className="col_name">{text}</span></Tooltip>
             }, {
-                title: '描述',
+                title: intl.get('common.desc'),
                 width: '15%',
                 dataIndex: 'description',
                 key: 'description',
                 render: text => <Tooltip title={text}><span className="col">{text}</span></Tooltip>
             }, {
-                title: '所有者ID',
+                title: intl.get('appsinstall.owner_ID'),
                 width: '15%',
                 dataIndex: 'developer',
                 key: 'developer',
                 render: text => <Tooltip title={text}><span className="col">{text}</span></Tooltip>
             }, {
-                title: '模板ID',
+                title: intl.get('appsinstall.Template_ID'),
                 width: '15%',
                 dataIndex: 'name',
                 key: 'name'
             }, {
-                title: '版本',
+                title: intl.get('appdetails.version'),
                 width: '10%',
                 key: 'latest_version',
                 dataIndex: 'latest_version'
             }, {
-                title: '操作',
+                title: intl.get('common.operation'),
                 width: '25%',
                 render: (record) => (
                     record.latest_version !== undefined && record.latest_version !== 0 ? (
@@ -392,7 +394,7 @@ class AppConfigSection extends Component {
                             onClick={()=>{
                                 this.onViewTemplate(record.name, record.latest_version)
                             }}
-                        > 查看 </Button>
+                        > {intl.get('appdetails.see')} </Button>
                         <span style={{padding: '0 1px'}}> </span>
                         {
                             record.developer !== this.props.store.session.user_id ? (
@@ -400,7 +402,7 @@ class AppConfigSection extends Component {
                                 onClick={()=>{
                                     this.onCloneTemplate(record.name, record.latest_version)
                                 }}
-                            > 克隆 </Button> ) : null
+                            > {intl.get('appdetails.clone')} </Button> ) : null
                         }
                         <span style={{padding: '0 1px'}}> </span>
                         <Button
@@ -408,14 +410,14 @@ class AppConfigSection extends Component {
                             onClick={()=>{
                                 this.onAddTemplate(config, record.name, record.conf_name, record.description, record.latest_version)
                             }}
-                        > 添加 </Button>
+                        > {intl.get('appsinstall_add')} </Button>
                     </span>) : (
                     <span>
                         <Button
                             onClick={()=>{
                                 this.onViewTemplate(record.name)
                             }}
-                        > 查看 </Button>
+                        > {intl.get('appdetails.see')} </Button>
                     </span>)
                 )
             }
@@ -436,16 +438,16 @@ class AppConfigSection extends Component {
                     onClick={this.templateShow}
                     style={{margin: '10px 0'}}
                 >
-                    选择模板
+                    {intl.get('appsinstall.select_template')}
                 </Button>
                 <Modal
-                    title="选择模板"
+                    title={intl.get('appsinstall.select_template')}
                     visible={this.state.showTemplateSelection}
                     onOk={this.handleCancelAddTempList}
                     onCancel={this.handleCancelAddTempList}
                     wrapClassName={'templatesModal'}
-                    okText="确定"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                     maskClosable={false}
                 >
                     <div
@@ -463,7 +465,7 @@ class AppConfigSection extends Component {
                                 this.props.refreshTemplateList()
                             }}
                         >
-                            刷新
+                            {intl.get('appsinstall.refresh')}
                         </Button>
                         <span style={{padding: '0 20px'}}> </span>
                         <Input.Search
@@ -476,7 +478,7 @@ class AppConfigSection extends Component {
                             type="primary"
                             onClick={this.onCreateNewTemplate}
                         >
-                            创建新模板
+                            {intl.get('appsinstall.create_a_new_template')}
                         </Button>
                     </div>
                     <Table

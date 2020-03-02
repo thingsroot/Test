@@ -4,6 +4,8 @@ import http from '../../../../utils/Server';
 import { withRouter, Link } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import GatesAppsUpgrade from '../Upgrade';
+import intl from 'react-intl-universal';
+
 let timer;
 function cancel () {
     message.error('You have canceled the update');
@@ -34,13 +36,13 @@ class Action extends Component {
             http.post('/api/gateways_applications_remove', data).then(res=>{
                 if (res.data){
                     if (res.ok){
-                        let title = '卸载应用' + data.inst + '请求成功!'
-                        message.info(title + '等待网关响应!')
+                        let title = intl.get('gateway.unloading_application') + data.inst + intl.get('gateway.request_succeeded!')
+                        message.info(title + `${intl.get('gateway.wait_for_gateway_response')}!`)
                         this.props.store.action.pushAction(res.data, title, '', data, 10000,  ()=> {
                         this.props.update_app_list();
                         })
                     } else {
-                        message.error('卸载应用' + data.inst + '请求失败!')
+                        message.error(intl.get('gateway.unloading_application') + data.inst + intl.get('gateway.request_succeeded!'))
                     }
                 }
             })
@@ -70,8 +72,8 @@ class Action extends Component {
         }
         http.post('/api/gateways_applications_option', data).then(res=>{
             if (res.ok){
-                let title = (props ? '开启应用开机自启' : '禁止应用开机自启') + '请求成功!';
-                message.info(title + '等待网关响应!')
+                let title = (props ? intl.get('gateway.turn_on_the_application_and_start_it_automatically') : intl.get('gateway.disable_the_application_from_starting')) + intl.get('gateway.request_succeeded');
+                message.info(title + intl.get('gateway.wait_for_gateway_response'))
                 let info = {
                     gateway: sn,
                     inst: record.inst_name,
@@ -81,7 +83,7 @@ class Action extends Component {
                     this.props.update_app_list();
                 })
             } else {
-                let title = (props ? '开启应用开机自启' : '禁止应用开机自启') + '请求失败!';
+                let title = (props ? intl.get('gateway.turn_on_the_application_and_start_it_automatically') : intl.get('gateway.disable_the_application_from_starting')) + intl.get('gateway.request_was_aborted');
                 message.error(title)
             }
         })
@@ -101,7 +103,7 @@ class Action extends Component {
         }
         http.post('/api/gateways_applications_upgrade', data).then(res=>{
             if (res.ok) {
-                this.props.store.action.pushAction(res.data, '应用升级', '', data, 10000,  ()=> {
+                this.props.store.action.pushAction(res.data, intl.get('gateway.application_upgrade'), '', data, 10000,  ()=> {
                     this.props.update_app_list();
                 })
             } else {
@@ -111,7 +113,7 @@ class Action extends Component {
         }).catch(req=>{
             req;
             this.setState({ running_action: false });
-            message.error('发送请求失败！')
+            message.error(intl.get('gateway.send_request_failed'))
         })
         setTimeout(() => {
             this.setState({ upgradeLoading: false, visible: false});
@@ -121,11 +123,11 @@ class Action extends Component {
         this.setState({ running_action: true });
         let action = '';
         if (type === 'stop'){
-            action = '关闭'
+            action = intl.get('gateway.close')
         } else if (type === 'start'){
-            action = '开启'
+            action = intl.get('gateway.open')
         } else {
-            action = '重启'
+            action = intl.get('gateway.restart')
         }
         const data = type === 'stop' || type === 'restart' ? {
             gateway: this.props.match.params.sn,
@@ -139,20 +141,20 @@ class Action extends Component {
         }
         http.post('/api/gateways_applications_' + type, data).then(res=>{
             if (res.ok) {
-                message.success(action + data.inst + '请求发送成功')
-                this.props.store.action.pushAction(res.data, action + '应用', '', data, 10000,  ()=> {
+                message.success(action + data.inst + intl.get('gateway.request_sent_successfully'))
+                this.props.store.action.pushAction(res.data, action + intl.get('common.applications'), '', data, 10000,  ()=> {
                     this.props.update_app_list();
                 })
                 setTimeout(()=> {
                     this.setState({ running_action: false })
                 }, 2000)
             } else {
-                message.error(action +  data.inst + '请求发送失败。 错误:' + res.error)
+                message.error(action +  data.inst + `${intl.get('gateway.request_send_failed')}。${intl.get('common.error')}` + res.error)
                 this.setState({ running_action: false });
             }
         }).catch(req=>{
             req;
-            message.error('发送请求失败！')
+            message.error(intl.get('gateway.send_request_failed'))
             this.setState({ running_action: false });
         })
     }
@@ -176,7 +178,7 @@ class Action extends Component {
     onDebug = (record) =>{
         const {gatewayInfo} = this.props.store;
         if (gatewayInfo.data.enable_beta === 0) {
-            message.error('网关未开启调试模式')
+            message.error(intl.get('gateway.gateway_does_not_turn_on_debugging_mode'))
             return
         }
         if (record.data){
@@ -202,7 +204,7 @@ class Action extends Component {
                         this.setState({appdebug: true})
                     }
                 }).catch(err => {
-                    message.error('获取克隆版本错误' + err)
+                    message.error(intl.get('gateway.get_clone_version_error') + err)
                 })
             }
         }
@@ -215,41 +217,41 @@ class Action extends Component {
             <div>
                 <div style={{width: '80%', lineHeight: '30px'}}>
                     <span className="spanStyle">
-                        应用ID: {record.data && record.data.name || '本地应用'}
+                        {intl.get('gateway.app_ID')}: {record.data && record.data.name || intl.get('gateway.local_application')}
                         {
                             record.data && record.data.name
                             ? <span style={{color: 'blue', padding: '0 5px'}} >
                                 <Link to={`/appdetails/${record.data.name}`}>
-                                    查看详情
+                                    {intl.get('gateway.view_details')}
                                 </Link>
                             </span> : null
                         }
                     </span>
                     <span className="spanStyle">
-                        应用名称: {record.data && record.data.app_name || '本地应用'}
+                        {intl.get('appedit.apply_name')}: {record.data && record.data.app_name || intl.get('gateway.local_application')}
                     </span>
                     <span className="spanStyle">
-                        应用开发者：{record.data && record.data.developer || this.props.store.session.companies}
+                        {intl.get('gateway.application_Developer')}：{record.data && record.data.developer || this.props.store.session.companies}
                     </span>
                     <br/>
                     {
                         record.data && record.data.fork_from ? (
                             <span>
-                                源自应用：{record.data && record.data.fork_from}
+                                {intl.get('gateway.from_application')}：{record.data && record.data.fork_from}
                                 <span style={{color: 'blue', padding: '0 5px'}} >
                                     <Link to={`/appdetails/${record.data.name}`}>
-                                        查看详情
+                                        {intl.get('gateway.view_details')}
                                     </Link>
                                 </span>
                                 <span
                                     style={{color: 'orange', padding: '0 5px'}}
                                     onClick={
                                         ()=>{
-                                            message.info('功能开发中.....')
+                                            message.info(intl.get('gateway.in_function_development'))
                                         }
                                     }
                                 >
-                                    使用源应用替换 <Icon type="rollback"/>
+                                    {intl.get('gateway.apply_replace_with_source')} <Icon type="rollback"/>
                                 </span>
                             </span>
                         ) : null
@@ -257,14 +259,14 @@ class Action extends Component {
                     {
                         record.data && record.data.fork_from ? (
                             <span>
-                                源自版本：{record.data && record.data.fork_version}
+                                {intl.get('gateway.from_version')}：{record.data && record.data.fork_version}
                             </span>
                         ) : null
                     }
                 </div>
                 <div style={{display: 'flex', marginTop: 10, width: '100%', minWidth: 840}}>
                     <div style={{paddingTop: 5}}>
-                        <span className="spanStyle">开机自启:</span>
+                        <span className="spanStyle">{intl.get('gateway.boo_from_boot')}:</span>
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <Switch checkedChildren=" ON"
                             unCheckedChildren="OFF"
@@ -282,7 +284,7 @@ class Action extends Component {
                             this.showModal('setName')
                         }}
                     >
-                        更改名称
+                        {intl.get('appeditorcode.change_name')}
                     </Button>
                     <span style={{margin: '0 5px'}}> </span>
                     <Button
@@ -293,14 +295,14 @@ class Action extends Component {
                             }
                         }}
                     >
-                        应用配置
+                        {intl.get('gateway.application_configuration')}
                     </Button>
                     <span style={{margin: '0 5px'}}> </span>
                     <Button
                         onClick={this.onDebug.bind(this, record)}
                         disabled={this.state.running_action || !actionEnable || !(record.data && record.data.name)}
                     >
-                        应用调试
+                        {intl.get('gateway.application_debugging')}
                     </Button>
                     <span style={{margin: '0 5px'}}> </span>
                     <Button
@@ -309,7 +311,7 @@ class Action extends Component {
                             this.showModal('visible')
                         }}
                     >
-                        更新版本
+                        {intl.get('gateway.updated_version')}
                     </Button>
                     <span style={{margin: '0 5px'}}> </span>
                     <Button
@@ -318,7 +320,7 @@ class Action extends Component {
                         }}
                         disabled={this.state.running_action || !actionEnable}
                     >
-                        启动应用
+                        {intl.get('gateway.startup_application')}
                     </Button>
                     <span style={{margin: '0 5px'}}> </span>
                     <Button
@@ -327,7 +329,7 @@ class Action extends Component {
                             this.appSwitch('stop')
                         }}
                     >
-                        关闭应用
+                        {intl.get('gateway.close_application')}
                     </Button>
                     <span style={{margin: '0 5px'}}> </span>
                     <Button
@@ -336,27 +338,27 @@ class Action extends Component {
                             this.appSwitch('restart')
                         }}
                     >
-                        重启应用
+                        {intl.get('gateway.restart_app')}
                     </Button>
                     <span style={{margin: '0 5px'}}></span>
                     <Popconfirm
                         disabled={this.state.running_action || !actionEnable}
-                        title="确定要卸载此应用吗?"
+                        title={intl.get('gateway.are_you_sure_you_want_to_uninstall_this_app')}
                         onConfirm={()=>{
                             this.confirm(record, this.props.match.params.sn, this)
                         }}
                         onCancel={cancel}
-                        okText="是"
-                        cancelText="否"
+                        okText={intl.get('common.yes')}
+                        cancelText={intl.get('common.no')}
                     >
                         <Button
                             disabled={this.state.running_action || !actionEnable}
                             type="danger"
-                        >应用卸载</Button>
+                        >{intl.get('gateway.apps_Uninstall')}</Button>
                     </Popconfirm>
                     <Modal
                         visible={visible}
-                        title="应用升级详情"
+                        title={intl.get('gateway.application_upgrade_details')}
                         onOk={this.handleOk}
                         destroyOnClose
                         onCancel={this.handleCancel}
@@ -365,7 +367,7 @@ class Action extends Component {
                             key="back"
                             onClick={this.handleCancel}
                         >
-                            取消
+                            {intl.get('common.cancel')}
                         </Button>,
                         <Button
                             key="submit"
@@ -373,7 +375,7 @@ class Action extends Component {
                             loading={upgradeLoading}
                             onClick={this.handleOk}
                         >
-                            升级
+                            {intl.get('gateway.upgrade')}
                         </Button>
                         ]}
                     >
@@ -389,7 +391,7 @@ class Action extends Component {
                     </Modal>
                     <Modal
                         visible={appdebug}
-                        title="应用调试"
+                        title={intl.get('gateway.application_debugging')}
                         onOk={()=>{
                             this.sendForkCreate(record)
                         }}
@@ -398,16 +400,15 @@ class Action extends Component {
                             this.setState({appdebug: false, running_action: false})
                         }}
                     >
-                        您不是{record.data && record.data.app_name}的应用所有者，如要继续远程调试，会将此应用当前版本克隆一份到您的账户下，而且在代码调试页面编辑的是您克隆的代码，在代码调试页面下载应用会将克隆到你名下的应用覆盖网关中的应用！
-                        如要继续，点击"继续"按钮！
+                        {intl.get('gateway.operate')[0]}{record.data && record.data.app_name}{intl.get('gateway.operate')[1]}
                     </Modal>
                     <Modal
                         visible={setName}
                         confirmLoading={setNameConfirmLoading}
-                        title="更改实例名"
+                        title={intl.get('gateway.change_instance_name')}
                         onOk={()=>{
                             if (nameValue === undefined || nameValue === record.inst_name) {
-                                message.error('实例名未修改！')
+                                message.error(intl.get('gateway.instance_name_not_modified'))
                                 return
                             }
                             this.setState({setNameConfirmLoading: true})
@@ -418,13 +419,13 @@ class Action extends Component {
                                 id: `gateway/rename/${nameValue}/${new Date() * 1}`
                             }).then(result=>{
                                 if (result.ok) {
-                                    message.success('更改实例名成功请求发送成功，请稍后...')
+                                    message.success(intl.get('gateway.change_instance_name_successful_request_sent_successfully'))
                                     let info = {
                                         gateway: this.props.match.params.sn,
                                         inst: this.props.record.inst_name,
                                         new_inst: nameValue
                                     }
-                                    this.props.store.action.pushAction(result.data, '应用改名', '', info, 10000, ()=> {
+                                    this.props.store.action.pushAction(result.data, intl.get('gateway.application_renaming'), '', info, 10000, ()=> {
                                         this.setState({setName: false}, ()=>{
                                             this.props.update_app_list();
                                         })
@@ -446,7 +447,7 @@ class Action extends Component {
                             this.setState({setNameConfirmLoading: false})
                         }}
                     >
-                        <span>实例名: </span>
+                        <span>{intl.get('appsinstall.instance_name')}: </span>
                         <Input
                             defaultValue={record.inst_name}
                             onChange={(e)=>{

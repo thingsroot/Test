@@ -13,6 +13,7 @@ import './style.scss';
 
 import Upgrade from './Upgrade'
 import SettingsEdit from './Edit'
+import intl from 'react-intl-universal';
 
 @withRouter
 @inject('store')
@@ -175,7 +176,7 @@ class GatewaySettings extends Component {
                         type: 'value'
                     },
                     series: {
-                        name: '数值',
+                        name: intl.get('common.number'),
                         type: 'line',
                         color: '#37A2DA',
                         data: res.data.map(item=>{
@@ -208,7 +209,7 @@ class GatewaySettings extends Component {
                         type: 'value'
                     },
                     series: {
-                        name: '数值',
+                        name: intl.get('common.number'),
                         type: 'line',
                         color: '#37A2DA',
                         data: res.data.map(item=>{
@@ -237,7 +238,7 @@ class GatewaySettings extends Component {
     }
     onGatewayUpgrade (version, skynet_version) {
         if (version === undefined && skynet_version === undefined) {
-            message.error('错误的升级请求')
+            message.error(intl.get('gateway.bad_upgrade_request'))
             return
         }
         console.log(skynet_version)
@@ -259,7 +260,7 @@ class GatewaySettings extends Component {
                 this.setState({skynet_latest_version: undefined}, ()=>{
                     this.fetchSkynetVersion()
                 })
-                this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 3000,  (result)=> {
+                this.props.store.action.pushAction(res.data, intl.get('gateway.gateway_firmware_upgrade'), '', data, 3000,  (result)=> {
                     this.fetchSkynetVersion()
                     if (result.ok){
                         this.setState({showUpgrade: false, skynet_latest_version: undefined})
@@ -268,11 +269,11 @@ class GatewaySettings extends Component {
                     }
                 })
             } else {
-                message.error('网关固件升级失败！ 错误:' + res.error)
+                message.error(`${intl.get('gateway.gateway_firmware_upgrade')}${intl.get('common.fail')}! ${intl.get('common.error')}: ` + res.error)
                 this.setState({upgrading: false})
             }
         }).catch((err)=>{
-            message.error('网关固件升级失败！ 错误:' + err)
+            message.error(`${intl.get('gateway.gateway_firmware_upgrade')}${intl.get('common.fail')}! ${intl.get('common.error')}: ` + err)
             this.setState({upgrading: false})
         })
     }
@@ -316,39 +317,39 @@ class GatewaySettings extends Component {
                                 <Icon type="setting"
                                     theme="filled"
                                 />
-                                高级设置
+                                {intl.get('gateway.advanced_setting')}
                             </Button>
                         </div>
                         <div className="border">
                             <Card title={
                                 <div>
-                                   | 基本信息 <Icon type="info-circle"/>
+                                   | {intl.get('gateway.essential_information')} <Icon type="info-circle"/>
                                 </div>
                                 }
                                 bordered={false}
                                 style={{ width: '100%' }}
                                 loading={loading}
                             >
-                            <p><b>序列号:</b>{gatewayInfo.sn}</p>
-                            <p><b>型号:</b>{gatewayInfo.model}</p>
-                            <p><b>名称:</b>{gatewayInfo.dev_name}</p>
-                            <p><b>描述:</b>{gatewayInfo.description}</p>
-                            <p><b>位置:</b>{gatewayInfo.address} </p>
+                            <p><b>{intl.get('appdetails.serial_number')}:</b>{gatewayInfo.sn}</p>
+                            <p><b>{intl.get('gateway.model')}:</b>{gatewayInfo.model}</p>
+                            <p><b>{intl.get('common.name')}:</b>{gatewayInfo.dev_name}</p>
+                            <p><b>{intl.get('common.desc')}:</b>{gatewayInfo.description}</p>
+                            <p><b>{intl.get('dashboard.location')}:</b>{gatewayInfo.address} </p>
                             </Card>
                             <Card title={
                                 <div>
-                                    | 配置信息 <Icon type="control" />
+                                    | {intl.get('gateway.configuration_information')} <Icon type="control" />
                                 </div>
                                 }
                                 bordered={false}
                                 style={{ width: '100%' }}
                                 loading={loading}
                             >
-                            <p><b>CPU型号:</b>{gatewayInfo.cpu}</p>
-                            <p><b>内存容量:</b>{gatewayInfo.ram}</p>
-                            <p><b>存储容量:</b>{gatewayInfo.rom}</p>
-                            <p><b>操作系统:</b>{gatewayInfo.data.platform}</p>
-                            <div className="setting_info"><b>业务软件:</b>{gatewayInfo.data && gatewayInfo.data.version}
+                            <p><b>{intl.get('gateway.CPU_model')}:</b>{gatewayInfo.cpu}</p>
+                            <p><b>{intl.get('gateway.memory_capacity')}:</b>{gatewayInfo.ram}</p>
+                            <p><b>{intl.get('gateway.storage_capacity')}:</b>{gatewayInfo.rom}</p>
+                            <p><b>{intl.get('gateway.operating_system')}:</b>{gatewayInfo.data.platform}</p>
+                            <div className="setting_info"><b>{intl.get('gateway.business_software')}:</b>{gatewayInfo.data && gatewayInfo.data.version}
                             {
                                 Number(gatewayInfo.data.version) !== 0
                                 ? freeioe_upgradable
@@ -357,13 +358,13 @@ class GatewaySettings extends Component {
                                         onClick={()=>{
                                             this.setState({showUpgrade: true})
                                         }}
-                                      >发现新版本</Tag>
+                                      >{intl.get('gateway.new_version_found')}</Tag>
                                     : <Tag color="cyan"
                                         style={{marginLeft: 15}}
-                                      >已是最新版</Tag>
+                                      >{intl.get('gateway.Its_the_latest_version')}</Tag>
                                 : ''
                             }</div>
-                            <div className="setting_info"><b>核心软件:</b>{gatewayInfo.data && gatewayInfo.data.skynet_version}
+                            <div className="setting_info"><b>{intl.get('gateway.core_software')}:</b>{gatewayInfo.data && gatewayInfo.data.skynet_version}
                             {
                                 Number(gatewayInfo.data.skynet_version) !== 0
                                 ? skynet_upgradable
@@ -372,23 +373,23 @@ class GatewaySettings extends Component {
                                         onClick={()=>{
                                             this.setState({showUpgrade: true})
                                         }}
-                                      >发现新版本</Tag>
+                                      >{intl.get('gateway.new_version_found')}</Tag>
                                     : <Tag color="cyan"
                                         style={{marginLeft: 15}}
-                                      >已是最新版</Tag>
+                                      >{intl.get('gateway.Its_the_latest_version')}</Tag>
                                 : ''
                             }</div>
-                            <p><b>调试模式:</b>{gatewayInfo.data && gatewayInfo.data.enable_beta === 1 ? '开启' : '关闭'}</p>
-                            <p><b>数据上传:</b>{gatewayInfo.data && gatewayInfo.data.data_upload ? '开启' : '关闭'}</p>
-                            <p><b>统计上传:</b>{gatewayInfo.data && gatewayInfo.data.stat_upload ? '开启' : '关闭'}</p>
-                            <p><b>事件上传:</b>{gatewayInfo.data && gatewayInfo.data.event_upload}</p>
+                            <p><b>{intl.get('gateway.debug_mode')}:</b>{gatewayInfo.data && gatewayInfo.data.enable_beta === 1 ? intl.get('gateway.open') : intl.get('gateway.close')}</p>
+                            <p><b>{intl.get('gateway.data_upload')}:</b>{gatewayInfo.data && gatewayInfo.data.data_upload ? intl.get('gateway.open') : intl.get('gateway.close')}</p>
+                            <p><b>{intl.get('gateway.statistical_upload')}:</b>{gatewayInfo.data && gatewayInfo.data.stat_upload ? intl.get('gateway.open') : intl.get('gateway.close')}</p>
+                            <p><b>{intl.get('gateway.event_upload')}:</b>{gatewayInfo.data && gatewayInfo.data.event_upload}</p>
                             <div style={{height: '25px'}}> </div>
                             </Card>
                         </div>
                     </div>
                     <div className="rightecharts">
                         <Card className="border">
-                            <p>CPU负载</p>
+                            <p>{intl.get('gateway.CPU_load')}</p>
                             <div
                                 style={{height: 280, width: '100%', minWidth: 300}}
                                 id="CPU"
@@ -397,7 +398,7 @@ class GatewaySettings extends Component {
                         </Card>
                         <p style={{height: '20px'}}> </p>
                         <Card className="border">
-                            <p>内存负载</p>
+                            <p>{intl.get('gateway.memory_load')}</p>
                             <div
                                 style={{height: 280, width: '100%', minWidth: 300}}
                                 id="memory"

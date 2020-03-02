@@ -8,6 +8,7 @@ import './style.scss';
 
 import http from '../../utils/Server';
 import GatewayStatus from '../../common/GatewayStatus';
+import intl from 'react-intl-universal';
 
 GatewayStatus;
 
@@ -53,10 +54,10 @@ class AppEditorCode extends Component {
         //提示：当前工作区是基于版本initVersion,
         // 请将设备中的应用升级到版本initVersion，或者将工作区重置到之前版本。
         const {initVersion} = this.state
-        this.info('版本提示',
-            '当前工作区是基于版本' + initVersion,
-            '请将设备中的应用升级到版本' + initVersion,
-            '或者将工作区重置到之前版本.'
+        this.info(intl.get('appedit.version_hint'),
+            intl.get('appedit.the_current_workspace_is_version_based') + initVersion,
+            intl.get('appeditorcode.please_upgrade_the_app_in_the_device_to_version') + initVersion,
+            intl.get('appeditorcode.Or_reset_the_workspace_to_a_previous_version')
         );
     }
 
@@ -68,7 +69,7 @@ class AppEditorCode extends Component {
             console.log(latestVersion);
             this.setState({latestVersion: latestVersion})
             if (latestVersion === undefined || latestVersion === 0){
-                this.info('版本提示', '应用还没有发布任何版本!');
+                this.info(intl.get('appedit.version_hint'), intl.get('appeidtorcode.the_app_hasnt_released_any_version_yet'));
                 this.initWorkspace()
                 return
             }
@@ -76,9 +77,9 @@ class AppEditorCode extends Component {
             if (version !== latestVersion) {
                 if (version !== undefined && version !== 0) {
                     //提示当前工作区是会基于worksapceVersion，当前的最新版本为latest_version（弹框）
-                    this.info('版本提示', '当前工作区是会基于版本    ' + version + '，当前的最新版本为    ' + latestVersion + '.');
+                    this.info(intl.get('appedit.version_hint'), intl.get('appeditorcode.the_current_workspace_is_based_on_version    ') + version + `, ${intl.get('appeditorcode.the_current_latest_version_is')}  ` + latestVersion + '.');
                 } else {
-                    message.info('初始化工作区')
+                    message.info(intl.get('appeditorcode.Initialize_workspace'))
                     this.resetWorkspace(latestVersion)
                 }
             } else if (version === latestVersion ) {
@@ -110,7 +111,7 @@ class AppEditorCode extends Component {
         .then(res=>{
             let version = res.message;
             this.setState({version: version}, ()=>{
-                message.success('工作区成功初始化成功，编辑器加载中请稍候')
+                message.success(intl.get('appeditorcode.workspace_initialized_successfully'))
                 this.setState({app: ''}) // Force the fileTree reload
                 setTimeout(() => {
                     this.setState({app: app})
@@ -126,7 +127,7 @@ class AppEditorCode extends Component {
             let version = res.message;
             // console.log(initVersion);
             //window.location.reload();
-            message.success(`工作区成功初始化至版本：${version}，编辑器加载中请稍候`)
+            message.success(`${intl.get('appeditorcode.workspace_successfully_initialized_to_version')}：${version}，${intl.get('appeditorcode.please_wait_while_the_editor_loads')}`)
             this.setState({app: ''}) // Force the fileTree reload
             setTimeout(() => {
                 this.setState({app: app})

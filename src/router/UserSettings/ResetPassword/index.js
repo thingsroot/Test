@@ -3,6 +3,7 @@ import {
     Modal, Form, Input
 } from 'antd';
 import http from '../../../utils/Server';
+import intl from 'react-intl-universal';
 
 const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
     class extends PureComponent {
@@ -26,7 +27,7 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
                     })
                     .catch(err=>{
                         err;
-                        callback('旧密码不正确！')
+                        callback(intl.get('usersettings.the_old_password_is_incorrect'))
                     })
                 // callback(value)
             };
@@ -34,7 +35,7 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
             const passwordValidator = (rule, value, callback) => {
                 const { getFieldValue } = this.props.form;
                 if (value && value !== getFieldValue('password')) {
-                    callback('两次输入不一致！')
+                    callback(intl.get('login.the_two_inputs_are_inconsistent'))
                 }
                 callback();
             };
@@ -42,27 +43,27 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
             return (
                 <Modal
                     visible={visible}
-                    title="修改密码"
-                    okText="确定"
-                    cancelText="取消"
+                    title={intl.get('login.change_password')}
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                     onCancel={onCancel}
                     onOk={onCreate}
                 >
                     <Form layout="vertical">
-                        <Form.Item label="旧密码">
+                        <Form.Item label={intl.get('usersettings.old_password')}>
                             {getFieldDecorator('oldPassword', {
-                                rules: [{ required: true, message: '不能为空' }, {
+                                rules: [{ required: true, message: intl.get('appedit.cannot_be_empty') }, {
                                     validator: verifyPassword
                             }]
                             })(
                                 <Input type="password"/>
                             )}
                         </Form.Item>
-                        <Form.Item label="新密码">
+                        <Form.Item label={intl.get('login.new_password')}>
                             {getFieldDecorator('password', {
-                                rules: [{ required: true, message: '请输入密码!' }, {
+                                rules: [{ required: true, message: `${intl.get('login.please_input_a_password')}!` }, {
                                     pattern: /^(?![a-zA-z]+$)(?!\d+$)(?![!@_#$%^&*]+$)[a-zA-Z\d!_@#$%^&*]{6,12}$/,
-                                    message: '长度最低6位，密码须包含字母，数字或特殊字符'
+                                    message: intl.get('login.the_minimum_length_is_6_digits')
                                 }]
                             })(
                                 <Input
@@ -70,9 +71,9 @@ const ResetPasswordCreateForm = Form.create({ name: 'resetPassword' })(
                                 />
                             )}
                         </Form.Item>
-                        <Form.Item label="确认新密码">
+                        <Form.Item label={intl.get('login.confirm_new_password')}>
                             {getFieldDecorator('passwordComfire', {
-                                rules: [{ required: true, message: '请再次输入密码!' }, {
+                                rules: [{ required: true, message: `${intl.get('login.please_enter_the_password_again')}!` }, {
                                     validator: passwordValidator
                                 }]
                             })(

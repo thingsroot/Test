@@ -4,6 +4,8 @@ import {
     Form, Icon, Input, Button, message
 } from 'antd';
 import http from '../../../utils/Server';
+import intl from 'react-intl-universal';
+
 class Retrieve extends PureComponent {
     state = {
         disabled: false
@@ -21,7 +23,7 @@ class Retrieve extends PureComponent {
                 http.post('/api/user_reset_password', data).then(res=>{
                     if (res.error) {
                         if (res.error === 'user_not_found') {
-                            message.info('用户不存在')
+                            message.info(intl.get('login.user_does_not_exist'))
                             this.setState({
                                 disabled: false
                             })
@@ -29,12 +31,12 @@ class Retrieve extends PureComponent {
                     }
                     if (res.ok){
                         if (res.info === 'password_reset_email_sent'){
-                            message.info('申请重置成功，请登录邮箱' + values.password + '完成密码重置')
+                            message.info(intl.get('login.application_for_reset_succeeded') + values.password + intl.get('login.complete_password_reset'))
                         }
                     }
                 }).catch(function (error){
                     if (error){
-                        message.info('提交错误')
+                        message.info(intl.get('login.commit_errorlogin.retrieve_password'))
                         this.setState({
                             disabled: false
                         })
@@ -47,15 +49,15 @@ class Retrieve extends PureComponent {
         const { getFieldDecorator } = this.props.form;
         return (
             <div>
-                <p className="title">找回密码</p>
+                <p className="title">{intl.get('')}</p>
                 <Form onSubmit={this.handleSubmit}
                     className="login-form"
                 >
                     <Form.Item>
                         {getFieldDecorator('password', {
-                            rules: [{ required: true, message: '请输入邮箱!' }, {
+                            rules: [{ required: true, message: `${intl.get('login.please_enter_email')}!` }, {
                                 pattern: /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/,
-                                message: '邮箱格式不正确！'
+                                message: intl.get('login.email_format_is_incorrect')
                             }]
                         })(
                             <Input prefix={
@@ -74,14 +76,14 @@ class Retrieve extends PureComponent {
                             style={{width: '100%'}}
                             disabled={this.state.disabled}
                         >
-                            {this.state.disabled ? '已发送' : '确定'}
+                            {this.state.disabled ? intl.get('login.has_been_sent') : intl.get('common.sure')}
                         </Button>
                         <Link to="/login"
                             style={{display: 'inlineBlock', width: '91%', height: '60px', float: 'left'}}
-                        >返回</Link>
+                        >{intl.get('login.return')}</Link>
                         <Link to="/login/register"
                             style={{display: 'inlineBlock', width: '9%', height: '60px', float: 'right'}}
-                        >注册</Link>
+                        >{intl.get('login.register')}</Link>
                     </Form.Item>
                 </Form>
             </div>

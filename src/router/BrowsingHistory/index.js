@@ -4,6 +4,8 @@ import { inject, observer } from 'mobx-react';
 import GatewayStatus from '../../common/GatewayStatus';
 import axios from 'axios';
 import './style.scss';
+import intl from 'react-intl-universal';
+
 const Option = Select.Option;
 const Search = Input.Search;
 // utc时间转换
@@ -26,34 +28,34 @@ const convertUTCTimeToLocalTime = function (UTCDateString) {
   return dateStr;
 }
 const columns = [{
-    title: '名称',
+    title: intl.get('common.name'),
     dataIndex: 'name',
     sorter: (a, b) => a.name.localeCompare(b.name),
     render: name => `${name}`,
     width: '50%'
   }, {
-    title: '描述',
+    title: intl.get('common.desc'),
     dataIndex: 'desc'
   }];
 
   const detailcolumns = [{
-    title: '序号',
+    title: intl.get('dashboard.the_serial_number'),
     dataIndex: 'id',
     sorter: (a, b) => a.id - b.id,
     width: '100px'
   }, {
-    title: '类型',
+    title: intl.get('common.type'),
     dataIndex: 'type',
     width: '150px'
   }, {
-    title: '数值',
+    title: intl.get('common.number'),
     dataIndex: 'value',
     width: '200px',
     render (text) {
       return (<span title={text}>{text}</span>)
     }
   }, {
-    title: '时间',
+    title: intl.get('common.time'),
     dataIndex: 'time',
     render: (time)=>{
       if (time) {
@@ -63,7 +65,7 @@ const columns = [{
       }
     }
   }, {
-    title: '质量戳',
+    title: intl.get('appstore.quality_stamp'),
     dataIndex: 'quality'
   }];
 
@@ -259,7 +261,7 @@ class BrowsingHistory extends Component {
                 <div className="history">
                     <div className="historyleft">
                         <div style={{display: 'flex'}}>
-                            选中变量：
+                            {intl.get('appstore.select_variables')}：
                             <Input disabled
                                 value={this.state.defaultvalue}
                                 style={{width: 300}}
@@ -292,11 +294,11 @@ class BrowsingHistory extends Component {
                               this.props.history.go(-1)
                             }}
                         >
-                          后退
+                          {intl.get('appstore.back_off')}
                           <Icon type="rollback"/>
                         </Button>
                         <div>
-                          取值方式：
+                          {intl.get('appstore.way_of_value_selection')}：
                             <Select defaultValue="raw"
                                 disabled={this.state.vt === 'string'}
                                 style={{ width: 120 }}
@@ -304,14 +306,14 @@ class BrowsingHistory extends Component {
                                   this.handleChange('value_function', value)
                                 }}
                             >
-                              <Option value="raw">原始值</Option>
-                              <Option value="mean">平均值</Option>
-                              <Option value="max">最大值</Option>
-                              <Option value="min">最小值</Option>
-                              <Option value="sum">总和</Option>
-                              <Option value="count">个数</Option>
+                              <Option value="raw">{intl.get('appstore.original_value')}</Option>
+                              <Option value="mean">{intl.get('appstore.average_value')}</Option>
+                              <Option value="max">{intl.get('appstore.maximum_value')}</Option>
+                              <Option value="min">{intl.get('appstore.minimum_value')}</Option>
+                              <Option value="sum">{intl.get('appstore.the_sum')}</Option>
+                              <Option value="count">{intl.get('appstore.number')}</Option>
                             </Select>
-                          统计时域：
+                          {intl.get('appstore.statistical_time_domain')}：
                             <Select defaultValue="5m"
                                 style={{ width: 120 }}
                                 disabled={this.state.value_function === 'raw' ? true : false}
@@ -319,32 +321,32 @@ class BrowsingHistory extends Component {
                               this.handleChange('value_group_time', value)
                             }}
                             >
-                              <Option value="5s">五秒</Option>
-                              <Option value="10s">十秒</Option>
-                              <Option value="30s">三十秒</Option>
-                              <Option value="1m">一分钟</Option>
-                              <Option value="5m">五分钟</Option>
-                              <Option value="10m">十分钟</Option>
-                              <Option value="30m">半小时</Option>
-                              <Option value="1h">一小时</Option>
-                              <Option value="1d">一天</Option>
+                              <Option value="5s">{intl.get('appstore.five_seconds')}</Option>
+                              <Option value="10s">{intl.get('appstore.ten_seconds')}</Option>
+                              <Option value="30s">{intl.get('appstore.thirty_seconds')}</Option>
+                              <Option value="1m">{intl.get('appstore.one_Minute')}</Option>
+                              <Option value="5m">{intl.get('appstore.five_Minute')}</Option>
+                              <Option value="10m">{intl.get('appstore.ten_Minute')}</Option>
+                              <Option value="30m">{intl.get('appstore.half_an_hour')}</Option>
+                              <Option value="1h">{intl.get('appstore.one_hour')}</Option>
+                              <Option value="1d">{intl.get('appstore.one_day')}</Option>
                             </Select>
-                          时间范围：
+                          {intl.get('appstore.time_frame')}：
                           <Select defaultValue="1h"
                               style={{ width: 120 }}
                               onChange={(value)=>{
                                 this.handleChange('value_time_duration', value)
                               }}
                           >
-                              <Option value="15m">十五分钟</Option>
-                              <Option value="30m">半小时</Option>
-                              <Option value="1h">一小时</Option>
-                              <Option value="2h">两小时</Option>
-                              <Option value="12h">半天</Option>
-                              <Option value="1d">一天</Option>
-                              <Option value="3d">三天</Option>
-                              <Option value="7d">一周</Option>
-                              <Option value="30d">一个月</Option>
+                              <Option value="15m">{intl.get('appstore.fifteen_minutes')}</Option>
+                              <Option value="30m">{intl.get('appstore.half_an_hour')}</Option>
+                              <Option value="1h">{intl.get('appstore.one_hour')}</Option>
+                              <Option value="2h">{intl.get('appstore.two_hours')}</Option>
+                              <Option value="12h">{intl.get('appstore.half_day')}</Option>
+                              <Option value="1d">{intl.get('appstore.one_day')}</Option>
+                              <Option value="3d">{intl.get('appstore.three_days')}</Option>
+                              <Option value="7d">{intl.get('appstore.a_week')}</Option>
+                              <Option value="30d">{intl.get('appstore.one_month')}</Option>
                             </Select>
                         </div>
                         <Table

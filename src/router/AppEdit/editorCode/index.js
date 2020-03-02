@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { split as SplitEditor} from 'react-ace';
 import 'brace/mode/java';
 import 'brace/theme/tomorrow';
+import intl from 'react-intl-universal';
+
 const style = {
     flexGrow: 1,
     display: 'inline-block',
@@ -26,8 +28,8 @@ class EditorCode extends Component {
             >
                 <div style={{paddingBottom: '20px'}}>
                     <p style={{display: 'flex'}}>
-                        <span style={style}>可视化面板描述(JSON):</span>
-                        <span style={style}>应用初始值(JSON):</span>
+                        <span style={style}>{intl.get('appedit.visual_panel_description')}:</span>
+                        <span style={style}>{intl.get('appedit.apply_initial_value')}:</span>
                     </p>
                     <SplitEditor
                         style={{width: '100%'}}

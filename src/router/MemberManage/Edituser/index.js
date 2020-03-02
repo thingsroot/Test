@@ -11,6 +11,8 @@ import {inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
 import './index.scss'
+import intl from 'react-intl-universal';
+
 const data = [];
 const EditableContext = React.createContext();
 
@@ -77,7 +79,7 @@ class Edituser extends React.Component {
                 width: '65%',
                 render: (record)=>{
                     if (record === 'root') {
-                        return <span>公司全员组</span>
+                        return <span>{intl.get('login.all_members_of_the_company')}</span>
                     } else {
                         return <span>{record}</span>
                     }
@@ -99,14 +101,14 @@ class Edituser extends React.Component {
                         onClick={() => this.save(form, record)}
                         style={{ marginRight: 8 }}
                     >
-                        保存
+                        {intl.get('appsinstall.save')}
                     </a>
                 )}
               </EditableContext.Consumer>
               <Popconfirm
                   onClick={() => this.cancel(record.key)}
               >
-                <a>取消</a>
+                <a>{intl.get('common.cancel')}</a>
               </Popconfirm>
             </span>
                     ) : (
@@ -117,18 +119,18 @@ class Edituser extends React.Component {
                             onClick={() => this.edit(record.name)}
                             style={{marginRight: '20px'}}
                         >
-                            编辑
+                            {intl.get('appdetails.edit')}
                         </a>
                         <Popconfirm
-                            title="确定要删除此成员组吗?"
-                            okText="确定"
-                            cancelText="取消"
+                            title={`${intl.get('login.are_you_sure_you_want_to_delete_this_member_group')}?`}
+                            okText={intl.get('common.sure')}
+                            cancelText={intl.get('common.cancel')}
                             onConfirm={() => this.delete(record)}
                         >
                             <a
                                 type="danger"
                                 disabled={editingKey !== ''}
-                            >删除</a>
+                            >{intl.get('appdetails.delete')}</a>
                         </Popconfirm>
                     </Fragment>
                     : ''
@@ -147,9 +149,9 @@ class Edituser extends React.Component {
         http.post('/api/companies_groups_remove', {name: record.name}).then(res=>{
             if (res.ok) {
                 this.props.getdata()
-                message.success('删除公司组成功！')
+                message.success(intl.get('login.delete_company_group_succeeded'))
             } else {
-                message.error('删除公司组失败！错误信息：' + res.error)
+                message.error(`${intl.get('login.delete_company_group_failed')}: ` + res.error)
             }
         })
     };
@@ -169,9 +171,9 @@ class Edituser extends React.Component {
             http.post('/api/companies_groups_update', data).then(res=>{
                 if (res.ok) {
                     this.props.getdata()
-                    message.success('更新组信息成功！')
+                    message.success(intl.get('login.update_group_information_succeeded'))
                 } else {
-                    message.error('更新组信息失败！错误信息：' + res.error)
+                    message.error(`${intl.get('login.failed_to_update_group_information')}: ` + res.error)
                 }
             })
                 this.setState({ editingKey: '' });
@@ -191,7 +193,7 @@ class Edituser extends React.Component {
     };
     handleOk = () => {
         if (this.state.groupValue === '') {
-            message.info('请输入共享组名')
+            message.info(intl.get('login.please_enter_share_group_name'))
         } else {
             const data = {
                 company: this.props.companies_list[0].name,
@@ -200,13 +202,13 @@ class Edituser extends React.Component {
             http.post('/api/companies_groups_create', data).then(res=>{
                 if (res.ok) {
                     this.props.getdata()
-                    message.success('创建公司组成功！')
+                    message.success(intl.get('login.create_company_group_successfully'))
                     this.setState({
                         visible: false,
                         groupValue: ''
                     })
                 } else {
-                    message.error('创建公司组失败！错误信息：' + res.error)
+                    message.error(`${intl.get('login.failed_to_create_company_group')}: ` + res.error)
                 }
             })
         }
@@ -295,15 +297,15 @@ class Edituser extends React.Component {
                     }
                 </EditableContext.Provider>
                 <Modal
-                    title="新增公司组"
+                    title={intl.get('login.new_company_group')}
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
-                    okText="确定"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                     maskClosable={false}
                 >
-                    <div> 成员组名称：
+                    <div> {intl.get('login.member_group_name')}：
                         <Input
                             style={{'width': '80%'}}
                             value={this.state.groupValue}

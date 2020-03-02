@@ -4,6 +4,7 @@ import {
     Form, Icon, Input, Button, message
 } from 'antd';
 import http from '../../../utils/Server';
+import intl from 'react-intl-universal';
 
 class Register extends PureComponent {
     handleSubmit = (e) => {
@@ -17,10 +18,10 @@ class Register extends PureComponent {
                 http.post('/api/user_create', data).then(res=>{
                     if (res.ok){
                         if (res.result === 0){
-                            message.info('此用户' + res.info)
+                            message.info(intl.get('login.this_user') + res.info)
                         }
                         if (res.result === 1){
-                            message.info('注册成功，' + res.info + '登录邮箱' + values.email + '完成注册')
+                            message.info(`${intl.get('login.login_was_successful')}，` + res.info + intl.get('login.login_mailbox') + values.email + intl.get('login.completion_of_registration'))
                         }
                     }
                 })
@@ -32,15 +33,15 @@ class Register extends PureComponent {
         const { getFieldDecorator } = this.props.form;
         return (
             <div>
-                <p className="title">用户注册</p>
+                <p className="title">{intl.get('login.user_registration')}</p>
                 <Form onSubmit={this.handleSubmit}
                     className="login-form"
                 >
                     <Form.Item>
                         {getFieldDecorator('email', {
-                            rules: [{ required: true, message: '请输入邮箱!' }, {
+                            rules: [{ required: true, message: `${intl.get('login.please_enter_email')}!` }, {
                                 pattern: /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/,
-                                message: '邮箱格式不正确'
+                                message: intl.get('login.incorrect_mailbox_format')
                             }]
                         })(
                             <Input prefix={
@@ -53,8 +54,8 @@ class Register extends PureComponent {
                     </Form.Item>
                     <Form.Item>
                         {getFieldDecorator('username', {
-                            rules: [{ required: true, message: '请输入用户名!'}, {
-                                pattern: /^([\d]|[\w]){6,16}$/, message: '用户名格式6-16位字母、数字、 - 、  _ 、  @'
+                            rules: [{ required: true, message: `${intl.get('login.enter_one_user_name')}!`}, {
+                                pattern: /^([\d]|[\w]){6,16}$/, message: intl.get('login.the_format_of_user_name_is_6-16_letters')
                             }]
                         })(
                             <Input prefix={
@@ -72,11 +73,11 @@ class Register extends PureComponent {
                             className="login-form-button"
                             style={{width: '100%'}}
                         >
-                            注册
+                            {intl.get('login.register')}
                         </Button>
                         <Link to="/login"
                             style={{display: 'block', height: '60px'}}
-                        >登录</Link>
+                        >{intl.get('login.login')}</Link>
                     </Form.Item>
                 </Form>
             </div>

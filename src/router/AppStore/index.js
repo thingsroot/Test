@@ -6,6 +6,8 @@ const { Search } = Input;
 import './style.scss';
 import http from '../../utils/Server';
 import { _getCookie } from '../../utils/Session';
+import intl from 'react-intl-universal';
+
 @withRouter
 @inject('store')
 @observer
@@ -110,20 +112,20 @@ class AppStore extends Component {
                         onClick={()=>{
                             this.props.history.push('/appdeveloper')
                         }}
-                    >申请成为开发者</Button>
+                    >{intl.get('developer.apply_to_be_a_developer')}</Button>
                     </div>
                 : ''
             }
             <div>
-                <p className="appStore_title">FreeIOE应用市场</p>
+                <p className="appStore_title">{intl.get('appstore.FreeIOE_application_market')}</p>
                 <Search
-                    placeholder="请输入应用名称"
+                    placeholder={intl.get('developer.enter_application_name')}
                     onChange={e => this.searchApp(e)}
                     style={{ width: '60%', marginLeft: '20%', height: '50px' }}
                 />
             </div>
             <div className="search">
-                <span>标签列表: &nbsp;&nbsp;</span>
+                <span>{intl.get('appstore.tag_list')}: &nbsp;&nbsp;</span>
                 {
                     tag_list && tag_list.length > 0 && tag_list.map((item, key)=>{
                         return (
@@ -141,7 +143,7 @@ class AppStore extends Component {
             {
                 add_tag_list && add_tag_list.length > 0
                 ? <div className="the_selected_label">
-                    <span>已选标签: &nbsp;&nbsp;</span>
+                    <span>{intl.get('appstore.selected_Tags')}: &nbsp;&nbsp;</span>
                     {
                         add_tag_list && add_tag_list.length > 0 && add_tag_list.map((item, key)=>{
                             return (
@@ -160,7 +162,7 @@ class AppStore extends Component {
                 : ''
             }
                 <div className="all_app_title">
-                    全部应用
+                    {intl.get('appstore.all_applications')}
                 </div>
             <div
                 style={{
@@ -186,7 +188,7 @@ class AppStore extends Component {
                                     <div
                                         className="app_item_desc"
                                     >
-                                        <div>{val.tags ? val.tags : '暂无标签'}</div>
+                                        <div>{val.tags ? val.tags : intl.get('appstore.no_label')}</div>
                                         <div style={{textAlign: 'center'}}><Icon type="download" /> {val.installed}</div>
                                     </div>
                                     <div
@@ -199,7 +201,7 @@ class AppStore extends Component {
                                                 style={{fontSize: '7px', letteSspacing: '2px'}}
                                             />
                                         </div>
-                                        <span>免费</span>
+                                        <span>{intl.get('appedit.free')}</span>
                                     </div>
                                 </div>
                             )

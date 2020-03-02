@@ -11,6 +11,7 @@ import {formatTime} from '../../../utils/time';
 import './style.scss';
 
 import {IconIOT, IconCloud} from '../../../utils/iconfont';
+import intl from 'react-intl-universal';
 
 
 @withRouter
@@ -60,13 +61,13 @@ class AppsList extends Component {
                     }
                 }
             }, {
-                title: '实例名',
+                title: intl.get('appsinstall.instance_name'),
                 dataIndex: 'inst_name',
                 sorter: (a, b) => a.inst_name.length - b.inst_name.length,
                 width: '20%',
                 className: 'cursor'
             }, {
-                title: '版本',
+                title: intl.get('appdetails.version'),
                 dataIndex: 'version',
                 key: 'version',
                 className: 'cursor',
@@ -104,17 +105,17 @@ class AppsList extends Component {
                         }
                     } else {
                         return (
-                            <span style={{color: 'orange'}}>本地</span>
+                            <span style={{color: 'orange'}}>{intl.get('gateway.local')}</span>
                         )
                     }
                 }
             }, {
-                title: '设备数',
+                title: intl.get('slider.number_of_equipment'),
                 dataIndex: 'devs_len',
                 key: 'devs_len',
                 className: 'cursor'
             }, {
-                title: '状态',
+                title: intl.get('common.state'),
                 dataIndex: 'status',
                 className: 'cursor',
                 render: record=>{
@@ -129,7 +130,7 @@ class AppsList extends Component {
                     }
                 }
             }, {
-                title: '启动时间',
+                title: intl.get('gateway.startup_time'),
                 dataIndex: 'running',
                 className: 'cursor',
                 render: (props, record)=>{
@@ -221,7 +222,7 @@ class AppsList extends Component {
         let gateway_sn = this.state.gateway_sn
         const { edit_app_inst } = this.state;
         if (edit_app_inst !== app_inst) {
-            message.error('应用实例不存在！');
+            message.error(intl.get('gateway.application_instance_does_not_exist'));
             return false;
         }
         const data = {
@@ -233,8 +234,8 @@ class AppsList extends Component {
         this.setState({apply_app_config: true})
         http.post('/api/gateways_applications_conf', data).then(res=>{
             if (res.ok) {
-                message.success('应用配置请求发送成功')
-                this.props.store.action.pushAction(res.data, '更改应用' + edit_app_inst + '配置',  '网关:' + gateway_sn, data, 10000,  (result)=> {
+                message.success(intl.get('gateway.app_configuration_request_sent_successfully'))
+                this.props.store.action.pushAction(res.data, intl.get('gateway.change_application') + edit_app_inst + intl.get('gateway.configure'),  `${intl.get('appsinstall.gateway')}:` + gateway_sn, data, 10000,  (result)=> {
                     if (result && edit_app_inst === app_inst && this.state.close_after_submit) {
                         this.setState({show_app_config: false, apply_app_config: false})
                     } else {
@@ -242,11 +243,11 @@ class AppsList extends Component {
                     }
                 })
             } else {
-                message.error('应用配置请求发送失败' + res.error)
+                message.error(intl.get('gateway.failed_to_send_application_configuration_request') + res.error)
                 this.setState({apply_app_config: false})
             }
         }).catch(err => {
-            message.error('应用配置请求发送失败' + err)
+            message.error(intl.get('gateway.failed_to_send_application_configuration_request') + err)
             this.setState({apply_app_config: false})
         })
     };
@@ -262,12 +263,12 @@ class AppsList extends Component {
     forceRefreshAppList = () => {
         http.post('/api/gateways_applications_refresh', {gateway: this.state.gateway_sn}).then(res => {
             if (res.ok) {
-                message.success('请求刷新列表成功')
+                message.success(intl.get('gateway.request_to_refresh_list_succeeded'))
             } else {
-                message.error('请求刷新列表失败:' + res.error)
+                message.error(`${intl.get('gateway.request_to_refresh_list_failed')}:` + res.error)
             }
         }).catch( err => {
-            message.error('请求刷新列表失败:' + err)
+            message.error(`${intl.get('gateway.request_to_refresh_list_failed')}:` + err)
         })
     }
     render () {
@@ -281,7 +282,7 @@ class AppsList extends Component {
                         <div>
                             <Tooltip
                                 placement="bottom"
-                                title="强制网关上送最新应用数据"
+                                title={intl.get('gateway.force_the_gateway_to_send_the_latest_application_data')}
                             >
                                 <Button
                                     disabled={!this.state.forceRefreshEnable}
@@ -293,7 +294,7 @@ class AppsList extends Component {
                                         }, 5000)
                                     }}
                                 >
-                                    <IconIOT type="icon-APIshuchu"/>强制刷新
+                                    <IconIOT type="icon-APIshuchu"/>{intl.get('devece_list.Forced_to_refresh')}
                                 </Button>
                             </Tooltip>
                             {/* <Tooltip

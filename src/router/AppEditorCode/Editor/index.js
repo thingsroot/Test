@@ -20,6 +20,7 @@ import 'brace/mode/json';//
 import 'brace/mode/css';//
 import 'brace/mode/typescript';
 import 'brace/theme/monokai';//
+import intl from 'react-intl-universal';
 
 const confirm = Modal.confirm;
 const Option = Select.Option;
@@ -146,19 +147,19 @@ class MyCode extends Component {
             http.post(url, params)
                 .then(res=>{
                     if (res.status === 'OK') {
-                        message.success(`保存文件${file_path}成功`)
+                        message.success(`${intl.get('appeditorcode.save_file')}${file_path}${intl.get('common.success')}`)
                     } else {
-                        message.error(`保存文件${file_path}失败! ${res.error}`)
+                        message.error(`${intl.get('appeditorcode.save_file')}${file_path}${intl.get('common.fail')}! ${res.error}`)
                     }
                 }).catch( err => {
-                    message.error(`保存文件${file_path}失败! ${err}`)
+                    message.error(`${intl.get('appeditorcode.save_file')}${file_path}${intl.get('common.fail')}! ${err}`)
                 })
         };
         confirm({
-            title: '提示信息',
-            okText: '确定',
-            cancelText: '取消',
-            content: `文件${file_path}已修改，是否保存这个文件？`,
+            title: intl.get('appdetails.prompt_information'),
+            okText: intl.get('common.sure'),
+            cancelText: intl.get('common.cancel'),
+            content: `${intl.get('appeditorcode.file')}${file_path}${intl.get('appeditorcode.revised')}，${intl.get('appeditorcode.do_you_want_to_save_this_file')}?`,
             onOk () {
                 save_file()
             }
@@ -211,7 +212,7 @@ class MyCode extends Component {
                     if (this.state.app !== app || this.state.filePath !== filePath) {
                         return
                     }
-                    message.error('文件不可编辑')
+                    message.error(intl.get('appeditorcode.file_is_not_editable'))
                     this.setState({editorContent: undefined, editable: false})
                 })
         } else {
@@ -273,7 +274,7 @@ class MyCode extends Component {
         http.post(url + '?app=' + this.state.app + '&operation=set_content&version=' + this.state.version)
             .then(res=>{
                 res;
-                message.success('工作区将重置到版本' + this.state.version);
+                message.success(intl.get('appeditorcode.workspace_will_be_reset_to_version') + this.state.version);
                 setTimeout(()=>{
                     window.location.reload();
                 }, 1500)
@@ -289,7 +290,7 @@ class MyCode extends Component {
         }
 
         if (app_inst === '' || app === '' || gateway === undefined) {
-            message.error('找不到安装信息')
+            message.error(intl.get('ppeditorcode.installation_information_not_found'))
             return
         }
         this.setState({applyEnable: false})
@@ -304,20 +305,20 @@ class MyCode extends Component {
         http.post(url, params)
             .then(res=>{
                 if (res.message) {
-                    message.success('应用安装成功请求成功，请等待网关执行结果');
-                    this.props.store.action.pushAction(res.message, '应用安装调试区代码', '', params, 30000,  (result)=> {
+                    message.success(intl.get('appeditorcode.application_installation_successful_request_successful'));
+                    this.props.store.action.pushAction(res.message, intl.get('appeditorcode.code_of_application_installation_and_debugging_area'), '', params, 30000,  (result)=> {
                         result;
                         this.setState({applyEnable: true})
                     })
                 } else {
                     this.setState({applyEnable: true})
-                    message.error('应用安装成功请求失败!')
+                    message.error(intl.get('appeditorcode.application_installation_success_request_failed'))
                 }
             })
             .catch( (err) => {
                 err;
                 this.setState({applyEnable: true})
-                message.error('发送应用安装成功请求失败')
+                message.error(intl.get('appeditorcode.failed_to_send_application_installation_success_request'))
             })
     }
 
@@ -351,7 +352,7 @@ class MyCode extends Component {
             '&operation=set_content&version=' + this.state.newVersion +
             '&comment=' + this.state.comment)
             .then(res=>{
-                message.success(res.message + ', 即将跳转到新版本！');
+                message.success(res.message + `, ${intl.get('appeditorcode.about_to_jump_to_the_new_version')}`);
             });
         setTimeout(()=>{
             this.setState({
@@ -376,13 +377,13 @@ class MyCode extends Component {
                 .then(res=>{
                     if (res.status === 'OK') {
                         this.setState({changed: false})
-                        message.success(`保存文件${this.state.filePath}成功`)
+                        message.success(`${intl.get('appeditorcode.save_file')}${this.state.filePath}${intl.get('common.success')}`)
                     } else {
-                        message.error(`保存文件${this.state.filePath}失败! ${res.error}`)
+                        message.error(`${intl.get('appeditorcode.save_file')}${this.state.filePath}${intl.get('common.fail')}! ${res.error}`)
                     }
                     this.autoSave()
                 }).catch( err => {
-                    message.error(`保存文件${this.state.filePath}失败! ${err}`)
+                    message.error(`${intl.get('appeditorcode.save_file')}${this.state.filePath}${intl.get('common.fail')}! ${err}`)
                 })
         }
     };//保存文件结束
@@ -395,7 +396,7 @@ class MyCode extends Component {
                 <div className="iconGroup">
                     <p style={{width: 'auto', position: 'resolute'}}>
                         <Divider type="vertical" />
-                        <Tooltip title="保存修改代码" >
+                        <Tooltip title={intl.get('appeditorcode.save_modification_code')} >
                             <Icon
                                 type="save"
                                 disabled
@@ -414,14 +415,14 @@ class MyCode extends Component {
                             onClick={this.zoomIn}
                         />
                         <Divider type="vertical" />
-                        <Tooltip title="打包发布新版本" >
+                        <Tooltip title={intl.get('appeditorcode.package_and_release_new_version')} >
                             <Icon
                                 type="tag"
                                 onClick={this.showReleaseModal}
                             />
                         </Tooltip>
                         <span style={{padding: '0 2px'}} />
-                        <Tooltip title="回滚代码" >
+                        <Tooltip title={intl.get('appeditorcode.rollback_code')} >
                             <Icon
                                 type="retweet"
                                 onClick={this.showModal}
@@ -431,7 +432,7 @@ class MyCode extends Component {
                         {
                             gateway !== undefined ? (
 
-                            <Tooltip title="安装当前代码到网关" >
+                            <Tooltip title={intl.get('appeditorcode.install_current_code_to_gateway')} >
                                 <Icon
                                     style={{color: this.state.applyEnable && actionEnable ? '#333' : '#ccc'}}
                                     type="check-square"
@@ -449,7 +450,7 @@ class MyCode extends Component {
                             className="color"
                         >
                             <span>当前文件：{this.state.filePath}</span>
-                            <span>{this.state.changed ? '已修改' : '未修改'}</span>
+                            <span>{this.state.changed ? intl.get('appeditorcode.revised') : intl.get('appeditorcode.not_changed')}</span>
                         </span>
                         <Icon
                             style={{position: 'absolute', right: 0, top: 10}}
@@ -482,7 +483,7 @@ class MyCode extends Component {
                                 bindKey: {win: 'Ctrl-S', mac: 'Command-S'}, //用于命令的组合键。
                                 exec: ()=>{
                                     if (!this.state.changed) {
-                                        message.warning('文件未改动')
+                                        message.warning(intl.get('appeditorcode.document_unchanged'))
                                     } else {
                                         this.saveFile()
                                     }
@@ -502,16 +503,16 @@ class MyCode extends Component {
                     }
                 </div>
                 <Modal
-                    title="重置编辑器工作区内容版本到"
+                    title={intl.get('appeditorcode.reset_editor_workspace_content_version_to')}
                     visible={showRevertModal}
                     onOk={this.resetVersion}
                     onCancel={this.hideModal}
-                    okText="确认"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                 >
-                    <span style={{padding: '0 20px'}}>版本</span>
+                    <span style={{padding: '0 20px'}}>{intl.get('appdetails.version')}</span>
                     <Select
-                        defaultValue="请选择..."
+                        defaultValue={intl.get('appeditorcode.please_choose')}
                         style={{ width: 350 }}
                     >
                         {
@@ -531,15 +532,15 @@ class MyCode extends Component {
                     </Select>
                 </Modal>
                 <Modal
-                    title="发布新版本"
+                    title={intl.get('appeditorcode.release_new_version')}
                     visible={showReleaseModal}
                     onOk={this.newVersion}
                     onCancel={this.hide}
-                    okText="确认"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                 >
                     <p style={{display: 'flex'}}>
-                        <span style={{padding: '5px 20px'}}>填写版本</span>
+                        <span style={{padding: '5px 20px'}}>{intl.get('appeditorcode.fill_in_version')}</span>
                         <Input
                             type="text"
                             defaultValue={newVersion}
@@ -550,7 +551,7 @@ class MyCode extends Component {
                     <br/>
 
                     <p style={{display: 'flex'}}>
-                        <span style={{padding: '0 20px'}}>更新日志</span>
+                        <span style={{padding: '0 20px'}}>{intl.get('appdetails.update_log')}</span>
                         <TextArea
                             row={8}
                             style={{width: '320px'}}

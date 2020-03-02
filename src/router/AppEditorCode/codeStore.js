@@ -1,4 +1,6 @@
 import {observable, action} from 'mobx';
+import intl from 'react-intl-universal';
+
 class CodeStore {
     @observable treeData = [];
     @observable isChange = false;
@@ -42,7 +44,7 @@ class CodeStore {
     @observable settingData = {
         appName: '',
         codeName: '',
-        licenseType: '免费',
+        licenseType: intl.get('appedit.free'),
         description: '',
         confTemplate: '',
         preConfiguration: '',

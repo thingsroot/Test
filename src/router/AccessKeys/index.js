@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import http from '../../utils/Server';
 import { Table, Popconfirm, message } from 'antd';
+import intl from 'react-intl-universal';
 
 class AccessKeys extends PureComponent {
     state = {
@@ -13,13 +14,13 @@ class AccessKeys extends PureComponent {
             },
             {   key: 'action',
                 dataIndex: 'action',
-                title: '操作',
+                title: intl.get('common.operate'),
                 width: '50%',
                 render: (records, val)=>{
                         const record = val.value;
                     return (
                         <Popconfirm
-                            title={record ? '更换AccessKey会导致使用原有AccessKey的应用工作不正常,是否确认更新?' : '是否创建AccessKey'}
+                            title={record ? `${intl.get('accesskeys.change_access')}?` : intl.get('accesskeys.create_accessKey_or_not')}
                             onConfirm={()=>{
                                 this.confirm(record)
                             }}
@@ -31,7 +32,7 @@ class AccessKeys extends PureComponent {
                         >
                             <span
                                 style={{color: 'blue', cursor: 'pointer'}}
-                            >{record ? '更新' : '创建'}</span>
+                            >{record ? intl.get('accesskeys.update') : intl.get('accesskeys.create')}</span>
                         </Popconfirm>
                     )
                 }
@@ -59,7 +60,7 @@ class AccessKeys extends PureComponent {
                     this.setState({
                         dataSource: [{value: res.data}]
                     }, ()=>{
-                        message.success('AccessKey更新成功');
+                        message.success(intl.get('accesskeys.accessKey_updated_successfully'));
                     })
                 }
             })
@@ -69,15 +70,15 @@ class AccessKeys extends PureComponent {
                     this.setState({
                         dataSource: [{value: res.data}]
                     }, ()=>{
-                        message.success('AccessKey创建成功');
+                        message.success(intl.get('accesskeys.accessKey_created_successfully'));
                     })
                 }
             })
         }
       }
     cancel = (record)=> {
-        const action = record ? '更新' : '创建'
-        message.error('取消' + action + 'AccessKey');
+        const action = record ? intl.get('accesskeys.update') : intl.get('accesskeys.create')
+        message.error(intl.get('common.cancel') + action + 'AccessKey');
       }
     render () {
         const { columns, dataSource } = this.state;

@@ -8,6 +8,7 @@ import TemplateList from './TemplateList';
 import AppDescription from './Description';
 import {inject, observer} from 'mobx-react';
 import { _getCookie } from '../../utils/Session';
+import intl from 'react-intl-universal';
 
 const TabPane = Tabs.TabPane;
 const block = {
@@ -36,7 +37,7 @@ class AppDetails extends Component {
         newTemplateVisiable: false,
         name: '',
         sn: '',
-        ModalText: '确认删除此应用？',
+        ModalText: intl.get('appdetails.confirm_to_delete_this_app'),
         visible: false,
         confirmLoading: false,
         dataSource: [],
@@ -52,27 +53,27 @@ class AppDetails extends Component {
                 }
             },
             {
-                title: '序列号',
+                title: intl.get('appdetails.serial_nubmer'),
                 dataIndex: 'sn',
                 key: 'sn'
             },
             {
-                title: '名称',
+                title: intl.get('common.name'),
                 dataIndex: 'dev_name',
                 key: 'dev_name',
                 sorter: (a, b) => a.dev_name.length - b.dev_name.length,
                 render: (props, record)=>{
                     return (
                         <div style={{lineHeight: '45px'}}>
-                            {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >公司</Tag> : null}
-                            {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >个人</Tag> : null}
-                            {record.is_shared ? <Tag color="orange" >分享</Tag> : null}
+                            {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >{intl.get('gateway.company')}</Tag> : null}
+                            {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >{intl.get('gateway.individual')}</Tag> : null}
+                            {record.is_shared ? <Tag color="orange" >{intl.get('gateway.share')}</Tag> : null}
                             {record.dev_name}
                         </div>
                     )
                 }
               }, {
-                title: '描述',
+                title: intl.get('common.desc'),
                 dataIndex: 'description',
                 key: 'description',
                 sorter: (a, b) => a.description && b.description && a.description.length - b.description.length
@@ -119,7 +120,7 @@ class AppDetails extends Component {
                 res.data.data.name = res.data.data.name.replace(/\//g, '*')
             }
             if (!res.ok) {
-                message.error('无法获取应用信息')
+                message.error(intl.get('appdetails.unable_to_get_app_information'))
                 this.props.history.push('/myapps')
                 return
             }
@@ -141,7 +142,7 @@ class AppDetails extends Component {
       };
       handleOk = () => {
         this.setState({
-          ModalText: '删除应用中,请稍后...',
+          ModalText: intl.get('appdetails.deleting_app'),
           confirmLoading: true
         });
         if (this.props.match.params.name) {
@@ -154,10 +155,10 @@ class AppDetails extends Component {
                     visible: false
                 }, ()=>{
                     if (res.ok){
-                        message.success('删除应用成功！')
+                        message.success(`${intl.get('appdetails.delete_app_succeeded')}!`)
                         this.props.history.go(-1)
                     } else {
-                        message.error('删除应用失败，错误信息：' + res.error + ',请重试！')
+                        message.error(`${intl.get('appdetails.failed_to_delete_app')}：` + res.error + `,${intl.get('appdetails.please_try_again')}!`)
                     }
                 })
             })
@@ -191,7 +192,7 @@ class AppDetails extends Component {
     }
     JumpToInstall = () => {
         if (this.state.sn === '') {
-            message.error('请先选择需要安装到的网关！')
+            message.error(`${intl.get('appdetails.please_select_the_gateway_you_want_to_install_to')}！`)
             return false;
         }
         this.props.history.push(`/appsinstall/${this.state.sn}/${this.state.app}/install`)
@@ -209,7 +210,7 @@ class AppDetails extends Component {
                     version: Number(result.data)
                 }).then(res=>{
                     if (res.ok){
-                        message.success('应用克隆成功，即将跳转到编辑页面！')
+                        message.success(`${intl.get('appdetails.clone_successfully_applied')}！`)
                         if (res.data){
                             this.props.history.push(`/appeditorcode/${res.data.name}/${res.data.app_name}`);
                         }
@@ -237,18 +238,18 @@ class AppDetails extends Component {
                     <div className="appImg">
                         <img
                             src={`/store_assets${app_info.icon_image}`}
-                            alt="图片"
+                            alt={intl.get('appdetails.picture')}
                         />
                     </div>
                     <div className="appInfo">
                         <p className="appName">{app_info.app_name}</p>
                         <p className="info">
-                            <span>发布者：{app_info.developer}</span>
-                            <span>创建时间：{time}</span><br/>
-                            <span>应用分类：{app_info.category === null ? '----' : app_info.category}</span>
-                            <span>通讯协议：{app_info.protocol === null ? '----' : app_info.protocol}</span><br/>
-                            <span>适配型号：{app_info.device_serial === null ? '----' : app_info.device_serial}</span>
-                            <span>设备厂商：{app_info.device_supplier === null ? '----' : app_info.device_supplier}</span>
+                            <span>{intl.get('appdetails.publisher')}：{app_info.developer}</span>
+                            <span>{intl.get('appdetails.creation_time')}：{time}</span><br/>
+                            <span>{intl.get('appdetails.application_classification')}：{app_info.category === null ? '----' : app_info.category}</span>
+                            <span>{intl.get('appdetails.communication_protocol')}：{app_info.protocol === null ? '----' : app_info.protocol}</span><br/>
+                            <span>{intl.get('appdetails.adapter_type')}：{app_info.device_serial === null ? '----' : app_info.device_serial}</span>
+                            <span>{intl.get('appdetails.equipment_manufacturer')}：{app_info.device_supplier === null ? '----' : app_info.device_supplier}</span>
                         </p>
                     </div>
                     <div className="btnGroup">
@@ -259,7 +260,7 @@ class AppDetails extends Component {
                             to={`/appedit/${app_info.name}`}
                         >
                             <Icon type="setting" />
-                            设置
+                            {intl.get('appdetails.settings')}
                         </Link>
                         <Link
                             className="button"
@@ -267,7 +268,7 @@ class AppDetails extends Component {
                             to={`/appeditorcode/${app_info.name}/${app_info.app_name}`}
                         >
                             <Icon type="edit" />
-                            代码编辑
+                            {intl.get('appdetails.code_editing')}
                         </Link>
                         <Button
                             onClick={()=>{
@@ -276,7 +277,7 @@ class AppDetails extends Component {
                             style={{height: '35px'}}
                         >
                             <Icon type="download" />
-                            安装此应用
+                            {intl.get('appdetails.install_this_app')}
                         </Button>
                         {
                             app_info.developer !== _getCookie('user_id') && Number(_getCookie('is_developer')) === 1
@@ -290,7 +291,7 @@ class AppDetails extends Component {
                                 }}
                               >
                                 <Icon type="fork" />
-                                克隆
+                                {intl.get('appdetails.clone')}
                             </Button>
                             : ''
                         }
@@ -300,7 +301,7 @@ class AppDetails extends Component {
                             to={`/appdetails/${app_info.fork_from}`}
                         >
                             <Icon type="share-alt" />
-                            分支
+                            {intl.get('appdetails.branch')}
                         </Link>
                         {
                             app_info.developer === _getCookie('user_id')
@@ -311,29 +312,29 @@ class AppDetails extends Component {
                                 style={{height: 36, marginLeft: 15}}
                               >
                                 <Icon type="info-circle" />
-                                <span>删除</span>
+                                <span>{intl.get('appdetails.delete')}</span>
                             </Button>
                             : ''
                         }
                         <Modal
-                            title={<span><Icon type="info-circle" /> 提示信息</span>}
+                            title={<span><Icon type="info-circle" /> {intl.get('appdetails.prompt_information')}</span>}
                             visible={visible}
                             onOk={this.handleOk}
                             confirmLoading={confirmLoading}
                             onCancel={this.handleCancel}
-                            cancelText="取消"
-                            okText="确定"
+                            cancelText={intl.get('common.cancel')}
+                            okText={intl.get('common.sure')}
                         >
                             <p>{ModalText}</p>
                         </Modal>
                         <Modal
-                            title={<span><Icon type="download" /> 请选择要安装到的网关</span>}
+                            title={<span><Icon type="download" /> {intl.get('appdetails.please_select_the_gateway_to_install_to')}</span>}
                             visible={this.state.sn_visible}
                             onOk={this.JumpToInstall}
                             onCancel={this.cancelInstall}
                             maskClosable={false}
-                            cancelText="取消"
-                            okText="确定"
+                            cancelText={intl.get('common.cancel')}
+                            okText={intl.get('common.sure')}
                             width="1024px"
                         >
                             <Table
@@ -356,13 +357,13 @@ class AppDetails extends Component {
                     activeKey={this.state.activeKey}
                 >
                     <TabPane
-                        tab="描述"
+                        tab={intl.get('common.desc')}
                         key="description"
                     >
                         <AppDescription source={desc}/>
                     </TabPane>
                     <TabPane
-                        tab="版本列表"
+                        tab={intl.get('appdetails.version_list')}
                         key="versions"
                     >
                         <VersionList
@@ -374,7 +375,7 @@ class AppDetails extends Component {
                         />
                     </TabPane>
                     <TabPane
-                        tab="模板列表"
+                        tab={intl.get('appdetails.template_list')}
                         key="templates"
                     >
                         <TemplateList

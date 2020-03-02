@@ -5,7 +5,7 @@ import http from '../../utils/Server';
 import axios from 'axios';
 import {inject, observer} from 'mobx-react';
 import SonTables from './SonTables';
-
+import intl from 'react-intl-universal';
 const InputGroup = Input.Group;
 const Option = Select.Option;
 const disposed = {
@@ -514,42 +514,42 @@ class DeviceEventList extends Component {
                         <Button onClick={()=>{
                             this.confMessage(selectedRowKeys)
                         }}
-                        >确认</Button>
+                        >{intl.get('common.confirm')}</Button>
                         <span style={{padding: '0 5px'}} />
                         <Button onClick={()=>{
                             this.confAllMessage()
                         }}
-                        >确认所有</Button>
+                        >{intl.get('common.make_sure_all')}</Button>
                     </div>
 
                     <div
                         className="flex"
                     >
-                        <span>类型:</span>
+                        <span>{intl.get('common.type')}:</span>
                         <Select
                             value={this.state.filterType}
                             style={{ width: 100 }}
                             onChange={this.onTypeChange}
                         >
-                            <Option value="">全部</Option>
-                            <Option value="COMM">通讯</Option>
-                            <Option value="DATA">数据</Option>
-                            <Option value="APP">应用</Option>
-                            <Option value="SYS">系统</Option>
-                            <Option value="DEV">设备</Option>
+                            <Option value="">{intl.get('common.all')}</Option>
+                            <Option value="COMM">{intl.get('common.communication')}</Option>
+                            <Option value="DATA">{intl.get('common.data')}</Option>
+                            <Option value="APP">{intl.get('common.app')}</Option>
+                            <Option value="SYS">{intl.get('common.sym')}</Option>
+                            <Option value="DEV">{intl.get('common.device')}</Option>
                         </Select>
                         <span style={{padding: '0 3px'}} />
-                        <span>等级:</span>
+                        <span>{intl.get('common.level')}:</span>
                         <Select
                             value={this.state.filterLevel}
                             style={{ width: 80 }}
                             onChange={this.onLevelChange}
                         >
-                            <Option value="">全部</Option>
-                            <Option value="1">常规</Option>
-                            <Option value="2">错误</Option>
-                            <Option value="3">警告</Option>
-                            <Option value="99">致命</Option>
+                            <Option value="">{intl.get('common.all')}</Option>
+                            <Option value="1">{intl.get('common.conventional')}</Option>
+                            <Option value="2">{intl.get('common.error')}</Option>
+                            <Option value="3">{intl.get('common.warning')}</Option>
+                            <Option value="99">{intl.get('common.deadly')}</Option>
                         </Select>
                         <span style={{padding: '0 1px'}} />
                         <Select
@@ -568,12 +568,12 @@ class DeviceEventList extends Component {
                             style={{ width: 100 }}
                             onChange={this.onTotalTimeChange}
                         >
-                            <Option value="1">1小时</Option>
-                            <Option value="6">6小时</Option>
-                            <Option value="12">12小时</Option>
-                            <Option value="24">24小时</Option>
-                            <Option value="72">三天</Option>
-                            <Option value="168">一周</Option>
+                            <Option value="1">1{intl.get('common.hours')}</Option>
+                            <Option value="6">6{intl.get('common.hours')}</Option>
+                            <Option value="12">12{intl.get('common.hours')}</Option>
+                            <Option value="24">24{intl.get('common.hours')}</Option>
+                            <Option value="72">{intl.get('common.three_days')}</Option>
+                            <Option value="168">{intl.get('common.a_week')}</Option>
                         </Select>
                         <span style={{padding: '0 1px'}} />
                         <InputGroup compact>
@@ -583,13 +583,13 @@ class DeviceEventList extends Component {
                                 style={{width: '100px'}}
                                 disabled={this.state.gateway !== undefined}
                             >
-                                <Option value="">全部</Option>
-                                <Option value="title">标题</Option>
-                                <Option value="device">序列号</Option>
+                                <Option value="">{intl.get('common.all')}</Option>
+                                <Option value="title">{intl.get('common.title')}</Option>
+                                <Option value="device">{intl.get('common.sn')}</Option>
                             </Select>
                             <Input
                                 style={{ width: 200 }}
-                                placeholder="请输入关键字"
+                                placeholder={intl.get('common.please_enter_a_keyword')}
                                 onChange={this.search}
                             />
                         </InputGroup>
@@ -607,12 +607,12 @@ class DeviceEventList extends Component {
                     showIcon
                     message={
                         <span>
-                            全部消息<b>{messageCount}</b>条，列表中未确认消息<b>{unconfirmed}</b>条，
+                            {intl.get('common.all_the_news')}<b>{messageCount}</b>{intl.get('common.article')}，{intl.get('common.no_confirmation_message_in_the_list')}<b>{unconfirmed}</b>{intl.get('common.article')}，
                             <span
                                 style={{color: 'blue', cursor: 'pointer'}}
                                 onClick={this.toggleMessage}
                             >
-                                {showUnDisposed ? '查看所有' : '查看未确认'}
+                                {showUnDisposed ? intl.get('common.to_see_all') : intl.get('common.check_unconfirmed')}
                             </span>
                         </span>
                     }

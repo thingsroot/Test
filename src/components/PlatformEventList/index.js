@@ -5,7 +5,7 @@ import './style.scss'
 import http from '../../utils/Server';
 import axios from 'axios';
 import {inject, observer} from 'mobx-react';
-
+import intl from 'react-intl-universal';
 const InputGroup = Input.Group;
 const Option = Select.Option;
 const disposed = {
@@ -623,26 +623,26 @@ class PlatformEvents extends Component {
                         <Button onClick={()=>{
                             this.confMessage(selectedRowKeys)
                         }}
-                        >确认</Button>
+                        >{intl.get('common.confirm')}</Button>
                         <span style={{padding: '0 5px'}} />
                         <Button onClick={()=>{
                             this.confAllMessage()
                         }}
-                        >确认所有</Button>
+                        >{intl.get('common.make_sure_all')}</Button>
                     </div>
                     <div
                         className="flex"
                     >
-                        <span>类型：</span>
+                        <span>{intl.get('common.type')}：</span>
                         <Select
                             value={this.state.filterType}
                             style={{ width: 120 }}
                             onChange={this.onTypeChange}
                         >
-                            <Option value="">全部</Option>
-                            <Option value="Owner">设备维护</Option>
-                            <Option value="Action">设备操作</Option>
-                            <Option value="Status">设备状态</Option>
+                            <Option value="">{intl.get('common.all')}</Option>
+                            <Option value="Owner">{intl.get('common.equipment_maintenance')}</Option>
+                            <Option value="Action">{intl.get('common.equipment_operation')}</Option>
+                            <Option value="Status">{intl.get('common.equipment_state')}</Option>
                         </Select>
                         <span style={{padding: '0 1px'}} />
                         <Select
@@ -661,12 +661,12 @@ class PlatformEvents extends Component {
                             style={{ width: 100 }}
                             onChange={this.onTotalTimeChange}
                         >
-                            <Option value="1">1小时</Option>
-                            <Option value="6">6小时</Option>
-                            <Option value="12">12小时</Option>
-                            <Option value="24">24小时</Option>
-                            <Option value="72">72小时</Option>
-                            <Option value="168">一周</Option>
+                            <Option value="1">1{intl.get('common.hours')}</Option>
+                            <Option value="6">6{intl.get('common.hours')}</Option>
+                            <Option value="12">12{intl.get('common.hours')}</Option>
+                            <Option value="24">24{intl.get('common.hours')}</Option>
+                            <Option value="72">72{intl.get('common.hours')}</Option>
+                            <Option value="168">{intl.get('common.a_week')}</Option>
                         </Select>
                         <span style={{padding: '0 1px'}} />
                         <InputGroup
@@ -678,13 +678,13 @@ class PlatformEvents extends Component {
                                 style={{width: '100px'}}
                                 disabled={this.state.gateway !== undefined}
                             >
-                                <Option value="">全部</Option>
-                                <Option value="title">标题</Option>
-                                <Option value="device">序列号</Option>
+                                <Option value="">{intl.get('common.all')}</Option>
+                                <Option value="title">{intl.get('common.title')}</Option>
+                                <Option value="device">{intl.get('common.sn')}</Option>
                             </Select>
                             <Input
                                 style={{ width: 200 }}
-                                placeholder="请输入关键字"
+                                placeholder={intl.get('common.please_enter_a_keyword')}
                                 onChange={this.search}
                             />
                         </InputGroup>
@@ -703,12 +703,12 @@ class PlatformEvents extends Component {
                     showIcon
                     message={
                         <span>
-                            全部消息<b>{messageCount}</b>条，列表中未确认消息<b>{unconfirmed}</b>条，
+                    {intl.get('common.all_the_news')}<b>{messageCount}</b>{intl.get('common.article')}，{intl.get('common.no_confirmation_message_in_the_list')}<b>{unconfirmed}</b>{intl.get('common.article')}，
                             <span
                                 style={{color: 'blue', cursor: 'pointer'}}
                                 onClick={this.toggleMessage}
                             >
-                                {showUnDisposed ? '查看所有' : '查看未确认'}
+                                {showUnDisposed ? intl.get('common.to_see_all') : intl.get('common.check_unconfirmed')}
                             </span>
                         </span>
                     }

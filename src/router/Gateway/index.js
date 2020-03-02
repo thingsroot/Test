@@ -9,6 +9,7 @@ import http from '../../utils/Server';
 import { inject, observer } from 'mobx-react';
 import { Button, Icon, message, Modal } from 'antd';
 import GatewayMQTT from '../../utils/GatewayMQTT';
+import intl from 'react-intl-universal';
 
 const DeviceList = LoadableComponent(()=>import('./DeviceList'));
 const AppsList = LoadableComponent(()=>import('./AppsList'));
@@ -69,8 +70,8 @@ class MyGatesDevices extends Component {
         })
         const $this = this;
             Modal.warning({
-                title: '应用不存在或未运行',
-                content: '该设备应用不存在或未运行，如未安装应用请安装应用，如已安装应用请检测应用是否启动...',
+                title: intl.get('gateway.App_does_not_exist_or_is_not_running'),
+                content: intl.get('gateway.The_device_app_does_not_exist_or_is_not_running'),
                 onOk (){
                   $this.props.history.push('/gateway/' + $this.props.match.params.sn + '/apps')
                 }
@@ -167,68 +168,68 @@ class MyGatesDevices extends Component {
                       <Switch>
                         <GatewayRoute path={`${path}/devices`}
                             component={DeviceList}
-                            title="我的网关·设备列表"
+                            title={intl.get('gateway.my_gateway_device_list')}
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path={`${path}/apps`}
                             component={AppsList}
-                            title="我的网关·应用列表"
+                            title={intl.get('gateway.my_gateway_application_list')}
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path={`${path}/settings`}
                             component={Settings}
-                            title="我的网关·网关设置"
+                            title={intl.get('gateway.my_gateway_gateway_settings')}
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path={`${path}/vnet`}
                             component={Vnet}
-                            title="我的网关·远程编程-网络"
+                            title={intl.get('gateway.my_gateway_remote_programming_network')}
                             gateway={this.state.gateway}
                             mqtt={this.state.mqtt}
                             gatewayInfo={gatewayInfo}
                         />
                         <GatewayRoute path={`${path}/vserial`}
                             component={Vserial}
-                            title="我的网关·虚拟串口"
+                            title={intl.get('gateway.my_gateway_virtual_serial_port')}
                             gateway={this.state.gateway}
                             mqtt={this.state.mqtt}
                             gatewayInfo={gatewayInfo}
                         />
                         <GatewayRoute path={`${path}/onlinerecords`}
                             component={OnlineRecords}
-                            title="我的网关·在线记录"
+                            title={intl.get('gateway.my_gateway_online record')}
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path={`${path}/logs`}
                             component={Logviewer}
-                            title="我的网关·日志"
+                            title={intl.get('gateway.my_gateway_log')}
                             mqtt={this.state.mqtt}
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path={`${path}/comms`}
                             component={Comm}
-                            title="我的网关·报文"
+                            title={intl.get('gateway.my_gateway_message')}
                             mqtt={this.state.mqtt}
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path={`${path}/platformevents`}
                             component={PlatformEvents}
-                            title="我的网关·平台事件"
+                            title={intl.get('gateway.my_gateway_platform_event')}
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path={`${path}/events`}
                             component={DeviceEvents}
-                            title="我的网关·设备事件"
+                            title={intl.get('gateway.my_gateway_device_events')}
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path="/gateways/appconfig"
                             component={Appconfig}
-                            title="我的网关·应用配置"
+                            title={intl.get('gateway.my_gateway_application_configuration')}
                             gateway={this.state.gateway}
                         />
                         <GatewayRoute path={`${path}/networkconfig`}
                             component={Networkconfig}
-                            title="我的网关·网络配置"
+                            title={intl.get('gateway.my_gateway_network_configuration')}
                             gateway={this.state.gateway}
                         />
                         <Redirect from={path}

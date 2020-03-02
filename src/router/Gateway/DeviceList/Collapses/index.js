@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import InputList from '../InputList';
 import DevicesOutputs from '../OutputList';
 import DevicesCommands from '../CommandList';
+import intl from 'react-intl-universal';
 const Panel = Collapse.Panel;
 
 
@@ -89,12 +90,12 @@ class Collapses extends Component {
                     <Panel
                         header={
                             <p className="collapseHead">
-                                <span>数据浏览</span>
+                                <span>{intl.get('devece_list.Data_browsing')}</span>
                                 <Input
                                     style={{marginLeft: '50%', maxWidth: '300px'}}
                                     type="text"
                                     allowClear
-                                    placeholder="搜索名称、描述"
+                                    placeholder={intl.get('devece_list.search_name_desc')}
                                     onClick={(e)=>{
                                         e.stopPropagation();
                                     }}
@@ -104,7 +105,7 @@ class Collapses extends Component {
                                 />
                                 <Tooltip
                                     placement="topLeft"
-                                    title="刷新数据"
+                                    title={intl.get('gateway.refresh_data')}
                                 >
                                     <Icon
                                         type="reload"
@@ -140,14 +141,14 @@ class Collapses extends Component {
                         disabled={this.props.outputs && Object.keys(this.props.outputs).length > 0 ? false : true}
                         header={
                             <p className="collapseHead">
-                                <span>数据下置</span>
+                                <span>{intl.get('devece_list.The_data_set')}</span>
                                 {
                                     this.props.outputs && Object.keys(this.props.outputs).length > 0
                                     ? <Input
                                         style={{marginLeft: '50%', maxWidth: '300px'}}
                                         type="text"
                                         allowClear
-                                        placeholder="搜索名称、描述"
+                                        placeholder={intl.get('devece_list.search_name_desc')}
                                         onClick={(e)=>{
                                             e.stopPropagation();
                                         }}
@@ -173,14 +174,14 @@ class Collapses extends Component {
                         disabled={this.props.commands && Object.keys(this.props.commands).length > 0 ? false : true}
                         header={
                             <p className="collapseHead">
-                                <span>控制指令</span>
+                                <span>{intl.get('devece_list.Control_instruction')}</span>
                                 {
                                     this.props.commands && Object.keys(this.props.commands).length > 0
                                     ? <Input
                                         style={{marginLeft: '50%', maxWidth: '300px'}}
                                         type="text"
                                         allowClear
-                                        placeholder="搜索名称、描述"
+                                        placeholder={intl.get('devece_list.search_name_desc')}
                                         onClick={(e)=>{
                                             e.stopPropagation();
                                         }}

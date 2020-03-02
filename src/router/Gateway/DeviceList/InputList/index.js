@@ -8,6 +8,7 @@ import { Table, Button, Modal } from 'antd';
 import { withRouter } from 'react-router-dom';
 import http from '../../../../utils/Server';
 import './style.scss';
+import intl from 'react-intl-universal';
 let myFaultTypeChart;
 
 class ExpandedRowRender extends PureComponent {
@@ -19,21 +20,21 @@ class ExpandedRowRender extends PureComponent {
         visible: false,
         barData: [],
         columns: [
-            { title: '类型', dataIndex: 'vt', key: 'vt', width: '60px' },
-            { title: '名称', dataIndex: 'name', key: 'name' },
-            { title: '描述', dataIndex: 'desc', key: 'desc', render (text) {
+            { title: intl.get('common.type'), dataIndex: 'vt', key: 'vt', width: '60px' },
+            { title: intl.get('common.name'), dataIndex: 'name', key: 'name' },
+            { title: intl.get('common.desc'), dataIndex: 'desc', key: 'desc', render (text) {
                 return (<span title={text}>{text}</span>)
             }},
-            { title: '单位', dataIndex: 'unit', key: 'unit', width: '60px', render (text) {
+            { title: intl.get('common.unit'), dataIndex: 'unit', key: 'unit', width: '60px', render (text) {
                 return (<span title={text}>{text}</span>)
             }},
-            { title: '数值', dataIndex: 'pv', key: 'pv', render (text) {
+            { title: intl.get('common.number'), dataIndex: 'pv', key: 'pv', render (text) {
                 return (<span title={text}>{text}</span>)
             }},
-            { title: '时间', dataIndex: 'tm', key: 'tm', width: '180px' },
-            { title: '质量戳', dataIndex: 'q', key: 'q', width: '60px' },
+            { title: intl.get('common.time'), dataIndex: 'tm', key: 'tm', width: '180px' },
+            { title: intl.get('appstore.quality_stamp'), dataIndex: 'q', key: 'q', width: '120px' },
             {
-                title: '操作',
+                title: intl.get('common.operation'),
                 dataIndex: 'operation',
                 key: 'operation',
                 width: '120px',
@@ -43,7 +44,7 @@ class ExpandedRowRender extends PureComponent {
                     <Button onClick={()=>{
                         this.showModal(props)
                     }}
-                    >浏览数据</Button>
+                    >{intl.get('devece_list.Browsing_data')}</Button>
                     </span>
                 )
                 }
@@ -177,7 +178,7 @@ class ExpandedRowRender extends PureComponent {
                     yAxis: {},
                     series: [
                       {
-                        name: '数值',
+                        name: intl.get('common.number'),
                         type: 'line',
                         color: '#37A2DA',
                         data: res.data
@@ -186,10 +187,10 @@ class ExpandedRowRender extends PureComponent {
             });
             } else if (this.state.record.vt === 'string') {
                 myCharts.style.textAlin = 'center'
-                myCharts.innerHTML = '暂不支持此类数据，请点击更多历史数据查看更多数据。'
+                myCharts.innerHTML = 'gateway.this_kind_of_data_is_not_supported_temporarily'
             } else {
                 myCharts.style.textAlin = 'center'
-                myCharts.innerHTML = '暂未获取到数据'
+                myCharts.innerHTML = intl.get('gateway.data_not_obtained_yet')
             }
         })
     }
@@ -232,7 +233,7 @@ class ExpandedRowRender extends PureComponent {
                     scroll={{x: '100%', y: 500}}
                 />
                 <Modal
-                    title={this.state.record ? '变量' + this.state.record.name + '十分钟内数值变化' : ''}
+                    title={this.state.record ? intl.get('gateway.variable') + this.state.record.name + intl.get('gateway.value_change_in_ten_minutes') : ''}
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
@@ -240,12 +241,12 @@ class ExpandedRowRender extends PureComponent {
                     footer={[
                         <Button key="back"
                             onClick={this.handleCancel}
-                        >关闭</Button>,
+                        >{intl.get('gateway.close')}</Button>,
                         <Button key="submit"
                             type="primary"
                             onClick={this.handleOk}
                         >
-                        更多历史数据
+                        {intl.get('gateway.more_historical_data')}
                         </Button>
                     ]}
                 >

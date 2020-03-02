@@ -9,6 +9,7 @@ import Register from './register'
 import Retrieve from './retrieve'
 import Password from './password'
 import OEM from '../../assets/OEM';
+import intl from 'react-intl-universal';
 
 const sectionStyle = {
     posation: 'absolute',
@@ -41,7 +42,7 @@ class Login extends PureComponent {
                 >
                     <Icon type="monitor" />
                     <span>
-                        快速指南
+                        {intl.get('header.quick_guide')}
                     </span>
                 </Menu.Item>
                 <Menu.Item
@@ -55,7 +56,7 @@ class Login extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                        应用开发手册
+                        {intl.get('header.app_manual')}
                     </span>
                 </Menu.Item>
 
@@ -75,7 +76,7 @@ class Login extends PureComponent {
                     </p>
                     <div className="help_link">
                         {
-                        OEM.Title === '冬笋云'
+                        OEM.Title === intl.get('login.winter_bamboo_shoots_cloud')
                         ? <span>
                             <Dropdown
                                 overlay={menu1}
@@ -88,7 +89,7 @@ class Login extends PureComponent {
                                 <Icon
                                     style={{padding: '0 4px', fontWeight: 800}}
                                     type="question-circle"
-                                />帮助
+                                />{intl.get('header.help')}
                             </span>
                         </Dropdown>
                         <span style={{padding: '0 5px'}}> </span>
@@ -101,7 +102,7 @@ class Login extends PureComponent {
                                 type="message"
                             />
 
-                            讨论
+                            {intl.get('header.discuss')}
                         </a>
                         <span style={{padding: '0 5px'}}> </span>
 
@@ -115,7 +116,7 @@ class Login extends PureComponent {
                                 type="book"
                             />
 
-                            知识库
+                            {intl.get('header.the_knowledge_base')}
                         </a>
                         <span style={{padding: '0 5px'}}> </span>
                         </span>
@@ -151,7 +152,7 @@ class Login extends PureComponent {
                     </div>
                 </div>
                 <div className="footer">
-                    {OEM.Companies} 版权所有 2018 京ICP备18043454号
+                    {OEM.Companies} {intl.get('login.copyright_2018_jingICPbei18043454')}
                 </div>
             </div>
         );

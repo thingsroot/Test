@@ -5,19 +5,19 @@ import { inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import Collapses from './Collapses';
 import PropTypes from 'prop-types';
-
+import intl from 'react-intl-universal';
 import './style.scss';
 
 import {IconIOT} from '../../../utils/iconfont';
 
 const columns = [{
-        title: '名称',
+        title: intl.get('common.name'),
         dataIndex: 'meta.inst',
         key: 'meta.inst',
         className: 'cursor'
         // sorter: true
     }, {
-        title: '描述',
+        title: intl.get('common.desc'),
         dataIndex: 'meta.description',
         key: 'meta.description',
         className: 'cursor'
@@ -29,14 +29,14 @@ const columns = [{
         className: 'cursor'
         // sorter: true
     }, {
-        title: '设备序列号',
+        title: intl.get('gateway.equipment_serial_number'),
         key: 'meta.sn',
         dataIndex: 'meta.sn',
         width: '30%',
         className: 'cursor'
         // sorter: true
     }, {
-        title: '所属实例',
+        title: intl.get('gateway.examples'),
         key: 'meta.app_inst',
         dataIndex: 'meta.app_inst',
         className: 'cursor'
@@ -103,7 +103,7 @@ class DevicesList extends Component {
                 this.getData();
                 const { gatewayInfo } = this.props.store;
                 if (!gatewayInfo.data.data_upload && this.state.uploadOneShort) {
-                    message.info('网关未开启数据上送，临时开启中!')
+                    message.info(intl.get('gateway.gateway_is_not_open_for_data_delivery'))
                     this.enableDataUploadOneShort(60)
                 }
             });
@@ -156,33 +156,33 @@ class DevicesList extends Component {
             }
             http.post('/api/gateways_enable_data_one_short', params).then(res => {
                 if (!res.ok) {
-                    message.error('临时数据上送指令失败:' + res.error)
+                    message.error(`${intl.get('gateway.temporary_data_delivery_instruction_failed')}: ` + res.error)
                 }
             }).catch( err => {
-                message.error('临时数据上送指令失败:' + err)
+                message.error(`${intl.get('gateway.temporary_data_delivery_instruction_failed')}: ` + err)
             })
         }
     }
     dataSnapshot () {
         http.post('/api/gateways_data_snapshot', {name: this.state.gateway}).then(res => {
             if (res.ok) {
-                message.success('请求网关数据数据快照成功')
+                message.success(intl.get('gateway.request_gateway_data_snapshot_succeeded'))
             } else {
-                message.error('请求网关数据数据快照失败:' + res.error)
+                message.error(`${intl.get('gateway.failed_to_request_gateway_data_snapshot')}: ` + res.error)
             }
         }).catch( err => {
-            message.error('请求网关数据数据快照失败:' + err)
+            message.error(`${intl.get('gateway.failed_to_request_gateway_data_snapshot')}: ` + err)
         })
     }
     dataFlush () {
         http.post('/api/gateways_data_flush', {name: this.state.gateway}).then(res => {
             if (res.ok) {
-                message.success('请求网关上送周期内数据成功')
+                message.success(intl.get('gateway.request_gateway_to_send_data_in_the_cycle_successfully'))
             } else {
-                message.error('请求网关上送周期内数据失败:' + res.error)
+                message.error(`${intl.get('gateway.failed_to_request_gateway_to_send_data_within_the_period')}: ` + res.error)
             }
         }).catch( err => {
-            message.error('请求网关上送周期内数据失败:' + err)
+            message.error(`${intl.get('gateway.failed_to_request_gateway_to_send_data_within_the_period')}: ` + err)
         })
     }
     render () {
@@ -192,9 +192,9 @@ class DevicesList extends Component {
             <div>
                 <div className="toolbar">
                     <p style={{color: '#ccc'}}>
-                        {'数据上送周期: ' + gatewayInfo.data.data_upload_period + ' 毫秒'}
+                        {intl.get('devece_list.Data_feed_cycle') + ': ' + gatewayInfo.data.data_upload_period + intl.get('common.ms')}
                         <span style={{padding: '0 5px'}}></span>
-                        {'全量数据上送周期: ' + gatewayInfo.data.data_upload_cov_ttl + ' 秒'}
+                        {intl.get('devece_list.Full_data_feed_cycle') + ': ' + gatewayInfo.data.data_upload_cov_ttl + '' + intl.get('common.seconds')}
                     </p>
                     <p>
                         {
@@ -221,7 +221,7 @@ class DevicesList extends Component {
                                     <Icon
                                         type={this.state.uploadOneShort ? 'close-circle' : 'play-circle'}
                                         theme="filled"
-                                    />{this.state.uploadOneShort ? '停止临时数据上传' : '开启临时数据上传'}
+                                    />{this.state.uploadOneShort ? intl.get('gateway.stop_temporary_data_upload') : intl.get('gateway.enable_temporary_data_upload')}
                                 </Button>
                         }
                         {/* <Tooltip
@@ -243,7 +243,7 @@ class DevicesList extends Component {
                         </Tooltip> */}
                         <Tooltip
                             placement="bottom"
-                            title="强制网关上送最新数据"
+                            title={intl.get('gateway.force_the_gateway_to_send_the_latest_data')}
                         >
                             <Button
                                 disabled={!this.state.dataFlushEnable}
@@ -255,7 +255,7 @@ class DevicesList extends Component {
                                     }, 1000)
                                 }}
                             >
-                                <IconIOT type="icon-APIshuchu"/>强制刷新
+                                <IconIOT type="icon-APIshuchu"/>{intl.get('devece_list.Forced_to_refresh')}
                             </Button>
                         </Tooltip>
                         {/* <Tooltip

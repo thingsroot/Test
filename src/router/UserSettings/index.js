@@ -4,6 +4,7 @@ import { Button, message } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import ResetPasswordCreateForm from './ResetPassword';
+import intl from 'react-intl-universal';
 
 
 @inject('store')
@@ -58,13 +59,13 @@ class UserSettings extends PureComponent {
                 this.props.store.session.setUserId('Guest')
                 this.props.store.session.setSid('Guest')
                 this.props.store.session.setCSRFToken('')
-                message.success('修改密码成功，请重新登陆！', 1.5).then(()=>{
+                message.success(intl.get('usersettings.password_change_succeeded'), 1.5).then(()=>{
                     console.log('Logout')
                     location.href = '/';
                 })
             }).catch(err=>{
                 err;
-                message.success('修改密码失败！')
+                message.success(intl.get('usersettings.failed_to_modify_password'))
             });
         });
     };
@@ -77,14 +78,14 @@ class UserSettings extends PureComponent {
         return (
             <div className="userSettings">
                 <div>
-                    <p><span>|</span>基本资料</p>
-                    <p><span>账户全称：</span><span>{info.first_name}{info.last_name}</span></p>
-                    <p><span>账户ID：</span><span>{info.name}</span></p>
+                    <p><span>|</span>{intl.get('usersettings.basic_data')}</p>
+                    <p><span>{intl.get('usersettings.full_name_of_account')}：</span><span>{info.first_name}{info.last_name}</span></p>
+                    <p><span>{intl.get('usersettings.account_ID')}：</span><span>{info.name}</span></p>
                     <br/>
                     <Button
                         type="primary"
                         onClick={this.showModal}
-                    >更改密码</Button>
+                    >{intl.get('usersettins.change_password')}</Button>
                     <ResetPasswordCreateForm
                         wrappedComponentRef={this.saveFormRef}
                         visible={this.state.visible}
@@ -93,14 +94,14 @@ class UserSettings extends PureComponent {
                     />
                 </div>
                 <div>
-                    <p><span>|</span>联系信息</p>
-                    <p><span>手机号：</span><span>{info.mobile_no}</span></p>
-                    <p><span>邮箱：</span><span>{info.name}</span></p>
+                    <p><span>|</span>{intl.get('usersettings.contact_information')}</p>
+                    <p><span>{intl.get('appdeveloper.cell-phone_number')}：</span><span>{info.mobile_no}</span></p>
+                    <p><span>{intl.get('usersettings.mailbox')}：</span><span>{info.name}</span></p>
                 </div>
                 <div>
-                    <p><span>|</span>公司信息</p>
-                    <p><span>所属公司：</span><span>{company}</span></p>
-                    <p><span>身份角色：</span><span>{isAdmin ? '管理员' : '普通用户'}</span></p>
+                    <p><span>|</span>{intl.get('usersettings.company_information')}</p>
+                    <p><span>{intl.get('usersettings.affiliated_company')}：</span><span>{company}</span></p>
+                    <p><span>{intl.get('usersettings.status_role')}：</span><span>{isAdmin ? intl.get('usersettings.administrators') : intl.get('usersettings.ordinary_users')}</span></p>
                 </div>
             </div>
         );

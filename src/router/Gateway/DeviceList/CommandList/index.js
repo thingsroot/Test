@@ -4,6 +4,7 @@ import { inject, observer} from 'mobx-react';
 import http from '../../../../utils/Server';
 import {Table, Button, Modal, Input, message, notification, Tooltip} from 'antd';
 import './style.scss';
+import intl from 'react-intl-universal';
 
 function formatTime (date, fmt) {
     const o = {
@@ -45,7 +46,7 @@ class CommandList extends Component {
         record: {},
         value: '{}',
         columns: [{
-            title: '名称',
+            title: intl.get('common.name'),
             render: (record)=>{
                 return (
                     <Tooltip placement="topLeft"
@@ -56,7 +57,7 @@ class CommandList extends Component {
                 )
             }
         }, {
-            title: '描述',
+            title: intl.get('common.desc'),
             render: (record)=>{
                 return (
                     <Tooltip placement="topLeft"
@@ -67,7 +68,7 @@ class CommandList extends Component {
                 )
             }
         }, {
-            title: '下置反馈',
+            title: intl.get('gateway.lower_feedback'),
             render: (record)=>{
                 return (
                     <Tooltip placement="topLeft"
@@ -78,15 +79,15 @@ class CommandList extends Component {
                 )
             }
         }, {
-            title: '反馈时间',
+            title: intl.get('gateway.feedback_time'),
             width: '130px',
             dataIndex: 'result_tm'
         }, {
-            title: '触发时间',
+            title: intl.get('gateway.trigger_time'),
             width: '130px',
             dataIndex: 'action_tm'
         }, {
-            title: '操作',
+            title: intl.get('common.operation'),
             width: '100px',
             render: (record)=>{
                 return (
@@ -95,7 +96,7 @@ class CommandList extends Component {
                         onClick={()=>{
                         this.showModal(record)
                     }}
-                    >发送</Button>
+                    >{intl.get('gateway.send')}</Button>
                 )
             }
         }]
@@ -141,7 +142,7 @@ class CommandList extends Component {
         try {
             param = JSON.parse(value);
         } catch (e) {
-            message.error('请输入合法的JSON字符串! ' + e)
+            message.error(`${intl.get('gateway.please_enter_a_valid_JSON_string')}!` + e)
             return;
         }
         let params = {
@@ -154,11 +155,11 @@ class CommandList extends Component {
         let command_record = record;
         http.post('/api/gateways_dev_commands', params).then(res=>{
             if (res.ok && res.data === id){
-                openNotification('提交设备指令成功', '网关:' + sn + '\n设备:' + vsn + '\n参数:' + value);
+                openNotification(intl.get('gateway.device_command_submitted_successfully'), `${intl.get('appsinstall.gateway')}:` + sn + `\n${intl.get('gateway.equipment')}:` + vsn + `\n${intl.get('gateway.parameter')}:` + value);
                 command_record.action_tm = formatTime(new Date(), 'hh:mm:ss S')
-                this.props.store.action.pushAction(res.data, '设备指令执行', '', params, 10000, (result, data)=>{
+                this.props.store.action.pushAction(res.data, intl.get('gateway.equipment_command_execution'), '', params, 10000, (result, data)=>{
                     if (result) {
-                        command_record.result = '下置成功'
+                        command_record.result = intl.get('gateway.successful_placement')
                         command_record.result_tm = formatTime(new Date(data.timestamp * 1000), 'hh:mm:ss S')
                     } else {
                         command_record.result = data.message
@@ -170,7 +171,7 @@ class CommandList extends Component {
             }
         }).catch(req=>{
             req;
-            message.error('发送请求失败')
+            message.error(intl.get('gateway.send_request_failed'))
         })
         this.setState({
             visible: false
@@ -199,20 +200,20 @@ class CommandList extends Component {
                     dataSource={data ? data : []}
                 />
                 <Modal
-                    title="设备指令"
+                    title={intl.get('gateway.equipment_command')}
                     visible={visible}
-                    okText="确定"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                 >
-                    <p className="flex">指令名：
+                    <p className="flex">{intl.get('gateway.instruction_name')}：
                         <Input
                             readOnly
                             value={record.name}
                         />
                     </p>
-                    <p className="flex">参数：
+                    <p className="flex">{intl.get('gateway.parameter')}：
                         <TextArea
                             rows={4}
                             defaultValue={'{\n}'}

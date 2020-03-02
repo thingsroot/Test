@@ -5,6 +5,7 @@ import './style.scss';
 import http from '../../utils/Server';
 import {inject, observer} from 'mobx-react';
 import { _getCookie } from '../../utils/Session';
+import intl from 'react-intl-universal';
 
 const Search = Input.Search;
 
@@ -129,16 +130,16 @@ class Developer extends Component {
                         <Button
                             type="primary"
                             style={{margin: '0 20px'}}
-                        >创建新应用</Button>
+                        >{intl.get('developer.create_new_app')}</Button>
                     </Link>
                     : <Button
                         type="primary"
                         disabled
                         style={{margin: '0 20px'}}
-                      >创建新应用</Button>
+                      >{intl.get('developer.create_new_app')}</Button>
                     }
                     <Search
-                        placeholder="输入应用名称"
+                        placeholder={intl.get('developer.enter_application_name')}
                         onChange={this.searchApp}
                         style={{ width: 300 }}
                     />
@@ -153,7 +154,7 @@ class Developer extends Component {
                         type="card"
                       >
                         <TabPane
-                            tab="原创应用"
+                            tab={intl.get('developer.original_application')}
                             key="1"
                         >
                             <div
@@ -175,10 +176,10 @@ class Developer extends Component {
                                                     <div className="appInfo">
                                                         <p className="appName">{v.app_name}</p>
                                                         <p className="info">
-                                                            <span>生产日期：{v.modified.substr(0, 11)}</span>
-                                                            <span>应用分类：{v.category === null ? '----' : v.category}</span><br/>
-                                                            <span>通讯协议：{v.protocol === null ? '----' : v.protocol}</span>
-                                                            <span>设备厂商：{v.device_supplier === null ? '----' : v.device_supplier}</span>
+                                                            <span>{intl.get('developer.the_date_of_production')}：{v.modified.substr(0, 11)}</span>
+                                                            <span>{intl.get('developer.application_of_classification')}：{v.category === null ? '----' : v.category}</span><br/>
+                                                            <span>{intl.get('developer.communication_protocol')}：{v.protocol === null ? '----' : v.protocol}</span>
+                                                            <span>{intl.get('developer.equipment_manufacturers')}：{v.device_supplier === null ? '----' : v.device_supplier}</span>
                                                         </p>
                                                     </div>
                                                 </li>
@@ -189,7 +190,7 @@ class Developer extends Component {
                         </div>
                     </TabPane>
                     <TabPane
-                        tab="克隆应用"
+                        tab={intl.get('developer.clone_application')}
                         key="2"
                     >
                         <div
@@ -210,10 +211,10 @@ class Developer extends Component {
                                             <div className="appInfo">
                                                 <p className="appName">{v.app_name}</p>
                                                 <p className="info">
-                                                    <span>生产日期：{v.modified.substr(0, 11)}</span>
-                                                    <span>应用分类：{v.category === null ? '----' : v.category}</span><br/>
-                                                    <span>通讯协议：{v.protocol === null ? '----' : v.protocol}</span>
-                                                    <span>设备厂商：{v.device_supplier === null ? '----' : v.device_supplier}</span>
+                                                    <span>{intl.get('developer.the_date_of_production')}：{v.modified.substr(0, 11)}</span>
+                                                    <span>{intl.get('developer.application_of_classification')}：{v.category === null ? '----' : v.category}</span><br/>
+                                                    <span>{intl.get('developer.communication_protocol')}：{v.protocol === null ? '----' : v.protocol}</span>
+                                                    <span>{intl.get('developer.equipment_manufacturers')}：{v.device_supplier === null ? '----' : v.device_supplier}</span>
                                                 </p>
                                             </div>
                                         </li>
@@ -223,7 +224,7 @@ class Developer extends Component {
                         </div>
                     </TabPane>
                     <TabPane
-                        tab="收藏应用"
+                        tab={intl.get('developer.collect_applied')}
                         key="3"
                     >
                         <div style={this.state.loading === false ? block : none}>
@@ -242,10 +243,10 @@ class Developer extends Component {
                                            <div className="appInfo">
                                                <p className="appName">{v.app_name}</p>
                                                <p className="info">
-                                                    <span>生产日期：{v.modified.substr(0, 11)}</span>
-                                                    <span>应用分类：{v.category === null ? '----' : v.category}</span><br/>
-                                                    <span>通讯协议：{v.protocol === null ? '----' : v.protocol}</span>
-                                                    <span>设备厂商：{v.device_supplier === null ? '----' : v.device_supplier}</span>
+                                                    <span>{intl.get('developer.the_date_of_production')}：{v.modified.substr(0, 11)}</span>
+                                                    <span>{intl.get('developer.application_of_classification')}：{v.category === null ? '----' : v.category}</span><br/>
+                                                    <span>{intl.get('developer.communication_protocol')}：{v.protocol === null ? '----' : v.protocol}</span>
+                                                    <span>{intl.get('developer.equipment_manufacturers')}：{v.device_supplier === null ? '----' : v.device_supplier}</span>
                                                 </p>
                                             </div>
                                        </li>
@@ -262,7 +263,7 @@ class Developer extends Component {
                     {
                         Number(_getCookie('is_developer')) !== 1
                         ? <Result
-                            title="您还不是开发者，请先申请成为开发者！"
+                            title={intl.get('developer.Please_apply_to_be_a_developer_first') + '!'}
                             extra={
                                 <Button
                                     type="primary"
@@ -272,7 +273,7 @@ class Developer extends Component {
                                         this.props.history.push('/appdeveloper')
                                     }}
                                 >
-                                    申请成为开发者
+                                    {intl.get('developer.apply_to_be_a_developer')}
                                 </Button>
                             }
                           />
@@ -280,7 +281,7 @@ class Developer extends Component {
                             className="empty"
                             style={appList && appList.length === 0 ? block : none}
                           >
-                            暂时没有应用！
+                            {intl.get('developer.temporarily_not_applied')}!
                         </p>
                     }
                 </div>

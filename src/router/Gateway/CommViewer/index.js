@@ -5,6 +5,7 @@ import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
 import './style.scss';
 import ReactList from 'react-list';
+import intl from 'react-intl-universal';
 
 const Search = Input.Search;
 const Option = Select.Option;
@@ -41,12 +42,12 @@ class CommViewer extends Component {
         const pathname = this.props.location.pathname.toLowerCase();
         if (pathname.indexOf('comms') !== -1){
             this.setState({
-                title: '报文',
+                title: intl.get('gateway.message'),
                 type: '/comm'
             })
         } else {
             this.setState({
-                title: '日志',
+                title: intl.get('gateway.log'),
                 type: '/log'
             })
         }
@@ -143,11 +144,11 @@ class CommViewer extends Component {
                                 ? <Button
                                     type="danger"
                                     onClick={this.stopChannel}
-                                  >取消订阅</Button>
+                                  >{intl.get('gateway.cancel_subscription')}</Button>
                                 : <Button
                                     type="primary"
                                     onClick={this.startChannel}
-                                  >订阅{this.state.title}</Button>
+                                  >{intl.get('gateway.subscription')}{this.state.title}</Button>
                         }
                         <span style={{padding: '0 5px'}} />
                         <Button
@@ -155,11 +156,11 @@ class CommViewer extends Component {
                             onClick={()=>{
                                 mqtt.comm_channel.clearData()
                             }}
-                        >清除</Button>
+                        >{intl.get('gateway.eliminate')}</Button>
                         <span style={{padding: '0 5px'}} />
-                        <span>当前数量：{mqtt.comm_channel.Data.length} </span>
+                        <span>{intl.get('gateway.current_quantity')}：{mqtt.comm_channel.Data.length} </span>
                         <span style={{padding: '0 5px'}} />
-                        <span>总数： {mqtt.comm_channel.AllData.length}</span>
+                        <span>{intl.get('gateway.total')}： {mqtt.comm_channel.AllData.length}</span>
                     </div>
                     <div className="searwrap">
                         <span>HEX：</span>
@@ -178,14 +179,14 @@ class CommViewer extends Component {
                             style={{ width: 140 }}
                             onChange={this.handleChange}
                         >
-                            <Option value="all">全部</Option>
-                            <Option value="content">内容</Option>
-                            <Option value="direction">方向</Option>
-                            <Option value="id">设备序列号</Option>
+                            <Option value="all">{intl.get('common.all')}</Option>
+                            <Option value="content">{intl.get('appitems.content')}</Option>
+                            <Option value="direction">{intl.get('gateway.direction')}</Option>
+                            <Option value="id">{intl.get('gateway.equipment_serial_number')}</Option>
                         </Select>
                         <span style={{padding: '0 5px'}} />
                         <Search
-                            placeholder="输入搜索内容"
+                            placeholder={intl.get('gateway.enter_search_content')}
                             value={this.state.filterText}
                             onChange={this.filter}
                             style={{ width: 300 }}
@@ -196,8 +197,8 @@ class CommViewer extends Component {
                 {
                     this.state.maxNum
                     ? <Alert
-                        message="超出最大数量"
-                        description="日志最大数量一千条，请清除后再重新订阅！"
+                        message={intl.get('gateway.maximum_quantity_exceeded')}
+                        description={intl.get('gateway.the_maximum_number_of_logs_is_1000')}
                         type="error"
                         closable
                         onClose={this.onClose}
@@ -209,10 +210,10 @@ class CommViewer extends Component {
                 >
                     <div style={{width: '100%'}}>
                         <div className="tableHeaders">
-                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>时间</div>
-                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>设备序列号</div>
-                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>方向</div>
-                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>报文</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>{intl.get('common.time')}</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>{intl.get('gateway.equipment_serial_number')}</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>{intl.get('gateway.direction')}</div>
+                            <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>{intl.get('gateway.message')}</div>
                         </div>
                             <div
                                 className="tableContent"

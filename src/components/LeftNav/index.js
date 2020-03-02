@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Icon, Modal, message } from 'antd';
+import { Icon, Modal, message, Tooltip } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import EditSwitch from '../../router/Gateway/Settings/Edit/switch';
 import http from '../../utils/Server';
 import './style.scss';
+import intl from 'react-intl-universal'
 // import {IconIOT} from '../../utils/iconfont';
 // const IconFont = Icon.createFromIconfontCN({
 //     scriptUrl: '//at.alicdn.com/t/font_1163855_v0zrjr2i1em.js'
@@ -20,15 +21,15 @@ class LeftNav extends Component {
         list: [
             {
                 icon: 'gold',
-                text: '设备列表',
+                text: intl.get('gateway.The_equipment_list'),
                 href: '/devices'
             }, {
                 icon: 'appstore',
-                text: '应用列表',
+                text: intl.get('gateway.The_application_list'),
                 href: '/apps'
             }, {
                 icon: 'setting',
-                text: '网关设置',
+                text: intl.get('gateway.The_gateway_is_set'),
                 href: '/settings'
             }
         ],
@@ -210,7 +211,7 @@ class LeftNav extends Component {
         return (
             <div className="leftnav">
                 <div className="navlist">
-                    <p className="FeaturesGroup">基本功能</p>
+        <p className="FeaturesGroup">{intl.get('gateway.The_basic_function')}</p>
                     <ul>
                         {
                             list.map((v, i)=>{
@@ -234,7 +235,7 @@ class LeftNav extends Component {
                     </ul>
                 </div>
                 <div className="navlist">
-                        <p className="FeaturesGroup">高级功能</p>
+                        <p className="FeaturesGroup">{intl.get('gateway.Advanced_features')}</p>
                         <ul>
                             <Link
                                 to={`${url}/logs`}
@@ -244,7 +245,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 6 ? 'active' : ''}
-                                >{this.state.lognum !== 0 ? <div className="logcount count">{this.state.lognum}</div> : ''}<Icon type="ordered-list"/>&nbsp;&nbsp;网关日志</li>
+                                >{this.state.lognum !== 0 ? <div className="logcount count">{this.state.lognum}</div> : ''}<Icon type="ordered-list"/>&nbsp;&nbsp;{intl.get('gateway.The_gateway_log')}</li>
                             </Link>
                             <Link
                                 to={`${url}/comms`}
@@ -254,7 +255,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 7 ? 'active' : ''}
-                                >{this.state.commnum !== 0 ? <div className="logcount count">{this.state.commnum}</div> : ''}<Icon type="bars"/>&nbsp;&nbsp;网关报文</li>
+                                >{this.state.commnum !== 0 ? <div className="logcount count">{this.state.commnum}</div> : ''}<Icon type="bars"/>&nbsp;&nbsp;{intl.get('gateway.The_gateway_message')}</li>
                             </Link>
                             <Link
                                 to={`${url}/platformevents`}
@@ -264,7 +265,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 8 ? 'active' : ''}
-                                ><Icon type="bell"/>&nbsp;&nbsp;平台事件</li>
+                                ><Icon type="bell"/>&nbsp;&nbsp;{intl.get('gateway.Platform_event')}</li>
                             </Link>
                             <Link
                                 to={`${url}/events`}
@@ -274,7 +275,7 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 9 ? 'active' : ''}
-                                ><Icon type="notification"/>&nbsp;&nbsp;设备事件</li>
+                                ><Icon type="notification"/>&nbsp;&nbsp;{intl.get('gateway.Equipment_time')}</li>
                             </Link>
                             <Link
                                 to={`${url}/onlinerecords`}
@@ -284,13 +285,17 @@ class LeftNav extends Component {
                             >
                                 <li
                                     className={index === 5 ? 'active' : ''}
-                                ><Icon type="exception"/>&nbsp;&nbsp;在线记录</li>
+                                ><Icon type="exception"/>&nbsp;&nbsp;{intl.get('gateway.The_online_record')}</li>
                             </Link>
                         </ul>
                 </div>
                 <div className="navlist">
                     <div className="FeaturesGroup">
-                        <p>扩展功能</p>
+                        <p>
+                            <Tooltip title={intl.get('gateway.Extend_the_functionality')}>
+                                <span>{intl.get('gateway.abbreviations_Extend_the_functionality')}</span>
+                            </Tooltip>
+                        </p>
                         <div className="Groupsetting"
                             onClick={this.showModal}
                         >
@@ -308,7 +313,17 @@ class LeftNav extends Component {
                               >
                                 <li
                                     className={index === 3 ? 'active' : ''}
-                                ><Icon type="control" />&nbsp;&nbsp;远程编程-串口</li></Link>
+                                >
+                                    <Icon type="control" />
+                                    &nbsp;&nbsp;
+                                    {/* {intl.get('gateway.Remote_programming-serial_port')} */}
+                                    <span>
+                                        <Tooltip title={intl.get('gateway.Remote_programming-serial_port')}>
+                                            <span>{intl.get('gateway.abbreviations_Remote_programming-serial_port')}</span>
+                                        </Tooltip>
+                                    </span>
+                                </li>
+                              </Link>
                         : ''
                         }
                         {
@@ -319,7 +334,17 @@ class LeftNav extends Component {
                                     this.setIndex(4)
                                 }}
                               >
-                              <li className={index === 4 ? 'active' : ''}><Icon type="compass" />&nbsp;&nbsp;远程编程-网络</li></Link>
+                              <li className={index === 4 ? 'active' : ''}>
+                                    <Icon type="compass" />
+                                    &nbsp;&nbsp;
+                                    {/* {intl.get('gateway.Remote_programming-network')} */}
+                                    <span>
+                                        <Tooltip title={intl.get('gateway.Remote_programming-network')}>
+                                            <span>{intl.get('gateway.abbreviations_Remote_programming-network')}</span>
+                                        </Tooltip>
+                                    </span>
+                                </li>
+                              </Link>
                             : ''
                         }
                         {
@@ -332,23 +357,31 @@ class LeftNav extends Component {
                               >
                                 <li
                                     className={index === 10 ? 'active' : ''}
-                                ><Icon type="bell"/>&nbsp;&nbsp;网络配置</li>
+                                ><Icon type="bell"/>
+                                &nbsp;&nbsp;
+                                {/* {intl.get('gateway.The_network_configuration')} */}
+                                <span>
+                                    <Tooltip title={intl.get('gateway.The_network_configuration')}>
+                                        <span>{intl.get('gateway.abbreviations_The_network_configuration')}</span>
+                                    </Tooltip>
+                                </span>
+                                </li>
                             </Link>
                             : ''
                         }
                     </ul>
                 </div>
                 <Modal
-                    title="扩展功能设置"
+                    title={intl.get('gateway.Extended_function_Settings')}
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
-                    cancelText="取消"
-                    okText="确认"
+                    cancelText={intl.get('common.cancel')}
+                    okText={intl.get('common.confirm')}
                 >
                     <div className="list">
                         <span>
-                            网络配置
+                        {intl.get('gateway.The_network_configuration')}
                         </span>
                         <EditSwitch
                             checked={gatewayInfo.isNetworkConf}
@@ -363,7 +396,7 @@ class LeftNav extends Component {
                     </div>
                     <div className="list">
                         <span>
-                            远程串口编程 [*开启后可使用远程串口编程功能]
+                            {intl.get('gateway.Remote_serial_programming')} [*{intl.get('gateway.Remote_serial_programming_desc')}]
                         </span>
                         <EditSwitch
                             checked={gatewayInfo.isVserial}
@@ -385,7 +418,7 @@ class LeftNav extends Component {
                         </div>
                         <div className="list">
                             <span>
-                                远程网络编程 [*开启后可使用远程网络编程功能]
+                            {intl.get('gateway.Remote_network_programming')} [*{intl.get('gateway.Remote_network_programming_desc')}]
                             </span>
                             <EditSwitch
                                 checked={gatewayInfo.isVnet}

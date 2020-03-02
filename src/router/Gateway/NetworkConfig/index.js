@@ -5,6 +5,8 @@ import { withRouter } from 'react-router-dom';
 import { message, Modal, Input, Select, Card, Form, Tooltip, Button } from 'antd';
 import { IconIOT } from '../../../utils/iconfont';
 import './style.scss';
+import intl from 'react-intl-universal';
+
 const Option = Select.Option;
 @withRouter
 @inject('store')
@@ -86,48 +88,48 @@ class NetworkConfig extends Component {
             }
             http.post('/api/gateways_enable_data_one_short', params).then(res => {
                 if (!res.ok) {
-                    message.error('临时数据上送指令失败:' + res.error)
+                    message.error(`${intl.get('gateway.temporary_data_delivery_instruction_failed')}: ` + res.error)
                 }
             }).catch( err => {
-                message.error('临时数据上送指令失败:' + err)
+                message.error(`${intl.get('gateway.temporary_data_delivery_instruction_failed')}: ` + err)
             })
         }
     }
     dataSnapshot () {
         http.post('/api/gateways_data_snapshot', {name: this.state.sn}).then(res => {
             if (res.ok) {
-                message.success('请求网关数据数据快照成功')
+                message.success(intl.get('gateway.request_gateway_data_snapshot_succeeded'))
             } else {
-                message.error('请求网关数据数据快照失败:' + res.error)
+                message.error(`${intl.get('gateway.failed_to_request_gateway_data_snapshot')}: ` + res.error)
             }
         }).catch( err => {
-            message.error('请求网关数据数据快照失败:' + err)
+            message.error(`${intl.get('gateway.failed_to_request_gateway_data_snapshot')}: ` + err)
         })
     }
     dataFlush () {
         http.post('/api/gateways_data_flush', {name: this.state.sn}).then(res => {
             if (res.ok) {
-                message.success('请求网关上送周期内数据成功')
+                message.success(intl.get('gateway.request_gateway_to_send_data_in_the_cycle_successfully'))
             } else {
-                message.error('请求网关上送周期内数据失败:' + res.error)
+                message.error(`${intl.get('gateway.failed_to_request_gateway_to_send_data_within_the_period')}: ` + res.error)
             }
         }).catch( err => {
-            message.error('请求网关上送周期内数据失败:' + err)
+            message.error(`${intl.get('gateway.failed_to_request_gateway_to_send_data_within_the_period')}: ` + err)
         })
     }
     showConfirm = (res) => {
         const $this = this;
         Modal.confirm({
-          title: '未安装net_info应用，是否安装?',
-          content: '未安装net_info应用，是否安装',
-          okText: '安装',
-          cancelText: '取消',
+          title: `${intl.get('gateway.net_info_app_is_not_installed')}?`,
+          content: `${intl.get('gateway.net_info_app_is_not_installed')}?`,
+          okText: intl.get('appitems.install'),
+          cancelText: intl.get('common.cancel'),
           onOk () {
               $this.installNet_info(res)
               return false;
           },
           onCancel () {
-              message.info('取消安装net_info')
+              message.info(intl.get('gateway.cancel_the_installation_of_net_info'))
               $this.props.history.push(`/gateway/${$this.props.match.params.sn}/devices`)
               return false
           }
@@ -153,14 +155,14 @@ class NetworkConfig extends Component {
                 id: `app_install/${this.state.sn}/net_info/APP00000115/${new Date() * 1}`,
                 inst: 'net_info'
             }
-            message.info('该网关未安装Netinfo应用，将为您自动安装，请稍后。')
+            message.info(intl.get('gateway.the_gateway_does_not_have_the_Netinfo_app_installed'))
             http.get('/api/applications_versions_latest?app=APP00000115&beta=' + beta).then(res=>{
                 if (res.ok) {
                     data.version = res.data;
                     http.post('/api/gateways_applications_install', data).then(Response=>{
                         if (Response.ok){
-                            let title = '安装应用' + data.inst + '请求'
-                            message.info(title + '等待网关响应!')
+                            let title = intl.get('appsinstall.installation_and_Application') + data.inst + intl.get('gateway.request')
+                            message.info(title + `${intl.get('gateway.wait_for_gateway_response')}!`)
                             this.props.store.action.pushAction(Response.data, title, '', data, 10000,  ()=> {
                                 this.getWanInfo('net_info')
                                 this.t1 = setInterval(() => {
@@ -229,7 +231,7 @@ class NetworkConfig extends Component {
     }
     startnetinfo = (inst_name) =>{
         if (!this.state.running_action){
-            message.info('应用未启动，将为你自动启动')
+            message.info(intl.get('gateway.app_is_not_started'))
             const data = {
                 gateway: this.props.match.params.sn,
                 inst: inst_name,
@@ -237,19 +239,19 @@ class NetworkConfig extends Component {
             }
             http.post('/api/gateways_applications_start', data).then(res=>{
                 if (res.ok) {
-                    message.success('启动' + data.inst + '请求发送成功')
-                    this.props.store.action.pushAction(res.data, '启动应用', '', data, 10000,  ()=> {
+                    message.success(intl.get('gateway.start_up') + data.inst + intl.get('gateway.request_sent_successfully'))
+                    this.props.store.action.pushAction(res.data, intl.get('gateway.startup_application'), '', data, 10000,  ()=> {
                         this.props.update_app_list();
                     })
                     setTimeout(()=> {
                         this.setState({ running_action: true })
                     }, 2000)
                 } else {
-                    message.error('启动' +  data.inst + '请求发送失败。 错误:' + res.error)
+                    message.error(intl.get('gateway.start_up') +  data.inst + `${intl.get('gateway.request_send_failed')}。${intl.get('common.error')}` + res.error)
                 }
             }).catch(req=>{
                 req;
-                message.error('发送请求失败！')
+                message.error(intl.get('gateway.send_request_failed'))
                 this.setState({ running_action: false });
             })
         }
@@ -306,8 +308,8 @@ class NetworkConfig extends Component {
           }
           http.post('/api/gateways_dev_commands', data).then(res=>{
               if (res.ok) {
-                let title = '更改lan IP地址与子网掩码地址' + data.name + '请求'
-                message.info(title + '等待网关响应!')
+                let title = intl.get('gateway.change_LAN_IP_address_and_subnet_mask_address') + data.name + intl.get('gateway.request')
+                message.info(title + `${intl.get('gateway.wait_for_gateway_response')}!`)
                 this.props.store.action.pushAction(res.data, title, '', data, 10000,  ()=> {
                     this.getWanInfo('net_info')
                 })
@@ -329,11 +331,11 @@ class NetworkConfig extends Component {
                     loading={loading || data.length === 0}
                 >
                     <div className="title">
-                        <h2>网络配置</h2>
+                        <h2>{intl.get('gateway.The_network_configuration')}</h2>
                         <div className="btn_to_set">
                         <Tooltip
                             placement="bottom"
-                            title="强制网关上送最新数据"
+                            title={intl.get('gateway.force_the_gateway_to_send_the_latest_data')}
                         >
                                 <Button
                                     icon="question-circle"
@@ -341,7 +343,7 @@ class NetworkConfig extends Component {
                                     onClick={()=>{
                                         window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000115', '_blank')
                                     }}
-                                >帮助</Button>
+                                >{intl.get('header.help')}</Button>
                                 <br/>
                                 <Button
                                     disabled={!this.state.dataFlushEnable}
@@ -353,7 +355,7 @@ class NetworkConfig extends Component {
                                         }, 1000)
                                     }}
                                 >
-                                    <IconIOT type="icon-APIshuchu"/>强制刷新
+                                    <IconIOT type="icon-APIshuchu"/>{intl.get('devece_list.Forced_to_refresh')}
                                 </Button>
                             </Tooltip>
                         </div>
@@ -378,9 +380,9 @@ class NetworkConfig extends Component {
                                         </div>
                                         <div className="networkpagelist_right">
                                             <div>
-                                                <p>网络协议：<span>{item.proto}</span></p>
-                                                <p>状态： <span>{item.up ? 'up' : 'down'}</span></p>
-                                                <p>IP地址：<span>{item['ipv4-address'] && item['ipv4-address'].length > 0 && item['ipv4-address'][0].address ? item['ipv4-address'][0].address + '/' + item['ipv4-address'][0].mask : ''}
+                                                <p>{intl.get('gateway.network_protocol')}：<span>{item.proto}</span></p>
+                                                <p>{intl.get('common.state')}： <span>{item.up ? 'up' : 'down'}</span></p>
+                                                <p>{intl.get('appsinstall.IP_address')}：<span>{item['ipv4-address'] && item['ipv4-address'].length > 0 && item['ipv4-address'][0].address ? item['ipv4-address'][0].address + '/' + item['ipv4-address'][0].mask : ''}
                                                     </span></p>
                                             </div>
                                         </div>
@@ -392,23 +394,23 @@ class NetworkConfig extends Component {
                                                     this.showModal(item['ipv4-address'][0], item)
                                                 }}
                                               >
-                                                编辑
+                                                {intl.get('appdetails.edit')}
                                             </div>
                                             : ''
                                         }
                                         <div className="modal_">
                                         <Modal
                                             maskClosable={false}
-                                            title="修改lan IP地址与子网掩码"
+                                            title={intl.get('gateway.modify_LAN_IP_address_and_subnet_mask')}
                                             visible={this.state.visible}
                                             onOk={this.handleOk}
                                             onCancel={this.handleCancel}
-                                            okText="更改"
-                                            cancelText="取消"
+                                            okText={intl.get('gateway.change')}
+                                            cancelText={intl.get('common.cancel')}
                                             maskStyle={{backgroundColor: 'rgba(0,0,0,0.15)'}}
                                         >
                                             <div>
-                                                <Form.Item label="I P 地址:">
+                                                <Form.Item label={`${intl.get('gateway.IP_address')}:`}>
                                                     <Input
                                                         style={{width: 300}}
                                                         onChange={(e)=>{
@@ -422,7 +424,7 @@ class NetworkConfig extends Component {
 
                                             </div>
                                             <div>
-                                                <Form.Item label="子网掩码:">
+                                                <Form.Item label={`${intl.get('gateway.subnet_mask ')}:`}>
                                                     <Select
                                                         defaultValue="255.255.255.0"
                                                         style={{width: 300}}
@@ -451,10 +453,10 @@ class NetworkConfig extends Component {
                 </Card>
                 <div className="DNSinfo">
                     <Card loading={loading || data.length === 0}>
-                        <h2>| 默认网关&DNS</h2>
+                        <h2>| {intl.get('gateway.default_gateway_&_DNS')}</h2>
                         <div style={{lineHeight: '30px', marginTop: '20px', marginLeft: '30px'}}>
-                            <p>默认网关： {this.state.default_gw}</p>
-                            <p>默认接口： {this.state.gw_interface}</p>
+                            <p>{intl.get('gateway.default_gateway')}： {this.state.default_gw}</p>
+                            <p>{intl.get('gateway.default_interface')}： {this.state.gw_interface}</p>
                             {
                                 dns_servers && dns_servers.length > 0 &&  dns_servers.map((item, key)=>{
                                     return (

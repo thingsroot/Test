@@ -10,6 +10,7 @@ import AceEditor from 'react-ace';
 import 'brace/mode/json';
 import 'brace/theme/monokai';
 import './style.scss';
+import intl from 'react-intl-universal';
 
 const TabPane = Tabs.TabPane;
 
@@ -38,13 +39,13 @@ const template_json_type = [
 const tcp_client_childs = [
     {
         'name': 'host',
-        'desc': 'IP地址',
+        'desc': intl.get('appsinstall.IP_address'),
         'type': 'string',
         'default': '127.0.0.1'
     },
     {
         'name': 'port',
-        'desc': '端口',
+        'desc': intl.get('appsinstall.port'),
         'type': 'number',
         'default': 502
     },
@@ -59,13 +60,13 @@ const tcp_client_childs = [
 const tcp_server_childs = [
     {
         'name': 'host',
-        'desc': '绑定地址',
+        'desc': intl.get('appsinstall.binding_address'),
         'type': 'string',
         'default': '0.0.0.0'
     },
     {
         'name': 'port',
-        'desc': '端口',
+        'desc': intl.get('appsinstall.port'),
         'type': 'number',
         'default': 4000
     },
@@ -83,39 +84,39 @@ function get_serial_childs (sn) {
         return [
             {
                 'name': 'port',
-                'desc': '端口',
+                'desc': intl.get('appsinstall.port'),
                 'type': 'string'
             },
             {
                 'name': 'baudrate',
-                'desc': '波特率',
+                'desc': intl.get('appsinstall.baud_rate'),
                 'type': 'dropdown',
                 'values': [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200],
                 'default': 9600
             },
             {
                 'name': 'stop_bits',
-                'desc': '停止位',
+                'desc': intl.get('appsinstall.Stop_bit'),
                 'type': 'dropdown',
                 'values': [1, 2]
             },
             {
                 'name': 'data_bits',
-                'desc': '数据位',
+                'desc': intl.get('appsinstall.data_bits'),
                 'type': 'dropdown',
                 'values': [7, 8],
                 'default': 8
             },
             {
                 'name': 'flow_control',
-                'desc': '流控',
+                'desc': intl.get('appsinstall.flow_control'),
                 'type': 'dropdown',
                 'values': ['ON', 'OFF'],
                 'default': 'OFF'
             },
             {
                 'name': 'parity',
-                'desc': '校验',
+                'desc': intl.get('appsinstall.check'),
                 'type': 'dropdown',
                 'values': ['None', 'Even', 'Odd']
             }
@@ -124,40 +125,40 @@ function get_serial_childs (sn) {
     return [
         {
             'name': 'port',
-            'desc': '端口',
+            'desc': intl.get('appsinstall.port'),
             'type': 'dropdown',
             'values': tty_list
         },
         {
             'name': 'baudrate',
-            'desc': '波特率',
+            'desc': intl.get('appsinstall.baud_rate'),
             'type': 'dropdown',
             'values': [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200],
             'default': 9600
         },
         {
             'name': 'stop_bits',
-            'desc': '停止位',
+            'desc': intl.get('appsinstall.Stop_bit'),
             'type': 'dropdown',
             'values': [1, 2]
         },
         {
             'name': 'data_bits',
-            'desc': '数据位',
+            'desc': intl.get('appsinstall.data_bits'),
             'type': 'dropdown',
             'values': [7, 8],
             'default': 8
         },
         {
             'name': 'flow_control',
-            'desc': '流控',
+            'desc': intl.get('appsinstall.flow_control'),
             'type': 'dropdown',
             'values': ['ON', 'OFF'],
             'default': 'OFF'
         },
         {
             'name': 'parity',
-            'desc': '校验',
+            'desc': intl.get('appsinstall.check'),
             'type': 'dropdown',
             'values': ['None', 'Even', 'Odd']
         }
@@ -166,17 +167,17 @@ function get_serial_childs (sn) {
 const templates_childs = [
     {
         'name': 'id',
-        'desc': '模板ID',
+        'desc': intl.get('appsinstall.Template_ID'),
         'type': 'string'
     },
     {
         'name': 'name',
-        'desc': '名称',
+        'desc': intl.get('common.name'),
         'type': 'string'
     },
     {
         'name': 'ver',
-        'desc': '版本',
+        'desc': intl.get('appdetails.version'),
         'type': 'number'
     }
 ];
@@ -245,7 +246,7 @@ class AppConfig extends Component {
     prettyJson (str) {
         let data = JSON.parse(str);
         if (!data) {
-            message.error('JSON解析错误');
+            message.error(intl.get('appsinstall.JSON_parsing_error'));
             return str
         }
         return JSON.stringify(data, null, 4)
@@ -331,7 +332,7 @@ class AppConfig extends Component {
             let sections = [];
             let cur_section = {
                 name: 'base_section__section',
-                desc: '应用配置信息',
+                desc: intl.get('appsinstall.application_configuration_information'),
                 type: 'fake_section',
                 child: []
             };
@@ -340,7 +341,7 @@ class AppConfig extends Component {
             config && config.length > 0 && config.map((v, key)=>{
                 key;
                 if (!template_json_type.find(item => item === v.type)) {
-                    message.error(`不支持的的可视化类型: ${v.type}`)
+                    message.error(`${intl.get('appsinstall.unsupported_visualization_type')}: ${v.type}`)
                     errorCode = true;
                     return
                 }
@@ -359,7 +360,7 @@ class AppConfig extends Component {
                     // }
                     cur_section = {
                         name: v.name + '__section',
-                        desc: v.desc !== undefined ? v.desc : '设备模板列表',
+                        desc: v.desc !== undefined ? v.desc : intl.get('appsinstall.device_template_list'),
                         type: 'fake_section',
                         child: [v]
                     }
@@ -445,7 +446,7 @@ class AppConfig extends Component {
             try {
                 value = JSON.parse(configValue)
             } catch (err) {
-                message.error('数据格式不正确:' + err)
+                message.error(`${intl.get('appsinstall.incorrect_data_format')}: ` + err)
             }
             if (value !== undefined) {
                 this.props.onSubmit(app_inst, app_info, value)
@@ -494,11 +495,11 @@ class AppConfig extends Component {
                             onClick={()=>{
                                 window.open('https://wiki.freeioe.org/doku.php?id=apps:' + app_info.name, '_blank')
                             }}
-                        >帮助</Button>
+                        >{intl.get('header.help')}</Button>
                     }
                 >
                     <TabPane
-                        tab="可视化编辑"
+                        tab={intl.get('appsinstall.visual_editing')}
                         key="ui"
                     >
                         <Inst
@@ -536,16 +537,16 @@ class AppConfig extends Component {
                             style={errorCode === false ? none : block}
                             className="message"
                         >
-                            数据错误，请使用文本编辑修正错误！
+                            {intl.get('appsinstall.data_error')}
                         </div>
                         <div style={configStore.sections && configStore.sections.length > 0 ? none : block}>
                             <p
                                 className="message"
-                            >此应用不支持可视化编辑 请使用文本编辑</p>
+                            >{intl.get('appsinstall.visual_editing_is_not_supported_in_this_app_please_use_text_editing')}</p>
                         </div>
                     </TabPane>
                     <TabPane
-                        tab="文本编辑(JSON)"
+                        tab={intl.get('appsinstall.text_editing')}
                         key="json"
                     >
                         <Inst
@@ -594,7 +595,7 @@ class AppConfig extends Component {
                                 this.onSubmit()
                             }}
                             disabled={disabled}
-                        > 保存 </Button>
+                        > {intl.get('appsinstall.save')} </Button>
                         <span style={{padding: '0 10px'}}> </span>
                         <Button
                             type="primary"
@@ -605,14 +606,14 @@ class AppConfig extends Component {
                                 this.onSubmit()
                             }}
                             disabled={disabled}
-                        > 保存&返回 </Button>
+                        > {intl.get('appsinstall.save_&_return')} </Button>
                         <span style={{padding: '0 10px'}}> </span>
                         <Button
                             onClick={()=>{
                                 this.onCancel()
                             }}
                             disabled={disabled}
-                        > 取消 </Button>
+                        > {intl.get('common.cancel')} </Button>
                     </div>
                     : <div>
                         <Button
@@ -621,14 +622,14 @@ class AppConfig extends Component {
                                 this.onSubmit()
                             }}
                             disabled={disabled}
-                        > 安装 </Button>
+                        > {intl.get('appsinstall.install')} </Button>
                         <span style={{padding: '0 10px'}}> </span>
                         <Button
                             onClick={()=>{
                                 this.onCancel()
                             }}
                             disabled={disabled}
-                        > 取消 </Button>
+                        > {intl.get('common.cancel')} </Button>
                     </div>
                 }
             </div>

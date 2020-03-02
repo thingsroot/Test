@@ -4,6 +4,7 @@ import { inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
 import './style.scss';
+import intl from 'react-intl-universal';
 const Option = Select.Option;
 @withRouter
 @inject('store')
@@ -108,10 +109,10 @@ class ServiceState extends Component {
             }
             http.post('/api/gateways_enable_data_one_short', params).then(res => {
                 if (!res.ok) {
-                    message.error('临时数据上送指令失败:' + res.error)
+                    message.error(intl.get('gateway.temporary_data_delivery_instruction_failed') + ':' + res.error)
                 }
             }).catch( err => {
-                message.error('临时数据上送指令失败:' + err)
+                message.error(intl.get('gateway.temporary_data_delivery_instruction_failed') + ':' + err)
             })
         }
     }
@@ -134,7 +135,7 @@ class ServiceState extends Component {
             }
             http.post('/api/gateways_applications_upgrade', data).then(res=>{
                 if (res.ok) {
-                    this.props.store.action.pushAction(res.data, '应用升级', '', data, 10000)
+                    this.props.store.action.pushAction(res.data, intl.get('gateway.application_upgrade'), '', data, 10000)
                 } else {
                     message.error(res.error)
                 }
@@ -213,25 +214,25 @@ class ServiceState extends Component {
         : mqtt.vnet_channel.vnet_config && mqtt.vnet_channel.is_running ? mqtt.vnet_channel.vnet_config.gate_sn : '------';
         return (
             <div className="VserviceStateWrapper">
-                <p className="VserviceState_title">服务状态<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
+                <p className="VserviceState_title">{intl.get('gateway.service_state')}<span>{message && Object.keys(message).length > 0 && message.info.sn}</span></p>
                 <div>
                     <div className="flex">
-                        <p>服务状态:</p>
+                        <p>{intl.get('gateway.service_state')}:</p>
                         <Input
-                            value={this.state.settimer !== undefined ? this.state.settimer ? '异常' : '正常' : '加载中...'}
+                            value={this.state.settimer !== undefined ? this.state.settimer ? intl.get('gateway.abnormal') : intl.get('gateway.normal') : intl.get('gateway.In_the_load') + '...'}
                         />
                         <div className="versionMsg">
                                 {
                                     mqtt.new_version
                                     ? mqtt.vserial_channel.Active && mqtt.versionMsg
-                                    ? '已是最新版本！'
+                                    ? intl.get('gateway.Its_the_latest_version') + '！'
                                     : <div>
-                                        请升级到最新版本！&nbsp;&nbsp;&nbsp;&nbsp;
+                                        {intl.get('gateway.Please_upgrade')}！&nbsp;&nbsp;&nbsp;&nbsp;
                                         <Button
                                             type="primary"
                                             loading={mqtt.versionMsg}
                                             onClick={this.upgradeRprogramming}
-                                        >升级</Button>
+                                        >{intl.get('gateway.upgrade')}</Button>
                                     </div>
                                     : ''
                                 }
@@ -240,40 +241,40 @@ class ServiceState extends Component {
                         {
                             this.state.settimer && this.state.settimer !== undefined
                             ? <div className="prompt">
-                            未能连接到远程编程服务，请确认freeioe_Rprogramming是否安装并运行。
-                            <a href="http://thingscloud.oss-cn-beijing.aliyuncs.com/freeioe_Rprogramming/freeioe_Rprogramming.zip">点击下载 freeioe_Rprogramming</a>
+                            {intl.get('gateway.Confirm_whether_to_install_or_not')}&nbsp;&nbsp;freeioe_Rprogramming&nbsp;&nbsp;{intl.get('gateway.Whether_to_install')}。
+                            <a href="http://thingscloud.oss-cn-beijing.aliyuncs.com/freeioe_Rprogramming/freeioe_Rprogramming.zip">{intl.get('virtualgateways.click_to_download')} freeioe_Rprogramming</a>
                           </div>
                             :  ''
                         }
                     <div className="flex">
-                        <p>应用状态:</p>
+                        <p>{intl.get('gateway.app_state')}:</p>
                         <Input
-                            value={this.props.store.gatewayInfo[this.state.app_name] ? '正常' : '异常'}
+                            value={this.props.store.gatewayInfo[this.state.app_name] ? intl.get('gateway.normal') : intl.get('gateway.abnormal')}
                         />
                             <div className="versionMsg">
                                 {
                                     appVersion
                                     ? appVersion < latestVersion
                                     ? <div>
-                                    请升级到最新版本！&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {intl.get('gateway.Please_upgrade')}！&nbsp;&nbsp;&nbsp;&nbsp;
                                     <Button
                                         type="primary"
                                         onClick={this.upgradeApp}
-                                    >升级</Button>
+                                    >{intl.get('gateway.upgrade')}</Button>
                                   </div>
-                                    : '已是最新版本！'
+                                    : intl.get('gateway.Its_the_latest_version') + '！'
                                     : ''
                                 }
                             </div>
                     </div>
                     <div className="flex">
-                        <p>关联网关:</p>
+                        <p>{intl.get('gateway.Associated_gateway')}:</p>
                         <Input
                             value={gateway}
                         />
                     </div>
                     <div className="flex">
-                        <p>服务节点:</p>
+                        <p>{intl.get('gateway.Service_node')}:</p>
                         <div>
                             {
                             serviceNode && serviceNode.length > 0 &&

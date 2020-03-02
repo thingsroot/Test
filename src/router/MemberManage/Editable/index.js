@@ -4,6 +4,7 @@ import {inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../../utils/Server';
 import './style.scss';
+import intl from 'react-intl-universal';
 const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
@@ -74,23 +75,23 @@ class EditableTable extends React.Component {
         };
         this.columns = [
             {
-                title: '姓名',
+                title: intl.get('common.name'),
                 dataIndex: 'full_name',
                 width: '15%',
                 editable: true
             }, {
-                title: '用户名',
+                title: intl.get('login.user_name'),
                 dataIndex: 'name',
                 width: '25%',
                 editable: true
             }, {
-                title: '手机号',
+                title: intl.get('appdeveloper.cell-phone_number'),
                 dataIndex: 'mobile_no',
                 width: 150,
                 editable: true
             },
             {
-                title: '操作',
+                title: intl.get('common.operation'),
                 dataIndex: 'operation',
                 width: 150,
                 render: (text, record) => {
@@ -105,7 +106,7 @@ class EditableTable extends React.Component {
                         onClick={() => this.save(form, record.idx, record)}
                         style={{ marginRight: 8 }}
                     >
-                        保存
+                        {intl.get('appsinstall.save')}
                     </Button>
                 )}
               </EditableContext.Consumer>
@@ -113,7 +114,7 @@ class EditableTable extends React.Component {
                   title="Sure to cancel?"
                   onClick={() => this.cancel(record.key)}
               >
-                <Button>取消</Button>
+                <Button>{intl.get('common.cancel')}</Button>
               </Popconfirm>
             </span>
                     ) : (
@@ -131,18 +132,18 @@ class EditableTable extends React.Component {
                                 }}
                                 style={{marginRight: '10px'}}
                             >
-                                修改密码
+                                {intl.get('login.change_password')}
                             </Button>
                             <Popconfirm
-                                title="确定要从公司组移除此成员吗?"
+                                title={`${intl.get('login.are_you_sure_you_want_to_remove')}？`}
                                 onConfirm={() => this.delete(record)}
-                                okText="确定"
-                                cancelText="取消"
+                                okText={intl.get('common.sure')}
+                                cancelText={intl.get('common.cancel')}
                             >
                                 <Button
                                     type="danger"
                                     disabled={editingKey !== ''}
-                                >移除</Button>
+                                >{intl.get('login.remove')}</Button>
                             </Popconfirm>
                         </Fragment>
                     );
@@ -220,7 +221,7 @@ class EditableTable extends React.Component {
         }).then(res=>{
             if (res.ok) {
                 this.props.getdata()
-                message.success('删除用户成功！')
+                message.success(intl.get('login.delete_user_succeeded'))
             }
         })
     };
@@ -282,7 +283,7 @@ class EditableTable extends React.Component {
     compareToFirstPassword = (rule, value, callback) => {
         const { form } = this.props;
         if (value && value !== form.getFieldValue('password')) {
-            callback('两次输入不一致!');
+            callback(intl.get('login.the_two_inputs_are_inconsistent'));
             this.errPassword = false
         } else {
             this.errPassword = true
@@ -299,11 +300,11 @@ class EditableTable extends React.Component {
         const {new_password, enter_new_password, record} = this.state;
         console.log(new_password, enter_new_password)
         if (new_password !== enter_new_password) {
-            message.error('两次密码输入不匹配！')
+            message.error(intl.get('login.two_password_entries_do_not_match'))
             return false;
         }
         if (new_password.length < 6) {
-            message.error('请最少输入六位长度密码！')
+            message.error(intl.get('login.please_input_a_password_of_at_least_six_digits'))
         }
         const datas = {
             name: record.name,
@@ -321,7 +322,7 @@ class EditableTable extends React.Component {
                 new_password: ''
             })
             if (res.ok) {
-                message.success('修改用户信息成功！')
+                message.success(intl.get('login.modification_of_user_information_succeeded'))
                 this.props.getdata()
             } else {
                 message.error(res.error)
@@ -382,7 +383,7 @@ class EditableTable extends React.Component {
                         if (res.ok) {
                             http.post('/api/companies_groups_add_user', {name: this.props.activeKey, user: res.data}).then(result=>{
                                 if (result.ok) {
-                                    message.success('创建用户成功！')
+                                    message.success(intl.get('login.user_created_successfully'))
                                     this.props.getdata()
                                 }
                             })
@@ -433,7 +434,7 @@ class EditableTable extends React.Component {
                     className="member_wrap_update_button"
                     disabled={this.state.loading}
                 >
-                    刷新
+                    {intl.get('appsinstall.refresh')}
                 </Button>
                 <Button
                     onClick={()=>{
@@ -446,7 +447,7 @@ class EditableTable extends React.Component {
                     // }}
                     disabled={this.props.activeKey === ''}
                 >
-                    添加组成员
+                    {intl.get('login.add_group_members')}
                 </Button>
                 <EditableContext.Provider value={this.props.form}>
                     <Table
@@ -462,7 +463,7 @@ class EditableTable extends React.Component {
                     />
                 </EditableContext.Provider>
                 <Modal
-                    title={(this.state.status === 'updateUser' ? '修改' : '添加') + '企业成员'}
+                    title={(this.state.status === 'updateUser' ? intl.get('appedit.modify') : intl.get('appsinstall_add')) + intl.get('login.enterprise_members')}
                     visible={this.state.visibleMember}
                     onOk={this.handleOkMember}
                     onCancel={this.handleCancelMember}
@@ -471,24 +472,24 @@ class EditableTable extends React.Component {
                     destroyOnClose
                 >
                     <Form onSubmit={this.handleSubmit} >
-                        <Form.Item label="用户">
+                        <Form.Item label={intl.get('login.user')}>
                             {getFieldDecorator('user', {
                                 initialValue: this.state.status === 'updateUser' ? this.state.record.name : '',
                                 rules: [
                                     {
                                         required: this.state.status === 'updateUser' ? false : true,
-                                        message: '请输入用户'
+                                        message: intl.get('login.please_enter_user')
                                     }
                                 ]
                             })(<Input disabled={this.state.status === 'updateUser'} />)}
                         </Form.Item>
-                        <Form.Item label="姓">
+                        <Form.Item label={intl.get('login.surname')}>
                             {getFieldDecorator('firstname', {
                                 initialValue: this.state.status === 'updateUser' ? this.state.record.first_name : '',
                                 rules: [
                                     {
                                         required: this.state.status === 'updateUser' ? false : true,
-                                        message: '请输入姓'
+                                        message: intl.get('login.please_input_your_last_name.')
                                     }
                                 ]
                             })(
@@ -498,13 +499,13 @@ class EditableTable extends React.Component {
                                 />
                             )}
                         </Form.Item>
-                        <Form.Item label="名">
+                        <Form.Item label={intl.get('login.name')}>
                             {getFieldDecorator('lastname', {
                                 initialValue: this.state.status === 'updateUser' ? this.state.record.last_name : '',
                                 rules: [
                                     {
                                         required: this.state.status === 'updateUser' ? false : true,
-                                        message: '请输入名'
+                                        message: intl.get('login.please_input_name')
                                     }
                                 ]
                             })(
@@ -514,13 +515,13 @@ class EditableTable extends React.Component {
                                 />
                             )}
                         </Form.Item>
-                        <Form.Item label="手机号码">
+                        <Form.Item label={intl.get('login.phone_number')}>
                             {getFieldDecorator('phone', {
                                 initialValue: this.state.status === 'updateUser' ? this.state.record.mobile_no : '',
                                 rules: [
                                     {
                                         required: this.state.status === 'updateUser' ? false : true,
-                                        message: '请输入手机号码'
+                                        message: intl.get('login.please_enter_your_mobile_number')
                                     }
                                 ]
                             })(
@@ -531,14 +532,14 @@ class EditableTable extends React.Component {
                             )}
                         </Form.Item>
                         <Form.Item
-                            label="新密码"
+                            label={intl.get('login.new_password')}
                             hasFeedback
                         >
                             {getFieldDecorator('password', {
                                 rules: [
                                     {
                                         required: this.state.status === 'updateUser' ? false : true,
-                                        message: '请输入密码!'
+                                        message: `${intl.get('login.please_input_a_password')}!`
                                     },
                                     {
                                         validator: this.validateToNextPassword
@@ -556,14 +557,14 @@ class EditableTable extends React.Component {
                                 )}
                         </Form.Item>
                         <Form.Item
-                            label="确认新密码"
+                            label={intl.get('login.confirm_new_password')}
                             hasFeedback
                         >
                             {getFieldDecorator('confirm', {
                                 rules: [
                                     {
                                         required: this.state.status === 'updateUser' ? false : true,
-                                        message: '请确认输入的密码'
+                                        message: intl.get('login.please_confirm_the_password')
                                     },
                                     {
                                         validator: this.compareToFirstPassword
@@ -587,39 +588,39 @@ class EditableTable extends React.Component {
                                 htmlType="submit"
                                 style={{marginRight: '20px'}}
                             >
-                                确认
+                                {intl.get('common.sure')}
                             </Button>
-                            <Button onClick={this.handleCancelMember}>取消</Button>
+                            <Button onClick={this.handleCancelMember}>{intl.get('common.cancel')}</Button>
                         </Form.Item>
                     </Form>
                 </Modal>
                 <Modal
                     visible={this.state.password_visible}
-                    title={'修改企业成员：' + this.state.record.name + ' 的密码'}
+                    title={`${intl.get('login.modify_enterprise_members')}: ` + this.state.record.name + ` ${intl.get('login.the_password')}`}
                     onOk={this.ChangeThePassword}
                     onCancel={()=>{
                         this.setState({password_visible: false})
                     }}
-                    okText="确定修改"
-                    cancelText="放弃修改"
+                    okText={intl.get('login.confirm_revision')}
+                    cancelText={intl.get('login.waiver_of_amendment')}
                     maskClosable={false}
                     destroyOnClose
                 >
                     <div className="member_wrap_flex">
-                        <span>请输入密码：</span>
+                        <span>{intl.get('login.please_input_a_password')}：</span>
                         <Input
                             type="password"
-                            placeholder="请输入六位以上密码"
+                            placeholder={intl.get('login.please_enter_more_than_six_passwords')}
                             value={this.state.new_password}
                             onChange={e => {
                                 this.setNewPassword(e, 'new_password')
                             }}
                         /></div>
                     <div className="member_wrap_flex">
-                        <span>请再次输入密码：</span>
+                        <span>{intl.get('login.please_enter_the_password_again')}：</span>
                         <Input
                             type="password"
-                            placeholder="请再次输入密码"
+                            placeholder={intl.get('login.please_enter_the_password_again')}
                             value={this.state.enter_new_password}
                             onChange={e => {
                                 this.setNewPassword(e, 'enter_new_password')

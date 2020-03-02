@@ -31,33 +31,33 @@ class MyGates extends Component {
             recordVisible: false,
             columns: [
                 {
-                title: '名称',
+                title: intl.get('common.name'),
                 dataIndex: 'dev_name',
                 key: 'dev_name',
                 sorter: (a, b) => a.dev_name.length - b.dev_name.length,
                 render: (props, record)=>{
                     return (
                         <div style={{lineHeight: '45px'}}>
-                            {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >公司</Tag> : null}
-                            {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >个人</Tag> : null}
-                            {record.is_shared ? <Tag color="orange" >分享</Tag> : null}
+                            {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >{intl.get('gateway.company')}</Tag> : null}
+                            {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >{intl.get('gateway.individual')}</Tag> : null}
+                            {record.is_shared ? <Tag color="orange" >{intl.get('gateway.share')}</Tag> : null}
                             {record.dev_name}
                         </div>
                     )
                 }
               }, {
-                title: '描述',
+                title: intl.get('common.desc'),
                 dataIndex: 'description',
                 key: 'description',
                 sorter: (a, b) => a.description && b.description && a.description.length - b.description.length
               }, {
-                title: '上线时间',
+                title: intl.get('common.on-line-time'),
                 dataIndex: 'last_updated',
                 key: 'last_updated',
                 width: '160px',
                 sorter: (a, b) => a.last_updated && b.last_updated && new Date(a.last_updated) - new Date(b.last_updated)
               }, {
-                title: '状态',
+                title: intl.get('common.state'),
                 key: 'device_status',
                 dataIndex: 'device_status',
                 width: '80px',
@@ -71,17 +71,17 @@ class MyGates extends Component {
                     }
                 }
               }, {
-                title: '设备数',
+                title: intl.get('slider.number_of_equipment'),
                 key: 'device_devs_num',
                 dataIndex: 'device_devs_num',
                 width: '65px'
                 }, {
-                title: '应用数',
+                title: intl.get('slider.number_of_applications'),
                 key: 'device_apps_num',
                 dataIndex: 'device_apps_num',
                 width: '65px'
                 }, {
-                title: '操作',
+                title: intl.get('common.operation'),
                 key: 'action',
                 width: '240px',
                 render: (text, record, props) => {
@@ -145,12 +145,12 @@ class MyGates extends Component {
                                 <Menu.Divider />
                                 <Menu.Item key="4">
                                     <Popconfirm
-                                        title="你确定要删除这个网关吗?"
+                                        title={`${intl.get('slider.are_you_sure_you_want_to_delete_this_gateway')}?`}
                                         onConfirm={()=>{
                                             this.confirm(record)
                                         }}
-                                        okText="确认"
-                                        cancelText="取消"
+                                        okText={intl.get('common.confirm')}
+                                        cancelText={intl.get('common.cancel')}
                                     >
                                         <Button key="3"
                                             disabled={record.is_shared}

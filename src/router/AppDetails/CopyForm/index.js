@@ -5,6 +5,7 @@ import {
 import http from '../../../utils/Server';
 import {inject, observer} from 'mobx-react';
 import { _getCookie } from '../../../utils/Session';
+import intl from 'react-intl-universal';
 
 const CopyForm = Form.create({ name: 'copy_form' })(
     @inject('store')
@@ -21,7 +22,7 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                 if (res.ok) {
                     this.setState({ userGroups: res.data})
                 } else {
-                    message.error('获取用户组失败')
+                    message.error(intl.get('appdetails.failed_to_get_user_group'))
                 }
             });
         }
@@ -50,11 +51,11 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                 //     }
                 //     params['owner_id'] = this.state.userGroups[0].name
                 // }
-                if (this.props.type === '复制') {
+                if (this.props.type === intl.get('appdetails.copy')) {
                     http.post('/api/configurations_create', params).then(res=>{
                         let conf_info = res.data;
                         if (res.ok === false) {
-                            message.error('复制模板信息失败！请更改名称后重试！');
+                            message.error(`${intl.get('appdetails.failed_to_copy_template_information')}!`);
                         } else {
                             conf_name = res.data.name;
                             if (this.props.copyData.version !== 0) {
@@ -69,28 +70,28 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                                 http.post('/api/configurations_versions_create', params)
                                     .then(res=>{
                                         if (res.ok === true) {
-                                            message.success('复制模板内容成功！');
+                                            message.success(`${intl.get('appdetails.copy_template_content_succeeded')}!`);
                                         } else {
-                                            message.error('复制模板内容失败！');
+                                            message.error(`${intl.get('appdetails.failed_to_copy_template_content')}!`);
                                         }
                                         this.props.onSuccess(conf_info)
                                         this.props.onOK();
                                     })
                             }
-                            message.success('新版本上传成功！');
+                            message.success(`${intl.get('appdetails.new_version_uploaded_successfully')}!`);
                             this.props.onOK();
                         }
                     });
-                } else if (this.props.type === '编辑') {
+                } else if (this.props.type === intl.get('appdetails.edit')) {
                     params['name'] = this.props.conf;
                     http.post('/api/configurations_update', params)
                         .then(res=>{
                             if (res.ok) {
-                                message.success('更新模板信息成功！');
+                                message.success(`${intl.get('appdetails.template_information_updated_successfully')}!`);
                                 this.props.onOK();
                                 this.props.onSuccess({name: this.props.conf, app: this.props.app})
                             } else {
-                                message.error('更新模板信息失败！');
+                                message.error(`${intl.get('appdetails.failed_to_update_template_information')}!`);
                             }
                         });
                 }
@@ -105,48 +106,48 @@ const CopyForm = Form.create({ name: 'copy_form' })(
             return (
                 <Modal
                     visible={visible}
-                    title={type + '模板'}
-                    okText="确定"
-                    cancelText="取消"
+                    title={type + intl.get('appdetails.template')}
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                     maskClosable={false}
                     onCancel={onCancel}
                     onOk={this.onCreate}
                 >
                     <Form layout="vertical">
-                        <Form.Item label="模板名称">
-                            {getFieldDecorator('conf_name', { initialValue: this.props.type === '编辑' ? copyData.conf_name : copyData.conf_name + '_copy' }, {
-                                rules: [{ required: true, message: '请填写模板名称!' }]
+                        <Form.Item label={intl.get('appdetails.template_name')}>
+                            {getFieldDecorator('conf_name', { initialValue: this.props.type === intl.get('appdetails.edit') ? copyData.conf_name : copyData.conf_name + '_copy' }, {
+                                rules: [{ required: true, message: `${intl.get('appdetails.please_fill_in_the_template_name')}!`}]
                             })(
                                 <Input type="text"/>
                             )}
                         </Form.Item>
-                        <Form.Item label="描述">
-                            {getFieldDecorator('description', { initialValue: this.props.type === '编辑' ? copyData.description : copyData.description + '_copy' }, {
-                                rules: [{ required: true, message: '请填写描述信息!' }]
+                        <Form.Item label={intl.get('common.desc')}>
+                            {getFieldDecorator('description', { initialValue: this.props.type === intl.get('appdetails.edit') ? copyData.description : copyData.description + '_copy' }, {
+                                rules: [{ required: true, message: `${intl.get('appdetails.please_fill_in_the_description')}!` }]
                             })(
                                 <Input type="textarea" />
                                 )}
                         </Form.Item>
                         <Form.Item
                             className="collection-create-form_last-form-item"
-                            label="权限"
+                            label={intl.get('appdetails.jurisdiction')}
                         >
                             {getFieldDecorator('developer', { initialValue: copyData.developer }
                             )(
                                 <Radio.Group>
-                                    {this.state.userGroups.length > 0 ? <Radio value={_getCookie('companies')}>公司</Radio> : ''}
-                                    <Radio value={copyData.developer}>个人</Radio>
+                                    {this.state.userGroups.length > 0 ? <Radio value={_getCookie('companies')}>{intl.get('gateway.company')}</Radio> : ''}
+                                    <Radio value={copyData.developer}>{intl.get('gateway.individual')}</Radio>
                                 </Radio.Group>
                             )}
                         </Form.Item>
                         <Form.Item
                             className="collection-create-form_last-form-item"
-                            label="是否公开"
+                            label={intl.get('appdetails.is_it_public')}
                         >
                             {getFieldDecorator('public', { initialValue: copyData.public === 0 ? '0' : '1' })(
                                 <Radio.Group>
-                                    <Radio value="0">不公开</Radio>
-                                    <Radio value="1">公开</Radio>
+                                    <Radio value="0">{intl.get('appdetails.not_public')}</Radio>
+                                    <Radio value="1">{intl.get('appdetails.public')}</Radio>
                                 </Radio.Group>
                             )}
                         </Form.Item>

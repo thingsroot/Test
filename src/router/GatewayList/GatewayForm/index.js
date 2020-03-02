@@ -57,15 +57,15 @@ class GatewayForm extends Component {
     handleOk = () => {
         const { sn, dev_name, description, longitude, latitude, owner_type, owner_id } = this.state;
         if (sn === '') {
-            message.error('请填写网关序列号')
+            message.error(intl.get('gateway.please_fill_in_the_gateway_serial_number'))
             return
         }
         if (dev_name === '') {
-            message.error('请填写网关名称')
+            message.error(intl.get('gateway.please_fill_in_the_gateway_name'))
             return
         }
         if (description === '') {
-            message.error('请填写网关描述')
+            message.error(intl.get('gateway.please_fill_in_the_gateway_describe'))
             return
         }
         const {user_groups} = this.props;
@@ -85,7 +85,7 @@ class GatewayForm extends Component {
                 http.post('/api/gateways_create', data).then(res=>{
                     this.setState({loading: false})
                     if (res.ok) {
-                        message.success('添加成功')
+                        message.success(intl.get('common.add_success'))
                         this.props.onOK()
                     } else {
                         message.error(res.error)
@@ -95,7 +95,7 @@ class GatewayForm extends Component {
                 http.post('/api/gateways_update', data).then(res=>{
                     this.setState({loading: false})
                     if (res.ok) {
-                        message.success('更改成功')
+                        message.success(intl.get('common.successful_change'))
                         this.props.onOK()
                     } else {
                         message.error(res.error)

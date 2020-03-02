@@ -5,6 +5,7 @@ import {
 import http from '../../../utils/Server';
 import {inject, observer} from 'mobx-react';
 import { _getCookie } from '../../../utils/Session';
+import intl from 'react-intl-universal';
 
 const TemplateForm = Form.create({ name: 'template_form' })(
     @inject('store')
@@ -21,7 +22,7 @@ const TemplateForm = Form.create({ name: 'template_form' })(
                 if (res.ok) {
                     this.setState({ userGroups: res.data})
                 } else {
-                    message.error('获取用户组失败')
+                    message.error(intl.get('appdetails.failed_to_get_user_group'))
                 }
             });
         }
@@ -50,9 +51,9 @@ const TemplateForm = Form.create({ name: 'template_form' })(
                 // }
                 http.post('/api/configurations_create', params).then(res=>{
                     if (res.ok === false) {
-                        message.error('创建应用模板失败！');
+                        message.error(`${intl.get('appdetails.failed_to_create_app_template')}!`);
                     } else {
-                        message.success('创建应用模板成功！');
+                        message.success(`${intl.get('appdetails.application_template_created_successfully')}!`);
                         this.props.onSuccess(res.data)
                     }
                 });
@@ -71,51 +72,51 @@ const TemplateForm = Form.create({ name: 'template_form' })(
             return (
                 <Modal
                     visible={visible}
-                    title="新建模板"
-                    okText="确定"
-                    cancelText="取消"
+                    title={intl.get('appdetails.new_template')}
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                     maskClosable={false}
                     onCancel={onCancel}
                     onOk={this.onCreate}
                 >
                     <Form layout="vertical">
-                        <Form.Item label="模板名称">
+                        <Form.Item label={intl.get('appdetails.template_name')}>
                             {getFieldDecorator('conf_name', {
-                                rules: [{ required: true, message: '请填写模板名称!' }]
+                                rules: [{ required: true, message: `${intl.get('appdetails.please_fill_in_the_template_name')}!` }]
                             })(
                                 <Input type="text"/>
                             )}
                         </Form.Item>
-                        <Form.Item label="描述">
+                        <Form.Item label={intl.get('common.desc')}>
                             {getFieldDecorator('description', {
-                                rules: [{ required: true, message: '请填写描述信息!' }]
+                                rules: [{ required: true, message: `${intl.get('appdetails.please_fill_in_the_description')}!` }]
                             })(
                                 <Input type="textarea" />
                                 )}
                         </Form.Item>
                         <Form.Item
                             className="collection-create-form_last-form-item"
-                            label="权限"
+                            label={intl.get('appdetails.jurisdiction')}
                         >
                             {getFieldDecorator('developer', {
                                 initialValue: _getCookie('user_id')
                             })(
                                 <Radio.Group>
-                                    {this.state.userGroups.length > 0 ? <Radio value={_getCookie('companies')}>公司</Radio> : ''}
-                                    <Radio value={_getCookie('user_id')}>个人</Radio>
+                                    {this.state.userGroups.length > 0 ? <Radio value={_getCookie('companies')}>{intl.get('gateway.company')}</Radio> : ''}
+                                    <Radio value={_getCookie('user_id')}>{intl.get('gateway.individual')}</Radio>
                                 </Radio.Group>
                             )}
                         </Form.Item>
                         <Form.Item
                             className="collection-create-form_last-form-item"
-                            label="是否公开"
+                            label={intl.get('appdetails.is_it_public')}
                         >
                             {getFieldDecorator('public', {
                                 initialValue: '0'
                             })(
                                 <Radio.Group>
-                                    <Radio value="0">不公开</Radio>
-                                    <Radio value="1">公开</Radio>
+                                    <Radio value="0">{intl.get('appdetails.not_public')}</Radio>
+                                    <Radio value="1">{intl.get('appdetails.public')}</Radio>
                                 </Radio.Group>
                             )}
                         </Form.Item>

@@ -4,6 +4,8 @@ import http from '../../../utils/Server';
 import {Comment, Avatar, Modal, Input, Button, message, Popconfirm, Empty} from 'antd'
 import { _getCookie } from '../../../utils/Session';
 import './style.scss';
+import intl from 'react-intl-universal';
+
 const { TextArea } = Input;
 @withRouter
 class Issues extends PureComponent {
@@ -26,7 +28,7 @@ class Issues extends PureComponent {
         }
         http.post('/api/store_comments_remove', data).then(res=>{
             if (res.ok) {
-                message.success('删除成功！')
+                message.success(intl.get('appeditorcode.delete_successfully'))
                 this.getComments()
             }
         })
@@ -70,7 +72,7 @@ class Issues extends PureComponent {
           http.post('/api/store_comments_create', data).then(res=>{
               if (res.ok) {
                   this.getComments()
-                  message.success('评论成功')
+                  message.success(intl.get('appitems.comment_succeeded'))
               }
           })
         this.setState({
@@ -142,9 +144,9 @@ class Issues extends PureComponent {
                     className="store_comments_add"
                     onClick={this.showModal}
                     type="primary"
-                >添加问题</Button>
+                >{intl.get('appitems.add_problem')}</Button>
                 <div className="store_comments_title">
-                    评论
+                    {intl.get('appitems.comments')}
                 </div>
                 <div className="store_comments_content">
                 {
@@ -162,18 +164,18 @@ class Issues extends PureComponent {
                                             visible: true
                                         })
                                     }}
-                                >回复</span>,
+                                >{intl.get('appitems.reply')}</span>,
                                 item.owner === _getCookie('user_id')
                                 ? <Popconfirm
-                                    title="确定要删除此回复吗?"
+                                    title={intl.get('appitems.are_you_sure_you_want_to_delete_this_reply')}
                                     onConfirm={()=> {
                                         this.commentsRemove(item)
                                     }}
                                     // onCancel={cancel}
-                                    okText="确定"
-                                    cancelText="取消"
+                                    okText={intl.get('common.sure')}
+                                    cancelText={intl.get('common.cancel')}
                                   >
-                                    <span>删除</span>
+                                    <span>{intl.get('appdetails.delete')}</span>
                                 </Popconfirm>
                                 : ''
                                 ]}
@@ -200,18 +202,18 @@ class Issues extends PureComponent {
                                                             reply_to: val.name
                                                         })
                                                     }}
-                                                >回复</span>,
+                                                >{intl.get('appitems.reply')}</span>,
                                                 val.owner === _getCookie('user_id')
                                                 ? <Popconfirm
-                                                    title="确定要删除此回复吗?"
+                                                    title={intl.get('appitems.are_you_sure_you_want_to_delete_this_reply')}
                                                     onConfirm={()=> {
                                                         this.commentsRemove(val)
                                                     }}
                                                     // onCancel={cancel}
-                                                    okText="确定"
-                                                    cancelText="取消"
+                                                    okText={intl.get('common.sure')}
+                                                    cancelText={intl.get('common.cancel')}
                                                   >
-                                                    <span>删除</span>
+                                                    <span>{intl.get('appdetails.delete')}</span>
                                                 </Popconfirm>
                                                 : ''
                                             ]}
@@ -223,7 +225,7 @@ class Issues extends PureComponent {
                                             }
                                             content={
                                                 <div>
-                                                    {val.reply_to_id ? <span>回复 <a>{val.reply_to_id}</a>  :   </span> : ''}
+                                                    {val.reply_to_id ? <span>{intl.get('appitems.reply')} <a>{val.reply_to_id}</a>  :   </span> : ''}
                                                     <span>
                                                         {val.comment}
                                                     </span>
@@ -241,20 +243,20 @@ class Issues extends PureComponent {
                             marginTop: '100px'
                         }}
                         description={
-                            <span>暂无评论！</span>
+                            <span>{intl.get('appitems.no_comment_yet')}</span>
                         }
                       />
                 }
                 </div>
                 <Modal
-                    title="请输入评论"
+                    title={intl.get('appitems.please_enter_a_comment')}
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     maskClosable={false}
                     destroyOnClose
-                    okText="确定"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                 >
                     <TextArea
                         rows={4}

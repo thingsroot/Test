@@ -7,18 +7,20 @@ import Logviewer from './Logview';
 import http from '../../../utils/Server';
 import './style.scss';
 import {_getCookie} from '../../../utils/Session';
+import intl from 'react-intl-universal';
+
 const Option = Select.Option;
 const cloums = [
     {
-        title: '服务名称',
+        title: intl.get('gateway.service_name'),
         dataIndex: 'name',
         key: 'name'
     }, {
-        title: '服务描述',
+        title: intl.get('gateway.service_describe'),
         dataIndex: 'desc',
         key: 'desc'
     }, {
-        title: '服务状态',
+        title: intl.get('gateway.service_state'),
         dataIndex: 'status',
         key: 'status'
     }
@@ -26,8 +28,8 @@ const cloums = [
 const { confirm } = Modal;
 function showConfirm (name, path) {
     confirm({
-      title: '串口关闭警告',
-      content: `当前虚拟串口${name}正在被程序${path}占用，释放程序占用后再关闭串口。`,
+      title: intl.get('gateway.serial_port_shutdown_warning'),
+      content: `${intl.get('gateway.current_virtual_serial_port')}${name}${intl.get('gateway.being_programmed')}${path}${intl.get('gateway.occupy')}，${intl.get('gateway.release_the_program_occupation_and_then_close_the_serial_port')}。`,
       onOk () {
         console.log('OK');
       },
@@ -88,7 +90,7 @@ class Vserial extends Component {
         openLoading: false,
         cloum: [
             {
-                title: '串口参数',
+                title: intl.get('gateway.serial_port_parameters'),
                 dataIndex: 'parame',
                 key: 'parame',
                 width: '100px',
@@ -114,7 +116,7 @@ class Vserial extends Component {
                     }
                 }
             }, {
-                title: '串口状态',
+                title: intl.get('gateway.serial_port_state'),
                 dataIndex: 'status',
                 key: 'status',
                 width: '100px',
@@ -126,7 +128,7 @@ class Vserial extends Component {
                     }
                 }
             }, {
-                title: '打开程序',
+                title: intl.get('gateway.open_programs'),
                 dataIndex: 'app_path',
                 key: 'app_path',
                 onCell: () => {
@@ -151,7 +153,7 @@ class Vserial extends Component {
                     }
                 }
             }, {
-                title: '连接地址',
+                title: intl.get('gateway.connection_address'),
                 dataIndex: 'host',
                 key: 'host',
                 onCell: () => {
@@ -176,11 +178,11 @@ class Vserial extends Component {
                     }
                 }
             }, {
-                title: '连接状态',
+                title: intl.get('gateway.connection_state'),
                 dataIndex: 'peer_state',
                 key: 'peer_state'
             }, {
-                title: '串口(收/发)',
+                title: intl.get('gateway.Serial_port_receiving_sending'),
                 dataIndex: 'recv_count',
                 key: 'recv_count',
                 width: '150px',
@@ -192,7 +194,7 @@ class Vserial extends Component {
                     }
                 }
             }, {
-                title: '网络(收/发)',
+                title: intl.get('gateway.network_receiving_sending'),
                 dataIndex: 'peer_recv_count',
                 key: 'peer_recv_count',
                 width: '150px',
@@ -204,7 +206,7 @@ class Vserial extends Component {
                     }
                 }
             }, {
-                title: '操作',
+                title: intl.get('common.operation'),
                 dataIndex: 'action',
                 key: 'action',
                 width: '100px',
@@ -219,7 +221,7 @@ class Vserial extends Component {
                                         logFlag: true
                                     })
                                 }}
-                              >监视</Button>
+                              >{intl.get('gateway.monitor')}</Button>
                             : <Button
                                 type="danger"
                                 onClick={()=>{
@@ -227,7 +229,7 @@ class Vserial extends Component {
                                         logFlag: false
                                     })
                                 }}
-                              >停止</Button>
+                              >{intl.get('gateway.stop')}</Button>
                         )
                     }
                 }
@@ -303,7 +305,7 @@ class Vserial extends Component {
             if (res.ok && res.data && res.data.length > 0) {
                 let obj = {
                                 name: '-----',
-                                desc: '串口映射服务',
+                                desc: intl.get('gateway.serial_port_mapping_service'),
                                 status: ''
                             }
                 res.data.map((item) =>{
@@ -395,13 +397,13 @@ class Vserial extends Component {
             let output_record = {};
             if (res.ok){
                 output_record.action_tm = formatTime(new Date(), 'hh:mm:ss S')
-                this.props.store.action.pushAction(res.data, '设备数据下置执行', '', params1, 10000, (result, data)=>{
+                this.props.store.action.pushAction(res.data, intl.get('gateway.equipment_data_download_execution'), '', params1, 10000, (result, data)=>{
                     if (result) {
                         let output_record1 = {};
                         http.post('/api/gateways_dev_outputs', params).then(respones=>{
                             if (respones.ok){
                                 output_record1.action_tm = formatTime(new Date(), 'hh:mm:ss S')
-                                this.props.store.action.pushAction(respones.data, '设备数据下置执行', '', params, 10000)
+                                this.props.store.action.pushAction(respones.data, intl.get('gateway.equipment_data_download_execution'), '', params, 10000)
                                 this.loop()
                             } else {
                                 this.setState({openLoading: false})
@@ -460,7 +462,7 @@ class Vserial extends Component {
         const {  addPortData } = mqtt.vserial_channel;
         return (
             <div className="vserialWrapper">
-                <h2>远程编程-串口</h2>
+                <h2>{intl.get('gateway.Remote_programming-serial_port')}</h2>
                 <div className="help_button">
                     <Button
                         icon="question-circle"
@@ -468,7 +470,7 @@ class Vserial extends Component {
                         onClick={()=>{
                             window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000130', '_blank')
                         }}
-                    >帮助</Button>
+                    >{intl.get('header.help')}</Button>
                 </div>
                 <ServiceState
                     mqtt={mqtt}
@@ -477,10 +479,10 @@ class Vserial extends Component {
                 />
                 <div className="vserialPort">
                     <div>
-                        <p className="vserial_title">网关串口：{SerialPort}</p>
+                        <p className="vserial_title">{intl.get('gateway.gateway_serial_port')}：{SerialPort}</p>
                         <div className="selectWrap">
                             <div className="selectChild">
-                                <p>串口:</p>
+                                <p>{intl.get('gateway.serial_port')}:</p>
                                 <Select
                                     disabled={!flag}
                                     value={this.state.SerialPort}
@@ -494,7 +496,7 @@ class Vserial extends Component {
                                 </Select>
                             </div>
                             <div className="selectChild">
-                                <p>波特率:</p>
+                                <p>{intl.get('appsinstall.baud_rate')}:</p>
                                 <Select
                                     disabled={!flag}
                                     value={this.state.BaudRate}
@@ -517,7 +519,7 @@ class Vserial extends Component {
                                 </Select>
                             </div>
                             <div className="selectChild">
-                                <p>停止位:</p>
+                                <p>{intl.get('appsinstall.Stop_bit')}:</p>
                                 <Select
                                     disabled={!flag}
                                     value={this.state.StopBit}
@@ -531,7 +533,7 @@ class Vserial extends Component {
                                 </Select>
                             </div>
                             <div className="selectChild">
-                                <p>数据位:</p>
+                                <p>{intl.get('appsinstall.data_bits')}:</p>
                                 <Select
                                     disabled={!flag}
                                     value={this.state.DataBits}
@@ -545,7 +547,7 @@ class Vserial extends Component {
                                 </Select>
                             </div>
                             <div className="selectChild">
-                                <p>校验:</p>
+                                <p>{intl.get('appsinstall.check')}:</p>
                                 <Select
                                     disabled={!flag}
                                     value={this.state.Check}
@@ -581,7 +583,7 @@ class Vserial extends Component {
                                             this.openVserial()
                                         })
                                     }}
-                                  >启动</Button>
+                                  >{intl.get('gateway.start_up')}</Button>
                                     : <Button
                                         type="danger"
                                         loading={stopLoading}
@@ -599,13 +601,13 @@ class Vserial extends Component {
                                                 showConfirm(addPortData[0].name, addPortData[0].app_path.split('\\')[addPortData[0].app_path.split('\\').length - 1])
                                             }
                                         }}
-                                      >停止</Button>
+                                      >{intl.get('gateway.stop')}</Button>
                             }
                         </div>
                     </div>
                 </div>
                 <div className="wrapper">
-                    <p className="vserial_title">本地串口： {addPortData[0].name ? addPortData[0].name : '无'}</p>
+                    <p className="vserial_title">{intl.get('gateway.local_serial_port')}： {addPortData[0].name ? addPortData[0].name : intl.get('gateway.nothing')}</p>
                     <Table
                         columns={this.state.cloum}
                         dataSource={addPortData}

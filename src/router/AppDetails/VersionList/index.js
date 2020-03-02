@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { Button } from 'antd';
 // import http from '../../../utils/Server';
 import UploadForm from '../UploadForm';
+import intl from 'react-intl-universal';
 
 const block = {
     display: 'block',
@@ -40,7 +41,7 @@ class VersionList extends PureComponent {
                         type="primary"
                         onClick={this.showModal}
                     >
-                        上传新版本
+                        {intl.get('appdetails.upload_new_version')}
                     </Button>
                     <UploadForm
                         visible={this.state.visible}
@@ -54,17 +55,17 @@ class VersionList extends PureComponent {
                     {
                         dataSource && dataSource.length > 0 && dataSource.map((v, key)=>{
                                 return <li key={key}>
-                                    <div><p>版本号：<span className="fontColor">{v.version}</span>
+                                    <div><p>{intl.get('appdetails.version_number')}：<span className="fontColor">{v.version}</span>
                                         {
-                                            v.beta === 0 ? <span>(正式版)</span> : <span>(测试版)</span>
+                                            v.beta === 0 ? <span>{`(${intl.get('appdetails.official_version')})`}</span> : <span>{`(${intl.get('appdetails.beta_version')})`}</span>
                                         }
                                     </p></div>
-                                    <div><p>更新时间：<span className="fontColor">{v.modified.substr(0, 19)}</span></p>
+                                    <div><p>{intl.get('appdetails.update_time')}：<span className="fontColor">{v.modified.substr(0, 19)}</span></p>
                                         {
-                                            v.meta === 0 ? '' : <span style={this.state.user ? block : none}>发布为正式版本</span>
+                                            v.meta === 0 ? '' : <span style={this.state.user ? block : none}>{intl.get('appdetails.release_as_official')}</span>
                                         }
                                     </div>
-                                    <div><p>更新日志：<span className="fontColor">{v.comment}</span></p></div>
+                                    <div><p>{intl.get('appdetails.update_log')}：<span className="fontColor">{v.comment}</span></p></div>
                                 </li>
                             })
 
@@ -73,7 +74,7 @@ class VersionList extends PureComponent {
                 <p
                     className="empty"
                     style={dataSource.length > 0 ? none : block}
-                >请先上传版本！</p>
+                >{intl.get('appdetails.please_upload_the_version_first')}</p>
             </div>
         );
     }

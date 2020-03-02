@@ -5,6 +5,8 @@ import http from '../../utils/Server';
 import Editable from './Editable/index'
 import Edituser from './Edituser/index'
 import { _getCookie } from '../../utils/Session';
+import intl from 'react-intl-universal';
+
 class ShareGroup extends React.Component {
     constructor (props) {
         super(props)
@@ -58,7 +60,7 @@ class ShareGroup extends React.Component {
     render () {
         return (
             <div className="share-device">
-                <p className="manage">成员管理</p>
+                <p className="manage">{intl.get('header.Members_of_the_management')}</p>
                 <Row>
                     <Col span={6}>
                         <Edituser

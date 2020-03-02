@@ -4,7 +4,7 @@ import { Icon, Tooltip, Button } from 'antd';
 import http from '../../utils/Server';
 import { Link, withRouter } from 'react-router-dom';
 import './style.scss';
-
+import intl from 'react-intl-universal';
 import {IconIOT, IconCloud} from '../../utils/iconfont';
 
 @withRouter
@@ -69,7 +69,7 @@ class Status extends Component {
                     className="status"
                     style={{width: '200px', marginRight: '20px'}}
                 >
-                    <Tooltip title="在线状态" >
+                    <Tooltip title={intl.get('gateway.Online_status')} >
                         {/* <span className={device_status === 'ONLINE' ? 'online' : 'offline'}><b></b></span>
                         <span style={{padding: '0 5px'}} /> */}
                         <IconIOT
@@ -81,7 +81,7 @@ class Status extends Component {
                         device_status === 'ONLINE' ? (
                             <span>
                                 <span style={{padding: '0 5px'}} />
-                                <Tooltip title="数据上传" >
+                                <Tooltip title={intl.get('gateway.data_upload')} >
                                     <Icon
                                         style={{fontSize: 22, color: data.data_upload ? '#3c763d' : '#f39c12'}}
                                         type={data.data_upload  ? 'cloud-upload' : 'cloud'}
@@ -90,7 +90,7 @@ class Status extends Component {
                                 <span style={{padding: '0 5px'}} />
                                 {
                                     data.enable_beta
-                                    ? <Tooltip title="调试模式" >
+                                    ? <Tooltip title={intl.get('gateway.debug_mode')} >
                                         <IconCloud
                                             style={{fontSize: 22, color: '#f39c12'}}
                                             type="icon-biaoshilei_ceshi"
@@ -105,21 +105,21 @@ class Status extends Component {
                     <Tooltip title={dev_name ? dev_name : ''}>
                         <div style={{width: '240px'}}>
                             <div className="positon"><span></span></div>
-                            &nbsp;名称: {dev_name ? dev_name : ''}
+                            &nbsp;{intl.get('common.name')}: {dev_name ? dev_name : ''}
                         </div>
                     </Tooltip>
                     <span style={{padding: '0 50px'}} />
                     <Tooltip title={description ? description : ''}>
                         <div style={{width: '300px'}}>
                             <div className="positon"><span></span></div>
-                            &nbsp;描述: {description ? description : ''}
+                            &nbsp;{intl.get('common.desc')}: {description ? description : ''}
                         </div>
                     </Tooltip>
                     <span style={{padding: '0 50px'}} />
                     <Tooltip title={this.state.gateway}>
                         <div style={{width: '300px'}}>
                             <div className="positon"><span></span></div>
-                            &nbsp;序号: {this.state.gateway}
+                            &nbsp;{intl.get('gateway.number')}: {this.state.gateway}
                         </div>
                     </Tooltip>
                 </div>
@@ -137,7 +137,7 @@ class Status extends Component {
                                     <Button type="primary">
                                         <Icon type="appstore"
                                             theme="filled"
-                                        />安装新应用
+                                        />{intl.get('gateway.install_new_app')}
                                     </Button>
                                 </Link>
                             </div>

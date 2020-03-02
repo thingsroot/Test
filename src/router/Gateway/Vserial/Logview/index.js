@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import ReactList from 'react-list';
 import {Switch, Icon, Button, Tabs} from 'antd';
 import './style.scss';
+import intl from 'react-intl-universal';
+
 class VserialLogView extends Component {
     constructor (props) {
         super(props)
@@ -32,7 +34,7 @@ class VserialLogView extends Component {
                         type="card"
                     >
                         <TabPane
-                            tab="监视报文"
+                            tab={intl.get('gateway.surveillance_message')}
                             key="1"
                         >
                         </TabPane>
@@ -55,7 +57,7 @@ class VserialLogView extends Component {
                             onClick={()=>{
                                 mqtt.vserial_channel.setLogView(null)
                             }}
-                        >清除</Button>
+                        >{intl.get('gateway.eliminate')}</Button>
                         {
                             mqtt.vserial_channel.LogViewFlag
                                 ? <Button
@@ -63,13 +65,13 @@ class VserialLogView extends Component {
                                     onClick={()=>{
                                         mqtt.vserial_channel.setVserialLogFlag(false)
                                     }}
-                                  >暂停</Button>
+                                  >{intl.get('gateway.suspend')}</Button>
                                 : <Button
                                     className="button-color-daybreak"
                                     onClick={()=>{
                                         mqtt.vserial_channel.setVserialLogFlag(true)
                                     }}
-                                  >恢复</Button>
+                                  >{intl.get('gateway.recovery')}</Button>
                         }
                     </div>
                 </div>
@@ -77,10 +79,10 @@ class VserialLogView extends Component {
                     style={{height: 600, overflowY: 'auto'}}
                 >
                     <div className="tableHeaders">
-                        <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>时间</div>
-                        <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>来源</div>
-                        <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>方向</div>
-                        <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>内容</div>
+                        <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>{intl.get('common.time')}</div>
+                        <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>{intl.get('gateway.source')}</div>
+                        <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>{intl.get('gateway.direction')}</div>
+                        <div style={{backgroundColor: '#f9f9f9', lineHeight: '30px'}}>{intl.get('appitems.content')}</div>
                     </div>
                     <ReactList
                         pageSize={1}

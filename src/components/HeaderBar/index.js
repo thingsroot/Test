@@ -11,7 +11,8 @@ const { Option } = Select;
 @withRouter
 class HeaderBar extends PureComponent {
     componentDidMount () {
-        this.handleChange('zh-CN')
+        // this.handleChange('zh-CN')
+        this.handleChange()
     }
     UNSAFE_componentWillReceiveProps () {
         if (!isAuthenticated()) {
@@ -20,6 +21,19 @@ class HeaderBar extends PureComponent {
     }
     handleChange (val) {
         // 发送消息
+        if (!val) {
+            if (!localStorage.getItem('i18n')) {
+                localStorage.setItem('i18n', 'zh-CN')
+            }
+            emit.emit('change_language', localStorage.getItem('i18n'));
+        } else {
+            if (localStorage.getItem('i18n') !== val) {
+                localStorage.setItem('i18n', val)
+                location.reload()
+            } else {
+                return false;
+            }
+        }
         emit.emit('change_language', val);
     }
     render () {
@@ -63,7 +77,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.location.href = '/account'
+                            this.props.history.push('/account')
                         }
                     }
                 >
@@ -77,7 +91,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.location.href = '/virtualgateways'
+                            this.props.history.push('/virtualgateways')
                         }
                     }
                 >
@@ -92,7 +106,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.location.href = '/accesskeys'
+                            this.props.history.push('/accesskeys')
                         }
                     }
                 >
@@ -160,7 +174,8 @@ class HeaderBar extends PureComponent {
         return (
             <div className="headerUser">
                 <Select
-                    defaultValue="中文"
+                    // defaultValue="中文"
+                    value={localStorage.getItem('i18n') === 'en-US' ? 'English' : '中文'}
                     onChange={(val)=>{
                         this.handleChange(val)
                     }}

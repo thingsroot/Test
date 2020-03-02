@@ -6,6 +6,7 @@ import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
 import reqwest from 'reqwest';
+import intl from 'react-intl-universal';
 
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
@@ -53,7 +54,7 @@ class AppEdit extends Component {
             let data = JSON.parse(str)
             return JSON.stringify(data, null, 4)
         } catch (err) {
-            message.error('JSON格式有错误: ' + err)
+            message.error(`${intl.get('appedit.JSON_format_error')}: ` + err)
             return str
         }
     }
@@ -65,7 +66,7 @@ class AppEdit extends Component {
             let data = JSON.parse(str);
             return JSON.stringify(data)
         } catch (err) {
-            message.error('JSON格式有错误: ' + err);
+            message.error(`${intl.get('appedit.JSON_format_error')}: ` + err);
             return
         }
     }
@@ -73,7 +74,7 @@ class AppEdit extends Component {
     getDetails = ()=>{
         http.get('/api/applications_details?name=' + this.state.app).then(res=>{
             if (!res.ok) {
-                message.error('获取应用信息失败:' + res.error)
+                message.error(`${intl.get('appedit.failed_to_get_application_information')}: ` + res.error)
                 return
             }
             console.log(res.data.conf_template)
@@ -134,14 +135,14 @@ class AppEdit extends Component {
                                 data: formData,
                                 success: (res) => {
                                     res;
-                                    message.success('应用创建成功！');
+                                    message.success(intl.get('appedit.application_created_successfully'));
                                 }
                             });
                             setTimeout(()=>{
                                 window.location.href = '/developer'
                             }, 1500)
                         } else {
-                            message.error('应用创建失败！')
+                            message.error(intl.get('appedit.application_creation_failed'))
                         }
                     })
                 } else {
@@ -159,7 +160,7 @@ class AppEdit extends Component {
                                     data: formData,
                                     success: (res) => {
                                         res;
-                                        message.success('应用已更新！');
+                                        message.success(intl.get('appedit.app_updated'));
                                         setTimeout(()=>{
                                             this.props.history.go(-1)
                                         }, 1500)
@@ -171,16 +172,16 @@ class AppEdit extends Component {
                             } else {
                                 if (JSON.parse(JSON.parse(res._server_messages)[0]).message ===
                                     'App Path must be unique') {
-                                    message.error('应用ID已存在！')
+                                    message.error(intl.get('appedit.app_ID_already_exists'))
                                 } else {
-                                    message.error('应用更新失败！')
+                                    message.error(intl.get('appedit.application_update_failed'))
                                 }
                             }
                         })
                 }
             })
         } else {
-            message.warning('抱歉，请您先申请开发者！')
+            message.warning(intl.get('appedit.sorry'))
         }
     };
 
@@ -238,7 +239,7 @@ class AppEdit extends Component {
                                         alt=""
                                         ref="img"
                                         src={this.state.imgSrc}
-                                        title="点击切换图片"
+                                        title={intl.get('appedit.click_to_switch_pictures')}
                                         id="icon_img1"
                                         style={{width: '100px', height: '100px'}}
                                     />
@@ -253,9 +254,9 @@ class AppEdit extends Component {
                         </Col>
                         <Col span={21}>
                             <Col span={7}>
-                                <Form.Item label="应用名称">
+                                <Form.Item label={intl.get('appedit.apply_name')}>
                                     {getFieldDecorator('app_name', {
-                                        rules: [{ required: true, message: '不能为空！' }],
+                                        rules: [{ required: true, message: intl.get('appedit.cannot_be_empty') }],
                                         initialValue: app_info.app_name ? app_info.app_name : ''
                                     })(
                                         <Input type="text"
@@ -267,9 +268,9 @@ class AppEdit extends Component {
                             <Col span={7}>
                                 <Form.Item label="应用ID">
                                     {getFieldDecorator('code_name', {
-                                        rules: [{ required: true, message: '不能为空！' }, {
+                                        rules: [{ required: true, message: intl.get('appedit.cannot_be_empty') }, {
                                             pattern: /^[^\u4e00-\u9fa5]+$/,
-                                            message: '应用ID不含中文！'
+                                            message: intl.get('appedit.app_ID_does_not_contain_Chinese')
                                         }],
                                         initialValue: app_info.code_name ? app_info.code_name : ''
                                     })(
@@ -281,21 +282,21 @@ class AppEdit extends Component {
                                 </Form.Item>
                             </Col>
                             <Col span={7}>
-                                <Form.Item label="授权类型">
+                                <Form.Item label={intl.get('appedit.authorization_type')}>
                                     {getFieldDecorator('license_type', {
-                                        rules: [{ required: true, message: '不能为空！' }],
+                                        rules: [{ required: true, message: intl.get('appedit.cannot_be_empty') }],
                                         initialValue: app_info.license_type !== undefined ? app_info.license_type : 'Open'
                                     })(
                                         <Select
                                             style={{ width: 240 }}
                                         >
-                                            <Option value="Open">免费</Option>
+                                            <Option value="Open">{intl.get('appedit.free')}</Option>
                                         </Select>
                                     )}
                                 </Form.Item>
                             </Col>
                             <Col span={3}>
-                                <Form.Item label="发布到应用市场">
+                                <Form.Item label={intl.get('appedit.publish_to_app_Market')}>
                                     {getFieldDecorator('published', {
                                         valuePropName: 'checked',
                                         initialValue: app_info.published === 1 ?  true : false
@@ -322,7 +323,7 @@ class AppEdit extends Component {
                     type="card"
                 >
                     <TabPane
-                        tab="描述"
+                        tab={intl.get('common.desc')}
                         key="desc"
                     >
                         <EditorDesc value={description}
@@ -330,7 +331,7 @@ class AppEdit extends Component {
                         />
                     </TabPane>
                     <TabPane
-                        tab="默认安装配置"
+                        tab={intl.get('appedit.default_installation_configuration')}
                         key="conf"
                     >
                         <div style={{minHeight: '400px'}}>
@@ -349,7 +350,7 @@ class AppEdit extends Component {
                     className="login-form-button"
                     onClick={this.handleSubmit}
                 >
-                    {this.state.is_new ? '创建' : '修改'}
+                    {this.state.is_new ? intl.get('accesskeys.create') : intl.get('appedit.modify')}
                 </Button>
                 <span style={{padding: '0 5px'}}> </span>
                 <Button
@@ -357,7 +358,7 @@ class AppEdit extends Component {
                         this.props.history.go(-1)
                     }}
                 >
-                    取消
+                    {intl.get('common.cancel')}
                 </Button>
             </div>
         )

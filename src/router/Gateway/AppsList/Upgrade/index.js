@@ -3,6 +3,8 @@ import http from '../../../../utils/Server';
 import { Icon, Timeline, Divider } from 'antd';
 import './style.scss';
 import { inject, observer } from 'mobx-react';
+import intl from 'react-intl-universal';
+
 let  timer;
 @inject('store')
 @observer
@@ -30,7 +32,7 @@ class AppUpgrade extends Component {
                         this.setState({newdata: data, title: data[0].app_name, version: data[0].version, app: data[0].app, loading: false})
                     }
                 } else {
-                    this.refs.version.innerHTML = '已经是最新版，无需升级'
+                    this.refs.version.innerHTML = intl.get('gateway.it_is_the_latest_version_without_upgrading')
                 }
             })
         }
@@ -58,7 +60,7 @@ class AppUpgrade extends Component {
                                 <div>
                                     <h3>{title}</h3>
                                     <p>v{this.props.version} -> v{version}</p>
-                                    <span>可升级到最新版</span>
+                                    <span>{intl.get('gateway.upgrade_to_the_latest_version')}</span>
                                 </div>
                             </div>
                         </div>

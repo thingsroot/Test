@@ -4,6 +4,7 @@ import { inject, observer} from 'mobx-react';
 import http from '../../../../utils/Server';
 import { Table, Button, Modal, Input, message, Tooltip } from 'antd';
 import './style.scss';
+import intl from 'react-intl-universal';
 
 function formatTime (date, fmt) {
     const o = {
@@ -36,11 +37,11 @@ class OutputList extends Component {
         record: {},
         value: '',
         columns: [{
-            title: '类型',
+            title: intl.get('common.type'),
             dataIndex: 'vt',
             width: '100px'
         }, {
-            title: '名称',
+            title: intl.get('common.name'),
             render: (record)=>{
                 return (
                     <Tooltip placement="topLeft"
@@ -51,7 +52,7 @@ class OutputList extends Component {
                 )
             }
         }, {
-            title: '描述',
+            title: intl.get('common.desc'),
             render: (record)=>{
                 return (
                     <Tooltip placement="topLeft"
@@ -62,7 +63,7 @@ class OutputList extends Component {
                 )
             }
         }, {
-            title: '下置反馈',
+            title: intl.get('gateway.lower_feedback'),
             render: (record)=>{
                 return (
                     <Tooltip placement="topLeft"
@@ -73,15 +74,15 @@ class OutputList extends Component {
                 )
             }
         }, {
-            title: '反馈时间',
+            title: intl.get('gateway.feedback_time'),
             width: '130px',
             dataIndex: 'result_tm'
         }, {
-            title: '触发时间',
+            title: intl.get('gateway.trigger_time'),
             width: '130px',
             dataIndex: 'action_tm'
         }, {
-            title: '操作',
+            title: intl.get('common.operation'),
             width: '100px',
             render: (record)=>{
                 return (
@@ -90,7 +91,7 @@ class OutputList extends Component {
                         onClick={()=>{
                         this.showModal(record)
                     }}
-                    >下置</Button>
+                    >{intl.get('gateway.underneath')}</Button>
                 )
             }
         }]
@@ -144,9 +145,9 @@ class OutputList extends Component {
         http.post('/api/gateways_dev_outputs', params).then(res=>{
             if (res.ok){
                 output_record.action_tm = formatTime(new Date(), 'hh:mm:ss S')
-                this.props.store.action.pushAction(res.data, '设备数据下置执行', '', params, 10000, (result, data)=>{
+                this.props.store.action.pushAction(res.data, intl.get('gateway.equipment_data_download_execution'), '', params, 10000, (result, data)=>{
                     if (result) {
-                        output_record.result = '下置成功'
+                        output_record.result = intl.get('gateway.successful_placement')
                         output_record.result_tm = formatTime(new Date(data.timestamp * 1000), 'hh:mm:ss S')
                     } else {
                         output_record.result = data.message
@@ -184,21 +185,21 @@ class OutputList extends Component {
                     dataSource={data ? data : []}
                 />
                 <Modal
-                    title="数据下置"
+                    title={intl.get('devece_list.The_data_set')}
                     visible={visible}
-                    okText="确定"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                 >
-                    <p className="flex">点名：
+                    <p className="flex">{intl.get('gateway.roll_call')}：
                         <Input
                             disabled
                             value={record.name}
                         />
                     </p>
                     <br/>
-                    <p className="flex">数值：
+                    <p className="flex">{intl.get('common.number')}：
                         <Input
                             onChange={this.inputChange}
                         />

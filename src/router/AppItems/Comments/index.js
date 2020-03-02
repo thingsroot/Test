@@ -4,6 +4,8 @@ import { withRouter } from 'react-router-dom';
 import { Comment, Tooltip, Avatar, Rate, Empty, Button, Modal, Input, message, Popconfirm  } from 'antd';
 import './style.scss';
 import { _getCookie } from '../../../utils/Session';
+import intl from 'react-intl-universal';
+
 const { TextArea } = Input;
 @withRouter
 class Comments extends PureComponent {
@@ -38,7 +40,7 @@ class Comments extends PureComponent {
         }
         http.post('/api/store_reviews_remove', data).then(res=>{
             if (res.ok) {
-                message.success('删除成功！')
+                message.success(intl.get('appeditorcode.delete_successfully'))
                 this.getReviews()
             }
         })
@@ -59,7 +61,7 @@ class Comments extends PureComponent {
           http.post('/api/store_reviews_create', data).then(res=>{
               if (res.ok) {
                   this.getReviews()
-                  message.success('评论成功！')
+                  message.success(intl.get('appitems.comment_succeeded'))
               }
           })
         this.setState({
@@ -79,9 +81,9 @@ class Comments extends PureComponent {
                     className="store_reviews_add"
                     onClick={this.showModal}
                     type="primary"
-                >添加评论</Button>
+                >{intl.get('appitems.add_comments')}</Button>
                 <div className="store_reviews_title">
-                    评分与评论
+                    {intl.get('appitems.ratings_and_comments')}
                 </div>
                 <div className="store_reviews_content">
                 {
@@ -93,14 +95,14 @@ class Comments extends PureComponent {
                                 actions={[
                                     item.owner === _getCookie('user_id')
                                     ? <Popconfirm
-                                        title="确定要删除此次评分吗?"
-                                        okText="确定"
-                                        cancelText="取消"
+                                        title={`${intl.get('appitems.are_you_sure_you_want_to_delete_this_rating')}?`}
+                                        okText={intl.get('common.sure')}
+                                        cancelText={intl.get('common.cancel')}
                                         onConfirm={()=>{
                                             this.removeReviews(item)
                                         }}
                                       >
-                                        <span>删除</span>
+                                        <span>{intl.get('appdetails.delete')}</span>
                                     </Popconfirm>
                                     : ''
                                 ]}
@@ -125,10 +127,10 @@ class Comments extends PureComponent {
                                             <span>{item.creation.split('.')[0]}</span>
                                         </Tooltip>
                                         <p style={{marginTop: '10px', color: '#000'}}>
-                                            主题：{item.title}
+                                            {intl.get('appitems.theme')}：{item.title}
                                         </p>
                                         <p style={{marginTop: '10px', marginLeft: '20px', color: '#000'}}>
-                                            内容：{item.content}
+                                            {intl.get('appitems.content')}：{item.content}
                                         </p>
                                 </div>
                                 }
@@ -148,22 +150,22 @@ class Comments extends PureComponent {
                     })
                     : <Empty
                         description={<span>
-                            暂无评分!
+                            {intl.get('appitems.no_score_yet')}
                           </span>}
                         style={{marginTop: '100px'}}
                       />
                 }
                 </div>
                 <Modal
-                    title="请输入评星及评论"
+                    title={intl.get('appitems.please_enter_comments_and_comments')}
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     maskClosable={false}
-                    okText="确定"
-                    cancelText="取消"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('common.cancel')}
                 >
-                    请选择评星:
+                    {intl.get('appitems.please_select_star_rating')}:
                     <Rate
                         onChange={(val)=>{
                             this.setState({
@@ -177,14 +179,14 @@ class Comments extends PureComponent {
                         }}
                     />
                     <br />
-                    请输入主题：
+                    {intl.get('appitems.please_enter_a_subject')}：
                     <Input
                         text="text"
                         onChange={(e)=>{
                             this.setState({title: e.target.value})
                         }}
                     />
-                    请输入评论:
+                    {intl.get('appitems.please_enter_a_comment')}
                     <TextArea
                         rows={4}
                         onChange={(val)=>{

@@ -3,6 +3,7 @@ import SimpleMDE from 'simplemde';
 import marked from 'marked';
 import highlight from 'highlight.js';
 import 'simplemde/dist/simplemde.min.css';
+import intl from 'react-intl-universal';
 import {
     Form, Row, Col, Input, Button, Select
   } from 'antd';
@@ -43,25 +44,25 @@ class AdvancedSearchForm extends PureComponent {
     }
     getFields () {
         let list = [{
-            name: '应用名称',
+            name: intl.get('appedit.apply_name'),
             type: 'input'
         }, {
-            name: '授权类型',
+            name: intl.get('appedit.authorization_type'),
             type: 'select',
-            children: ['免费']
+            children: [intl.get('appedit.freeappedit.free')]
         }, {
-            name: '应用厂商',
+            name: intl.get('gateway.application_manufacturer'),
             type: 'select',
-            children: ['罗克菲尔', '西门子', '中达电通', '旋思科技', '冬笋科技', 'Other', '华为', '三菱电机']
+            children: [intl.get('gatewayappinstall.Roque_Phil'), intl.get('gatewayappinstall.Siemens'), intl.get('gatewayappinstall.Zhongda_Telecom'), intl.get('gatewayappinstall.Spin_technology'), intl.get('gatewayappinstall.Winter_bamboo_shoot_Technology'), 'Other', intl.get('gatewayappinstall.HUAWEI'), intl.get('gatewayappinstall.MITSUBISHI_electric')]
         }, {
-            name: '设备型号',
+            name: intl.get('gatewayappinstall.equipment_type'),
             type: 'input'
         }, {
-            name: '协议',
+            name: intl.get('gatewayappinstall.agreement'),
             type: 'select',
             children: ['SIEMENS-S7COMM', 'Redis', 'Mitsubishi_FX', 'OMRON-FINS', 'Private', 'UNKNOWN', 'DLT645-2007', 'DLT645-1997']
         }, {
-            name: '类别',
+            name: intl.get('gatewayappinstall.category'),
             type: 'select',
             children: ['General', 'Meter', 'UPS', 'PLC', 'Other', 'SYS']
         }]
@@ -83,7 +84,7 @@ class AdvancedSearchForm extends PureComponent {
                             message: 'Input something!'
                           }]
                         })(
-                          <Input placeholder={`请输入${item.name}`} />
+                          <Input placeholder={`${intl.get('gatewayappinstall.please_input')}${item.name}`} />
                         )}
                       </Form.Item>
                     </Col>
@@ -153,11 +154,11 @@ class AdvancedSearchForm extends PureComponent {
                     >
                     </Col>
                     </Row>
-                    <p>描述</p>
+                    <p>{intl.get('common.desc')}</p>
                     <textarea id="editor"></textarea>
                     <Button type="primary"
                         htmlType="submit"
-                    >创建</Button>
+                    >{intl.get('accesskeys.create')}</Button>
                 </Form>
             </div>
         )

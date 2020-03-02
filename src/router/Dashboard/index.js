@@ -10,6 +10,7 @@ import 'echarts/lib/component/tooltip';
 import { Tabs, Table } from 'antd';
 import { Link } from 'react-router-dom';
 import http from '../../utils/Server';
+// import intl from 'react-intl-universal';
 
 const show = {
     display: 'block'
@@ -24,7 +25,7 @@ const todayColumns = [{
     key: 'index',
     render: (text, record, index)=>`${index + 1}`
 }, {
-    title: '名称',
+    title: intl.get('common.name'),
     dataIndex: 'name',
     className: 'nameWidth',
     key: 'name',
@@ -126,10 +127,10 @@ class Dashboard extends PureComponent {
                         formatter: '{a} <br/>{b} : {c} ({d}%)'
                     },
                     legend: {
-                        data: ['Q102', 'Q204', 'T1-3000', '其他']
+                        data: ['Q102', 'Q204', 'T1-3000', intl.get('dashboard.other')]
                     },
                     series: [{
-                        name: '设备类型',
+                        name: intl.get('dashboard.equipment_type'),
                         type: 'pie',
                         radius: '55%',
                         color: ['#3CB2EF', '#50A3BA', '#236192', '#FFD85C'],
@@ -137,7 +138,7 @@ class Dashboard extends PureComponent {
                             {value: this.state.pieData['Q102'], name: 'Q102'},
                             {value: this.state.pieData['Q204'], name: 'Q204'},
                             {value: this.state.pieData['T1-3000'], name: 'T1-3000'},
-                            {value: this.state.pieData['VBOX'], name: '其他'}
+                            {value: this.state.pieData['VBOX'], name: intl.get('dashboard.other')}
                         ]
                     }]
                 });
@@ -204,10 +205,10 @@ class Dashboard extends PureComponent {
                 let data3 = [];
                 let data4 = [];
                 this.state.barData.map((v) =>{
-                    data1.push(v['系统']);
-                    data2.push(v['设备']);
-                    data3.push(v['通讯']);
-                    data4.push(v['数据']);
+                    data1.push(v[intl.get('common.sym')]);
+                    data2.push(v[intl.get('gateway.equipment')]);
+                    data3.push(v[intl.get('common.communication')]);
+                    data4.push(v[intl.get('common.data')]);
                 });
 
                 this.myFaultTypeChart = echarts.init(faultTypeMain);
@@ -219,7 +220,7 @@ class Dashboard extends PureComponent {
                         }
                     },
                     legend: {
-                        data: ['系统', '设备', '通讯', '数据', '应用']
+                        data: [intl.get('common.sym'), intl.get('gateway.equipment'), intl.get('common.communication'), intl.get('common.data'), intl.get('common.applications')]
                     },
                     xAxis: [{
                         type: 'category',
@@ -230,34 +231,34 @@ class Dashboard extends PureComponent {
                     }],
                     yAxis: {},
                     series: [{
-                        name: '系统',
+                        name: intl.get('common.sym'),
                         type: 'bar',
                         data: this.state.barData.map(function (item) {
-                            return [item.time.substr(0, 10), item['系统']];
+                            return [item.time.substr(0, 10), item[intl.get('common.sym')]];
                         })
                     }, {
-                        name: '设备',
+                        name: intl.get('gateway.equipment'),
                         type: 'bar',
                         data: this.state.barData.map(function (item) {
-                            return [item.time.substr(0, 10), item['设备']];
+                            return [item.time.substr(0, 10), item[intl.get('gateway.equipment')]];
                         })
                     }, {
-                        name: '通讯',
+                        name: intl.get('common.communication'),
                         type: 'bar',
                         data: this.state.barData.map(function (item) {
-                            return [item.time.substr(0, 10), item['通讯']];
+                            return [item.time.substr(0, 10), item[intl.get('common.communication')]];
                         })
                     }, {
-                        name: '数据',
+                        name: intl.get('common.data'),
                         type: 'bar',
                         data: this.state.barData.map(function (item) {
-                            return [item.time.substr(0, 10), item['数据']];
+                            return [item.time.substr(0, 10), item[intl.get('common.data')]];
                         })
                     }, {
-                        name: '应用',
+                        name: intl.get('common.applications'),
                         type: 'bar',
                         data: this.state.barData.map(function (item) {
-                            return [item.time.substr(0, 10), item['应用']];
+                            return [item.time.substr(0, 10), item[intl.get('common.applications')]];
                         })
                     }]
                 });

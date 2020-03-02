@@ -3,6 +3,8 @@ import {Form, Input, Button, message, Result, Skeleton} from 'antd';
 import http from '../../utils/Server';
 import './style.scss';
 import { _getCookie } from '../../utils/Session';
+import intl from 'react-intl-universal';
+
 const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 8 }
@@ -64,9 +66,9 @@ class DynamicRule extends PureComponent {
           }
           http.post('/api/developers_requisition_create', data).then(res=>{
               if (res.ok) {
-                  message.success('申请成功！等待后台审核中，请耐心等候！')
+                  message.success(intl.get('appdeveloper.application_succeeded'))
               } else {
-                  message.error('申请失败，错误信息:' + res.error)
+                  message.error(`${intl.get('appdeveloper.application_failed')}:` + res.error)
               }
           })
         });
@@ -76,7 +78,7 @@ class DynamicRule extends PureComponent {
         const {loading, flag, status} = this.state;
     return (
       <div className="app_developer">
-        <div className="app_developer_title">申请成为开发者</div>
+        <div className="app_developer_title">{intl.get('appdeveloper.apply_to_become_a_developer')}</div>
         {
             loading
             ? <Skeleton active />
@@ -84,70 +86,70 @@ class DynamicRule extends PureComponent {
                 ? <div>
                 <Form.Item
                     {...formItemLayout}
-                    label="姓名"
+                    label={intl.get('common.name')}
                 >
                     {getFieldDecorator('username', {
                         rules: [
                         {
                             required: true,
-                            message: '请输入您的姓名'
+                            message: intl.get('appdeveloper.please_enter_your_name')
                         }
                         ]
-                    })(<Input placeholder="请输入您的姓名" />)}
+                    })(<Input placeholder={intl.get('appdeveloper.please_enter_your_name')} />)}
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
-                    label="身份证号码"
+                    label={intl.get('appdeveloper.ID_card_No.')}
                 >
                     {getFieldDecorator('idcardnumber', {
                         rules: [
                         {
                             required: true,
-                            message: '请输入正确的身份证号码',
+                            message: intl.get('appdeveloper.please_enter_the_correct_ID_number'),
                             pattern: /^[1-9]\d{5}(18|19|20|(3\d))\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
                         }
                         ]
-                    })(<Input placeholder="请输入您的身份证号码" />)}
+                    })(<Input placeholder={intl.get('appdeveloper.please_enter_the_correct_ID_number')} />)}
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
-                    label="地址"
+                    label={intl.get('appdeveloper.address')}
                 >
                     {getFieldDecorator('address', {
                         rules: [
                         {
                             required: true,
-                            message: '请输入您的地址'
+                            message: intl.get('appdeveloper.please_enter_your_address')
                         }
                         ]
-                    })(<Input placeholder="请输入您的地址" />)}
+                    })(<Input placeholder={intl.get('appdeveloper.please_enter_your_address')} />)}
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
-                    label="手机号"
+                    label={intl.get('appdeveloper.cell-phone_number')}
                 >
                     {getFieldDecorator('phone', {
                         rules: [
                         {
                             required: true,
-                            message: '请输入您的手机号',
+                            message: intl.get('appdeveloper.please_enter_your_mobile_number'),
                             pattern: /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/
                         }
                         ]
-                    })(<Input placeholder="请输入您的电话" />)}
+                    })(<Input placeholder={intl.get('appdeveloper.please_enter_your_mobile_number')} />)}
                 </Form.Item>
                 <Form.Item {...formTailLayout}>
                     <Button
                         type="primary"
                         onClick={this.check}
                     >
-                        提交申请
+                        {intl.get('appdeveloper.application_for_submission')}
                     </Button>
                 </Form.Item>
             </div>
                 : status !== null
                     ? <Result
-                        title={status === 0 ? '您的申请正在处理中，请耐心等候...' : '您的申请已被拒绝,请重新提交资料后重试！'}
+                        title={status === 0 ? intl.get('appdeveloper.your_application_is_being_processed') : intl.get('appdeveloper.your_application_has_been_rejected')}
                         extra={
                             status !== 0
                             ? <Button
@@ -159,7 +161,7 @@ class DynamicRule extends PureComponent {
                                     })
                                 }}
                               >
-                                  重新申请
+                                  {intl.get('appdeveloper.reapply')}
                             </Button>
                         : ''
                         }

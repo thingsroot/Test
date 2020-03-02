@@ -6,6 +6,8 @@ import http from '../../utils/Server';
 import Edituser from './Edituser';
 import Editable from './Editable';
 import { _getCookie } from '../../utils/Session';
+import intl from 'react-intl-universal';
+
 @inject('store')
 @observer
 class ShareGroup extends Component {
@@ -66,7 +68,7 @@ class ShareGroup extends Component {
     render () {
         return (
             <div className="share-group">
-                <p className="manage">共享组管理</p>
+                <p className="manage">{intl.get('header.Shared_group_management')}</p>
                 <Row>
                     <Col span={6}>
                         <Edituser
