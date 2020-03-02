@@ -19,7 +19,7 @@ const posed = {
 
 const AllColumns = [
     {
-        title: '标题',
+        title: intl.get('common.title'),
         dataIndex: 'title',
         width: '25%',
         render: (text, record) => (
@@ -30,28 +30,28 @@ const AllColumns = [
             </span>
         )
     }, {
-        title: '网关序列号',
+        title: intl.get('sharegroup.gateway_serial_number'),
         dataIndex: 'device',
         width: '35%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
-        title: '发生时间',
+        title: intl.get('platformevent.Time_of_occurrence'),
         dataIndex: 'creation',
         width: '20%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
-        title: '事件类型',
+        title: intl.get('platformevent.message_type'),
         dataIndex: 'event_type_str',
         width: '10%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
-        title: '事件等级',
+        title: intl.get('platformevent.Event_level'),
         dataIndex: 'event_level_str',
         width: '10%',
         render: (text, record) => (
@@ -62,7 +62,7 @@ const AllColumns = [
 
 const NoSNColumns = [
     {
-        title: '标题',
+        title: intl.get('common.title'),
         dataIndex: 'title',
         width: '60%',
         render: (text, record) => (
@@ -73,21 +73,21 @@ const NoSNColumns = [
             </span>
         )
     }, {
-        title: '发生时间',
+        title: intl.get('platformevent.Time_of_occurrence'),
         dataIndex: 'creation',
         width: '20%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
-        title: '事件类型',
+        title: intl.get('platformevent.message_type'),
         dataIndex: 'event_type_str',
         width: '10%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
-        title: '事件等级',
+        title: intl.get('platformevent.Event_level'),
         dataIndex: 'event_level_str',
         width: '10%',
         render: (text, record) => (
@@ -158,7 +158,7 @@ class DeviceEventList extends Component {
     //确认消息
     confMessage = (toData)=>{
         if (toData.length === 0) {
-            message.warning('请您先选择要确认的消息！');
+            message.warning(intl.get('platformevent.Please_select_the_message_to_confirm_first'));
         } else {
             this.setState({ loading: true  });
 
@@ -329,25 +329,25 @@ class DeviceEventList extends Component {
                     }
                     let level = '';
                     if (v.event_level === 1) {
-                        level = '常规'
+                        level = intl.get('common.conventional')
                     } else if (v.event_level === 2) {
-                        level = '错误'
+                        level = intl.get('common.error')
                     } else if (v.event_level >= 3 && v.event_level < 10) {
-                        level = '警告'
+                        level = intl.get('common.warning')
                     } else if (v.event_level >= 10) {
-                        level = '致命'
+                        level = intl.get('common.deadly')
                     }
                     let type = '';
                     if (v.event_type === 'COMM') {
-                        type = '通讯'
+                        type = intl.get('common.communication')
                     } else if (v.event_type === 'DATA') {
-                        type = '数据'
+                        type = intl.get('common.data')
                     } else if (v.event_type === 'SYS') {
-                        type = '系统'
+                        type = intl.get('common.sym')
                     } else if (v.event_type === 'DEV') {
-                        type = '设备'
+                        type = intl.get('common.equipment')
                     } else {
-                        type = '未知'
+                        type = intl.get('common.The_unknown')
                     }
                     data.push({
                         title: v.event_info,
@@ -365,7 +365,7 @@ class DeviceEventList extends Component {
                     });
                 });
             } else {
-                message.error('获取消息列表失败！')
+                message.error(intl.get('platformevent.Failed_to_get_message_list'))
             }
             this.setState({
                 loading: false,

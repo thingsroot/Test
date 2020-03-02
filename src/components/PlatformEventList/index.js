@@ -20,7 +20,7 @@ const posed = {
 
 const AllColumns = [
     {
-        title: '标题',
+        title: intl.get('common.title'),
         dataIndex: 'title',
         width: '30%',
         render: (text, record) => (
@@ -32,21 +32,21 @@ const AllColumns = [
             </span>
         )
     }, {
-        title: '网关序列号',
+        title: intl.get('sharegroup.gateway_serial_number'),
         dataIndex: 'device',
         width: '35%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
-        title: '发生时间',
+        title: intl.get('platformevent.Time_of_occurrence'),
         dataIndex: 'creation',
         width: '20%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
-        title: '消息类型',
+        title: intl.get('platformevent.message_type'),
         dataIndex: 'operation_str',
         width: '15%',
         render: (text, record) => (
@@ -57,7 +57,7 @@ const AllColumns = [
 
 const NoSNColumns = [
     {
-        title: '标题',
+        title: intl.get('common.title'),
         dataIndex: 'title',
         width: '65%',
         render: (text, record) => (
@@ -69,14 +69,14 @@ const NoSNColumns = [
             </span>
         )
     }, {
-        title: '发生时间',
+        title: intl.get('platformevent.Time_of_occurrence'),
         dataIndex: 'creation',
         width: '20%',
         render: (text, record) => (
             <span style={record.disposed === 0 ? disposed : posed}>{text}</span>
         )
     }, {
-        title: '消息类型',
+        title: intl.get('platformevent.message_type'),
         dataIndex: 'operation_str',
         width: '15%',
         render: (text, record) => (
@@ -148,7 +148,7 @@ class PlatformEvents extends Component {
     //确认消息
     confMessage = (toData)=>{
         if (toData.length === 0) {
-            message.warning('请您先选择要确认的消息！');
+            message.warning(intl.get('platformevent.Please_select_the_message_to_confirm_first'));
         } else {
             this.setState({ loading: true });
 
@@ -283,132 +283,132 @@ class PlatformEvents extends Component {
         //设备状态
         if (data.hasOwnProperty('device_status')) {
             if (data.device_status === 'ONLINE'){
-                sub = '设备上线'
+                sub = intl.get('platformevent.Equipment_online')
             } else if (data.device_status === 'OFFLINE'){
-                sub = '设备离线'
+                sub = intl.get('platformevent.Equipment_offline')
             }
             //设备操作
         } else if (data.hasOwnProperty('action')){
             if (data.channel === 'app') {
                 if (data.action === 'option') {   //开机自启动
                     if (data.data.value === 1 || data.data.value === '1') {
-                        sub = activity.full_name + '  开启应用' + data.data.inst + '开机自启动'
+                        sub = activity.full_name + '  ' + intl.get('platformevent.Open_the_application') + data.data.inst + intl.get('platformevent.self_starting')
                     } else if (data.data.value === 0 || data.data.value === '0') {
-                        sub = activity.full_name + '  关闭应用' + data.data.inst + '开机自启动'
+                        sub = activity.full_name + '  ' + intl.get('gateway.close_application') + data.data.inst + intl.get('platformevent.self_starting')
                     } else {
                         sub = JSON.stringify(data)
                     }
                 } else if (data.action === 'restart') {
-                    sub = activity.full_name + '    重启应用' + data.data.inst
+                    sub = activity.full_name + '    ' + intl.get('gateway.restart_app') + data.data.inst
                 } else if (data.action === 'start') {
-                    sub = activity.full_name + '    启动应用' + data.data.inst
+                    sub = activity.full_name + '    ' + intl.get('gateway.startup_application') + data.data.inst
                 } else if (data.action === 'stop') {
-                    sub = activity.full_name + '   停止应用' + data.data.inst
+                    sub = activity.full_name + '   ' + intl.get('platformevent.Stop_the_application') + data.data.inst
                 } else if (data.action === 'conf') {
-                    sub = activity.full_name + '   更改应用' + data.data.inst + '应用配置'
+                    sub = activity.full_name + '   ' + intl.get('gateway.change_application') + data.data.inst + intl.get('gateway.application_configuration')
                 } else if (data.action === 'upload_comm') {
                     if (data.data.sec === 0 || data.data.sec === '0') {
-                        sub = activity.full_name + '   停止上传应用' + data.data.inst + '报文'
+                        sub = activity.full_name + '   ' + intl.get('platformevent.Stop_uploading_apps') + data.data.inst + intl.get('gateway.message')
                     } else if (data.data.sec !== 0 || data.data.sec !== '0') {
-                        sub = activity.full_name + '   上传应用' + data.data.inst + '报文'
+                        sub = activity.full_name + '   ' + intl.get('platformevent.To_upload_application') + data.data.inst + intl.get('gateway.message')
                     } else {
                         sub = JSON.stringify(data)
                     }
                 } else if (data.action === 'install') {
-                    sub = activity.full_name + '   安装应用' + data.data.name + '实例名' + data.data.inst
+                    sub = activity.full_name + '   ' + intl.get('appsinstall.installation_and_Application') + data.data.name + intl.get('appsinstall.instance_name') + data.data.inst
                 } else if (data.action === 'uninstall') {
-                    sub = activity.full_name + '   卸载应用' + data.data.inst
+                    sub = activity.full_name + '   ' + intl.get('gateway.unloading_application') + data.data.inst
                 } else if (data.action === 'query_comm') {
-                    sub = activity.full_name + '   查询应用' + data.data.inst + '报文'
+                    sub = activity.full_name + '   ' + intl.get('gateway.Query_the_application') + data.data.inst + intl.get('gateway.message')
                 } else if (data.action === 'query_log') {
-                    sub = activity.full_name + '   应用查询' + data.data.inst + '日志'
+                    sub = activity.full_name + '   ' + intl.get('gateway.Application_of_query') + data.data.inst + intl.get('gateway.log')
                 } else if (data.action === 'list') {
-                    sub = activity.full_name + '   刷新应用列表'
+                    sub = activity.full_name + '   ' + intl.get('gateway.Refresh_application_list')
                 } else if (data.action === 'upgrade') {
-                    sub = activity.full_name + '   升级应用' + data.data.inst + '到最新版本'
+                    sub = activity.full_name + '   ' + intl.get('platformevent.Upgrade_application') + data.data.inst + intl.get('platformevent.To_the_latest_version')
                 } else if (data.action === 'rename') {
-                    sub = activity.full_name + '   重命名应用' + data.data.inst + '为' + data.data.new_name
+                    sub = activity.full_name + '   ' + intl.get('platformevent.Rename_application') + data.data.inst + intl.get('platformevent.for') + data.data.new_name
                 } else {
                     sub = JSON.stringify(data)
                 }
             } else if (data.channel === 'sys') {
                 if (data.action === 'enable/beta') {
                     if (data.data === 0 || data.data === '0') {
-                        sub = activity.full_name + '    关闭网关beta模式'
+                        sub = activity.full_name + '    ' + intl.get('platformevent.Close_gateway_beta_mode')
                     } else if (data.data !== 0 || data.data !== '0') {
-                        sub = activity.full_name + '    开启网关beta模式'
+                        sub = activity.full_name + '    ' + intl.get('platformevent.Open_gateway_beta_mode')
                     } else {
                         sub = JSON.stringify(data)
                     }
                 } else if (data.action === 'enable/data') {
                     if (data.data === 0 || data.data === '0') {
-                        sub = activity.full_name + '    关闭网关数据上传'
+                        sub = activity.full_name + '    ' + intl.get('platformevent.Close_gateway_data_upload')
                     } else if (data.data !== 0 || data.data === '0') {
-                        sub = activity.full_name + '    开启网关数据上传'
+                        sub = activity.full_name + '    ' + intl.get('platformevent.Enable_gateway_data_upload')
                     } else {
                         sub = JSON.stringify(data)
                     }
                 } else if (data.action === 'enable/log') {
                     if (data.data === 0 || data.data === '0') {
-                        sub = activity.full_name + '    关闭网关日志上送'
+                        sub = activity.full_name + '    ' + intl.get('platformevent.Close_gateway_log_feed')
                     } else if (data.data !== 0 || data.data !== '0') {
-                        sub = activity.full_name + '    开启网关日志上送'
+                        sub = activity.full_name + '    ' + intl.get('platformevent.Open_gateway_log_feed')
                     } else {
                         sub = JSON.stringify(data)
                     }
                 } else if (data.action === 'enable/comm') {
                     if (data.data === 0 || data.data === '0') {
-                        sub = activity.full_name + '    停止网关报文上送'
+                        sub = activity.full_name + '    ' + intl.get('platformevent.Stop_gateway_message_sending')
                     } else if (data.data !== 0 || data.data !== '0') {
-                        sub = activity.full_name + '    开启网关报文上送'
+                        sub = activity.full_name + '    ' + intl.get('platformevent.Open_gateway_message_sending')
                     } else {
                         sub = JSON.stringify(data)
                     }
                 } else if (data.action === 'restart') {
-                    sub = activity.full_name + '    重启网关IOT程序'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Restart_the_gateway_IOT_application')
                 } else if (data.action === 'reboot') {
-                    sub = activity.full_name + '    重启网关设备'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Restart_gateway_device')
                 } else if (data.action === 'cloud_conf') {
-                    sub = activity.full_name + '    更新网关云中心配置选项'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Update_gateway_cloud_center_configuration_options')
                 } else if (data.action === 'enable/data_one_short') {
                     if (data.data === 0  || data.data === '0') {
-                        sub = activity.full_name + '    关闭网关临时上传数据'
+                        sub = activity.full_name + '    ' + intl.get('platformevent.Close_the_gateway_to_temporarily_upload_data')
                     } else if (data.data !== 0 || data.data !== '0') {
-                        sub = activity.full_name + '    开启网关临时上传数据'
+                        sub = activity.full_name + '    ' + intl.get('platformevent.Enable_gateway_to_temporarily_upload_data')
                     } else {
                         sub = JSON.stringify(data)
                     }
                 } else if (data.action === 'ext/upgrade') {
-                    sub = activity.full_name + '    更新网关扩展库' + data.data.name
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Update_the_gateway_extension_library') + data.data.name
                 } else if (data.action === 'ext/list') {
-                    sub = activity.full_name + '    上传网关扩展库列表'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Upload_the_gateway_extension_library_list')
                 } else if (data.action === 'cfg/download') {
-                    sub = activity.full_name + '    下载网关IOT固件配置'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Download_the_gateway_IOT_firmware_configuration')
                 } else if (data.action === 'cfg/upload') {
-                    sub = activity.full_name + '    上传网关IOT固件配置'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Upload_gateway_IOT_firmware_configuration')
                 } else if (data.action === 'upgrade') {
-                    sub = activity.full_name + '    升级网关到最新版本'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Upgrade_the_gateway_to_the_latest_version')
                 } else if (data.action === 'enable/event') {
-                    sub = activity.full_name + '    更改网关事件上传等级'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Change_the_gateway_event_upload_level')
                 } else if (data.action === 'enable/stat') {
-                    sub = activity.full_name + '    开启网关统计数据上传'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Enable_gateway_statistics_upload')
                 } else if (data.action === 'batch_script') {
-                    sub = activity.full_name + '    执行网关批量操作'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Perform_gateway_batch_operations')
                 } else if (data.action === 'upgrade/ack') {
-                    sub = activity.full_name + '    确认升级网关IOT固件'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Confirm_upgrade_gateway_IOT_firmware')
                 } else if (data.action === 'data/query') {
-                    sub = activity.full_name + '    请求立刻上传网关数据'
+                    sub = activity.full_name + '    ' + intl.get('platformevent.Request_to_upload_gateway_data_immediately')
                 } else {
                     sub = JSON.stringify(data)
                 }
             } else if (data.channel === 'command') {
-                sub = activity.full_name + '    执行网关应用设备' + data.data.cmd + '指令'
+                sub = activity.full_name + '    ' + intl.get('platformevent.Execute_the_gateway_application_device') + data.data.cmd + intl.get('platformevent.instruction')
             } else if (data.channel === 'output') {
-                sub = activity.full_name + '    操作网关设备应用' + data.data.output + '数据输出'
+                sub = activity.full_name + '    ' + intl.get('platformevent.Operate_gateway_device_applications') + data.data.output + intl.get('platformevent.Data_output')
             } else if (data.action === 'Delete') {
-                sub = activity.full_name + '    删除了一台网关'
+                sub = activity.full_name + '    ' + intl.get('platformevent.A_gateway_was_removed')
             } else if (data.action === 'Add') {
-                sub = activity.full_name + '    增加了一台网关'
+                sub = activity.full_name + '    ' + intl.get('platformevent.Added_a_gateway')
             } else {
                 sub = JSON.stringify(data)
             } //output
@@ -460,11 +460,11 @@ class PlatformEvents extends Component {
                     let sub = obj ? this.generateTitle(v, obj) : 'UNKNOWN TITLE'
                     let op = ''
                     if (v.operation === 'Owner') {
-                        op = '设备维护'
+                        op = intl.get('platformevent.Equipment_maintenance')
                     } else if (v.operation === 'Action') {
-                        op = '设备操作'
+                        op = intl.get('platformevent.Equipment_operation')
                     } else if (v.operation === 'Status') {
-                        op = '设备状态'
+                        op = intl.get('platformevent.Equipment_state')
                     }
                     data.push({
                         title: sub,
@@ -483,7 +483,7 @@ class PlatformEvents extends Component {
                     });
                 });
             } else {
-                message.error('获取消息列表失败！')
+                message.error(intl.get('platformevent.Failed_to_get_message_list'))
             }
             this.setState({
                 loading: false,
