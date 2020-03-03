@@ -157,7 +157,7 @@ class LeftNav extends Component {
             }
             http.post('/api/gateways_applications_install', params).then(res=>{
                 if (res.ok) {
-                    message.info(title + '请求成功. 等待网关响应!')
+                    message.info(title + intl.get('gateway.send_request_successfully') + '. ' + intl.get('gateway.wait_for_gateway_response') + '!')
                     this.props.store.action.pushAction(res.data, title, '', params, 30000,  (result)=> {
                         resolve(result, 60000)
                         this.props.refreshGatewayData();
@@ -168,7 +168,7 @@ class LeftNav extends Component {
                 }
             }).catch(err=>{
                 reject(err)
-                message.error(title + '发送请求失败：' + err)
+                message.error(title + + intl.get('gateway.request_send_failed') + '：' + err)
             })
         })
     }
@@ -182,7 +182,7 @@ class LeftNav extends Component {
             }
             http.post('/api/gateways_applications_remove', params).then(res=>{
                 if (res.ok) {
-                    message.info(title + '请求成功. 等待网关响应!')
+                    message.info(title + intl.get('gateway.send_request_successfully') + '. ' + intl.get('gateway.wait_for_gateway_response') + '!')
                     this.props.store.action.pushAction(res.data, title, '', params, 10000,  (result)=> {
                         resolve(result, 60000)
                         this.props.refreshGatewayData();
@@ -193,7 +193,7 @@ class LeftNav extends Component {
                 }
             }).catch(err=>{
                 reject(err)
-                message.error(title + '发送请求失败：' + err)
+                message.error(title + intl.get('gateway.request_send_failed') + '：' + err)
             })
         })
     }

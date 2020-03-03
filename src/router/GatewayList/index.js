@@ -227,7 +227,7 @@ class MyGates extends Component {
                 name: record.name
             }).then(res=>{
                 if (res.ok){
-                    message.success('移除网关成功')
+                    message.success(intl.get('gateway.remove_gateway_success'))
                 }
                 this.refreshDevicesList()
             })

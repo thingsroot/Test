@@ -607,7 +607,7 @@ class DeviceEventList extends Component {
                     showIcon
                     message={
                         <span>
-                            {intl.get('common.all_the_news')}<b>{messageCount}</b>{intl.get('common.article')}，{intl.get('common.no_confirmation_message_in_the_list')}<b>{unconfirmed}</b>{intl.get('common.article')}，
+                            {intl.get('common.all_the_news')}<b>&nbsp;{messageCount}&nbsp;</b>{intl.get('common.article')}，{intl.get('common.no_confirmation_message_in_the_list')}<b>&nbsp;{unconfirmed}&nbsp;</b>{intl.get('common.article')}，
                             <span
                                 style={{color: 'blue', cursor: 'pointer'}}
                                 onClick={this.toggleMessage}

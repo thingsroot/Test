@@ -339,7 +339,7 @@ class NetworkConfig extends Component {
                         >
                                 <Button
                                     icon="question-circle"
-                                    style={{marginLeft: '27px', marginBottom: '4px'}}
+                                    style={{bottom: 30}}
                                     onClick={()=>{
                                         window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000115', '_blank')
                                     }}
@@ -424,7 +424,7 @@ class NetworkConfig extends Component {
 
                                             </div>
                                             <div>
-                                                <Form.Item label={`${intl.get('gateway.subnet_mask ')}:`}>
+                                                <Form.Item label={`${intl.get('gateway.subnet_mask')}:`}>
                                                     <Select
                                                         defaultValue="255.255.255.0"
                                                         style={{width: 300}}

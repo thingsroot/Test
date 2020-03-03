@@ -10,9 +10,13 @@
         position: relative;
         >button{
             position: absolute;
-            right:50%;
+            right:40%;
             top:50%;
             transform: translate3d(0,-50%,0)
+        }
+        >div{
+            right: -20.5%;
+            top: 0%;
         }
     }
     .hide{
@@ -57,7 +61,7 @@
         
         b{
             display: inline-block;
-            width:75px;
+            width:85px;
         }
     }
     .upgrade{

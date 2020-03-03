@@ -266,7 +266,7 @@ class AppEdit extends Component {
                                 </Form.Item>
                             </Col>
                             <Col span={7}>
-                                <Form.Item label="应用ID">
+                                <Form.Item label={intl.get('gateway.app_ID')}>
                                     {getFieldDecorator('code_name', {
                                         rules: [{ required: true, message: intl.get('appedit.cannot_be_empty') }, {
                                             pattern: /^[^\u4e00-\u9fa5]+$/,

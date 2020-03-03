@@ -1,6 +1,7 @@
 import {observable, action} from 'mobx'
 import http from '../utils/Server';
 import {message} from 'antd';
+import intl from 'react-intl-universal';
 class groups {
     @observable UserList = [];
     @observable GroupsUserlist = [];
@@ -29,7 +30,7 @@ class groups {
             if (res.ok) {
                 this.GroupsUserlist.splice(index, 1)
                 this.GroupsUserlist = [].concat(this.GroupsUserlist)
-                !flag && message.success('删除共享组用户成功！')
+                !flag && message.success(intl.get('sharegroup.remove_sharegroup_user_success'))
             }
         })
     }
@@ -45,8 +46,9 @@ class groups {
             device: arr[0].device
         }
         http.post('/api/companies_sharedgroups_remove_device', data).then(res=>{
-            console.log(res)
-            message.success('删除共享设备成功！')
+            if (res.ok) {
+                message.success(intl.get('sharegroup.Delete_Shared_device_successfully!'))
+            }
         })
     }
 }

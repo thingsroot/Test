@@ -264,7 +264,7 @@ class Action extends Component {
                         ) : null
                     }
                 </div>
-                <div style={{display: 'flex', marginTop: 10, width: '100%', minWidth: 840}}>
+                <div style={{display: 'flex', marginTop: 10, width: '100%', minWidth: 840, flexWrap: 'wrap'}}>
                     <div style={{paddingTop: 5}}>
                         <span className="spanStyle">{intl.get('gateway.boo_from_boot')}:</span>
                         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -306,6 +306,7 @@ class Action extends Component {
                     </Button>
                     <span style={{margin: '0 5px'}}> </span>
                     <Button
+                        style={{marginBottom: 5}}
                         disabled={record.latestVersion === undefined || record.latestVersion <= record.version || this.state.running_action || !actionEnable}
                         onClick={()=>{
                             this.showModal('visible')

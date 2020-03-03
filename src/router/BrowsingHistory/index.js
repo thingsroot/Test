@@ -289,7 +289,7 @@ class BrowsingHistory extends Component {
                     </div>
                     <div className="historyright">
                         <Button
-                            style={{position: 'absolute', right: 20, top: 5}}
+                            style={{position: 'absolute', right: 10, top: 10}}
                             onClick={()=>{
                               this.props.history.go(-1)
                             }}

@@ -225,7 +225,7 @@ class ServiceState extends Component {
                                 {
                                     mqtt.new_version
                                     ? mqtt.vserial_channel.Active && mqtt.versionMsg
-                                    ? intl.get('gateway.Its_the_latest_version') + '！'
+                                    ? intl.get('gateway.Its_the_latest_version')
                                     : <div>
                                         {intl.get('gateway.Please_upgrade')}！&nbsp;&nbsp;&nbsp;&nbsp;
                                         <Button
@@ -262,7 +262,7 @@ class ServiceState extends Component {
                                         onClick={this.upgradeApp}
                                     >{intl.get('gateway.upgrade')}</Button>
                                   </div>
-                                    : intl.get('gateway.Its_the_latest_version') + '！'
+                                    : intl.get('gateway.Its_the_latest_version')
                                     : ''
                                 }
                             </div>

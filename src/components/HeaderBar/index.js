@@ -123,12 +123,12 @@ class HeaderBar extends PureComponent {
                         http.post('/api/user_logout').then(res=>{
                             res;
                             authenticateClear();
-                            message.success('退出成功,即将跳转至登录页', 1.5).then(()=>{
+                            message.success(intl.get('header.log_out_success'), 1.5).then(()=>{
                                 location.href = '/'
                             })
                         }).catch(err=>{
                             err;
-                            message.error('退出失败!!')
+                            message.error(intl.get('header.log_out_fail'))
                         });
                     }}
                 >

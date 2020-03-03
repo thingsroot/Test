@@ -4,6 +4,7 @@ import { withRouter, Link } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import { Drawer } from 'antd';  //
 import './style.scss';
+import intl from 'react-intl-universal';
 // import {Drawer} from "antd";
 
 @withRouter
@@ -57,7 +58,7 @@ class GatewaysDrawer extends Component {
         return (
             <Drawer
                 className="gateways_drawer"
-                title="网关列表"
+                title={intl.get('gateway.gateway_list')}
                 placement="left"
                 closable={false}
                 onClose={this.onClose}

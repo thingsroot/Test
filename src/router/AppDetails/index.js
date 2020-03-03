@@ -53,7 +53,7 @@ class AppDetails extends Component {
                 }
             },
             {
-                title: intl.get('appdetails.serial_nubmer'),
+                title: intl.get('appdetails.serial_number'),
                 dataIndex: 'sn',
                 key: 'sn'
             },

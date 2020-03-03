@@ -126,7 +126,7 @@ class AppItems extends PureComponent {
                         <Button
                             loading={this.state.loading}
                             onClick={this.setFavorites}
-                            style={{marginLeft: '30px', marginTop: '10px', width: '100px'}}
+                            style={{marginLeft: '30px', marginTop: '10px', width: '150px'}}
                             type={!this.state.favorites ? 'primary' : 'danger'}
                         >{this.state.favorites ? intl.get('appitems.cancel_collection') : intl.get('appitems.collection')}</Button>
                         {

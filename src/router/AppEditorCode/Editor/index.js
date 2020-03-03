@@ -449,7 +449,7 @@ class MyCode extends Component {
                             style={{padding: '0 10px', position: 'absolute', right: 160, color: '#ccc'}}
                             className="color"
                         >
-                            <span>当前文件：{this.state.filePath}</span>
+                            <span>{intl.get('appedit.The_current_file')}：{this.state.filePath}</span>
                             <span>{this.state.changed ? intl.get('appeditorcode.revised') : intl.get('appeditorcode.not_changed')}</span>
                         </span>
                         <Icon
