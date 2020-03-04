@@ -380,9 +380,6 @@ class Action extends Component {
                         </Button>
                         ]}
                     >
-                        {
-                            console.log(record.version)
-                        }
                     <GatesAppsUpgrade
                         version={record.version}
                         inst={record.inst_name}
@@ -396,6 +393,8 @@ class Action extends Component {
                         onOk={()=>{
                             this.sendForkCreate(record)
                         }}
+                        okText="继续"
+                        cancelText="取消"
                         destroyOnClose
                         onCancel={()=>{
                             this.setState({appdebug: false, running_action: false})

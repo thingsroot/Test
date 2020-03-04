@@ -7,6 +7,22 @@
     border-bottom: 1px solid #e8e8e8;
     .status{
         text-align: center;
+        display: flex;
+    }
+    .status_tag{
+        margin-right: 20px;
+        width: 0px;
+        height:25px;
+        display: inline-block;
+        position: relative;
+        .ant-tag{
+            position: absolute;
+            height: 25px;
+            line-height: 25px;
+            top: 5px;
+            left: 0px;
+        }
+
     }
     .gateDesc{
         width: 70%;
@@ -21,6 +37,36 @@
     .install{
         position: absolute;
         right: 0px;
+        .share_devece{
+            position: fixed;
+            right:30px;
+            top:135px;
+            z-index: 999;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            width: 520px;
+            min-height:400px;
+            max-height: 80%;
+            max-width: 100%;
+            overflow-y: auto;
+            .share_devece_close{
+                position: absolute;
+                right:10px;
+                top:10px;
+                z-index: 999;
+            }
+            .shares_list_wrap{
+                // height: '350px';
+                overflow-y: 'auto';
+                position: 'absolute';
+                top: '0px';
+                left: '0px';
+            }
+            .shares_list{
+                min-height: 380px;
+                height: 100%;
+            }
+        }
     }
     >div{
         float: left;

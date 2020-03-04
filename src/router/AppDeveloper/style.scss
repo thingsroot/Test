@@ -1,9 +1,45 @@
 .app_developer{
-    // width: 784px;
-    // margin: 0 auto;
+    position: relative;
+    width: 784px;
+    margin: 100px auto;
+    padding-bottom: 30px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 3px;
     .app_developer_title{
-        font-size: 30px;
-        margin-bottom: 50px;
-        text-indent: 50px;
+        font-size: 15px;
+        line-height: 40px;
+        height:40px;
+        border-radius:3px 3px 0 0 ;
+        background-color: #6495C6;
+        color: #fff;
+        text-indent: 20px;
+        text-align: center;
+    }
+    .app_developer_form{
+        .ant-btn-primary{
+            margin-top: 20px;
+        }
+        .ant-form-item-control{
+            margin: 0 auto;    
+        }
+        .app_developer_register{
+            font-size: 20px;
+            line-height: 40px;
+            font-weight: 800;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .ant-form-item-label{
+            margin-left: 160px;
+        }
+    }
+    .ant-form-item:last-child .ant-form-item-control{
+        text-align: center;
+    }
+    .app_developer_up_button{
+        position: absolute;
+        left: 3px;
+        top: 3px;
     }
 }

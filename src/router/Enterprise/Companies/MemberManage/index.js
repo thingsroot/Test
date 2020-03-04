@@ -1,12 +1,13 @@
 import React from 'react';
 import './index.scss'
 import { Row, Col} from 'antd'
-import http from '../../utils/Server';
+import http from '../../../../utils/Server';
 import Editable from './Editable/index'
 import Edituser from './Edituser/index'
-import { _getCookie } from '../../utils/Session';
+import { _getCookie } from '../../../../utils/Session';
 import intl from 'react-intl-universal';
 
+// import { _getCookie } from '../../../../utils/Session';
 class ShareGroup extends React.Component {
     constructor (props) {
         super(props)
@@ -19,10 +20,6 @@ class ShareGroup extends React.Component {
         }
     }
     componentDidMount () {
-        if (_getCookie('is_admin') !== '1') {
-            this.props.history.push('/')
-            return false;
-        }
         this.getData()
     }
     getData = () => {
@@ -30,21 +27,35 @@ class ShareGroup extends React.Component {
             if (res.ok) {
                 if (res.data.length > 0) {
                     http.get('/api/companies_read?name=' + res.data[0]).then(data=>{
-                        let arr = [];
-                        http.get('/api/companies_groups_list?company=' + res.data[0]).then(groups_list=>{
-                           if (groups_list.ok && groups_list.data.length > 0) {
-                                data.data.groups_list = groups_list.data
-                                arr.push(data.data)
-                                this.setActiveKey(groups_list.data[0])
+                        if (data.ok) {
+                            let arr = [];
+                            http.get('/api/companies_groups_list?company=' + res.data[0]).then(groups_list=>{
+                               if (groups_list.ok && groups_list.data.length > 0) {
+                                    data.data.groups_list = groups_list.data
+                                    arr.push(data.data)
+                                    this.setActiveKey(groups_list.data[0])
+                                    this.setState({
+                                        companies_list: arr
+                                    })
+                               } else {
                                 this.setState({
-                                    companies_list: arr
+                                    empty: true
                                 })
-                           }
-                        })
+                               }
+                            })
+                        }
                     })
                 } else {
                     this.setState({
                         empty: true
+                    }, ()=>{
+                        http.get('/api/companies_read?name=' + _getCookie('companies')).then(data=>{
+                            if (data.ok && data.data.admin !== _getCookie('user_id')) {
+                                this.props.history.push('/enterprise/shared')
+                                this.props.setIndex(2)
+                                return false
+                            }
+                        })
                     })
                 }
             }

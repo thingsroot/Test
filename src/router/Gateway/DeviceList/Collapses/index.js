@@ -92,7 +92,7 @@ class Collapses extends Component {
                             <p className="collapseHead">
                                 <span>{intl.get('devece_list.Data_browsing')}</span>
                                 <Input
-                                    style={{marginLeft: '50%', maxWidth: '300px'}}
+                                    style={{marginLeft: '70%', maxWidth: '300px'}}
                                     type="text"
                                     allowClear
                                     placeholder={intl.get('devece_list.search_name_desc')}
@@ -145,7 +145,7 @@ class Collapses extends Component {
                                 {
                                     this.props.outputs && Object.keys(this.props.outputs).length > 0
                                     ? <Input
-                                        style={{marginLeft: '50%', maxWidth: '300px'}}
+                                        style={{marginLeft: '70%', maxWidth: '300px'}}
                                         type="text"
                                         allowClear
                                         placeholder={intl.get('devece_list.search_name_desc')}
@@ -178,7 +178,7 @@ class Collapses extends Component {
                                 {
                                     this.props.commands && Object.keys(this.props.commands).length > 0
                                     ? <Input
-                                        style={{marginLeft: '50%', maxWidth: '300px'}}
+                                        style={{marginLeft: '70%', maxWidth: '300px'}}
                                         type="text"
                                         allowClear
                                         placeholder={intl.get('devece_list.search_name_desc')}

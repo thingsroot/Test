@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import http from '../../../utils/Server';
 import { Button, message, Tabs, Modal, Table, Divider } from 'antd';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import TemplateForm from '../TemplateForm';
 import CopyForm from '../CopyForm';
 import intl from 'react-intl-universal';
 
+import { _getCookie } from '../../../utils/Session';
 const TabPane = Tabs.TabPane;
 const block = {
     display: 'block'
@@ -80,10 +81,13 @@ class TemplateList extends Component {
                     width: '26%',
                     render: (record) => (
                         <span>
-                            <Link
+                            <Button
+                                type="link"
                                 className="mybutton"
-                                to={`/template/${record.app}/${record.name}/${record.latest_version}`}
-                            >{intl.get('appdetails.see')}</Link>
+                                onClick={()=>{
+                                    window.open(`/template/${record.app}/${record.name}`, '_blank')
+                                }}
+                            >{intl.get('appdetails.see')}</Button>
                             <Divider type="vertical" />
                             <a
                                 style={{cursor: 'pointer'}}
@@ -149,10 +153,13 @@ class TemplateList extends Component {
                     width: '20%',
                     render: (record) => (
                         <span>
-                            <Link
+                            <Button
+                                type="link"
                                 className="mybutton"
-                                to={`/template/${record.app}/${record.name}/${record.latest_version}`}
-                            >{intl.get('appdetails.see')}</Link>
+                                onClick={()=>{
+                                    window.open(`/template/${record.app}/${record.name}`, '_blank')
+                                }}
+                            >{intl.get('appdetails.see')}</Button>
                             <Divider type="vertical" />
                             <a
                                 style={{cursor: 'pointer'}}
@@ -187,14 +194,14 @@ class TemplateList extends Component {
     editContent = (record, type)=>{
         let new_name = record.conf_name;
         if (type === 'copy') {
-            new_name = record.conf_name + '-copy'
+            new_name = record.conf_name
         }
         let data = {
             conf_name: new_name,
             description: record.description,
             public: record.public,
             developer: record.developer,
-            company: record.company,
+            company: _getCookie('companies') !== undefined ? record.company : null,
             version: record.latest_version
         };
         this.setState({

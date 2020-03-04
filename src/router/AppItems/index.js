@@ -8,9 +8,6 @@ import {_getCookie} from '../../utils/Session';
 import intl from 'react-intl-universal';
 import './style.scss';
 const { TabPane } = Tabs;
-function callback (key) {
-    console.log(key);
-  }
 class AppItems extends PureComponent {
     constructor (props) {
         super(props)
@@ -19,6 +16,7 @@ class AppItems extends PureComponent {
             data: [],
             visible: false,
             comment: '',
+            is_fork: false,
             favorites: false,
             favorites_loading: false
         }
@@ -27,6 +25,21 @@ class AppItems extends PureComponent {
         this.getData()
         this.getFavoritesList()
     }
+    CheckForCloning = () => {
+        http.get('/api/applications_forks_list?name=' + this.props.match.params.name).then(res=>{
+            if (res.ok) {
+                if (res.data.length > 0) {
+                    res.data.map(item=>{
+                        if (item.fork_version === this.state.version) {
+                           this.setState({
+                               is_fork: true
+                           })
+                        }
+                    })
+                }
+            }
+        })
+    }
     getData = () => {
         const {name} = this.props.match.params;
         http.get('/api/applications_read?app=' + name).then(res=>{
@@ -34,6 +47,8 @@ class AppItems extends PureComponent {
                 this.setState({
                     data: res.data.data,
                     version: res.data.versionLatest
+                }, ()=>{
+                    this.CheckForCloning()
                 })
             }
         })
@@ -61,7 +76,6 @@ class AppItems extends PureComponent {
         })
     }
     setFavorites = () => {
-        console.log(this.state)
         this.setState({
             loading: true
         })
@@ -100,6 +114,22 @@ class AppItems extends PureComponent {
         const {data, version} = this.state;
         return (
             <div className="app_items">
+                <div className="app_items_up_button">
+                    <Button
+                        icon="question-circle"
+                        style={{marginRight: '10px'}}
+                        onClick={()=>{
+                            window.open('https://wiki.freeioe.org/doku.php?id=apps:' + this.props.match.params.name, '_blank')
+                        }}
+                    >{intl.get('header.help')}</Button>
+                    <Button
+                        icon="rollback"
+                        // type="primary"
+                        onClick={()=>{
+                            this.props.history.go(-1)
+                        }}
+                    >{intl.get('login.return')}</Button>
+                </div>
                 <div className="app_title">
                     <div className="app_logo">
                         <img src={'http://ioe.thingsroot.com' + data.icon_image}/>
@@ -139,6 +169,7 @@ class AppItems extends PureComponent {
                                 onClick={()=>{
                                     this.sendForkCreate(data)
                                 }}
+                                disabled={this.state.is_fork}
                               >
                                 <Icon type="fork" />
                                 {intl.get('appdetails.clone')}
@@ -151,7 +182,6 @@ class AppItems extends PureComponent {
                     <div className="app_info_left">
                     <Tabs
                         defaultActiveKey="1"
-                        onChange={callback}
                     >
                         <TabPane
                             tab={intl.get('appitems.overview')}
@@ -162,6 +192,19 @@ class AppItems extends PureComponent {
                                 <div className="app_desc_right">
                                     <div>
                                         <p>{intl.get('appitems.classification_tool')}</p>
+                                        <div>
+                                            {
+                                                data.category &&
+                                                data.category.length > 0 &&
+                                                data.category.split(',').map((item, key)=>{
+                                                    return (
+                                                        <Tag key={key}>
+                                                            {item}
+                                                        </Tag>
+                                                    )
+                                                })
+                                            }
+                                        </div>
                                     </div>
                                     <div>
                                         <p>{intl.get('appitems.label')}</p>
@@ -179,12 +222,12 @@ class AppItems extends PureComponent {
                                             }
                                         </div>
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <p>{intl.get('appitems.apply_to')}</p>
                                         <Tag>
                                             {data.device_serial === 'ALL' ? intl.get('common.all') : data.device_serial}
                                         </Tag>
-                                    </div>
+                                    </div> */}
                                     <div className="info_details">
                                         <p>{intl.get('appitems.more_information')}</p>
                                         <div><span className="info_title">{intl.get('appdetails.version')}:</span><span>{version}</span></div>

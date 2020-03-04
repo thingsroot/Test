@@ -10,11 +10,24 @@ const { Option } = Select;
 
 @withRouter
 class HeaderBar extends PureComponent {
+    state = {
+        page: ''
+    }
     componentDidMount () {
         // this.handleChange('zh-CN')
         this.handleChange()
     }
-    UNSAFE_componentWillReceiveProps () {
+    UNSAFE_componentWillReceiveProps (nextProps) {
+        if (nextProps.location.pathname.indexOf('appstore') === -1 && nextProps.location.pathname.indexOf('enterprise') === -1) {
+            this.setState({
+                page: ''
+            })
+        }
+        if (nextProps.location.pathname.indexOf('appitems') !== -1) {
+            this.setState({
+                page: 'appstore'
+            })
+        }
         if (!isAuthenticated()) {
             this.props.history.push('/login')
         }
@@ -37,6 +50,7 @@ class HeaderBar extends PureComponent {
         emit.emit('change_language', val);
     }
     render () {
+        const {page} = this.state;
         const menu1 = (
             <Menu>
                 <Menu.Item
@@ -44,7 +58,7 @@ class HeaderBar extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.open('http://help.cloud.thingsroot.com/quick_start/', '_blank')
+                            window.open('http://help.cloud.thingsroot.com/guide/quick_start/', '_blank')
                         }
                     }
                 >
@@ -53,8 +67,52 @@ class HeaderBar extends PureComponent {
                         {intl.get('header.quick_guide')}
                     </span>
                 </Menu.Item>
+                <Menu.Divider />
                 <Menu.Item
                     key="17"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/guide/', '_blank')
+                        }
+                    }
+                >
+                    <Icon type="read" />
+                    <span>
+                        产品介绍
+                    </span>
+                </Menu.Item>
+                <Menu.Item
+                    key="18"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/guide/user_guide/', '_blank')
+                        }
+                    }
+                >
+                    <Icon type="read" />
+                    <span>
+                        用户指南
+                    </span>
+                </Menu.Item>
+                <Menu.Item
+                    key="19"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/guide/admin_guide/ ', '_blank')
+                        }
+                    }
+                >
+                    <Icon type="read" />
+                    <span>
+                        管理员指南
+                    </span>
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item
+                    key="20"
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
@@ -139,38 +197,38 @@ class HeaderBar extends PureComponent {
                 </Menu.Item>
             </Menu>
         );
-        const menu2 = (
-            <Menu style={{width: 160}}>
-                <Menu.Item
-                    key="18"
-                    style={{lineHeight: '30px'}}
-                    onClick={
-                        ()=>{
-                            this.props.history.push('/member')
-                        }
-                    }
-                >
-                    <Icon type="team" />
-                    <span>
-                    {intl.get('header.Members_of_the_management')}
-                    </span>
-                </Menu.Item>
-                <Menu.Item
-                    key="19"
-                    style={{lineHeight: '30px'}}
-                    onClick={
-                        ()=>{
-                            this.props.history.push('/sharegroup')
-                        }
-                    }
-                >
-                    <Icon type="share-alt"/>
-                    <span>
-                    {intl.get('header.Shared_group_management')}
-                    </span>
-                </Menu.Item>
-            </Menu>
-        )
+        // const menu2 = (
+        //     <Menu style={{width: 160}}>
+        //         <Menu.Item
+        //             key="18"
+        //             style={{lineHeight: '30px'}}
+        //             onClick={
+        //                 ()=>{
+        //                     this.props.history.push('/member')
+        //                 }
+        //             }
+        //         >
+        //             <Icon type="team" />
+        //             <span>
+        //             {intl.get('header.Members_of_the_management')}
+        //             </span>
+        //         </Menu.Item>
+        //         <Menu.Item
+        //             key="19"
+        //             style={{lineHeight: '30px'}}
+        //             onClick={
+        //                 ()=>{
+        //                     this.props.history.push('/sharegroup')
+        //                 }
+        //             }
+        //         >
+        //             <Icon type="share-alt"/>
+        //             <span>
+        //             {intl.get('header.Shared_group_management')}
+        //             </span>
+        //         </Menu.Item>
+        //     </Menu>
+        // )
         return (
             <div className="headerUser">
                 <Select
@@ -187,27 +245,33 @@ class HeaderBar extends PureComponent {
                 <Link
                     to="/appstore"
                     style={{marginRight: '15px'}}
+                    className={page === 'appstore' ? 'the_selected' : ''}
+                    onClick={()=>{
+                        this.setState({
+                            page: 'appstore'
+                        })
+                    }}
                 ><Icon type="appstore"/>&nbsp;&nbsp;{intl.get('header.app_store')}</Link>
-                {
-                    _getCookie('is_admin') === '1'
-                    ? <Dropdown
-                        overlay={menu2}
-                        placement="bottomRight"
-                      >
-                        <span
-                            className="ant-dropdown-link"
-                            style={{padding: '10px', cursor: 'pointer'}}
-                        >
-                            <Icon
-                                style={{padding: '0 4px', fontWeight: 800}}
-                                type="global"
-                            />
-                                {intl.get('header.enterprise')}
-                            <Icon type="down" />
-                        </span>
-                    </Dropdown>
-                : ''
-                }
+                <Link
+                    to="/enterprise/shared"
+                    className={page === 'enterprise' ? 'the_selected' : ''}
+                    onClick={()=>{
+                        this.setState({
+                            page: 'enterprise'
+                        })
+                    }}
+                >
+                    <span
+                        className="ant-dropdown-link"
+                        style={{padding: '10px', cursor: 'pointer'}}
+                    >
+                        <Icon
+                            style={{padding: '0 4px', fontWeight: 800}}
+                            type="global"
+                        />
+                        {intl.get('header.enterprise')}
+                    </span>
+                </Link>
                 {
                     OEM.Title === '冬笋云'
                     ? <span>

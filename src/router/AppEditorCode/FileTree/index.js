@@ -4,8 +4,9 @@ import { withRouter } from 'react-router-dom';
 import { Tree, Icon, Modal, message, Input, Tooltip } from 'antd';
 import { observer, inject } from 'mobx-react';
 import http from '../../../utils/Server';
-import {IconEditor} from '../../../utils/iconfont';
+// import {IconEditor} from '../../../utils/iconfont';
 import intl from 'react-intl-universal';
+import {IconEditor, IconVnet} from '../../../utils/iconfont';
 
 const confirm = Modal.confirm;
 const { TreeNode } = Tree;
@@ -32,7 +33,7 @@ const newNodeItem = (title, isLeaf, type, key, icon) => {
             this.isLeaf = !value.children
             this.type = value.type
             this.key = value.id,
-                this.icon = value.icon.substr(value.icon.indexOf('.') + 1, value.icon.length)
+            this.icon = value.icon.substr(value.icon.indexOf('.') + 1, value.icon.length)
         },
         addChild (item) {
             item.parent = this
@@ -433,21 +434,26 @@ class MyTree extends Component {
             // })
         }
     };
-
     renderTreeNodes = data =>
         data.map(item => {
             let icon = item.icon;
             if (item.title === 'version') {
                 icon =  'txt'
             }
+            const arr = ['txt', 'css', 'xml', 'html', 'py', 'rb', 'js', 'json', 'java', 'folder', 'md', 'lua']
             if (item.children) {
                 return (
                     <TreeNode
                         icon={
-                            <IconEditor
+                            arr.indexOf(icon) !== -1
+                            ? <IconEditor
                                 style={{fontSize: 20}}
                                 type={'icon-' + icon}
-                            />
+                              />
+                            : <IconVnet
+                                style={{fontSize: '18px'}}
+                                type={icon === 'csv' ? 'icon-CSV' : 'icon-file'}
+                              />
                         }
                         title={item.title}
                         key={item.key}
@@ -475,7 +481,8 @@ class MyTree extends Component {
         });
 
     onDragEnter = info => {
-        console.log(info);
+        info;
+        // console.log(info);
         // expandedKeys 需要受控时设置
         // this.setState({
         //   expandedKeys: info.expandedKeys,
@@ -522,7 +529,6 @@ class MyTree extends Component {
             loop(data, dropKey, item => {
                 item.children = item.children || [];
                 // where to insert 示例添加到尾部，可以是随意位置
-                console.log(item)
                 if (item.type === 'file') {
                     item.children.unshift(dragObj);
                 } else {

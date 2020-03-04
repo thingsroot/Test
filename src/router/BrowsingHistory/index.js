@@ -42,7 +42,7 @@ const columns = [{
     title: intl.get('dashboard.the_serial_number'),
     dataIndex: 'id',
     sorter: (a, b) => a.id - b.id,
-    width: '100px'
+    width: '150px'
   }, {
     title: intl.get('common.type'),
     dataIndex: 'type',
@@ -92,20 +92,27 @@ class BrowsingHistory extends Component {
       };
       componentDidMount () {
         this.setState({
-          gateway: this.props.match.params.sn,
-          device_sn: this.props.match.params.vsn,
-          input: this.props.match.params.input
+          gateway: this.props.record.sn,
+          device_sn: this.props.record.vsn,
+          input: this.props.record.name
         }, () =>{
           this.fetch();
         })
+        // this.setState({
+        //   gateway: this.props.match.params.sn,
+        //   device_sn: this.props.match.params.vsn,
+        //   input: this.props.match.params.input
+        // }, () =>{
+        //   this.fetch();
+        // })
         this.props.store.timer.setGateStatusLast(0)
       }
       UNSAFE_componentWillReceiveProps (nextProps){
-        if (this.props.match.params.sn !== nextProps.match.params.sn){
+        if (this.props.record.sn !== nextProps.record.sn){
           this.setState({
-            gateway: this.props.match.params.sn,
-            device_sn: this.props.match.params.vsn,
-            input: this.props.match.params.input
+            gateway: this.props.record.sn,
+            device_sn: this.props.record.vsn,
+            input: this.props.record.name
           }, () =>{
             this.fetch();
           })
@@ -267,12 +274,13 @@ class BrowsingHistory extends Component {
                                 style={{width: 300}}
                             />
                         </div>
-                        <div>
-                        <Search
-                            placeholder="input search text"
-                            onSearch={this.searchVariable}
-                            style={{ width: 200 }}
-                        />
+                        <div style={{margin: '10px 0'}}>
+                          <span style={{marginRight: '10px'}}>{intl.get('gateway.To_find_the_variables')}:</span>
+                          <Search
+                              placeholder="input search text"
+                              onSearch={this.searchVariable}
+                              style={{ width: 200 }}
+                          />
                         </div>
                         <Table
                             columns={columns}
@@ -290,8 +298,10 @@ class BrowsingHistory extends Component {
                     <div className="historyright">
                         <Button
                             style={{position: 'absolute', right: 10, top: 10}}
+                            // style={{position: 'absolute', right: 10, top: 20}}
                             onClick={()=>{
-                              this.props.history.go(-1)
+                              // this.props.history.go(-1)
+                              this.props.closewindows()
                             }}
                         >
                           {intl.get('appstore.back_off')}

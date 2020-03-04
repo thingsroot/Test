@@ -16,7 +16,8 @@ class Issues extends PureComponent {
             data: [],
             visible: false,
             comment: '',
-            reply_to: null
+            reply_to: null,
+            type: ''
         }
     }
     componentDidMount () {
@@ -58,7 +59,8 @@ class Issues extends PureComponent {
     showModal = () => {
         this.setState({
           visible: true,
-          reply_to: null
+          reply_to: null,
+          type: '问题'
         });
       };
       handleOk = () => {
@@ -161,7 +163,8 @@ class Issues extends PureComponent {
                                     onClick={()=>{
                                         this.setState({
                                             reply_to: item.name,
-                                            visible: true
+                                            visible: true,
+                                            type: '回复'
                                         })
                                     }}
                                 >{intl.get('appitems.reply')}</span>,

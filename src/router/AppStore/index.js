@@ -1,13 +1,27 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Tag, Input, Icon, Rate, Button  } from 'antd';
-const { Search } = Input;
+import { Tag, Input, Icon, Rate, Button, Select } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import { _getCookie } from '../../utils/Session';
 import intl from 'react-intl-universal';
 
+const { Search } = Input;
+const { Option } = Select;
+      function compare (propertyName) {
+        return function (object1, object2) {
+          var value1 = object1[propertyName];
+          var value2 = object2[propertyName];
+          if (value2 < value1) {
+            return 1;
+          } else if (value2 > value1) {
+            return -1;
+          } else {
+            return 0;
+          }
+        }
+    }
 @withRouter
 @inject('store')
 @observer
@@ -18,6 +32,7 @@ class AppStore extends Component {
             data: [],
             tag_list: [],
             add_tag_list: [],
+            visivle: false,
             color: ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple', '#f50', '#2db7f5', '#87d068', '#108ee9']
         }
     }
@@ -25,8 +40,15 @@ class AppStore extends Component {
     componentDidMount (){
         http.get('/api/store_list').then(res=>{
             if (res.ok) {
-                this.setState({data: res.data, filterData: res.data})
-                console.log(res.data)
+                if (res.data.length > 0 ) {
+                    const arr = [];
+                    res.data.map(item=>{
+                        if (arr.indexOf(item.category) === -1 && item.category !== null) {
+                            arr.push(item.category)
+                        }
+                    })
+                    this.setState({data: res.data, filterData: res.data, category: arr})
+                }
             } else {
                 console.log('error')
             }
@@ -101,13 +123,33 @@ class AppStore extends Component {
     getRandomNumber = () => {
         return (Math.floor(Math.random() * (this.state.color.length - 1)))
     }
+    handleChange = (val) => {
+        const data = this.state.filterData.filter(item=> item)
+        if (val === 'all') {
+            this.setState({
+                data
+            })
+        } else {
+            const data = this.state.filterData.filter(item=> item.category === val)
+            this.setState({
+                data
+            })
+        }
+    }
+    dataSort = (val)=>{
+        const arr = this.state.data;
+        arr.sort(compare(val))
+        this.setState({
+            data: arr
+        })
+    }
     render () {
-        const { data, tag_list, add_tag_list } = this.state;
+        const { data, tag_list, add_tag_list, category } = this.state;
         return (
         <div className="AppStore">
             {
                 Number(_getCookie('is_developer')) !== 1
-                ? <div className="app_developer">
+                ? <div className="app_developer_button">
                     <Button
                         onClick={()=>{
                             this.props.history.push('/appdeveloper')
@@ -125,20 +167,61 @@ class AppStore extends Component {
                 />
             </div>
             <div className="search">
-                <span>{intl.get('appstore.tag_list')}: &nbsp;&nbsp;</span>
                 {
-                    tag_list && tag_list.length > 0 && tag_list.map((item, key)=>{
-                        return (
-                            <Tag
-                                key={key}
-                                color={item.color}
-                                onClick={()=>{
-                                    this.addTag(item)
-                                }}
-                            >{item.tag + ' (' + item.number + ')'}</Tag>
-                        )
-                    })
+                    tag_list && tag_list.length >= 8
+                    ? <div
+                        className="tags_icon"
+                        style={{cursor: 'pointer'}}
+                        onClick={()=>{
+                            this.setState({
+                                visible: !this.state.visible
+                            })
+                        }}
+                      >
+                            {intl.get('appedit.To_view_more')}&nbsp;&nbsp;
+                            <Icon type={this.state.visible ? 'down' : 'right'}/>
+                    </div>
+                    : ''
                 }
+                <div className="appstore_tags_list">
+                    <div className="appstore_tags_list_min">
+                        <span>{intl.get('appitems.label')}:</span>
+                        <div>
+                            {
+                                tag_list && tag_list.length > 0 && tag_list.map((item, key)=>{
+                                    if (key < 8) {
+                                        return (
+                                            <Tag
+                                                key={key}
+                                                color={item.color}
+                                                onClick={()=>{
+                                                    this.addTag(item)
+                                                }}
+                                            >{item.tag + ' (' + item.number + ')'}</Tag>
+                                        )
+                                    }
+                                })
+                            }
+                        </div>
+                    </div>
+                    <div className={!this.state.visible ? 'appstore_tags_list_max' : ''}>
+                    {
+                        tag_list && tag_list.length > 0 && tag_list.map((item, key)=>{
+                            if (key >= 10) {
+                                return (
+                                    <Tag
+                                        key={key}
+                                        color={item.color}
+                                        onClick={()=>{
+                                            this.addTag(item)
+                                        }}
+                                    >{item.tag + ' (' + item.number + ')'}</Tag>
+                                )
+                            }
+                        })
+                    }
+                    </div>
+                </div>
             </div>
             {
                 add_tag_list && add_tag_list.length > 0
@@ -165,11 +248,43 @@ class AppStore extends Component {
                     {intl.get('appstore.all_applications')}
                 </div>
             <div
-                style={{
-                    display: 'flex',
-                    flexWrap: 'wrap'
-                }}
+                className="all_app_content"
             >
+                <div className="all_app_filter">
+                    <span>{intl.get('appstore.classification')}:</span>
+                    &nbsp;&nbsp;
+                    <Select
+                        defaultValue={intl.get('common.all')}
+                        style={{ width: 120 }}
+                        onChange={this.handleChange}
+                    >
+                        <Option value="all">{intl.get('common.all')}</Option>
+                        {
+                            category && category.length > 0 && category.map((item, key) => {
+                                return (
+                                    <Option
+                                        value={item}
+                                        key={key}
+                                    >{item}</Option>
+                                )
+                            })
+                        }
+                    </Select>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span>{intl.get('appstore.The_sorting')}:</span>
+                    &nbsp;&nbsp;
+                    <Select
+                        defaultValue={intl.get('appstore.The_default_sort')}
+                        style={{ width: 120 }}
+                        onChange={this.dataSort}
+                    >
+                        <Option value="app_name">{intl.get('common.name')}</Option>
+                        {/* <Option value="description">描述</Option> */}
+                        <Option value="creation">{intl.get('appdetails.creation_time')}</Option>
+                        <Option value="modified">{intl.get('appdetails.update_time')}</Option>
+                        {/* <Option value="developer">应用开发者</Option> */}
+                    </Select>
+                </div>
             {
                         data && data.length > 0 && data.map((val, ind)=>{
                             return (
@@ -184,11 +299,25 @@ class AppStore extends Component {
                                         src={'http://ioe.thingsroot.com' + val.icon_image}
                                         alt=""
                                     />
-                                    <div style={{textAlign: 'center', fontWeight: '600'}}>{val.app_name}</div>
+                                    <div className="app_title_and_developer">
+                                        <p>{val.app_name}</p>
+                                        <span>{val.user_info.dev_name}</span>
+                                    </div>
                                     <div
                                         className="app_item_desc"
                                     >
-                                        <div>{val.tags ? val.tags : intl.get('appstore.no_label')}</div>
+                                        <div>
+                                            {
+                                                val.tags && val.tags.split(',').length > 0 && val.tags.split(',').map((item, key)=>{
+                                                    return (
+                                                        <Tag
+                                                            color="gold"
+                                                            key={key}
+                                                        >{item}</Tag>
+                                                    )
+                                                })
+                                            }
+                                        </div>
                                         <div style={{textAlign: 'center'}}><Icon type="download" /> {val.installed}</div>
                                     </div>
                                     <div
@@ -198,7 +327,8 @@ class AppStore extends Component {
                                             <Rate
                                                 value={val.star}
                                                 disabled
-                                                style={{fontSize: '7px', letteSspacing: '2px'}}
+                                                size="small"
+                                                style={{fontSize: '14px', letteSspacing: '2px'}}
                                             />
                                         </div>
                                         <span>{intl.get('appedit.free')}</span>

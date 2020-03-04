@@ -9,7 +9,7 @@ import {Table, Input,
 } from 'antd';
 import {inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import http from '../../../utils/Server';
+import http from '../../../../../utils/Server';
 import './index.scss'
 import intl from 'react-intl-universal';
 
@@ -128,7 +128,6 @@ class Edituser extends React.Component {
                             onConfirm={() => this.delete(record)}
                         >
                             <a
-                                type="danger"
                                 disabled={editingKey !== ''}
                             >{intl.get('appdetails.delete')}</a>
                         </Popconfirm>

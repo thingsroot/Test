@@ -1,6 +1,14 @@
 .light-row{
     background:#f9f9f9;
 }
+.dev_name{
+    line-height: 20px;
+    display: flex;
+    .ant-tag{
+        height: 40px;
+        line-height: 40px;
+    }
+}
 .inputs{
     display: flex;
     padding: 10px;

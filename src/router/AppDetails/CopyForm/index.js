@@ -60,12 +60,11 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                             conf_name = res.data.name;
                             if (this.props.copyData.version !== 0) {
                                 const data = this.props.csvData ? this.props.csvData.join('\n') : this.props.copyData
-
                                 let params = {
                                     conf: conf_name,
                                     version: 1,
                                     comment: 'V1',
-                                    data: data
+                                    data: data.data ? data.data : data
                                 };
                                 http.post('/api/configurations_versions_create', params)
                                     .then(res=>{
@@ -132,7 +131,7 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                             className="collection-create-form_last-form-item"
                             label={intl.get('appdetails.jurisdiction')}
                         >
-                            {getFieldDecorator('developer', { initialValue: copyData.developer }
+                            {getFieldDecorator('developer', { initialValue: _getCookie('companies') !== 'undefined' ? copyData.company ? copyData.company : copyData.developer : _getCookie('user_id') }
                             )(
                                 <Radio.Group>
                                     {this.state.userGroups.length > 0 ? <Radio value={_getCookie('companies')}>{intl.get('gateway.company')}</Radio> : ''}
@@ -144,7 +143,7 @@ const CopyForm = Form.create({ name: 'copy_form' })(
                             className="collection-create-form_last-form-item"
                             label={intl.get('appdetails.is_it_public')}
                         >
-                            {getFieldDecorator('public', { initialValue: copyData.public === 0 ? '0' : '1' })(
+                            {getFieldDecorator('public', { initialValue: _getCookie('companies') !== 'undefined' && copyData.public ? copyData.public === 0 ? '0' : '1' : '0'})(
                                 <Radio.Group>
                                     <Radio value="0">{intl.get('appdetails.not_public')}</Radio>
                                     <Radio value="1">{intl.get('appdetails.public')}</Radio>

@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
-import { Icon, Tabs, message, Button, Modal, Table, Tag, Radio } from 'antd';
+import { withRouter } from 'react-router-dom';
+import { Icon, Tabs, message, Button, Modal, Table, Tag, Radio, Input } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
 import VersionList from './VersionList';
 import TemplateList from './TemplateList';
 import AppDescription from './Description';
+// import TagsEdit from '../../common/TagsEdit';
 import {inject, observer} from 'mobx-react';
 import { _getCookie } from '../../utils/Session';
 import intl from 'react-intl-universal';
 
+// const { Panel } = Collapse;
 const TabPane = Tabs.TabPane;
 const block = {
-    display: 'inline-block',
-    margin: '0 10px',
-    textDecoration: 'none'
+    height: '35px',
+    margin: '0 5px'
 };
 const none = {
     display: 'none'
@@ -25,9 +26,13 @@ const none = {
 class AppDetails extends Component {
     state = {
         user: '',
+        tag: '',
         app_info: '',
         versionList: [],
+        select_the_label: [],
+        tags_list: [],
         versionLatest: 0,
+        is_fork: false,
         time: '',
         app: '',
         desc: '',
@@ -39,9 +44,12 @@ class AppDetails extends Component {
         sn: '',
         ModalText: intl.get('appdetails.confirm_to_delete_this_app'),
         visible: false,
+        visible_tags: false,
         confirmLoading: false,
         dataSource: [],
+        filterDataSource: [],
         loading: false,
+        favorites: false,
         columns: [
             {
                 title: '',
@@ -87,6 +95,7 @@ class AppDetails extends Component {
     }
     componentDidMount (){
         this.loadApp(this.state.name)
+        this.getFavoritesList()
     }
     UNSAFE_componentWillReceiveProps (nextProps){
         if (nextProps.location.pathname !== this.props.location.pathname){
@@ -96,6 +105,59 @@ class AppDetails extends Component {
                 this.loadApp(this.state.name)
             })
         }
+    }
+    CheckForCloning = () => {
+        http.get('/api/applications_forks_list?name=' + this.props.match.params.name).then(res=>{
+            if (res.ok) {
+                if (res.data.length > 0) {
+                    res.data.map(item=>{
+                        if (item.fork_version === this.state.versionLatest) {
+                           this.setState({
+                               is_fork: true
+                           })
+                        }
+                    })
+                }
+            }
+        })
+    }
+    getFavoritesList = () => {
+        http.post('/api/store_favorites_list').then(res=>{
+            if (res.ok && res.data && res.data.length > 0) {
+                const {name} = this.props.match.params;
+                let favorites = false;
+                res.data.map(item=>{
+                    if (item.name === name) {
+                        favorites = true
+                    }
+                })
+                this.setState({
+                    favorites,
+                    favorites_loading: false
+                })
+            } else {
+                this.setState({
+                    favorites: false,
+                    favorites_loading: false
+                })
+            }
+        })
+    }
+    setFavorites = () => {
+        this.setState({
+            favorites_loading: true
+        })
+        const data = {
+            app: this.state.app_info.name
+            // comment: '123',
+            // priority: ''v
+        }
+        const url = !this.state.favorites ? '/api/store_favorites_add' : '/api/store_favorites_remove'
+        http.post(url, data).then(res=>{
+            if (res.ok) {
+                this.getFavoritesList()
+            }
+        })
     }
     loadApp = (name) => {
         let user = this.props.store.session.user_id;
@@ -131,6 +193,8 @@ class AppDetails extends Component {
                 versionLatest: res.data.versionLatest,
                 desc: res.data.data.description,
                 time: res.data.data.modified.substr(0, 11)
+            }, ()=>{
+                this.CheckForCloning()
             });
             sessionStorage.setItem('app_name', res.data.data.app_name);
         });
@@ -186,6 +250,7 @@ class AppDetails extends Component {
         http.get('/api/gateways_list?status=online').then(res=>{
             this.setState({
                 dataSource: res.data,
+                filterDataSource: res.data,
                 loading: false
             })
         })
@@ -221,6 +286,101 @@ class AppDetails extends Component {
             }
         })
     }
+    saveTags = () => {
+        const {select_the_label} = this.state;
+        const data = {
+            name: this.props.match.params.name,
+            tags: select_the_label.join(',')
+        }
+        http.post('/api/applications_tags_update', data).then(res=>{
+            if (res.ok && res.data === 'done') {
+                message.success('更改标签成功！')
+                this.setVisibleTags()
+                this.loadApp(this.state.name)
+            } else {
+                message.error('更改标签失败，错误信息：' + res.error)
+                this.setVisibleTags()
+            }
+        })
+    }
+    filterGateway = (e) => {
+        const value = e.target.value.toLowerCase();
+        const data = this.state.filterDataSource.filter(item=> item.description.toLowerCase().indexOf(value) !== -1 || item.dev_name.toLowerCase().indexOf(value) !== -1 || item.name.indexOf(value) !== -1)
+        this.setState({
+            dataSource: data
+        })
+    }
+    getTags = () => {
+        http.get('/api/store_tags_list').then(res=>{
+            if (res.ok) {
+                const tags_list = []
+                if (res.data.length > 0) {
+                    res.data.map(item=>{
+                        tags_list.push(item[0])
+                    })
+                }
+                const {tags} = this.state.app_info;
+                const select_the_label = tags !== '' ? tags.split(',') : []
+                this.setState({
+                    tags_list,
+                    select_the_label
+                })
+            }
+        })
+        this.setState({visible_tags: true})
+    }
+    setVisibleTags = () => {
+        this.setState({
+            visible_tags: false
+        })
+    }
+    addTag = (item) =>{
+        const {select_the_label} = this.state;
+        if (select_the_label.indexOf(item) === -1) {
+            if (select_the_label.length < 20) {
+                select_the_label.push(item)
+                this.setState({
+                    select_the_label
+                })
+            } else {
+                message.error('数量已满！')
+            }
+        } else {
+            message.error('请勿重复添加同一标签！')
+        }
+    }
+    addCustomTag = () => {
+        if (this.state.tag !== ''){
+            const {select_the_label} = this.state;
+            if (select_the_label.indexOf(this.state.tag) === -1) {
+                if (select_the_label.length < 20) {
+                    if (this.state.tag.length < 8) {
+                        select_the_label.push(this.state.tag)
+                        this.setState({
+                            select_the_label,
+                            tag: ''
+                        })
+                    } else {
+                        message.error('字符最大长度为八位！')
+                    }
+                } else {
+                    message.error('数量已满！')
+                }
+            } else {
+                message.error('请勿重复添加同一标签！')
+            }
+        } else {
+            message.error('请输入标签内容！')
+        }
+    }
+    deleteTag = (item)=>{
+        const {select_the_label} = this.state;
+        const ind = select_the_label.indexOf(item)
+        select_the_label.splice(ind, 1)
+        this.setState({
+            select_the_label
+        })
+    }
     render () {
         let { app, app_info, time, user, desc, visible, confirmLoading, ModalText } = this.state;
         return (
@@ -253,28 +413,30 @@ class AppDetails extends Component {
                         </p>
                     </div>
                     <div className="btnGroup">
-
-                        <Link
-                            className="button"
+                        <Button
                             style={app_info.developer === user ? block : none}
-                            to={`/appedit/${app_info.name}`}
+                            onClick={()=>{
+                                this.props.history.push(`/appedit/${app_info.name}`)
+                            }}
                         >
                             <Icon type="setting" />
                             {intl.get('appdetails.settings')}
-                        </Link>
-                        <Link
+                        </Button>
+                        <Button
                             className="button"
                             style={app_info.developer === user ? block : none}
-                            to={`/appeditorcode/${app_info.name}/${app_info.app_name}`}
+                            onClick={()=>{
+                                this.props.history.push(`/appeditorcode/${app_info.name}/${app_info.app_name}`)
+                            }}
                         >
                             <Icon type="edit" />
                             {intl.get('appdetails.code_editing')}
-                        </Link>
+                        </Button>
                         <Button
                             onClick={()=>{
                                 this.getGatewayList()
                             }}
-                            style={{height: '35px'}}
+                            style={{height: '35px', marginRight: '10px', marginLeft: '5px'}}
                         >
                             <Icon type="download" />
                             {intl.get('appdetails.install_this_app')}
@@ -284,8 +446,9 @@ class AppDetails extends Component {
                             ? <Button
                                 style={{
                                     height: '35px',
-                                    marginLeft: '15px'
+                                    marginRight: '10px'
                                 }}
+                                disabled={this.state.is_fork}
                                 onClick={()=>{
                                     this.sendForkCreate(app_info)
                                 }}
@@ -295,21 +458,21 @@ class AppDetails extends Component {
                             </Button>
                             : ''
                         }
-                        <Link
+                        <Button
                             className="button"
                             style={app_info.fork_from ? block : none}
                             to={`/appdetails/${app_info.fork_from}`}
                         >
                             <Icon type="share-alt" />
                             {intl.get('appdetails.branch')}
-                        </Link>
+                        </Button>
                         {
                             app_info.developer === _getCookie('user_id')
                             ? <Button
                                 type="danger"
                                 onClick={this.showModal}
                                 size="default"
-                                style={{height: 36, marginLeft: 15}}
+                                style={{height: 35, marginLeft: 5, marginRight: '5px'}}
                               >
                                 <Icon type="info-circle" />
                                 <span>{intl.get('appdetails.delete')}</span>
@@ -337,6 +500,15 @@ class AppDetails extends Component {
                             okText={intl.get('common.sure')}
                             width="1024px"
                         >
+                            <Input.Search
+                                placeholder="请输入网关序列号，名称，描述"
+                                onChange={this.filterGateway}
+                                style={{
+                                    width: '70%',
+                                    marginLeft: '15%',
+                                    marginBottom: '15px'
+                                }}
+                            />
                             <Table
                                 dataSource={this.state.dataSource}
                                 columns={this.state.columns}

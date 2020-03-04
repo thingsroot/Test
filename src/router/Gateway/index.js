@@ -90,13 +90,11 @@ class MyGatesDevices extends Component {
                     const { pathname } = this.props.location;
                     res.data && res.data.length > 0 && res.data.map(item=>{
                         if (item.name === 'APP00000130' && item.status !== 'running' && pathname.indexOf('vserial') !== -1) {
-                            console.log('error')
                             if (this.state.warning) {
                                 this.warning()
                             }
                         }
                         if (item.name === 'APP00000135' && item.status !== 'running' && pathname.indexOf('vnet') !== -1) {
-                            console.log('error')
                             if (this.state.warning) {
                                 this.warning()
                             }
@@ -130,11 +128,6 @@ class MyGatesDevices extends Component {
     onChangeGateway = () => {
         //this.componentDidMount()
     }
-    // setUrl = (sn) => {
-    //   let arr = location.pathname.split('/');
-    //   arr[2] = sn;
-    //   return arr.join('/')
-    // }
     render () {
       const { path } = this.props.match;
       const { pathname } = this.props.location;

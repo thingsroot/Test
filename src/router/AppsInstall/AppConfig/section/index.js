@@ -24,10 +24,31 @@ class AppConfigSection extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            showTemplateSelection: false
+            showTemplateSelection: false,
+            TheBackupappTemplateList: [],
+            tempList: []
         }
     }
-
+    UNSAFE_componentWillReceiveProps (nextProps){
+        if (JSON.stringify(nextProps.templatesSource) !== JSON.stringify(this.props.templatesSource)) {
+            this.setState({
+                TheBackupappTemplateList: nextProps.templatesSource,
+                tempList: nextProps.templatesSource
+            })
+        }
+    }
+    search = (value) => {
+        if (value) {
+            const newList = this.state.TheBackupappTemplateList.filter(item=>item.name.toLocaleLowerCase().indexOf(value) !== -1 || item.description.indexOf(value) !== -1 || item.conf_name.toLocaleLowerCase().indexOf(value) !== -1)
+            this.setState({
+                tempList: newList
+            })
+        } else {
+            this.setState({
+                tempList: this.state.TheBackupappTemplateList
+            })
+        }
+    }
     //添加模板
     onAddTemplate = (config, name, conf_name, desc, version)=>{
         let val = config.Value
@@ -66,7 +87,9 @@ class AppConfigSection extends Component {
     };
     templateShow = ()=>{
         this.setState({
-            showTemplateSelection: true
+            showTemplateSelection: true,
+            TheBackupappTemplateList: this.props.templatesSource,
+            tempList: this.props.templatesSource
         })
     };
 
@@ -383,21 +406,14 @@ class AppConfigSection extends Component {
                 render: (record) => (
                     record.latest_version !== undefined && record.latest_version !== 0 ? (
                     <span>
-                        {/* <Button>
-                            <Link to={`/template/${record.app}/${record.name}/${record.latest_version}`}> 查看 </Link>
-                        </Button> */}
-                        {/* <span style={{padding: '0 2px'}}> </span>
-                        <Button>
-                            <Link to={`/template/${record.app}/${record.name}/${record.latest_version}/clone`}> 克隆 </Link>
-                        </Button> */}
                         <Button
                             onClick={()=>{
                                 this.onViewTemplate(record.name, record.latest_version)
                             }}
                         > {intl.get('appdetails.see')} </Button>
                         <span style={{padding: '0 1px'}}> </span>
-                        {
-                            record.developer !== this.props.store.session.user_id ? (
+                        {/* {
+                            record.developer !== this.props.store.session.user_id ? ( */}
                             <Button
                                 onClick={()=>{
                                     this.onCloneTemplate(record.name, record.latest_version)
@@ -406,6 +422,7 @@ class AppConfigSection extends Component {
                         }
                         <span style={{padding: '0 1px'}}> </span>
                         <Button
+                            disabled={this.props.configStore.templates.filter(item=> item.name === record.name).length > 0 ? true : false}
                             type="primary"
                             onClick={()=>{
                                 this.onAddTemplate(config, record.name, record.conf_name, record.description, record.latest_version)
@@ -454,7 +471,7 @@ class AppConfigSection extends Component {
                         style={{
                             display: 'flex',
                             position: 'absolute',
-                            right: 300,
+                            left: '110px',
                             top: 10,
                             zIndex: 999,
                             lineHeight: '30px'
@@ -469,24 +486,32 @@ class AppConfigSection extends Component {
                         </Button>
                         <span style={{padding: '0 20px'}}> </span>
                         <Input.Search
-                            placeholder="模板名称、描述"
-                            onChange={this.search}
+                            placeholder="网关名称、描述、模板ID"
+                            onChange={(e=>{
+                                this.search(e.target.value.toLocaleLowerCase())
+                            })}
                             style={{ width: 200 }}
                         />
                         <span style={{padding: '0 2px'}}> </span>
                         <Button
+                            style={{
+                                marginLeft: '670px'
+                            }}
                             type="primary"
-                            onClick={this.onCreateNewTemplate}
+                            onClick={()=>{
+                                this.props.refreshTemplateList()
+                            }}
                         >
                             {intl.get('appsinstall.create_a_new_template')}
                         </Button>
                     </div>
                     <Table
                         rowKey="key"
-                        dataSource={templateStore}
+                        dataSource={this.state.tempList}
                         columns={addTempLists}
                         pagination={false}
                         scroll={{ y: 240 }}
+                        loading={this.props.loading}
                     />
                 </Modal>
             </div>
@@ -519,6 +544,7 @@ class AppConfigSection extends Component {
                             return this.render_text(key, v)
                         }
                         if (v.type === 'dropdown') {
+                            // return false
                             return this.render_dropdown(key, v)
                         }
                         if (v.type === 'table') {

@@ -22,15 +22,11 @@ class VserialLogView extends Component {
             marginLeft: '5px',
             marginRight: '10px'
         }
-        function callback (key) {
-            console.log(key);
-        }
         return (
             <div className="vserial_log">
                 <div style={Mt15}></div>
                 <div className="vserial_log_title parent-relative">
                     <Tabs
-                        onChange={callback}
                         type="card"
                     >
                         <TabPane

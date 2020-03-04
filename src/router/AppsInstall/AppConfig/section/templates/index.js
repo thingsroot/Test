@@ -1,4 +1,5 @@
 import React from 'react'
+import {withRouter} from 'react-router-dom';
 import './style.scss';
 import { Table, Input, InputNumber, Popconfirm, Form, Button, Select } from 'antd';
 import intl from 'react-intl-universal';
@@ -71,7 +72,7 @@ class EditableCell extends React.Component {
     return <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>;
   }
 }
-
+@withRouter
 class EditorTemplates extends React.Component {
   constructor (props) {
     super(props);
@@ -100,6 +101,7 @@ class EditorTemplates extends React.Component {
         }, {
             title: intl.get('common.operation'),
             dataIndex: 'operation',
+            width: '270px',
             render: (text, record) => {
             const { editingKey } = this.state;
             const editable = this.isEditing(record);
@@ -123,7 +125,22 @@ class EditorTemplates extends React.Component {
             ) : (
               <div disabled={editingKey !== ''}>
                 <Button
-                    onClick={() => this.edit(record.key)}
+                    onClick={()=>{
+                      window.open(`/template/${this.props.match.params.app}/${record.id}/${record.ver}`, '_blank')
+                    }}
+                >
+                    查看
+                </Button>
+                <Button
+                    disabled={
+                      this.props.configStore.templatesList.filter(item=>item.name === record.id).length > 0
+                      ? this.props.configStore.templatesList.filter(item=>item.name === record.id)[0].latest_version === record.ver
+                      : true
+                    }
+                    onClick={()=>{
+                      this.updateNew(record.id)
+                    }}
+                    style={{margin: '0 10px'}}
                 >
                     {intl.get('appdetails.edit')}
                 </Button>
@@ -151,7 +168,24 @@ class EditorTemplates extends React.Component {
   cancel = () => {
     this.setState({ editingKey: '' });
   };
-
+  updateNew (id) {
+    const newData = [...this.props.dataSource];
+    const index = newData.findIndex(item => id === item.id);
+    if (index > -1) {
+        const item = this.props.configStore.templatesList.filter(item=> item.name === id)[0]
+        if (item) {
+          const obj = {
+            key: newData[index].key,
+            id: id,
+            name: newData[index].name,
+            ver: item.latest_version,
+            description: item.description
+          }
+          newData.splice(index, 1, obj);
+          this.props.config.setValue(newData)
+        }
+    }
+  }
   save (form, key) {
     form.validateFields((error, row) => {
       if (error) {
@@ -218,12 +252,10 @@ class EditorTemplates extends React.Component {
             rowKey="key"
             components={components}
             bordered
+            pagination={false}
             dataSource={this.props.dataSource}
             columns={columns}
             rowClassName="editable-row"
-            pagination={{
-                onChange: this.cancel
-            }}
         />
       </EditableContext.Provider>
     );

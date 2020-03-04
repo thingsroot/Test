@@ -177,7 +177,8 @@ class ConfigSection {
             return
         }
         let item = this.child.find(item => item.name === key)
-        if (item !== undefined) {
+        const text = JSON.stringify(item)
+        if (item !== undefined && (text === 'true' || text === 'false')) {
             item.setHide(value)
         }
     }
@@ -216,7 +217,7 @@ const newAppConfigTemplate = (name, conf_name, description, version) => {
 export class ConfigStore {
     @observable sections = []
     @observable templates = []
-
+    @observable templatesList = [];
     @action addSection (section) {
         let item = new ConfigSection()
         item.fromObject(section)
@@ -237,12 +238,17 @@ export class ConfigStore {
     @action delTemplate (index) {
         this.templates.splice(index, 1)
     }
-
+    @action setTemplatesList (templates) {
+        this.templatesList = templates
+    }
     @action delTemplateByName (name) {
         this.templates.splice(this.templates.findIndex(item => name === item.name), 1)
     }
 
     @action setHide (key, value) {
+        if (key === true || key === false){
+            return false;
+        }
         let arr = key.split('/');
         let section = this.sections.find(item => item.name === arr[0])
         if (section) {
@@ -273,10 +279,14 @@ export class ConfigStore {
     @action setValue (value){
         let val = value ? value : {}
         this.sections.map( (section, index) => {
-            if (index === 0 || section.type === 'fake_section') {
-                section.setValue(val)
-            } else {
-                section.setValue(val[section.name])
+            try {
+                if (index === 0 || section.type === 'fake_section') {
+                    section.setValue(val)
+                } else {
+                    section.setValue(val[section.name])
+                }
+            } catch (e) {
+                console.log(e)
             }
         })
     }

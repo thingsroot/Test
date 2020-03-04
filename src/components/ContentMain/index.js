@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import {notification } from 'antd';  //
+import { Redirect } from 'react-router';
 import { Switch, withRouter} from 'react-router-dom';
 import LoadableComponent from '../../utils/LoadableComponent';
 import PrivateRoute from '../PrivateRoute';
@@ -15,19 +16,17 @@ const Developer = LoadableComponent(()=>import('../../router/Developer'));
 const AppStore = LoadableComponent(()=>import('../../router/AppStore'));
 const UserSettings = LoadableComponent(()=>import('../../router/UserSettings'));
 const AccessKeys = LoadableComponent(()=>import('../../router/AccessKeys'));
-const ShareGroup = LoadableComponent(()=>import('../../router/ShareGroup'));
-const MemberManage = LoadableComponent(()=>import('../../router/MemberManage'));
 const VirtualGateways = LoadableComponent(()=>import('../../router/VirtualGateways'));
 const Gateway = LoadableComponent(()=>import('../../router/Gateway'));
-//const GatewayAppInstall = LoadableComponent(()=>import('../../router/GatewayAppInstall'));
 const PlatformEvents = LoadableComponent(()=>import('../../router/PlatformEvents'));
 const DeviceEvents = LoadableComponent(()=>import('../../router/GatewayEvents'));
-const BrowsingHistory = LoadableComponent(()=>import('../../router/BrowsingHistory'));
 const AppsInstall = LoadableComponent(()=>import('../../router/AppsInstall'));
 const AppEditorCode = LoadableComponent(()=>import('../../router/AppEditorCode'));
 const AppDeveloper = LoadableComponent(()=>import('../../router/AppDeveloper'));
 const TemplateDetails = LoadableComponent(()=>import('../../router/TemplateDetails'));
 const AppItems = LoadableComponent(()=>import('../../router/AppItems'))
+const Enterprise = LoadableComponent(()=>import('../../router/Enterprise'));
+
 let timer;
 const openNotification = (title, message) => {
     notification.open({
@@ -90,7 +89,7 @@ class ContentMain extends Component {
                 <PrivateRoute
                     path="/appstore"
                     component={AppStore}
-                    title={'应用商店'}
+                    title={'应用市场'}
                 />
                 <PrivateRoute
                     path="/appitems/:name"
@@ -101,6 +100,11 @@ class ContentMain extends Component {
                     path="/gateway/:sn"
                     component={Gateway}
                     title={'网关详情'}
+                />
+                <PrivateRoute
+                    path="/enterprise"
+                    component={Enterprise}
+                    title={'企业'}
                 />
                 <PrivateRoute
                     path="/appdetails/:name/:action?"
@@ -153,16 +157,6 @@ class ContentMain extends Component {
                     title={intl.get('sider.header.virtual_gateway')}
                 />
                 <PrivateRoute
-                    path="/sharegroup"
-                    component={ShareGroup}
-                    title={intl.get('sider.header.Shared_group_management')}
-                />
-                <PrivateRoute
-                    path="/member"
-                    component={MemberManage}
-                    title={intl.get('sider.header.Members_of_the_management')}
-                />
-                <PrivateRoute
                     path="/platformevents/:limitTime?"
                     component={PlatformEvents}
                     title={intl.get('sider.platform_event')}
@@ -182,16 +176,9 @@ class ContentMain extends Component {
                     component={DeviceEvents}
                     title={intl.get('sider.device_events')}
                 />
-
-                <PrivateRoute
-                    path="/browsinghistory/:sn/:vsn/:input?"
-                    component={BrowsingHistory}
-                    title={'设备数据 · 历史浏览'}
-                />
-                <PrivateRoute
-                    path="/"
-                    component={Dashboard}
-                    title={'Dashboard'}
+                <Redirect
+                    from="/"
+                    to="/dashboard"
                 />
             </Switch>
         );

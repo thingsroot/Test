@@ -34,22 +34,39 @@ class MyGates extends Component {
                 title: intl.get('common.name'),
                 dataIndex: 'dev_name',
                 key: 'dev_name',
+                width: '380px',
                 sorter: (a, b) => a.dev_name.length - b.dev_name.length,
                 render: (props, record)=>{
                     return (
-                        <div style={{lineHeight: '45px'}}>
-                            {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >{intl.get('gateway.company')}</Tag> : null}
-                            {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >{intl.get('gateway.individual')}</Tag> : null}
-                            {record.is_shared ? <Tag color="orange" >{intl.get('gateway.share')}</Tag> : null}
-                            {record.dev_name}
+                        <div
+                            className="dev_name"
+                        >
+                            <div style={{lineHeight: '30px'}}>
+                                {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >{intl.get('gateway.company')}</Tag> : null}
+                                {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >{intl.get('gateway.individual')}</Tag> : null}
+                                {record.is_shared ? <Tag color="orange" >{intl.get('gateway.share')}</Tag> : null}
+                            </div>
+                            <div
+                                style={{fontSize: '14px'}}
+                            >
+                                {record.dev_name}
+                                <br />
+                                <span
+                                    style={{
+                                        color: 'rgb(162, 159, 159)',
+                                        fontSize: '12px'
+                                    }}
+                                >{record.description}</span>
+                            </div>
                         </div>
                     )
                 }
               }, {
-                title: intl.get('common.desc'),
-                dataIndex: 'description',
-                key: 'description',
-                sorter: (a, b) => a.description && b.description && a.description.length - b.description.length
+                title: intl.get('appdetails.serial_number'),
+                dataIndex: 'sn',
+                key: 'sn',
+                width: '220px',
+                sorter: (a, b) => a.sn && b.sn && a.sn.length - b.sn.length
               }, {
                 title: intl.get('common.on-line-time'),
                 dataIndex: 'last_updated',

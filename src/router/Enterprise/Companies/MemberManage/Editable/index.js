@@ -2,9 +2,10 @@ import React, {Fragment} from 'react';
 import {Table, Input, Popconfirm, Form, Button, Modal, message} from 'antd';
 import {inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import http from '../../../utils/Server';
+import http from '../../../../../utils/Server';
 import './style.scss';
 import intl from 'react-intl-universal';
+import { _getCookie } from '../../../../../utils/Session';
 const EditableContext = React.createContext();
 
 class EditableCell extends React.Component {
@@ -67,11 +68,13 @@ class EditableTable extends React.Component {
             loading: true,
             editingKey: '',
             visibleMember: false,
+            visible: false,
             confirmDirty: false,
             type: 'text',
             password_visible: false,
             new_password: '',
-            enter_new_password: ''
+            enter_new_password: '',
+            user: ''
         };
         this.columns = [
             {
@@ -93,7 +96,7 @@ class EditableTable extends React.Component {
             {
                 title: intl.get('common.operation'),
                 dataIndex: 'operation',
-                width: 150,
+                width: '180px',
                 render: (text, record) => {
                     const { editingKey } = this.state;
                     const editable = this.isEditing(record);
@@ -118,7 +121,7 @@ class EditableTable extends React.Component {
               </Popconfirm>
             </span>
                     ) : (
-                        <Fragment>
+                        <Fragment style={{width: '150px'}}>
                             <Button
                                 type="primary"
                                 disabled={editingKey !== ''}
@@ -130,7 +133,7 @@ class EditableTable extends React.Component {
                                         password_visible: true
                                     })
                                 }}
-                                style={{marginRight: '10px'}}
+                                style={{marginRight: '20px'}}
                             >
                                 {intl.get('login.change_password')}
                             </Button>
@@ -238,7 +241,7 @@ class EditableTable extends React.Component {
                 role: 'Admin',
                 description: ''
             }
-            console.log(data, record)
+            data;
         });
     }
 
@@ -298,7 +301,6 @@ class EditableTable extends React.Component {
     }
     ChangeThePassword = () => {
         const {new_password, enter_new_password, record} = this.state;
-        console.log(new_password, enter_new_password)
         if (new_password !== enter_new_password) {
             message.error(intl.get('login.two_password_entries_do_not_match'))
             return false;
@@ -319,7 +321,8 @@ class EditableTable extends React.Component {
                 status: '',
                 type: 'text',
                 password_visible: false,
-                new_password: ''
+                new_password: '',
+                enter_new_password: ''
             })
             if (res.ok) {
                 message.success(intl.get('login.modification_of_user_information_succeeded'))
@@ -338,28 +341,6 @@ class EditableTable extends React.Component {
             if (!err) {
                 console.log('Received values of form: ', values);
             }
-            // if (this.state.status === 'updateUser') {
-            //     const datas = {
-            //         name: values.user,
-            //         first_name: values.firstname,
-            //         last_name: values.lastname,
-            //         mobile_no: values.phone,
-            //         new_password: values.password
-            //     }
-            //     http.post('/api/companies_users_update', datas).then(res=>{
-            //         this.setState({
-            //             visibleMember: false,
-            //             status: '',
-            //             type: 'text'
-            //         })
-            //         if (res.ok) {
-            //             message.success('修改用户信息成功！')
-            //             this.props.getdata()
-            //         } else {
-            //             message.error(res.error)
-            //         }
-            //     })
-            // } else {
                 if (values.firstname !== undefined &&
                     values.lastname !== undefined &&
                     values.phone !== undefined &&
@@ -397,11 +378,26 @@ class EditableTable extends React.Component {
                         type: 'text'
                     })
                 }
-            // }
-
         });
     };
-
+    invitation = () => {
+        const data = {
+            company: _getCookie('companies'),
+            user: this.state.user
+        }
+        if (this.state.user === _getCookie('user_id')){
+            message.error('管理员已是组中成员!')
+            return false;
+        }
+        http.post('/api/companies_employees_invite', data).then(res=>{
+            if (res.ok) {
+                message.success('邀请成功，请等待用户接受邀请！')
+            }
+            this.setState({
+                visible: false
+            })
+        })
+    }
     render () {
         const components = {
             body: {
@@ -593,6 +589,28 @@ class EditableTable extends React.Component {
                             <Button onClick={this.handleCancelMember}>{intl.get('common.cancel')}</Button>
                         </Form.Item>
                     </Form>
+                </Modal>
+                <Modal
+                    visible={this.state.visible}
+                    title="邀请用户加入公司组"
+                    onOk={this.invitation}
+                    onCancel={()=>{
+                        this.setState({visible: false})
+                    }}
+                    okText="确定"
+                    cancelText="放弃"
+                    maskClosable={false}
+                    destroyOnClose
+                >
+                    <span>用户名:</span>
+                    <Input
+                        placeholder="请输入要邀请的成员账户"
+                        onChange={(e)=>{
+                            this.setState({
+                                user: e.target.value
+                            })
+                        }}
+                    />
                 </Modal>
                 <Modal
                     visible={this.state.password_visible}

@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import {Form, Row, Col, Input, Button, Select, Tabs, message, Checkbox, Icon } from 'antd';
+import {Form, Row, Col, Input, Button, Select, Tabs, message, Checkbox, Icon, Modal, Tag } from 'antd';
 import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
 import reqwest from 'reqwest';
+import TagEdit from '../../common/TagsEdit';
 import intl from 'react-intl-universal';
-
+import './style.scss';
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 
-function callback (key) {
-    console.log(key);
-}
 
 @withRouter
 @inject('store')
@@ -23,6 +21,7 @@ class AppEdit extends Component {
         is_new: true,
         expand: false,
         message: '',
+        tag: '',
         imgSrc: '',
         previewImage: '',
         previewVisible: false,
@@ -32,7 +31,11 @@ class AppEdit extends Component {
         app_info: {},
         description: '',
         conf_template: '',
-        pre_configuration: ''
+        pre_configuration: '',
+        select_the_label: [],
+        visible_tags: false,
+        tags_list: [],
+        categories_list: []
     };
     componentDidMount (){
         const app = this.props.match.params.name && this.props.match.params.name.indexOf('*') !== -1 ? this.props.match.params.name.replace(/\*/g, '/') : this.props.match.params.name
@@ -54,30 +57,36 @@ class AppEdit extends Component {
             let data = JSON.parse(str)
             return JSON.stringify(data, null, 4)
         } catch (err) {
-            message.error(`${intl.get('appedit.JSON_format_error')}: ` + err)
+            message.error(intl.get('appedit.JSON_format_error') + ': ' + err)
             return str
         }
     }
     strimJsonStr (str) {
         try {
-            if (str === undefined || str.length === 0){
+            if (!str === undefined || str.length === 0){
                 return ''
             }
             let data = JSON.parse(str);
             return JSON.stringify(data)
         } catch (err) {
-            message.error(`${intl.get('appedit.JSON_format_error')}: ` + err);
+            message.error(intl.get('appedit.JSON_format_error') + ': ' + err);
             return
         }
     }
 
     getDetails = ()=>{
+        http.get('/api/applications_categories_list').then(res=>{
+            if (res.ok) {
+                this.setState({
+                    categories_list: res.data
+                })
+            }
+        })
         http.get('/api/applications_details?name=' + this.state.app).then(res=>{
             if (!res.ok) {
-                message.error(`${intl.get('appedit.failed_to_get_application_information')}: ` + res.error)
+                message.error(intl.get('appedit.failed_to_get_application_information') + ':' + res.error)
                 return
             }
-            console.log(res.data.conf_template)
             this.setState({
                 app_info: res.data,
                 description: res.data.description,
@@ -88,7 +97,7 @@ class AppEdit extends Component {
         })
     };
     handleSubmit = (e) => {
-        const { app_info, description, conf_template, pre_configuration } = this.state;
+        const { app_info, description, conf_template, pre_configuration, select_the_label } = this.state;
         app_info;
         e.preventDefault();
         if (this.props.store.session.is_developer === '1') {
@@ -112,7 +121,9 @@ class AppEdit extends Component {
                     license_type: 'Open',
                     description: description,
                     conf_template: conf_template_str,
-                    pre_configuration: pre_configuration_str
+                    pre_configuration: pre_configuration_str,
+                    tags: select_the_label.join(','),
+                    category: values.category
                 };
                 if (conf_template && conf_template !== '') {
                     params['has_conf_template'] = 1
@@ -181,7 +192,7 @@ class AppEdit extends Component {
                 }
             })
         } else {
-            message.warning(intl.get('appedit.sorry'))
+            message.warning(intl.get('appedit.Sorry_please_apply_to_be_a_developer_first'))
         }
     };
 
@@ -205,19 +216,108 @@ class AppEdit extends Component {
     }
 
     checkChange = (e)=>{
-        console.log(e.target.value);
         if (e.target.value === '0') {
             e.target.value = 1
         } else {
             e.target.value = 0
         }
     };
-
+    saveTags = () => {
+        const {select_the_label} = this.state;
+        const data = {
+            name: this.props.match.params.name,
+            tags: select_the_label.join(',')
+        }
+        http.post('/api/applications_tags_update', data).then(res=>{
+            if (res.ok) {
+                message.success(intl.get('appedit.Changed_TAB_successfully'))
+                this.getDetails();
+                this.setVisibleTags()
+            }
+        })
+    }
+    filterGateway = (e) => {
+        const value = e.target.value.toLowerCase();
+        const data = this.state.filterDataSource.filter(item=> item.description.toLowerCase().indexOf(value) !== -1 || item.dev_name.toLowerCase().indexOf(value) !== -1 || item.name.indexOf(value) !== -1)
+        this.setState({
+            dataSource: data
+        })
+    }
+    getTags = () => {
+        http.get('/api/store_tags_list').then(res=>{
+            if (res.ok) {
+                const tags_list = this.state.app_info.tags.length > 0 ? this.state.app_info.tags.split(',') : [];
+                const select_the_label = this.state.select_the_label.concat(tags_list)
+                if (res.data.length > 0) {
+                    res.data.map(item=>{
+                        tags_list.push(item[0])
+                    })
+                }
+                this.setState({
+                    tags_list,
+                    select_the_label
+                })
+            }
+        })
+        this.setState({visible_tags: true})
+    }
+    setVisibleTags = () => {
+        this.setState({
+            visible_tags: false
+        })
+    }
+    addTag = (item) =>{
+        const {select_the_label} = this.state;
+        if (select_the_label.indexOf(item) === -1) {
+            if (select_the_label.length < 20) {
+                select_the_label.push(item)
+                this.setState({
+                    select_the_label
+                })
+            } else {
+                message.error(intl.get('appedit.The_quantity_is_full'))
+            }
+        } else {
+            message.error(intl.get('appedit.Do_not_add_the_same_label_repeatedly'))
+        }
+    }
+    addCustomTag = () => {
+        if (this.state.tag !== ''){
+            const {select_the_label} = this.state;
+            if (select_the_label.indexOf(this.state.tag) === -1) {
+                if (select_the_label.length < 20) {
+                    if (this.state.tag.length < 8) {
+                        select_the_label.push(this.state.tag)
+                        this.setState({
+                            select_the_label,
+                            tag: ''
+                        })
+                    } else {
+                        message.error(intl.get('appedit.Maximum_length_of_characters_is_eight'))
+                    }
+                } else {
+                    message.error(intl.get('appedit.The_quantity_is_full'))
+                }
+            } else {
+                message.error(intl.get('appedit.Do_not_add_the_same_label_repeatedly'))
+            }
+        } else {
+            message.error(intl.get('appedit.Please_enter_label_content'))
+        }
+    }
+    deleteTag = (item)=>{
+        const {select_the_label} = this.state;
+        const ind = select_the_label.indexOf(item)
+        select_the_label.splice(ind, 1)
+        this.setState({
+            select_the_label
+        })
+    }
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { app_info, description, conf_template, pre_configuration } = this.state;
+        const { app_info, description, conf_template, pre_configuration, select_the_label, visible_tags, tags_list, categories_list } = this.state;
         return (
-            <div>
+            <div className="appedit_wrap">
                 <Icon
                     className="rollback"
                     style={{top: 85, right: 40}}
@@ -239,7 +339,7 @@ class AppEdit extends Component {
                                         alt=""
                                         ref="img"
                                         src={this.state.imgSrc}
-                                        title={intl.get('appedit.click_to_switch_pictures')}
+                                        title={intl.get('appedit.Im_gonna_go_ahead_and_hit_toggle')}
                                         id="icon_img1"
                                         style={{width: '100px', height: '100px'}}
                                     />
@@ -253,7 +353,7 @@ class AppEdit extends Component {
                             </div>
                         </Col>
                         <Col span={21}>
-                            <Col span={7}>
+                            <Col span={9}>
                                 <Form.Item label={intl.get('appedit.apply_name')}>
                                     {getFieldDecorator('app_name', {
                                         rules: [{ required: true, message: intl.get('appedit.cannot_be_empty') }],
@@ -265,7 +365,7 @@ class AppEdit extends Component {
                                     )}
                                 </Form.Item>
                             </Col>
-                            <Col span={7}>
+                            <Col span={9}>
                                 <Form.Item label={intl.get('gateway.app_ID')}>
                                     {getFieldDecorator('code_name', {
                                         rules: [{ required: true, message: intl.get('appedit.cannot_be_empty') }, {
@@ -281,7 +381,30 @@ class AppEdit extends Component {
                                     )}
                                 </Form.Item>
                             </Col>
-                            <Col span={7}>
+                            <Col span={9}>
+                                <Form.Item label={intl.get('developer.application_of_classification')}>
+                                    {getFieldDecorator('category', {
+                                        rules: [{ required: true, message: intl.get('appedit.cannot_be_empty') }],
+                                        initialValue: app_info.category !== null ? app_info.category : '默认分类'
+                                    })(
+                                        <Select
+                                            style={{ width: 240 }}
+                                        >
+                                            {
+                                                categories_list && categories_list.length > 0 && categories_list.map((item, key)=>{
+                                                    return (
+                                                        <Option
+                                                            value={item.name}
+                                                            key={key}
+                                                        >{item.name}</Option>
+                                                    )
+                                                })
+                                            }
+                                        </Select>
+                                    )}
+                                </Form.Item>
+                            </Col>
+                            <Col span={9}>
                                 <Form.Item label={intl.get('appedit.authorization_type')}>
                                     {getFieldDecorator('license_type', {
                                         rules: [{ required: true, message: intl.get('appedit.cannot_be_empty') }],
@@ -290,7 +413,7 @@ class AppEdit extends Component {
                                         <Select
                                             style={{ width: 240 }}
                                         >
-                                            <Option value="Open">{intl.get('appedit.free')}</Option>
+                                            <Option value="Open">{intl.get('appedit.freeappedit.free')}</Option>
                                         </Select>
                                     )}
                                 </Form.Item>
@@ -308,6 +431,23 @@ class AppEdit extends Component {
                                     )}
                                 </Form.Item>
                             </Col>
+                            <Col span={24}>
+                                <div>
+                                    <div className="app_details_tags_wrap">
+                                        <span>{intl.get('appitems.label')}:</span>&nbsp;&nbsp;
+                                        <TagEdit tags_list={app_info.tags}/>
+                                        {
+                                            this.props.location.pathname.toLowerCase().indexOf('appnew') === -1
+                                            ? <span
+                                                type="link"
+                                                className="app_details_tags_set"
+                                                onClick={this.getTags}
+                                              >{intl.get('appedit.modify')}</span>
+                                            : ''
+                                        }
+                                    </div>
+                                </div>
+                            </Col>
                         </Col>
                     </Row>
                 </Form>
@@ -319,7 +459,6 @@ class AppEdit extends Component {
                     </Row>
 
                 <Tabs
-                    onChange={callback}
                     type="card"
                 >
                     <TabPane
@@ -350,7 +489,7 @@ class AppEdit extends Component {
                     className="login-form-button"
                     onClick={this.handleSubmit}
                 >
-                    {this.state.is_new ? intl.get('accesskeys.create') : intl.get('appedit.modify')}
+                    {this.state.is_new ? intl.get('accesskeys.create') : intl.get('accesskeys.appedit.modify')}
                 </Button>
                 <span style={{padding: '0 5px'}}> </span>
                 <Button
@@ -360,6 +499,81 @@ class AppEdit extends Component {
                 >
                     {intl.get('common.cancel')}
                 </Button>
+                <Modal
+                    title={<span><Icon type="info-circle" /> {intl.get('appedit.Edit_the_label')}</span>}
+                    visible={visible_tags}
+                    onOk={this.saveTags}
+                    // confirmLoading={confirmLoading}
+                    onCancel={()=>{
+                        this.setState({
+                            select_the_label: []
+                        }, ()=>{
+                            this.setVisibleTags()
+                        })
+                    }}
+                    cancelText={intl.get('appedit.cancel_all')}
+                    okText={intl.get('common.sure')}
+                >
+                    <div>
+                        <div className="Select_the_label">
+                            {
+                                select_the_label.length > 0 && select_the_label.map((item, key) => {
+                                    return (
+                                        <Tag
+                                            key={key}
+                                            closable
+                                            onClose={()=>{
+                                                this.deleteTag(item)
+                                            }}
+                                        >{item}</Tag>
+                                    )
+                                })
+                            }
+                        </div>
+                        <div>
+                            {intl.get('appedit.max_number_20')}
+                        </div>
+                        <div>
+                        <Tabs defaultActiveKey="1">
+                            <TabPane
+                                tab={intl.get('appedit.For_the_label')}
+                                key="1"
+                            >
+                            {
+                                tags_list.length > 0 && tags_list.map((item, key) => {
+                                    return (
+                                        <Tag
+                                            key={key}
+                                            onClick={()=>{
+                                                this.addTag(item)
+                                            }}
+                                        >{item}</Tag>
+                                    )
+                                })
+                            }
+                            </TabPane>
+                            <TabPane
+                                tab={intl.get('appedit.The_new_label')}
+                                key="2"
+                            >
+                                <div className="add_tags">
+                                    {intl.get('appedit.The_new_label')}：
+                                    <Input
+                                        value={this.state.tag}
+                                        placeholder={intl.get('appedit.Please_enter_a_custom_label')}
+                                        onChange={(e)=>{
+                                            this.setState({tag: e.target.value})
+                                        }}
+                                    />
+                                    <Button
+                                        onClick={this.addCustomTag}
+                                    >{intl.get('appsinstall_add')}</Button>
+                                </div>
+                            </TabPane>
+                        </Tabs>
+                        </div>
+                    </div>
+                </Modal>
             </div>
         )
     }

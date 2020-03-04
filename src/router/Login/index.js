@@ -36,7 +36,7 @@ class Login extends PureComponent {
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{
-                            window.open('http://help.cloud.thingsroot.com/quick_start/', '_blank')
+                            window.open('http://help.cloud.thingsroot.com/guide/quick_start/', '_blank')
                         }
                     }
                 >
@@ -45,8 +45,52 @@ class Login extends PureComponent {
                         {intl.get('header.quick_guide')}
                     </span>
                 </Menu.Item>
+                <Menu.Divider />
                 <Menu.Item
                     key="17"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/guide/', '_blank')
+                        }
+                    }
+                >
+                    <Icon type="read" />
+                    <span>
+                        产品介绍
+                    </span>
+                </Menu.Item>
+                <Menu.Item
+                    key="18"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/guide/user_guide/', '_blank')
+                        }
+                    }
+                >
+                    <Icon type="read" />
+                    <span>
+                        用户指南
+                    </span>
+                </Menu.Item>
+                <Menu.Item
+                    key="19"
+                    style={{lineHeight: '30px'}}
+                    onClick={
+                        ()=>{
+                            window.open('http://help.cloud.thingsroot.com/guide/admin_guide/ ', '_blank')
+                        }
+                    }
+                >
+                    <Icon type="read" />
+                    <span>
+                        管理员指南
+                    </span>
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item
+                    key="20"
                     style={{lineHeight: '30px'}}
                     onClick={
                         ()=>{

@@ -16,7 +16,7 @@ const maxHeader = {
     right: 0,
     left: '200px',
     transition: 'background 0.3s, left 0.2s',
-    zIndex: 1000
+    zIndex: 0
 };
 const minHeader = {
     width: '100%',
@@ -28,7 +28,7 @@ const minHeader = {
     right: 0,
     left: '80px',
     transition: 'background 0.3s, left 0.2s',
-    zIndex: 1000
+    zIndex: 0
 
 };
 

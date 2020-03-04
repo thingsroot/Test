@@ -1,0 +1,21 @@
+.tags_edit_wrap{
+    width: 400px;
+    .tags_title{
+        position: relative;
+        .tags_icon{
+            position: absolute;
+            right: -20px;
+            top: 0px;
+            -webkit-user-select: none;
+            -moz-user-select:none;
+            -o-user-select:none;
+            -ms-user-select:none;
+        }
+
+    }
+    .tags_select{
+        margin-left: 0px;
+        margin-top: 10px;
+        line-height: 20px;
+    }
+}

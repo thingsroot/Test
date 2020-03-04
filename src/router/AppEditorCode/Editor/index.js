@@ -394,7 +394,7 @@ class MyCode extends Component {
         return (
             <div className="codeEditor">
                 <div className="iconGroup">
-                    <p style={{width: 'auto', position: 'resolute'}}>
+                    <div style={{width: 'auto', position: 'resolute'}}>
                         <Divider type="vertical" />
                         <Tooltip title={intl.get('appeditorcode.save_modification_code')} >
                             <Icon
@@ -460,7 +460,7 @@ class MyCode extends Component {
                             }}
                         />
 
-                    </p>
+                    </div>
                 </div>
                 <div className="myCode">
                     {

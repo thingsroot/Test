@@ -36,7 +36,6 @@ export function authenticateClear () {
 }
 
 export function authenticateSuccess (data) {
-    console.log(data)
     _setCookie(LOGIN_COOKIE_NAME, data.csrf_token)
     _setCookie('companies', data.companies[0])
     _setCookie('is_developer', data.is_developer)
@@ -71,7 +70,6 @@ export function getParam (name) {
     return null;
 }
 export const getUrl = (url)=> {
-    console.log(url)
     return url.split('/')[1];
 }
 // 申请AccessKey

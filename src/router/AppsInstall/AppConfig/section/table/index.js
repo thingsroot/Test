@@ -315,9 +315,16 @@ class EditableTable extends React.Component {
                 components={components}
                 rowClassName={() => 'editable-row'}
                 bordered
+                pagination={false}
                 dataSource={dataSource}
                 columns={columns}
             />
+            <Button onClick={this.handleAdd}
+                type="primary"
+                style={{ margin: '10px 0' }}
+            >
+                添加
+            </Button>
         </div>
         );
     }

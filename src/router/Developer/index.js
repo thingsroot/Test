@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Button, Spin, Tabs, Result  } from 'antd';
+import { Input, Button, Spin, Tabs, Result, Icon  } from 'antd';
 import {Link, withRouter} from 'react-router-dom';
 import './style.scss';
 import http from '../../utils/Server';
@@ -119,7 +119,7 @@ class Developer extends Component {
         }
     };
     render () {
-        const { appList, myList, forkList, collectList } = this.state;
+        const { myList, forkList, collectList } = this.state;
         return (
             <div className="appList">
 
@@ -157,12 +157,28 @@ class Developer extends Component {
                             tab={intl.get('developer.original_application')}
                             key="1"
                         >
-                            <div
-                                style={this.state.loading === false ? block : none}
-                            >
-                                <ul style={myList && myList.length > 0 ? {} : {height: '40px'}}>
+                            {
+                                Number(_getCookie('is_developer')) !== 1
+                                ? <Result
+                                    title={intl.get('developer.Please_apply_to_be_a_developer_first') + '!'}
+                                    extra={
+                                        <Button
+                                            type="primary"
+                                            key="console"
+                                            onClick={()=>{
+                                                console.log(this)
+                                                this.props.history.push('/appdeveloper')
+                                            }}
+                                        >
+                                            {intl.get('developer.apply_to_be_a_developer')}
+                                        </Button>
+                                    }
+                                  />
+                                : <div>
+                                <ul>
                                     {
-                                        myList && myList.length > 0 && myList.map((v, key)=>{
+                                        myList && myList.length > 0
+                                        ? myList.map((v, key)=>{
                                             return (
                                                 <li key={key}>
                                                     <div className="appImg">
@@ -185,9 +201,26 @@ class Developer extends Component {
                                                 </li>
                                             )
                                         })
+                                        : <Result
+                                            icon={
+                                                <Icon
+                                                    type="smile"
+                                                    theme="twoTone"
+                                                />
+                                            }
+                                            title={intl.get('appedit.You_havent_applied_yet_click_create_new_application')}
+                                            extra={
+                                            <Link to={'/appnew'}>
+                                                <Button
+                                                    type="primary"
+                                                    style={{margin: '0 20px'}}
+                                                >{intl.get('developer.create_new_app')}</Button>
+                                            </Link>}
+                                          />
                                     }
-                                </ul>
-                        </div>
+                                    </ul>
+                                </div>
+                            }
                     </TabPane>
                     <TabPane
                         tab={intl.get('developer.clone_application')}
@@ -198,7 +231,8 @@ class Developer extends Component {
                         >
                             <ul>
                                 {
-                                    forkList && forkList.length > 0 && forkList.map((v, key)=>{
+                                    forkList && forkList.length > 0
+                                    ? forkList.map((v, key)=>{
                                         return <li key={key}>
                                             <div className="appImg">
                                                 <Link to={`/appdetails/${v.name}`}>
@@ -219,6 +253,22 @@ class Developer extends Component {
                                             </div>
                                         </li>
                                     })
+                                    : <Result
+                                        icon={
+                                            <Icon
+                                                type="smile"
+                                                theme="twoTone"
+                                            />
+                                        }
+                                        title={intl.get('appedit.You_have_not_yet_cloned_the_application,_click_jump_to_the_application_market')}
+                                        extra={
+                                        <Link to={'/appstore'}>
+                                            <Button
+                                                type="primary"
+                                                style={{margin: '0 20px'}}
+                                            >{intl.get('header.app_store')}</Button>
+                                        </Link>}
+                                      />
                                 }
                             </ul>
                         </div>
@@ -230,7 +280,8 @@ class Developer extends Component {
                         <div style={this.state.loading === false ? block : none}>
                            <ul>
                                {
-                                   collectList && collectList.length > 0 && collectList.map((v, key)=>{
+                                   collectList && collectList.length > 0
+                                   ? collectList.map((v, key)=>{
                                        return <li key={key}>
                                            <div className="appImg">
                                                <Link to={`/appdetails/${v.name}`}>
@@ -251,13 +302,29 @@ class Developer extends Component {
                                             </div>
                                        </li>
                                    })
+                                    : <Result
+                                        icon={
+                                            <Icon
+                                                type="smile"
+                                                theme="twoTone"
+                                            />
+                                        }
+                                        title={intl.get('appedit.You_do_not_yet_have_a_favorite_app_click_jump_to_app_market')}
+                                        extra={
+                                        <Link to={'/appstore'}>
+                                            <Button
+                                                type="primary"
+                                                style={{margin: '0 20px'}}
+                                            >{intl.get('header.app_store')}</Button>
+                                        </Link>}
+                                      />
                                }
                            </ul>
                         </div>
                     </TabPane>
                 </Tabs>
                 }
-                <div
+                {/* <div
                     style={this.state.loading ? none : block}
                 >
                     {
@@ -284,7 +351,7 @@ class Developer extends Component {
                             {intl.get('developer.temporarily_not_applied')}!
                         </p>
                     }
-                </div>
+                </div> */}
             </div>
         )
     }

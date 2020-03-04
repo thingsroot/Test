@@ -61,33 +61,63 @@ pre{
     justify-content: center;
     flex-wrap: wrap;
     .item{
+        position: relative;
         width: 222px;
-        height: 215px;
+        height: 225px;
         padding: 10px;
         margin:10px;
         line-height: 1.5;
         background-color: #fff;
         border:1px solid #eee;
         cursor: pointer;
+        overflow: hidden;
+        .price {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            color: #327e36;
+        }
         &:hover{
             box-shadow: 0 1px 3px rgba(34, 25, 25, .4);
         }
         img{
             display: block;
-            height: 96px;
-            width:96px;
+            height: 72px;
+            width:72px;
             margin: 0 auto;
         }
         .apptitle{
-            margin-top: 25px;
+            height: 111px;
+            margin-top: 5px;
             padding:10px;
-            background:#f6f6f6;
+            // background:#f6f6f6;
             font-size: 12px;
             font-weight: 600;
+            >p{
+                text-align: center;
+                font-size: 14px;
+                line-height: 25px;
+            }
+            >span{
+                display: block;
+                text-align: center;
+                color: #ccc;
+                font-size: 12px;
+                line-height: 25px;
+            }
             p:hover{
                 color:#3c8dbc;
             }
-            div{
+            .app_footer{
+                .app_footer_tags{
+                    height: 22px;
+                    margin: 7px 0;
+                }
+                .ant-tag{
+                    display: inline-block;
+                }
+            }
+            .app_footer_rate{
                 display: flex;
                 justify-content: space-between;
                 box-sizing: border-box;
@@ -114,7 +144,7 @@ pre{
     position: relative;
     .installbtn{
         position: absolute;
-        right:80px;
+        right:50px;
         top:10px;
     }
     .installapp{

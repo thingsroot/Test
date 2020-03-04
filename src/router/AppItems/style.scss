@@ -1,9 +1,16 @@
 .app_items{
+    position: relative;
     .app_desc{
         display: flex;
     }
     .appDescription{
         width: 70%;
+    }
+    .app_items_up_button{
+        color:#000;
+        position: absolute;
+        right:20px;
+        top:30px;
     }
     .app_title{
         display: flex;
@@ -37,6 +44,9 @@
     }
     .app_desc_right{
         padding-left: 20px;
+        >div{
+            margin-bottom: 20px;
+        }
         p{
             vertical-align: inherit; 
             // box-sizing: border-box;

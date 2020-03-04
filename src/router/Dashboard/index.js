@@ -346,9 +346,6 @@ class Dashboard extends PureComponent {
     render () {
         let todayData = this.state.todayData;
         let weekData = this.state.weekData;
-        function callback (key) {
-            console.log(key);
-        }
         return (
             <div className="home">
                 <div className="main">
@@ -376,7 +373,6 @@ class Dashboard extends PureComponent {
                         <p>{intl.get('dashboard.fault_statistics')}</p>
                         <div id="">
                             <Tabs
-                                onChange={callback}
                                 type="card"
                             >
                                 <TabPane

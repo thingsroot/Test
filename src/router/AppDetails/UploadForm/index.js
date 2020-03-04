@@ -64,8 +64,7 @@ const CollectionCreateForm = Form.create()(
         };
 
         checkChange = (e)=>{
-            console.log(e.target.checked);
-            console.log(this)
+            e;
         };
 
         render () {
@@ -140,6 +139,7 @@ const CollectionCreateForm = Form.create()(
                         </Form.Item>
                         <Form.Item>
                             {getFieldDecorator('agreement', {
+                                valuePropName: 'checked',
                                 rules: [{ validator: isChecked}]
                             })(
                                 <Checkbox

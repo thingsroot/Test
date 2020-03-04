@@ -104,7 +104,10 @@ class CommandList extends Component {
     componentDidMount (){
         this.setState({data: this.props.commands})
 
-        const { regFilterChangeCB } = this.props;
+        const { regFilterChangeCB, filterText } = this.props;
+        if (filterText) {
+            this.applyFilter()
+        }
         if (regFilterChangeCB) {
             regFilterChangeCB(()=>{
                 this.applyFilter()

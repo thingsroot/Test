@@ -5,3 +5,12 @@
     padding: 0 30px 0 10px;
     white-space:nowrap;
 }
+.applist_appconfig{
+    position: relative;
+    .applist_appconfig_help{
+        position: absolute;
+        right: 50px;
+        top: 5px;
+        z-index: 999;
+    }
+}

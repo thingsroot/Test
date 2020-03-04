@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 import { _getCookie, isAuthenticated } from './Session';
 

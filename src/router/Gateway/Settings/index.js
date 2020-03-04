@@ -241,7 +241,6 @@ class GatewaySettings extends Component {
             message.error(intl.get('gateway.bad_upgrade_request'))
             return
         }
-        console.log(skynet_version)
         const { gatewayInfo } = this.props.store;
         this.setState({upgrading: true})
         const data = {

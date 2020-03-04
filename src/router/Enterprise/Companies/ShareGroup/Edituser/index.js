@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import {Table, Input, Popconfirm, Form, Modal, message, Empty, Icon} from 'antd';
 import { withRouter } from 'react-router-dom';
-import http from '../../../utils/Server';
+import http from '../../../../../utils/Server';
 import {inject, observer} from 'mobx-react';
 import './index.scss'
 import intl from 'react-intl-universal';
@@ -100,26 +100,28 @@ class Edituser extends React.Component {
             </span>
                     ) : (
                         <Fragment>
-                            <a
-                                disabled={editingKey !== ''}
-                                onClick={() => {
-                                    this.edit(record)
-                                }}
-                                style={{marginRight: '20px'}}
-                            >
-                                {intl.get('appdetails.edit')}
-                            </a>
-                            <Popconfirm
-                                title={`${intl.get('sharegroup.are_you_sure_you_want_to_delete_this_sharing_group')}?`}
-                                onConfirm={() => this.delete(record)}
-                                okText={intl.get('common.sure')}
-                                cancelText={intl.get('common.cancel')}
-                            >
+                            <div style={{minWidth: '95px'}}>
                                 <a
-                                    type="danger"
                                     disabled={editingKey !== ''}
-                                >{intl.get('appdetails.delete')}</a>
-                            </Popconfirm>
+                                    onClick={() => {
+                                        this.edit(record)
+                                    }}
+                                    style={{marginRight: '20px'}}
+                                >
+                                    {intl.get('appdetails.edit')}
+                                </a>
+                                <Popconfirm
+                                    title={intl.get('sharegroup.are_you_sure_you_want_to_delete_this_sharing_group') + '?'}
+                                    onConfirm={() => this.delete(record)}
+                                    okText={intl.get('common.sure')}
+                                    cancelText={intl.get('common.cancel')}
+                                >
+                                    <a
+                                        type="danger"
+                                        disabled={editingKey !== ''}
+                                    >{intl.get('appdetails.delete')}</a>
+                                </Popconfirm>
+                            </div>
                         </Fragment>
                     );
                 }

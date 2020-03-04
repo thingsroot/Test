@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import './index.scss'
 import { Row, Col} from 'antd'
 import {inject, observer} from 'mobx-react';
-import http from '../../utils/Server';
+import http from '../../../../utils/Server';
 import Edituser from './Edituser';
 import Editable from './Editable';
-import { _getCookie } from '../../utils/Session';
+import { _getCookie } from '../../../../utils/Session';
 import intl from 'react-intl-universal';
 
 @inject('store')
@@ -21,42 +21,37 @@ class ShareGroup extends Component {
         }
     }
     componentDidMount () {
-        if (_getCookie('is_admin') !== '1') {
-            this.props.history.push('/')
-            return false;
-        }
         this.getData()
     }
     getData = () => {
-        http.get('/api/companies_list').then(res=>{
-            if (res.ok && res.data.length > 0) {
-                this.setState({
-                    company: res.data[0]
-                })
-                http.get('/api/companies_read?name=' + res.data[0]).then(data=>{
-                    if (data.ok) {
-                        this.setState({
-                            companies_list: [data.data]
-                        })
-                    }
-                })
-                http.get('/api/companies_sharedgroups_list?company=' + res.data[0]).then(data=>{
-                    if (data.ok && data.data.length > 0) {
-                        this.setState({
-                            group_list: data.data,
-                            activeKey: data.data[0].name,
-                            group_name: data.data[0].group_name
-                        }, ()=>{
-                            this.props.store.groups.setGroupsUserlist(data.data[0])
-                        })
-                    } else {
-                        this.setState({
-                            group_list: []
-                        })
-                    }
-                })
-            }
-        })
+        if (_getCookie('companies') !== 'undefined') {
+            const company = _getCookie('companies')
+            this.setState({
+                company: _getCookie('companies')
+            })
+            http.get('/api/companies_read?name=' + company).then(data=>{
+                if (data.ok) {
+                    this.setState({
+                        companies_list: [data.data]
+                    })
+                }
+            })
+            http.get('/api/companies_sharedgroups_list?company=' + company).then(data=>{
+                if (data.ok && data.data.length > 0) {
+                    this.setState({
+                        group_list: data.data,
+                        activeKey: data.data[0].name,
+                        group_name: data.data[0].group_name
+                    }, ()=>{
+                        this.props.store.groups.setGroupsUserlist(data.data[0])
+                    })
+                } else {
+                    this.setState({
+                        group_list: []
+                    })
+                }
+            })
+        }
     }
     setActiveKey = (record) => {
         this.setState({

@@ -1,12 +1,14 @@
 import React, { PureComponent } from 'react';
 import { inject, observer} from 'mobx-react';
 import Papa from 'papaparse';
+import Wps from './Wps';
 import { Select, Button, Upload, Icon, Modal, message } from 'antd';
 import { CSVLink } from 'react-csv';
 import http from '../../utils/Server';
 import './style.scss';
 import CopyForm from '../AppDetails/CopyForm'
 import intl from 'react-intl-universal';
+// import CopyForm from '../AppDetails/CopyForm';
 
 const Dragger = Upload.Dragger;
 const Option = Select.Option;
@@ -40,7 +42,9 @@ class MyTemplateDetails extends PureComponent {
             file: '',        //文件流
             previewData: '',  //预览数据原型
             previewCsvData: '', //预览csv数据
-            maxVersion: 0
+            maxVersion: 0,
+            edit_template_visible: false, //显示编辑wps,
+            newVersion: 0
         }
     }
     componentDidMount () {
@@ -49,17 +53,17 @@ class MyTemplateDetails extends PureComponent {
     UpdateFetchData = () => {
         let app = this.props.match.params.app;
         let conf = this.props.match.params.name;
-        let version = this.props.match.params.version
+        // let version = this.props.match.params.version
         let action = this.props.match.params.action;
-        if (version === undefined) {
-            version = 0
-        } else {
-            version = Number(version) ? Number(version) : 0
-        }
+        // if (version === undefined) {
+        //     version = 0
+        // } else {
+        //     version = Number(version) ? Number(version) : 0
+        // }
         this.setState({
             app: app,
             conf: conf,
-            show_version: version,
+            // show_version: version,
             action: action
         }, ()=>{
             this.fetchInfo();
@@ -89,10 +93,11 @@ class MyTemplateDetails extends PureComponent {
                     list.push(v.version);
                 });
                 if (list.length > 0) {
-                    let show_version = this.state.show_version !== 0 ? this.state.show_version : list[0]
+                    let show_version = list[0]
                     this.setState({
                         versionList: list,
                         maxVersion: list[0],
+                        newVersion: list[0],
                         show_version: show_version,
                         dataList: res.data
                     });
@@ -174,14 +179,17 @@ class MyTemplateDetails extends PureComponent {
         http.post('/api/configurations_versions_create', params)
             .then(res=>{
                 res;
-                message.success(intl.get('templatedetails.upload_new_version_succeeded'));
-                setTimeout(()=>{
-                    this.setState({
-                        visible: false,
-                        previewCsvData: []
-                    });
-                }, 500);
-                this.getVersionList(this.state.conf)
+                if (res.ok) {
+                    this.onVersionChange(res.data.version)
+                    message.success('上传新版本成功！');
+                    setTimeout(()=>{
+                        this.setState({
+                            visible: false,
+                            previewCsvData: []
+                        });
+                    }, 500);
+                    this.getVersionList(this.state.conf)
+                }
             })
             .catch(err=>{
                 console.log(err)
@@ -197,9 +205,12 @@ class MyTemplateDetails extends PureComponent {
         this.props.history.push('/template/' + conf_info.app + '/' + conf_info.name + '/1')
         this.UpdateFetchData()
     }
-
+    closeWps = () => {
+        this.setState({edit_template_visible: false})
+        this.UpdateFetchData()
+    }
     render () {
-        const { conf_info, content, csvData, versionList, previewCsvData, show_version } = this.state;
+        const { conf_info, content, csvData, versionList, previewCsvData, show_version, edit_template_visible } = this.state;
         return (
             <div className="MyTemplateDetails">
                 <div className="title">
@@ -212,7 +223,7 @@ class MyTemplateDetails extends PureComponent {
                         <Select
                             disabled={versionList.length > 0 ? false : true}
                             value={show_version}
-                            style={{ width: 220 }}
+                            style={{ width: '100px' }}
                             onChange={this.onVersionChange}
                         >
                             {
@@ -235,12 +246,20 @@ class MyTemplateDetails extends PureComponent {
                                 this.setState({visibleEdit: true})
                             }}
                         >
+                            {intl.get('appdetails.settings')}
+                        </Button>
+                        <Button
+                            style={this.state.conf_info.developer === this.props.store.session.user_id ? {display: 'inline-block', marginRight: '20px'} : {display: 'none', marginRight: '20px'}}
+                            onClick={()=>{
+                                this.setState({edit_template_visible: true})
+                            }}
+                        >
                             {intl.get('appdetails.edit')}
                         </Button>
                         <Button
                             style={this.state.conf_info.developer === this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showModal}
-                        >{intl.get('appdetails.upload_new_version')}</Button>
+                        >{intl.get('common.upload')}</Button>
                         <Button
                             style={this.state.conf_info.developer !== this.props.store.session.user_id ? {display: 'inline-block'} : {display: 'none'}}
                             onClick={this.showCloneModal}
@@ -253,7 +272,7 @@ class MyTemplateDetails extends PureComponent {
                             <CSVLink
                                 data={content}
                                 filename={conf_info.app + '-' + conf_info.name + '-' + show_version + '.csv'}
-                            >{intl.get('templatedetails.download_to_local')}</CSVLink>
+                            >{intl.get('common.download')}</CSVLink>
                         </Button>
                         <span style={{padding: '10px'}}></span>
                         <Icon
@@ -276,7 +295,8 @@ class MyTemplateDetails extends PureComponent {
                     >
                         <tbody>
                             {
-                                csvData && csvData.length > 0 && csvData.map((v, key)=>{
+                                csvData && csvData.length > 0
+                                ? csvData.map((v, key)=>{
                                     if (v.length > 1) {
                                         return <tr key={key}>
                                             {
@@ -294,6 +314,7 @@ class MyTemplateDetails extends PureComponent {
                                         </tr>
                                     }
                                 })
+                                : <tr></tr>
                             }
                         </tbody>
                     </table>
@@ -313,22 +334,35 @@ class MyTemplateDetails extends PureComponent {
                     wrapClassName={'web'}
                 >
                     <div style={previewCsvData.length > 0
-                        ? {display: 'none'}
-                        : {width: '100%', height: '100%', display: 'block'}}
+                        ? {opacity: '0', position: 'absolute', width: '90%', height: '80%', left: '5%', top: '0'}
+                        : {width: '90%', height: '80%', display: 'block', position: 'relative', zIndex: '999', left: '5%'}}
                     >
                         <Dragger
-                            style={{width: '100%', height: '100%'}}
+                            style={{width: '100%'}}
                             accept=".csv"
                             onChange={this.fileChang}
                         >
-                            <p className="ant-upload-drag-icon">
-                                <Icon type="inbox" />
-                            </p>
-                            <p className="ant-upload-text">{intl.get('templatedetails.drag_the_file_here_or_click_Add')}</p>
+                            <div
+                                style={{position: 'absolute', top: '0px', left: '0px', width: '100%', height: '100%', padding: '16px', opacity: previewCsvData.length > 0 ? '0' : '1'}}
+                                onClick={(e)=>{
+                                    if (previewCsvData.length > 0) {
+                                        e.stopPropagation()
+                                    }
+                                    return false;
+                                }}
+                            >
+                                <p
+                                    className="ant-upload-drag-icon"
+                                    style={{marginTop: '175px'}}
+                                >
+                                    <Icon type="inbox" />
+                                </p>
+                                <p className="ant-upload-text">{intl.get('templatedetails.drag_the_file_here_or_click_Add')}</p>
+                            </div>
                         </Dragger>
                     </div>
                     <div style={previewCsvData.length > 0
-                        ? {width: '100%', height: '100%', overflow: 'auto', display: 'block'}
+                        ? {width: '100%', height: '100%', overflow: 'auto', display: 'block', zIndex: '0'}
                         : {display: 'none'}}
                     >
                         <table
@@ -337,7 +371,8 @@ class MyTemplateDetails extends PureComponent {
                         >
                             <tbody>
                             {
-                                previewCsvData && previewCsvData.length > 0 && previewCsvData.map((v, key)=>{
+                                previewCsvData && previewCsvData.length > 0
+                                ? previewCsvData.map((v, key)=>{
                                     if (v.length > 1) {
                                         return (
                                             <tr key={key}>
@@ -357,6 +392,7 @@ class MyTemplateDetails extends PureComponent {
                                         )
                                     }
                                 })
+                                : <tr></tr>
                             }
                             </tbody>
                         </table>
@@ -402,6 +438,25 @@ class MyTemplateDetails extends PureComponent {
                     copyData={conf_info}
                     csvData={csvData}
                 />
+                {
+                    edit_template_visible
+                    ? <div
+                        className="edit_template_wps"
+                      >
+                        <Button
+                            className="edit_template_wps_close"
+                            type="link"
+                            onClick={this.closeWps}
+                        >
+                            关闭
+                        </Button>
+                        <Wps
+                            version={this.state.maxVersion}
+                            newVersion={this.state.newVersion}
+                        />
+                    </div>
+                    : ''
+                }
             </div>
         );
     }

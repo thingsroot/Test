@@ -26,12 +26,17 @@ class groups {
             name,
             user
         }
-        http.post('/api/companies_sharedgroups_remove_user', data).then(res=>{
-            if (res.ok) {
-                this.GroupsUserlist.splice(index, 1)
-                this.GroupsUserlist = [].concat(this.GroupsUserlist)
-                !flag && message.success(intl.get('sharegroup.remove_sharegroup_user_success'))
-            }
+        return new Promise((resolve, reject)=>{
+            http.post('/api/companies_sharedgroups_remove_user', data).then(res=>{
+                if (res.ok) {
+                    this.GroupsUserlist.splice(index, 1)
+                    this.GroupsUserlist = [].concat(this.GroupsUserlist)
+                    !flag && message.success('删除共享组用户成功！')
+                    resolve(true)
+                } else {
+                    reject(false)
+                }
+            })
         })
     }
     @action handleDeleteDevice (index, name) {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';     //
-import {Input, Icon, Button, message, notification, Rate, Modal } from 'antd';  //
+import {Input, Icon, Button, message, notification, Rate, Modal, Tag } from 'antd';  //
 import { inject, observer} from 'mobx-react';
 import GatewayStatus from '../../common/GatewayStatus';
 import http from '../../utils/Server';
@@ -48,9 +48,6 @@ class MyGatesAppsInstall extends Component {
         let app = this.props.match.params.app ? this.props.match.params.app.replace(/\*/g, '/') : ''
         let gateway_sn = this.props.match.params.sn;
         let install_step = this.props.match.params.step ? this.props.match.params.step : ''
-        // if (this.props.match.params.sn && this.props.match.params.app) {
-        //     console.log('pushspsushdbiqgeibakbfj')
-        // }
         if (this.props.match.params.app !== undefined && install_step === '') {
             install_step = 'view'
         }
@@ -88,12 +85,15 @@ class MyGatesAppsInstall extends Component {
     }
 
     searchApp (value){
-        let { app_list } = this.state;
-        let newdata = [];
-        newdata = app_list.filter((item)=>item.app_name.toLowerCase().indexOf(value.toLowerCase()) !== -1);
-        this.setState({
-            app_show: newdata
-        })
+        this.inputFilterTimer && clearTimeout(this.inputFilterTimer)
+        this.inputFilterTimer = setTimeout(()=>{
+            let { app_list } = this.state;
+            let newdata = [];
+            newdata = app_list.filter((item)=>item.app_name.toLowerCase().indexOf(value.toLowerCase()) !== -1);
+            this.setState({
+                app_show: newdata
+            })
+        }, 200)
     }
 
     setUrl = (name, step) => {
@@ -261,7 +261,7 @@ class MyGatesAppsInstall extends Component {
                         onClose={this.onClose}
                         onChange={this.onChangeGateway}
                         visible={this.state.gateway_list_visible}
-                    ></GatewaysDrawer>
+                    />
                     <Modal
                         visible={showLinkSelection}
                         title={intl.get('appsinstall.shortcut_selection')}
@@ -271,14 +271,6 @@ class MyGatesAppsInstall extends Component {
                         onCancel={()=>{
                             this.setState({install_step: 'view', showLinkSelection: false})
                         }}
-                        footer={[
-                            // <Button key="back" onClick={this.handleCancel}>
-                            // Return
-                            // </Button>,
-                            // <Button key="submit" type="primary" loading={loading} onClick={this.handleOk}>
-                            // Submit
-                            // </Button>,
-                        ]}
                     >
                         <ul className="linkSelection">
                             <li
@@ -306,21 +298,39 @@ class MyGatesAppsInstall extends Component {
                                 <Icon type="appstore" />
                                 {intl.get('appsinstall.view_app_list')}
                             </li>
+                            <li
+                                onClick={()=>{
+                                    window.location.href = `/gateway/${gateway_sn}/devices`
+                                }}
+                            >
+                                <Icon type="unordered-list" />
+                                查看设备列表
+                            </li>
                         </ul>
 
                     </Modal>
                     <div className={install_step === '' ? 'hide appsdetail' : 'show appsdetail'}>
-                    <Button
-                        className="installbtn"
-                        type="primary"
-                        onClick={()=>{
-                            if (install_step === 'install') {
-                                this.setState({install_step: 'view'})
-                            } else {
-                                this.setState({install_step: 'install'})
-                            }
-                        }}
-                    >
+                        <Button
+                            style={{position: 'absolute', right: '220px', top: '10px', zIndex: '999'}}
+                            icon="question-circle"
+                            onClick={()=>{
+                                window.open('https://wiki.freeioe.org/doku.php?id=apps:' + app_info.name, '_blank')
+                            }}
+                        >{intl.get('header.help')}</Button>
+                        <Button
+                            className="installbtn"
+                            type="primary"
+                            onClick={()=>{
+                                if (install_step === 'install') {
+                                    this.setState({install_step: 'view'})
+                                } else {
+                                    this.setState({install_step: 'install'})
+                                }
+                            }}
+                        >
+                            {/* {
+                                install_step === 'install' ? '查看应用描述' : '安装到网关'
+                            } */}
                         {
                             install_step === 'install' ? intl.get('appsinstall.view_app_description') : intl.get('appsinstall.install_to_gateway')
                         }
@@ -428,6 +438,7 @@ class MyGatesAppsInstall extends Component {
                                             <div
                                                 className="item"
                                             >
+                                                <span className="price">{intl.get('appedit.freeappedit.free')}</span>
                                                 <Link
                                                     to={
                                                         this.setUrl(val.name)
@@ -446,29 +457,44 @@ class MyGatesAppsInstall extends Component {
                                                 </Link>
                                                 <div className="apptitle">
                                                     <p>{val.app_name}</p>
-                                                    <div>
-                                                        <Rate
-                                                            disabled
-                                                            defaultValue={val.star}
-                                                            size="small"
-                                                        />
-                                                        <span onClick={()=>{
-                                                            this.setState({
-                                                                install_step: 'install',
-                                                                app_info: val
-                                                            })
-                                                        }}
-                                                        >
-                                                            <Link
-                                                                to={
-                                                                    this.setUrl(val.name, 'install')
-                                                                }
+                                                    <span>{val.user_info.dev_name}</span>
+                                                    <div className="app_footer">
+                                                        <div className="app_footer_tags">
+                                                            {
+                                                                val.tags && val.tags.split(',').length > 0 && val.tags.split(',').map((item, key)=>{
+                                                                    return (
+                                                                        <Tag
+                                                                            color="gold"
+                                                                            key={key}
+                                                                        >{item}</Tag>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </div>
+                                                        <div className="app_footer_rate">
+                                                            <Rate
+                                                                disabled
+                                                                defaultValue={val.star}
+                                                                size="small"
+                                                            />
+                                                            <span onClick={()=>{
+                                                                this.setState({
+                                                                    install_step: 'install',
+                                                                    app_info: val
+                                                                })
+                                                            }}
                                                             >
-                                                                <Icon
-                                                                    type="cloud-download"
-                                                                />
-                                                            </Link>
-                                                        </span>
+                                                                <Link
+                                                                    to={
+                                                                        this.setUrl(val.name, 'install')
+                                                                    }
+                                                                >
+                                                                    <Icon
+                                                                        type="cloud-download"
+                                                                    />
+                                                                </Link>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

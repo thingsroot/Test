@@ -1,0 +1,46 @@
+.share-group{
+  .manage{
+    color:#666;
+    font-size: 20px;
+    line-height: 50px;
+    font-weight: 600;
+  }
+  .add-user{
+    float: right;
+  }
+  .company-name{
+    font-weight: 600;
+  }
+  .group {
+    border: 1px solid #ccc;
+    width: 260px;
+    padding: 10px;
+  }
+  .ant-list-item-content-single {
+    width: 100%;
+  }
+}
+
+.online{
+  color:#3c763d;
+  b{
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #3c763d;
+      border-radius: 50%;
+      position: relative;
+  }
+  
+}
+.offline{
+  color:#f39c12;
+  b{
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #f39c12 ;
+      border-radius: 50%;
+      position: relative;
+  }
+}

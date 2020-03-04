@@ -3,7 +3,28 @@
     margin: 0 auto;
     position: relative;
     // background: #ccc;
-    .app_developer{
+    .all_app_content{
+        display: flex;
+        flex-wrap: wrap;
+        width: 1214px;
+        position: relative;
+        .all_app_filter{
+            position: absolute;
+            right: 23px;
+            top: -30px;
+        }
+    }
+    .app_title_and_developer{
+        text-align: center;
+        p{
+            font-weight: 600;
+        }
+        span{
+            font-size: 12px;
+            color: #ccc;
+        }
+    }
+    .app_developer_button{
         position: absolute;
         right: 40px;
         top: 20px;
@@ -18,12 +39,38 @@
     }
     .search{
         width:80%;
-        // height: 60px;
-        // border: 1px solid #ccc;
         border-radius: 5px;
         margin-bottom: 15px;
-        margin: 10px auto;
-        padding-left: 140px;
+        margin-top: 10px;
+        padding-left: 20%;
+        line-height: 30px;
+        position: relative;
+        .appstore_tags_list_min{
+            position: relative;
+            display: flex;
+            height: 30px;
+            overflow: hidden;
+            >span{
+                width: 50px;
+            }
+        }
+        .tags_icon{
+            position: absolute;
+            right:0;
+            top:0;
+            background-color: #fff;
+            z-index: 999;
+            -webkit-user-select: none;
+            -moz-user-select:none;
+            -o-user-select:none;
+            -ms-user-select:none;
+        }
+        .appstore_tags_list_max{
+            display: none;
+        }
+        // .appstore_tags_list{
+        //     margin-left: 20px;
+        // }
     }
     .all_app_title{
         height: 30px;
@@ -61,7 +108,7 @@
         margin-right: 20px;
         margin-top: 10px;
         width: 182px;
-        height: 200px;
+        height: 225px;
         border: 1px solid #ccc;
         border-radius: 5px;
         cursor: pointer;
@@ -93,8 +140,7 @@
     .the_selected_label{
         width: 80%;
         margin: 0 auto;
-        // border: 1px solid #ccc;
-        height: 30px;
+        line-height: 30px;
         border-radius: 5px;
         padding-left: 140px;
     }

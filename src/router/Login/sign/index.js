@@ -43,6 +43,7 @@ class Sign extends PureComponent {
                         }
                     }
                 }).catch(function (error){
+                    console.log(error)
                     if (error){
                         message.info(intl.get('login.system_error'))
                     }

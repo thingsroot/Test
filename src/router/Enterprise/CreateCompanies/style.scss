@@ -1,0 +1,16 @@
+.create_companies{
+    width: 90;
+    box-sizing: border-box;
+    padding: 30px;
+    .create_companies_title{
+        line-height: 50px;
+        font-size: 20px;
+        font-weight: 600;
+    }
+    .create_companies_content{
+        margin-bottom: 15px;
+        padding: 20px 0;
+        box-sizing: border-box;
+        width: 1024px;
+    }
+}

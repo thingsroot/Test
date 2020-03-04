@@ -350,23 +350,35 @@ class AppsList extends Component {
                 </Button>
                 {
                     show_app_config
-                    ? <AppConfig
-                        gateway_sn={gateway_sn}
-                        configStore={configStore}
-                        app_info={edit_app_info}
-                        app_inst={edit_app_inst}
-                        inst_editable={false}
-                        update_config
-                        pre_configuration={edit_app_conf}
-                        disabled={!this.props.store.gatewayInfo.actionEnable || this.state.apply_app_config}
-                        onSubmit={this.onSubmitAppConfig}
-                        onCancel={()=>{
-                            this.setState({close_after_submit: false, show_app_config: false})
-                        }}
-                        closeOnSubmit={()=>{
-                            this.setState({close_after_submit: true})
-                        }}
-                      />
+                    ? <div
+                        className="applist_appconfig"
+                      >
+                        <Button
+                            className="applist_appconfig_help"
+                            icon="question-circle"
+                            style={{marginRight: '10px'}}
+                            onClick={()=>{
+                                window.open('https://wiki.freeioe.org/doku.php?id=apps:' + this.state.edit_app_info.name, '_blank')
+                            }}
+                        >帮助</Button>
+                        <AppConfig
+                            gateway_sn={gateway_sn}
+                            configStore={configStore}
+                            app_info={edit_app_info}
+                            app_inst={edit_app_inst}
+                            inst_editable={false}
+                            update_config
+                            pre_configuration={edit_app_conf}
+                            disabled={!this.props.store.gatewayInfo.actionEnable || this.state.apply_app_config}
+                            onSubmit={this.onSubmitAppConfig}
+                            onCancel={()=>{
+                                this.setState({close_after_submit: false, show_app_config: false})
+                            }}
+                            closeOnSubmit={()=>{
+                                this.setState({close_after_submit: true})
+                            }}
+                        />
+                    </div>
                     : ''
                     }
                 </div>

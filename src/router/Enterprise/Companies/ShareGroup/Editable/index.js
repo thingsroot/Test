@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import {Button, Divider, Input, Modal, Popconfirm, Table, Form, message} from 'antd';
 import { inject, observer} from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import http from '../../../utils/Server';
 import intl from 'react-intl-universal';
+import http from '../../../../../utils/Server';
+import { _getCookie } from '../../../../../utils/Session';
 
 const EditableContext = React.createContext();
 
@@ -84,6 +85,19 @@ class Editable extends Component {
                     title: intl.get('common.name'),
                     dataIndex: 'description'
                 }, {
+                    title: intl.get('common.state'),
+                    dataIndex: 'device_status',
+                    width: '10%',
+                    render: (record)=>{
+                        if (record === 'ONLINE'){
+                            return <span className="online"><b></b>&nbsp;&nbsp;{intl.get('gateway.online')}</span>
+                        } else if (record === 'OFFLINE') {
+                            return <span className="offline"><b></b>&nbsp;&nbsp;{intl.get('gateway.offline')}</span>
+                        } else {
+                            return <span className="notline"><b></b>&nbsp;&nbsp;{intl.get('gateway.all')}</span>
+                        }
+                    }
+                }, {
                     title: intl.get('common.operation'),
                     render: (record)=>{
                         return (
@@ -92,7 +106,7 @@ class Editable extends Component {
                                 onClick={()=>{
                                     this.addGateway(record)
                                 }}
-                                disabled={this.props.store.groups.GroupsGatewaylist.filter(item=>item.device === record.dev_name).length > 0}
+                                disabled={this.props.store.groups.GroupsGatewaylist.filter(item=>item.device === record.sn).length > 0}
                             >
                                 {intl.get('appsinstall_add')}
                             </Button>
@@ -206,8 +220,7 @@ class Editable extends Component {
     save (record, form) {
         form.validateFields((error, row) => {
             if (error){
-                console.log(error)
-                return;
+                return false;
             }
             const newData = this.props.store.groups.GroupsUserlist;
             const index = newData.findIndex(item => record.idx === item.idx);
@@ -283,7 +296,7 @@ class Editable extends Component {
             if (res.ok) {
                 const num = this.props.store.groups.GroupsGatewaylist.length + 1;
                 const obj = {
-                    device: record.dev_name,
+                    device: record.sn,
                     creation: record.creation,
                     idx: num,
                     modified: record.modified,
@@ -322,9 +335,21 @@ class Editable extends Component {
         }, ()=>{
             http.get('/api/gateways_list').then(res=>{
                 if (res.ok) {
+                    const data = res.data;
+                    const gatewayList = [];
+                    if (data.length > 0) {
+                        data.map(item=>{
+                            if (item.owner_type === 'Cloud Company Group' && item.company === _getCookie('companies')) {
+                                gatewayList.push(item)
+                            }
+                        })
+                    }
+                    gatewayList.sort((a, b)=>{
+                        return a.device_status - b. device_status
+                    })
                     this.setState({
-                        gatewayList: res.data,
-                        filterGatewayList: res.data,
+                        gatewayList,
+                        filterGatewayList: gatewayList,
                         loading: false
                     })
                 }
@@ -401,9 +426,18 @@ class Editable extends Component {
                         className="templateList"
                         title={<h3>{intl.get('sharegroup.search_gateway')}</h3>}
                         maskClosable={false}
+                        footer={
+                            <Button
+                                type="primary"
+                                onClick={this.handleCancelAddTempListDevice}
+                            >{intl.get('gateway.close')}</Button>
+                        }
+                        onCancel={()=>{
+                            this.setState({
+                                showTemplateSelectionDevice: false
+                            })
+                        }}
                         visible={this.state.showTemplateSelectionDevice}
-                        onOk={this.handleCancelAddTempListDevice}
-                        onCancel={this.handleCancelAddTempListDevice}
                         wrapClassName={'templatesModal'}
                         okText={intl.get('common.sure')}
                         cancelText={intl.get('common.cancel')}
@@ -419,7 +453,7 @@ class Editable extends Component {
                                 lineHeight: '30px'
                             }}
                         >
-                            <span style={{padding: '0 20px'}}> </span>
+                            <span style={{padding: '0 30px'}}> </span>
                             <Input.Search
                                 placeholder={intl.get('sharegroup.ID_name')}
                                 onChange={(e)=>{
