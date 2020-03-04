@@ -16,6 +16,16 @@ class HeaderBar extends PureComponent {
     componentDidMount () {
         // this.handleChange('zh-CN')
         this.handleChange()
+        if (this.props.location.pathname.indexOf('appstore') !== -1 || this.props.location.pathname.indexOf('appitems') !== -1) {
+            this.setState({
+                page: 'appstore'
+            })
+        }
+        if (this.props.location.pathname.indexOf('enterprise') !== -1) {
+            this.setState({
+                page: 'enterprise'
+            })
+        }
     }
     UNSAFE_componentWillReceiveProps (nextProps) {
         if (nextProps.location.pathname.indexOf('appstore') === -1 && nextProps.location.pathname.indexOf('enterprise') === -1) {
@@ -79,7 +89,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                        产品介绍
+                        {intl.get('header.Product_introduction')}
                     </span>
                 </Menu.Item>
                 <Menu.Item
@@ -93,7 +103,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                        用户指南
+                    {intl.get('header.The_user_guide')}
                     </span>
                 </Menu.Item>
                 <Menu.Item
@@ -107,7 +117,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                        管理员指南
+                    {intl.get('header.Manager_s_guide')}
                     </span>
                 </Menu.Item>
                 <Menu.Divider />
