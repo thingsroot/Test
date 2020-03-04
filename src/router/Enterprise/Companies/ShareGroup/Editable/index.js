@@ -84,6 +84,19 @@ class Editable extends Component {
                     title: '描述',
                     dataIndex: 'description'
                 }, {
+                    title: '状态',
+                    dataIndex: 'device_status',
+                    width: '10%',
+                    render: (record)=>{
+                        if (record === 'ONLINE'){
+                            return <span className="online"><b></b>&nbsp;&nbsp;在线</span>
+                        } else if (record === 'OFFLINE') {
+                            return <span className="offline"><b></b>&nbsp;&nbsp;离线</span>
+                        } else {
+                            return <span className="notline"><b></b>&nbsp;&nbsp;全部}</span>
+                        }
+                    }
+                }, {
                     title: '操作',
                     render: (record)=>{
                         return (
@@ -92,7 +105,7 @@ class Editable extends Component {
                                 onClick={()=>{
                                     this.addGateway(record)
                                 }}
-                                disabled={this.props.store.groups.GroupsGatewaylist.filter(item=>item.device === record.dev_name).length > 0}
+                                disabled={this.props.store.groups.GroupsGatewaylist.filter(item=>item.device === record.sn).length > 0}
                             >
                                 添加
                             </Button>
@@ -288,7 +301,7 @@ class Editable extends Component {
             if (res.ok) {
                 const num = this.props.store.groups.GroupsGatewaylist.length + 1;
                 const obj = {
-                    device: record.dev_name,
+                    device: record.sn,
                     creation: record.creation,
                     idx: num,
                     modified: record.modified,
@@ -424,6 +437,11 @@ class Editable extends Component {
                                 onClick={this.handleCancelAddTempListDevice}
                             >关闭</Button>
                         }
+                        onCancel={()=>{
+                            this.setState({
+                                showTemplateSelectionDevice: false
+                            })
+                        }}
                         visible={this.state.showTemplateSelectionDevice}
                         wrapClassName={'templatesModal'}
                         okText="确定"
