@@ -114,11 +114,11 @@ class Editable extends Component {
                 }
             ],
             columnsUser: [
-                {
-                    title: '序号',
-                    dataIndex: 'idx',
-                    width: '100px'
-                },
+                // {
+                //     title: '序号',
+                //     dataIndex: 'idx',
+                //     width: '100px'
+                // },
                 {
                     title: '用户ID',
                     dataIndex: 'user',
@@ -186,19 +186,19 @@ class Editable extends Component {
             ],
             count: 0,
             columnsDevice: [
-                {
-                    title: '序号',
-                    dataIndex: 'idx',
-                    width: '100px'
-                },
+                // {
+                //     title: '序号',
+                //     dataIndex: 'idx',
+                //     width: '100px'
+                // },
                 {
                     title: '网关序列号',
                     dataIndex: 'device',
                     editable: true
                 },
                 {
-                    title: '备注',
-                    dataIndex: 'comment',
+                    title: '名称',
+                    dataIndex: 'dev_name',
                     width: '30%',
                     editable: true
                 },
@@ -305,7 +305,8 @@ class Editable extends Component {
                     creation: record.creation,
                     idx: num,
                     modified: record.modified,
-                    description: ''
+                    description: '',
+                    dev_name: record.dev_name
                 }
                 this.props.store.groups.pushGroupsGatewaylist(obj)
                 message.success('添加设备成功')
@@ -415,10 +416,11 @@ class Editable extends Component {
                     <Table
                         columns={columnsDevice}
                         components={components}
+                        loading={this.props.store.groups.loading}
                         dataSource={this.props.store.groups.GroupsGatewaylist}
                         size="small"
                         pagination={false}
-                        rowKey="idx"
+                        rowKey="device"
                     />
                     <Button
                         onClick={this.templateShowDevice}
