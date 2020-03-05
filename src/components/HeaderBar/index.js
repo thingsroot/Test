@@ -103,7 +103,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                    {intl.get('header.The_user_guide')}
+                        {intl.get('header.The_user_guide')}
                     </span>
                 </Menu.Item>
                 <Menu.Item
@@ -117,7 +117,7 @@ class HeaderBar extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                    {intl.get('header.Manager_s_guide')}
+                        {intl.get('header.Manager_s_guide')}
                     </span>
                 </Menu.Item>
                 <Menu.Divider />
