@@ -91,6 +91,8 @@
     "dashboard.the_serial_number": "The serial number",
     "dashboard.no_trouble": "Congratulations, there was no trouble today",
     "gateway.Equipment_sharing_has_been_postponed_successfully": "Equipment sharing has been postponed successfully!",
+    "gateway.Has_the_failure": "Has the failure",
+    "gateway.please_enter": "please enter",
     "gateway.Device_sharing_successful": "Device sharing successful!",
     "gateway.Delete_temporary_share_successfully": "Device sharing successful!",
     "gateway.delay": "delay",

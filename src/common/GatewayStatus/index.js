@@ -33,7 +33,7 @@ class EditableCell extends React.Component {
               rules: [
                 {
                   required: true,
-                  message: `请输入${title}!`
+                  message: `${intl.get('gateway.please_enter')}  ${title}!`
                 }
               ],
               initialValue: record[dataIndex]
@@ -80,7 +80,7 @@ class Status extends Component {
                                 if (new Date(record) * 1 > new Date() * 1) {
                                     return <span>{record}</span>
                                 } else {
-                                    return <span style={{color: 'red'}}>{record ? '已失效' : ''}</span>
+                                    return <span style={{color: 'red'}}>{record ? intl.get('gateway.Has_the_failure') : ''}</span>
                                 }
                             } else {
                                 return (
@@ -374,7 +374,7 @@ class Status extends Component {
                             }
                     </div>
                     <div
-                        style={{flex: '1'}}
+                        style={{flex: '1', marginLeft: 15}}
                     >
                     <Tooltip title="在线状态" >
                         <IconIOT
@@ -414,16 +414,16 @@ class Status extends Component {
                             &nbsp;{intl.get('common.name')}: {dev_name ? dev_name : ''}
                         </div>
                     </Tooltip>
-                    <span style={{padding: '0 50px'}} />
+                    <span style={{padding: '0 0px'}} />
                     <Tooltip title={description ? description : ''}>
-                        <div style={{width: '300px'}}>
+                        <div style={{width: '280px'}}>
                             <div className="positon"><span></span></div>
                             &nbsp;{intl.get('common.desc')}: {description ? description : ''}
                         </div>
                     </Tooltip>
-                    <span style={{padding: '0 50px'}} />
+                    <span style={{padding: '0 0px'}} />
                     <Tooltip title={this.state.gateway}>
-                        <div style={{width: '300px'}}>
+                        <div style={{width: '280px'}}>
                             <div className="positon"><span></span></div>
                             &nbsp;{intl.get('gateway.number')}: {this.state.gateway}
                         </div>

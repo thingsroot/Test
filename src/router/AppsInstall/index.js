@@ -358,7 +358,7 @@ class MyGatesAppsInstall extends Component {
                             <div style={{display: 'flex' }}>
                                 {
                                     app_info.icon_image
-                                    ? <img src={'/store_assets' + app_info.icon_image}
+                                    ? <img src={'/store_assets' + app_info.icon_image ? app_info.icon_image : '/'}
                                         alt=""
                                         style={{width: 128, height: 128}}
                                       />

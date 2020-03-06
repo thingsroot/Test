@@ -92,7 +92,7 @@ class AppEdit extends Component {
                 description: res.data.description,
                 conf_template: this.prettyJson(res.data.conf_template),
                 pre_configuration: this.prettyJson(res.data.pre_configuration),
-                imgSrc: '/store_assets' + res.data.icon_image
+                imgSrc: '/store_assets' + res.data.icon_image ? res.data.icon_image : '/'
             })
         })
     };
@@ -489,7 +489,7 @@ class AppEdit extends Component {
                     className="login-form-button"
                     onClick={this.handleSubmit}
                 >
-                    {this.state.is_new ? intl.get('accesskeys.create') : intl.get('accesskeys.appedit.modify')}
+                    {this.state.is_new ? intl.get('accesskeys.create') : intl.get('appedit.modify')}
                 </Button>
                 <span style={{padding: '0 5px'}}> </span>
                 <Button
@@ -503,7 +503,6 @@ class AppEdit extends Component {
                     title={<span><Icon type="info-circle" /> {intl.get('appedit.Edit_the_label')}</span>}
                     visible={visible_tags}
                     onOk={this.saveTags}
-                    // confirmLoading={confirmLoading}
                     onCancel={()=>{
                         this.setState({
                             select_the_label: []

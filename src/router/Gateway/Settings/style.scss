@@ -8,6 +8,10 @@
         border-bottom: 1px solid #eee;
         vertical-align: middle;
         position: relative;
+        display: -webkit- box;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
         >button{
             position: absolute;
             right:40%;

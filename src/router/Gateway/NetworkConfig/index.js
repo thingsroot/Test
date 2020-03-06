@@ -333,10 +333,6 @@ class NetworkConfig extends Component {
                     <div className="title">
                         <h2>{intl.get('gateway.The_network_configuration')}</h2>
                         <div className="btn_to_set">
-                        <Tooltip
-                            placement="bottom"
-                            title={intl.get('gateway.force_the_gateway_to_send_the_latest_data')}
-                        >
                                 <Button
                                     icon="question-circle"
                                     style={{bottom: 30}}
@@ -345,19 +341,23 @@ class NetworkConfig extends Component {
                                     }}
                                 >{intl.get('header.help')}</Button>
                                 <br/>
-                                <Button
-                                    disabled={!this.state.dataFlushEnable}
-                                    onClick={()=>{
-                                        this.setState({dataFlushEnable: false})
-                                        this.dataFlush()
-                                        setTimeout(()=>{
-                                            this.setState({dataFlushEnable: true})
-                                        }, 1000)
-                                    }}
+                                <Tooltip
+                                    placement="bottom"
+                                    title={intl.get('gateway.force_the_gateway_to_send_the_latest_data')}
                                 >
-                                    <IconIOT type="icon-APIshuchu"/>{intl.get('devece_list.Forced_to_refresh')}
-                                </Button>
-                            </Tooltip>
+                                    <Button
+                                        disabled={!this.state.dataFlushEnable}
+                                        onClick={()=>{
+                                            this.setState({dataFlushEnable: false})
+                                            this.dataFlush()
+                                            setTimeout(()=>{
+                                                this.setState({dataFlushEnable: true})
+                                            }, 1000)
+                                        }}
+                                    >
+                                        <IconIOT type="icon-APIshuchu"/>{intl.get('devece_list.Forced_to_refresh')}
+                                    </Button>
+                                </Tooltip>
                         </div>
                     </div>
                 <div className="networkpagecontent">

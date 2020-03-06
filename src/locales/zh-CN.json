@@ -89,6 +89,8 @@
     "dashboard.name": "名称",
     "dashboard.the_serial_number": "序号",
     "dashboard.no_trouble": "恭喜你，今天没有发生故障",
+    "gateway.please_enter": "请输入",
+    "gateway.Has_the_failure": "已失效",
     "gateway.Equipment_sharing_has_been_postponed_successfully": "设备共享延期成功！",
     "gateway.Device_sharing_successful": "设备共享成功！",
     "gateway.Delete_temporary_share_successfully": "删除临时共享成功!",

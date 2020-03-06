@@ -397,7 +397,7 @@ class AppDetails extends Component {
                 <div className="details">
                     <div className="appImg">
                         <img
-                            src={`/store_assets${app_info.icon_image}`}
+                            src={`/store_assets${app_info.icon_image ? app_info.icon_image : '/'}`}
                             alt={intl.get('appdetails.picture')}
                         />
                     </div>
@@ -461,7 +461,10 @@ class AppDetails extends Component {
                         <Button
                             className="button"
                             style={app_info.fork_from ? block : none}
-                            to={`/appdetails/${app_info.fork_from}`}
+                            onClick={()=>{
+                                this.props.history.push(`/appdetails/${app_info.fork_from}`)
+                            }}
+                            // to={`/appdetails/${app_info.fork_from}`}
                         >
                             <Icon type="share-alt" />
                             {intl.get('appdetails.branch')}
@@ -472,7 +475,7 @@ class AppDetails extends Component {
                                 type="danger"
                                 onClick={this.showModal}
                                 size="default"
-                                style={{height: 35, marginLeft: 5, marginRight: '5px'}}
+                                style={{height: 35, marginLeft: 5, marginRight: '5px', marginTop: 5}}
                               >
                                 <Icon type="info-circle" />
                                 <span>{intl.get('appdetails.delete')}</span>
