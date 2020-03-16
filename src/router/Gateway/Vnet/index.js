@@ -367,7 +367,7 @@ class VPN extends Component {
                             type="primary"
                             loading={start_loading}
                             disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0 && this.state.timer !== undefined && !this.state.timer)}
-                            style={{fontSize: 24, height: 50}}
+                            style={{fontSize: 24, height: 50, width: 150}}
                             onClick={()=>{
                                 this.setState({
                                     start_loading: true,
@@ -381,7 +381,7 @@ class VPN extends Component {
                         className="btn"
                         type="danger"
                         loading={stop_loading}
-                        style={{fontSize: 24, height: 50}}
+                        style={{fontSize: 24, height: 50, width: 150}}
                         onClick={()=>{
                             this.setState({
                                 start_loading: false,

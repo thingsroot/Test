@@ -3,6 +3,7 @@ import http from '../../../utils/Server';
 import { _getCookie, _setCookie } from '../../../utils/Session';
 import reqwest from 'reqwest';
 import { withRouter } from 'react-router-dom';
+import intl from 'react-intl-universal'
 import {
     Button,
     Form,
@@ -42,55 +43,55 @@ import {
             return (
                 <Modal
                     visible={visible}
-                    title="创建企业组织"
-                    okText="创建"
-                    cancelText="取消"
+                    title={intl.get('company.Creating_an_organization')}
+                    okText={intl.get('accesskeys.create')}
+                    cancelText={intl.get('common.cancel')}
                     onCancel={onCancel}
                     onOk={onCreate}
                     maskClosable={false}
                 >
                 <Form layout="vertical">
-                  <Form.Item label="公司简称">
+                  <Form.Item label={intl.get('company.The_company_referred_to_as')}>
                     {getFieldDecorator('comp_name', {
-                      rules: [{ required: true, message: '请输入公司简称!' }]
+                      rules: [{ required: true, message: intl.get('gateway.please_enter') + intl.get('company.The_company_referred_to_as') + '!' }]
                     })(<Input />)}
                   </Form.Item>
-                  <Form.Item label="公司全称">
+                  <Form.Item label={intl.get('company.The_company_full_name')}>
                     {getFieldDecorator('full_name', {
-                      rules: [{ required: true, message: '请输入公司全称!' }]
+                      rules: [{ required: true, message: intl.get('gateway.please_enter') + intl.get('company.The_company_full_name') + '!' }]
                     })(<Input />)}
                   </Form.Item>
-                  <Form.Item label="公司域名">
+                  <Form.Item label={intl.get('company.The_company_name')}>
                     {getFieldDecorator('domain', {
-                      rules: [{ required: true, message: '请输入公司域名!' }]
+                      rules: [{ required: true, message: intl.get('gateway.please_enter') + intl.get('company.The_company_name') + '!' }]
                     })(<Input />)}
                   </Form.Item>
-                  <Form.Item label="联系电话">
+                  <Form.Item label={intl.get('company.Contact_phone_number')}>
                     {getFieldDecorator('telephone', {
-                      rules: [{ required: true, message: '请输入联系电话!' }]
+                      rules: [{ required: true, message: intl.get('gateway.please_enter') + intl.get('company.Contact_phone_number') + '!' }]
                     })(<Input />)}
                   </Form.Item>
-                  <Form.Item label="公司信用代码(税号)">
+                  <Form.Item label={intl.get('company.Company_credit_code_(tax_code)')}>
                     {getFieldDecorator('credit_code', {
-                      rules: [{ required: true, message: '请输入公司信用代码(税号)!' }]
+                      rules: [{ required: true, message: intl.get('gateway.please_enter') + intl.get('company.Company_credit_code_(tax_code)') + '!' }]
                     })(<Input />)}
                   </Form.Item>
-                  <Form.Item label="公司注册地址">
+                  <Form.Item label={intl.get('company.Company_registered_address')}>
                     {getFieldDecorator('address', {
-                      rules: [{ required: true, message: '请输入公司注册地址!' }]
+                      rules: [{ required: true, message: intl.get('gateway.please_enter') + intl.get('company.Company_registered_address') + '!' }]
                     })(<Input />)}
                   </Form.Item>
-                  <Form.Item label="联系地址">
+                  <Form.Item label={intl.get('company.Contact_address')}>
                     {getFieldDecorator('contact', {
-                      rules: [{ required: true, message: '请输入公司联系地址!' }]
+                      rules: [{ required: true, message: intl.get('gateway.please_enter') + intl.get('company.Contact_address') + '!' }]
                     })(<Input />)}
                   </Form.Item>
-                  <Form.Item label="公司运营执照照片文件">
+                  <Form.Item label={intl.get('company.Company_operating_license_photo_file')}>
                     {getFieldDecorator('business_license_file', {
-                      rules: [{ required: true, message: '请上传公司运营执照照片!' }]
+                      rules: [{ required: true, message: intl.get('company.Please_upload_photos_of_the_companys_operating_license') + '!' }]
                     })(<Upload {...props}>
                         <Button>
-                          <Icon type="upload" /> 上传运营执照照片
+                          <Icon type="upload" /> {intl.get('company.Upload_photos_of_operating_license')}
                         </Button>
                       </Upload>)}
                   </Form.Item>
@@ -141,7 +142,7 @@ class CreateCompanies extends PureComponent {
                                 })
                                 if (result.data && result.data.companies.length > 0) {
                                     _setCookie('companies', result.data.companies[0])
-                                    message.success('您的申请已经成功，即将为您跳转到企业页面，请稍等！')
+                                    message.success(intl.get('company.Your_application_has_been_successful_and_will_be_redirected_to_the_enterprise_page_for_you._Please_wait_a_moment'))
                                     this.props.history.push('/enterprise/shared')
                                 }
                             }
@@ -166,7 +167,7 @@ class CreateCompanies extends PureComponent {
         }
         http.post('/api/user_company_invitations_accept', data).then(res=>{
             if (res.ok) {
-                message.success('您已成功加入该公司！')
+                message.success(intl.get('company.You_have_successfully_joined_the_company"'))
                 _setCookie('companies', company)
             }
         })
@@ -177,14 +178,14 @@ class CreateCompanies extends PureComponent {
         }
         http.post('/api/user_company_invitations_reject', data).then(res=>{
             if (res.ok) {
-              message.error('您已拒绝加入该公司！')
+              message.error(intl.get('company.You_have_refused_to_join_the_company'))
             }
         })
     }
     showConfirm = (record) => {
         confirm({
-          title: '有用户邀请您加入公司' + record.company,
-          content: '是否加入该公司？',
+          title: intl.get('company.Users_have_invited_you_to_join_the_company') + record.company,
+          content: intl.get('company.Join_the_company'),
           onOk: ()=> {
             this.addcompany(record.name, record.company)
           },
@@ -210,11 +211,11 @@ class CreateCompanies extends PureComponent {
             }
             const formData = new FormData();
             if (fileList.length > 1) {
-                message.error('不能上传多个文件')
+                message.error(intl.get('appdetails.cannot_upload_multiple_files'))
                 return
             }
             if (fileList.length === 0) {
-                message.error('请选择要上传的文件')
+                message.error(intl.get('appdetails.Please select the file to upload'))
                 return
             }
             fileList.forEach((file) => {
@@ -232,7 +233,7 @@ class CreateCompanies extends PureComponent {
                 processData: false,
                 data: formData,
                 success: () => {
-                    message.success('资料提交成功，请耐心等待后台审核，预计需要1-3个工作日...');
+                    message.success(intl.get('company.The_materials_are_submitted_successfully._Please_wait_patiently_for_the_background_review._It_is_expected_to_take_1-3_working_days'));
                     this.setState({
                       visible: false,
                       status: 'processing',
@@ -240,7 +241,7 @@ class CreateCompanies extends PureComponent {
                     })
                 },
                 error: () => {
-                  message.error('资料提交失败，请重试！');
+                  message.error(intl.get('company.Data_submission_failed,_please_try_again'));
                 }
               });
             form.resetFields();
@@ -256,13 +257,13 @@ class CreateCompanies extends PureComponent {
                 {
                     status === '' && !loading
                     ? <div>
-                        <p className="create_companies_title">企业组织简介</p>
-                        <p className="create_companies_content">您可以将相关账户加入企业组织，组织成员具有层级关系的结构，如果您的账户代表一家公司，则可以将所有部门账户添加进来，按照公司结构组织这些部门账户的层级关系；如果您的账户是代理商，可以添加所有子公司账户。作为主账户，您还可以控制子账户的访问权限。</p>
+                        <p className="create_companies_title">{intl.get('company.company.Introduction_to_enterprise_organization')}</p>
+                        <p className="create_companies_content">{intl.get('company.company.Introduction_to_enterprise_organization_content')}</p>
                         <Button
                             icon="plus"
                             type="primary"
                             onClick={this.showModal}
-                        >创建企业组织</Button>
+                        >{intl.get('company.Creating_an_organization')}</Button>
                         <CollectionCreateForm
                             wrappedComponentRef={this.saveFormRef}
                             visible={this.state.visible}
@@ -277,14 +278,14 @@ class CreateCompanies extends PureComponent {
                     ? <div>
                         <Result
                             status="warning"
-                            title="申请失败,点击重新申请"
+                            title={intl.get('company.Application_failed_click_reapply')}
                             extra={
                             <Button
                                 type="primary"
                                 key="console"
                                 onClick={this.showModal}
                             >
-                                重新申请
+                                {intl.get('appdeveloper.reapply')}
                             </Button>
                             }
                         />
@@ -301,7 +302,7 @@ class CreateCompanies extends PureComponent {
                                     theme="twoTone"
                                 />
                             }
-                            title="您的申请正在处理中，请耐心等待!"
+                            title={intl.get('company.Your_application_is_being_processed_please_wait_patiently')}
                             extra={
                               <Button
                                   type="primary"

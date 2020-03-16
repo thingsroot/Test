@@ -386,12 +386,12 @@ class EditableTable extends React.Component {
             user: this.state.user
         }
         if (this.state.user === _getCookie('user_id')){
-            message.error('管理员已是组中成员!')
+            message.error(intl.get('company.The_administrator_is_already_a_member_of_the_group') + '!')
             return false;
         }
         http.post('/api/companies_employees_invite', data).then(res=>{
             if (res.ok) {
-                message.success('邀请成功，请等待用户接受邀请！')
+                message.success(intl.get('company.Invitation successful, please wait for the user to accept the invitation'))
             }
             this.setState({
                 visible: false
@@ -592,19 +592,19 @@ class EditableTable extends React.Component {
                 </Modal>
                 <Modal
                     visible={this.state.visible}
-                    title="邀请用户加入公司组"
+                    title={intl.get('Invite_users_to_join_the_company_group')}
                     onOk={this.invitation}
                     onCancel={()=>{
                         this.setState({visible: false})
                     }}
-                    okText="确定"
-                    cancelText="放弃"
+                    okText={intl.get('common.sure')}
+                    cancelText={intl.get('login.waiver_of_amendment')}
                     maskClosable={false}
                     destroyOnClose
                 >
-                    <span>用户名:</span>
+                    <span>{intl.get('login.user_name')}:</span>
                     <Input
-                        placeholder="请输入要邀请的成员账户"
+                        placeholder={intl.get('company.Please_enter_the_member_account_to_be_invited')}
                         onChange={(e)=>{
                             this.setState({
                                 user: e.target.value

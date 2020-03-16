@@ -137,6 +137,7 @@ class NetworkConfig extends Component {
       }
     getInfo = ()=>{
         this.getIsNetInfo().then(res=>{
+            console.log(res, ' ressssss')
             if (res) {
                 this.getWanInfo('net_info')
             } else {

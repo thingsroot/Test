@@ -36,9 +36,6 @@ class App extends PureComponent {
   state = {
     collapsed: true
   };
-  componentDidMount () {
-    console.log(this)
-  }
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed

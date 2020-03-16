@@ -111,33 +111,33 @@ class LeftNav extends Component {
     };
     info () {
         Modal.info({
-          title: '提示：',
+          title: intl.get('common.prompt') + '：',
           content: (
             <div>
-              <p>该设备为虚拟设备,暂不支持此项功能！请更换设备后重试！</p>
+              <p>{intl.get('gateway.Please_try_again_after_changing_the_equipment')}</p>
             </div>
           )
         });
       }
     enableVSERIAL (enable) {
         if (enable) {
-            return this.installApp('freeioe_Vserial', 'APP00000130', '开启远程串口功能')
+            return this.installApp('freeioe_Vserial', 'APP00000130', intl.get('devece_list.Enable_remote_serial_port_function'))
         } else {
-            return this.removeApp('freeioe_Vserial', '关闭虚拟网络功能')
+            return this.removeApp('freeioe_Vserial', intl.get('devece_list.Turn_off_remote_serial_port_function'))
         }
     }
     enableVNET (enable) {
         if (enable) {
-            return this.installApp('freeioe_Vnet', 'APP00000135', '开启远程编程网络功能')
+            return this.installApp('freeioe_Vnet', 'APP00000135', intl.get('devece_list.Enable_remote_programming_network_function'))
         } else {
-            return this.removeApp('freeioe_Vnet', '关闭虚拟网络功能')
+            return this.removeApp('freeioe_Vnet', intl.get('devece_list.Turn_off_remote_programming_network_functionality'))
         }
     }
     enableIOENetwork (enable){
         if (enable) {
-            return this.installApp('net_info', 'APP00000115', '开启虚拟网络功能')
+            return this.installApp('net_info', 'APP00000115', intl.get('devece_list.Enable_virtual_network_function'))
         } else {
-            return this.removeApp('net_info', '关闭虚拟网络功能')
+            return this.removeApp('net_info', intl.get('devece_list.Turn_off_the_virtual_network_function'))
         }
     }
     installApp (inst_name, app_name, title){

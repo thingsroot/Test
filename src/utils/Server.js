@@ -18,23 +18,29 @@ axios.interceptors.request.use((config) => {
   // config.headers.common['user_id'] = _getCookie('user_id');
   // config.headers.common['user_image'] = _getCookie('user_image');
   return config;
+
 });
 */
 
 // 添加响应拦截器
-// axios.interceptors.response.use(
-//   function (response) {
-
-//     if (!isAuthenticated() || response.data.error && response.data.error === 'auth_code_missing'){
-//       window.location.href = '/login'
-//     }
-//     return response;
-//   },
-//   function (error) {
-//     // 对响应错误做点什么
-//     return Promise.reject(error);
-//   }
-// );
+axios.interceptors.response.use(
+  function (response) {
+    console.log(response)
+    console.log(response.headers, 'headers')
+    if (response['set-cookie'] === undefined) {
+      console.log('meiyoumeiyoumeiyou')
+    }
+    console.log(response.headers['set-cookie'])
+// //     if (!isAuthenticated() || response.data.error && response.data.error === 'auth_code_missing'){
+// //       window.location.href = '/login'
+// //     }
+    return response;
+// //   },
+// //   function (error) {
+// //     // 对响应错误做点什么
+// //     return Promise.reject(error);
+  }
+);
 /**
  * get请求
  * @method get

@@ -103,7 +103,6 @@ class MyGates extends Component {
                 width: '240px',
                 render: (text, record, props) => {
                     props;
-                    console.log(this)
                   return (
                       <span>
                         <Link to={{

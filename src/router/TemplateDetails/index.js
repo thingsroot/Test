@@ -181,7 +181,7 @@ class MyTemplateDetails extends PureComponent {
                 res;
                 if (res.ok) {
                     this.onVersionChange(res.data.version)
-                    message.success('上传新版本成功！');
+                    message.success(intl.get('templatedetails.upload_new_version_succeeded'));
                     setTimeout(()=>{
                         this.setState({
                             visible: false,

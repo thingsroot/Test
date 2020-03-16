@@ -75,7 +75,7 @@ class GatewaysDrawer extends Component {
                 width="500"
             >
                 <Input.Search
-                    placeholder="请输入网关序列号，名称，描述"
+                    placeholder={intl.get('gateway.placeholder')}
                     onChange={this.filterGateway}
                     style={{
                         width: '70%',

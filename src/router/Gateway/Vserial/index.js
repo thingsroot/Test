@@ -283,6 +283,7 @@ class Vserial extends Component {
         clearInterval(this.keep)
     }
     keepAlive = () =>{
+        console.log(this.props, 'propsssssssss')
         let params = {
             gateway: this.props.gateway,
             name: this.props.gateway + '.freeioe_Vserial',
@@ -575,6 +576,7 @@ class Vserial extends Component {
                                     type="primary"
                                     loading={openLoading}
                                     disabled={!(mqtt.vserial_channel.serviceNode && mqtt.vserial_channel.serviceNode.length > 0 && !this.state.timer)}
+                                    style={{width: 150, height: 50, fontSize: 20}}
                                     onClick={()=>{
                                         this.setState({
                                             openLoading: true,
@@ -587,6 +589,7 @@ class Vserial extends Component {
                                     : <Button
                                         type="danger"
                                         loading={stopLoading}
+                                        style={{width: 150, height: 50, fontSize: 20}}
                                         onClick={()=>{
                                             if (addPortData[0].app_path === '' || addPortData[0].app_path.indexOf('freeioe_Rprogramming') !== -1) {
                                                 this.setState({

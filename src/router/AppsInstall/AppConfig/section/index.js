@@ -486,7 +486,7 @@ class AppConfigSection extends Component {
                         </Button>
                         <span style={{padding: '0 20px'}}> </span>
                         <Input.Search
-                            placeholder="网关名称、描述、模板ID"
+                            placeholder={intl.get('gateway.placeholder_template')}
                             onChange={(e=>{
                                 this.search(e.target.value.toLocaleLowerCase())
                             })}

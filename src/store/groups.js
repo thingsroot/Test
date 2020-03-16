@@ -6,9 +6,28 @@ class groups {
     @observable UserList = [];
     @observable GroupsUserlist = [];
     @observable GroupsGatewaylist = [];
+    @observable loading = false;
+    @action getGatewayInfo (index, arr) {
+        if (index >= arr.length) {
+            this.GroupsGatewaylist = [];
+            this.GroupsGatewaylist = [].concat(arr);
+            this.loading = false;
+            return false;
+        }
+        http.get('/api/gateways_info_read?name=' + arr[index].device).then(res=>{
+            if (res.ok) {
+                arr[index].dev_name = res.data.dev_name;
+                this.getGatewayInfo(index + 1, arr)
+            }
+        })
+    }
     @action setGroupsUserlist (val) {
+        this.GroupsGatewaylist = [];
+        this.GroupsUserlist = [];
+        this.loading = true;
+        const device = val.devices ? val.devices : [];
         this.GroupsUserlist = val.users ? val.users : [];
-        this.GroupsGatewaylist = val.devices ? val.devices : [];
+        this.getGatewayInfo(0, device)
     }
     @action setUserlist (val) {
         this.UserList = val.user_list ? val.user_list : [];
@@ -31,7 +50,7 @@ class groups {
                 if (res.ok) {
                     this.GroupsUserlist.splice(index, 1)
                     this.GroupsUserlist = [].concat(this.GroupsUserlist)
-                    !flag && message.success('删除共享组用户成功！')
+                    !flag && message.success(intl.get('sharegroup.remove_sharegroup_user_success'))
                     resolve(true)
                 } else {
                     reject(false)

@@ -71,27 +71,31 @@ class GatewaySettings extends Component {
     fetchFreeIOEVersion () {
         const { gatewayInfo } = this.props.store;
         http.get('/api/applications_versions_list?app=FreeIOE&beta=' + (gatewayInfo.data.enable_beta ? 1 : 0)).then(res=>{
-            const arr = [];
-            res.data && res.data.length > 0 && res.data.map(item=>{
-                if (item.version > gatewayInfo.data.version){
-                    if (gatewayInfo.data.enable_beta){
-                        arr.push(item)
-                    } else {
-                        if (item.beta === 0){
+            if (res.ok) {
+                const arr = [];
+                res.data && res.data.length > 0 && res.data.map(item=>{
+                    if (item.version > gatewayInfo.data.version){
+                        if (gatewayInfo.data.enable_beta){
                             arr.push(item)
+                        } else {
+                            if (item.beta === 0){
+                                arr.push(item)
+                            }
                         }
                     }
-                }
-            })
-            this.setState({
-                freeioe_version_list: arr
-            })
+                })
+                this.setState({
+                    freeioe_version_list: arr
+                })
+            }
         })
 
         http.get('/api/applications_versions_latest?app=freeioe&beta=' + (gatewayInfo.data.enable_beta ? 1 : 0)).then(res=>{
-            this.setState({
-                freeioe_latest_version: res.data
-            })
+            if (res.ok) {
+                this.setState({
+                    freeioe_latest_version: res.data
+                })
+            }
         })
     }
     fetchSkynetVersion () {

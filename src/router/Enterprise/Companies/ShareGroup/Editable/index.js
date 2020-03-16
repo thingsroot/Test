@@ -115,10 +115,11 @@ class Editable extends Component {
                 }
             ],
             columnsUser: [
-                {
-                    title: intl.get('dashboard.the_serial_number'),
-                    dataIndex: 'idx'
-                },
+                // {
+                //     title: '序号',
+                //     dataIndex: 'idx',
+                //     width: '100px'
+                // },
                 {
                     title: intl.get('sharegroup.user_ID'),
                     dataIndex: 'user',
@@ -182,18 +183,19 @@ class Editable extends Component {
             ],
             count: 0,
             columnsDevice: [
-                {
-                    title: intl.get('dashboard.the_serial_number'),
-                    dataIndex: 'idx'
-                },
+                // {
+                //     title: '序号',
+                //     dataIndex: 'idx',
+                //     width: '100px'
+                // },
                 {
                     title: intl.get('sharegroup.gateway_serial_number'),
                     dataIndex: 'device',
                     editable: true
                 },
                 {
-                    title: intl.get('sharegroup.remarks'),
-                    dataIndex: 'comment',
+                    title: intl.get('common.name'),
+                    dataIndex: 'dev_name',
                     width: '30%',
                     editable: true
                 },
@@ -300,7 +302,8 @@ class Editable extends Component {
                     creation: record.creation,
                     idx: num,
                     modified: record.modified,
-                    description: ''
+                    description: '',
+                    dev_name: record.dev_name
                 }
                 this.props.store.groups.pushGroupsGatewaylist(obj)
                 message.success(intl.get('sharegroup.device_added_successfully'))
@@ -410,10 +413,11 @@ class Editable extends Component {
                     <Table
                         columns={columnsDevice}
                         components={components}
+                        loading={this.props.store.groups.loading}
                         dataSource={this.props.store.groups.GroupsGatewaylist}
                         size="small"
                         pagination={false}
-                        rowKey="idx"
+                        rowKey="device"
                     />
                     <Button
                         onClick={this.templateShowDevice}

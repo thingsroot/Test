@@ -284,6 +284,14 @@ class Edituser extends React.Component {
                                         onRow={(record)=>{
                                             return {
                                                 onClick: ()=>{
+                                                    if (record.devices.length > 0) {
+                                                        record.devices.map(item=>{
+                                                            const arr = this.props.store.gatewayList.all.filter(items=> items.sn === item.device)
+                                                            if (arr.length > 0) {
+                                                                item.dev_name = arr[0].dev_name
+                                                            }
+                                                        })
+                                                    }
                                                     this.props.setActiveKey(record)
                                                     this.props.store.groups.setGroupsUserlist(record)
                                                 }

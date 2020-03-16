@@ -294,11 +294,11 @@ class AppDetails extends Component {
         }
         http.post('/api/applications_tags_update', data).then(res=>{
             if (res.ok && res.data === 'done') {
-                message.success('更改标签成功！')
+                message.success(intl.get('appedit.Changed_TAB_successfully'))
                 this.setVisibleTags()
                 this.loadApp(this.state.name)
             } else {
-                message.error('更改标签失败，错误信息：' + res.error)
+                message.error(intl.get('appedit.Failed_to_change_label_error_message') + res.error)
                 this.setVisibleTags()
             }
         })
@@ -343,10 +343,10 @@ class AppDetails extends Component {
                     select_the_label
                 })
             } else {
-                message.error('数量已满！')
+                message.error(intl.get('appedit.The_quantity_is_full'))
             }
         } else {
-            message.error('请勿重复添加同一标签！')
+            message.error(intl.get('appedit.Do_not_add_the_same_label_repeatedly'))
         }
     }
     addCustomTag = () => {
@@ -361,16 +361,16 @@ class AppDetails extends Component {
                             tag: ''
                         })
                     } else {
-                        message.error('字符最大长度为八位！')
+                        message.error(intl.get('appedit.Maximum_length_of_characters_is_eight'))
                     }
                 } else {
-                    message.error('数量已满！')
+                    message.error(intl.get('appedit.The_quantity_is_full'))
                 }
             } else {
-                message.error('请勿重复添加同一标签！')
+                message.error(intl.get('appedit.Do_not_add_the_same_label_repeatedly'))
             }
         } else {
-            message.error('请输入标签内容！')
+            message.error(intl.get('appedit.Please_enter_label_content'))
         }
     }
     deleteTag = (item)=>{
@@ -504,7 +504,7 @@ class AppDetails extends Component {
                             width="1024px"
                         >
                             <Input.Search
-                                placeholder="请输入网关序列号，名称，描述"
+                                placeholder={intl.get('gateway.placeholder')}
                                 onChange={this.filterGateway}
                                 style={{
                                     width: '70%',

@@ -89,7 +89,7 @@ class ContentMain extends Component {
                 <PrivateRoute
                     path="/appstore"
                     component={AppStore}
-                    title={'应用市场'}
+                    title={intl.get('header.app_store')}
                 />
                 <PrivateRoute
                     path="/appitems/:name"
@@ -119,17 +119,17 @@ class ContentMain extends Component {
                 <PrivateRoute
                     path="/appnew"
                     component={AppEdit}
-                    title={'创建新应用'}
+                    title={intl.get('developer.create_new_app')}
                 />
                 <PrivateRoute
                     path="/appsinstall/:sn/:app?/:step?"
                     component={AppsInstall}
-                    title={'安装应用'}
+                    title={intl.get('appsinstall.installation_and_Application')}
                 />
                 <PrivateRoute
                     path="/appeditorcode/:app/:name/:gateway?/:inst?"
                     component={AppEditorCode}
-                    title={'代码编辑'}
+                    title={intl.get('appdetails.code_editing')}
                 />
                 <PrivateRoute
                     path="/template/:app/:name?/:version?/:action?"
@@ -149,12 +149,12 @@ class ContentMain extends Component {
                 <PrivateRoute
                     path="/appdeveloper"
                     component={AppDeveloper}
-                    title={'申请成为开发者'}
+                    title={intl.get('developer.apply_to_be_a_developer')}
                 />
                 <PrivateRoute
                     path="/virtualgateways"
                     component={VirtualGateways}
-                    title={intl.get('sider.header.virtual_gateway')}
+                    title={intl.get('header.virtual_gateway')}
                 />
                 <PrivateRoute
                     path="/platformevents/:limitTime?"

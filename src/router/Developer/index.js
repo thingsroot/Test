@@ -166,7 +166,6 @@ class Developer extends Component {
                                             type="primary"
                                             key="console"
                                             onClick={()=>{
-                                                console.log(this)
                                                 this.props.history.push('/appdeveloper')
                                             }}
                                         >
