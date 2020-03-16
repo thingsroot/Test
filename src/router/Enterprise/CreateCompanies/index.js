@@ -235,13 +235,17 @@ class CreateCompanies extends PureComponent {
                 },
                 processData: false,
                 data: formData,
-                success: () => {
-                    message.success('资料提交成功，请耐心等待后台审核，预计需要1-3个工作日...');
-                    this.setState({
-                      visible: false,
-                      status: 'processing',
-                      loading: false
-                    })
+                success: (res) => {
+                    if (res.ok) {
+                        message.success('资料提交成功，请耐心等待后台审核，预计需要1-3个工作日...');
+                        this.setState({
+                          visible: false,
+                          status: 'processing',
+                          loading: false
+                        })
+                    } else {
+                        message.error('资料提交失败，请重试！');
+                    }
                 },
                 error: () => {
                   message.error('资料提交失败，请重试！');

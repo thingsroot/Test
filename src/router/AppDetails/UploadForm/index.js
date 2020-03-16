@@ -32,6 +32,9 @@ const CollectionCreateForm = Form.create()(
                 if (err) {
                     return;
                 }
+                this.setState({
+                    uploading: true
+                })
                 formData.append('app', this.props.app);
                 formData.append('version', values.version);
                 formData.append('comment', values.comment);
@@ -44,22 +47,29 @@ const CollectionCreateForm = Form.create()(
                     headers: {
                         'X-Frappe-CSRF-Token': token
                     },
-                    success: () => {
-                        this.setState({
-                            fileList: [],
-                            uploading: false
-                        });
-                        message.success('上传成功.');
-                        this.setState({
-                            initialVersion: values.version + 1
-                        })
-                        this.props.onSuccess()
+                    success: (res) => {
+                        if (res.ok) {
+                            this.setState({
+                                fileList: [],
+                                uploading: false
+                            });
+                            message.success('上传成功。');
+                            this.setState({
+                                initialVersion: values.version + 1
+                            })
+                            this.props.onSuccess()
+                        } else {
+                            this.setState({
+                                uploading: false
+                          });
+                          message.error('上传失败，请重试。');
+                        }
                     },
                     error: () => {
                       this.setState({
                             uploading: false
                       });
-                      message.error('上传失败.');
+                      message.error('上传失败，请重试。');
                     }
                   });
                 form.resetFields();
@@ -111,6 +121,7 @@ const CollectionCreateForm = Form.create()(
                     maskClosable={false}
                     onCancel={onCancel}
                     onOk={this.handleCreate}
+                    confirmLoading={this.state.uploading}
                 >
                     <Form layout="vertical">
                         <Form.Item label="版本">

@@ -149,8 +149,11 @@ class AppEdit extends Component {
                                 processData: false,
                                 data: formData,
                                 success: (res) => {
-                                    res;
-                                    message.success('应用创建成功！');
+                                    if (res.ok) {
+                                        message.success('应用创建成功！');
+                                    } else {
+                                        message.error('应用创建失败！')
+                                    }
                                 }
                             });
                             setTimeout(()=>{
