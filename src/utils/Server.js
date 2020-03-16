@@ -88,6 +88,7 @@ var postNoToken = function (url, data) {
 };
 var form = function (url, data) {
     return new Promise((resolve, reject) => {
+      const token = _getCookie('csrf_auth_token') || '';
         // qs.stringify(data)
         axios(url, {
             method: 'post',
@@ -95,7 +96,8 @@ var form = function (url, data) {
             headers: {
                 Accept: 'application/x-www-form-urlencoded; charset=UTF-8',
                 'Content-Type': false,
-                'dataType': 'json'
+                'dataType': 'json',
+                'X-Frappe-CSRF-Token': token
             }
         }).then(res=>{
             resolve(res.data)

@@ -226,9 +226,13 @@ class CreateCompanies extends PureComponent {
                     formData.append(item, values[item]);
                 }
             })
+            const token = _getCookie('csrf_auth_token') || '';
             reqwest({
                 url: '/api/companies_requisition_create',
                 method: 'post',
+                headers: {
+                    'X-Frappe-CSRF-Token': token
+                },
                 processData: false,
                 data: formData,
                 success: () => {

@@ -180,7 +180,7 @@ class Developer extends Component {
                                             return (
                                                 <li key={key}>
                                                     <div className="appImg">
-                                                        <Link to={`/appdetails/${v.name}`}>
+                                                        <Link to={`/appdetails/${v.name.replace(/\//g, '*')}`}>
                                                             <img
                                                                 src={`/store_assets${v.icon_image}`}
                                                                 alt=""
@@ -249,7 +249,7 @@ class Developer extends Component {
                                         ? forkList.map((v, key)=>{
                                             return <li key={key}>
                                                 <div className="appImg">
-                                                    <Link to={`/appdetails/${v.name}`}>
+                                                    <Link to={`/appdetails/${v.name.replace(/\//g, '*')}`}>
                                                         <img
                                                             src={`/store_assets${v.icon_image}`}
                                                             alt=""
@@ -299,7 +299,7 @@ class Developer extends Component {
                                    ? collectList.map((v, key)=>{
                                        return <li key={key}>
                                            <div className="appImg">
-                                               <Link to={`/appdetails/${v.name}`}>
+                                               <Link to={`/appdetails/${v.name.replace(/\//g, '*')}`}>
                                                    <img
                                                        src={`/store_assets${v.icon_image}`}
                                                        alt=""

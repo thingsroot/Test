@@ -5,7 +5,9 @@ import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
+import {_getCookie} from '../../utils/Session';
 import reqwest from 'reqwest';
+
 import TagEdit from '../../common/TagsEdit';
 import './style.scss';
 const Option = Select.Option;
@@ -135,11 +137,15 @@ class AppEdit extends Component {
                     http.post('/api/applications_create', params).then(res=>{
                         if (res.ok === true) {
                             let formData = new FormData();
+                            const token = _getCookie('csrf_auth_token') || '';
                             formData.append('name', res.data.name);
                             formData.append('file', this.state.imageUrl);
                             reqwest({
                                 url: '/api/applications_icon',
                                 method: 'post',
+                                headers: {
+                                    'X-Frappe-CSRF-Token': token
+                                },
                                 processData: false,
                                 data: formData,
                                 success: (res) => {
@@ -383,7 +389,7 @@ class AppEdit extends Component {
                                 <Form.Item label="应用分类">
                                     {getFieldDecorator('category', {
                                         rules: [{ required: true, message: '不能为空！' }],
-                                        initialValue: app_info.category !== null ? app_info.category : '默认分类'
+                                        initialValue: app_info.category ? app_info.category : '默认分类'
                                     })(
                                         <Select
                                             style={{ width: 240 }}

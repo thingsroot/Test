@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Modal, Form, Input, Checkbox, Upload, Icon, Button, message} from 'antd';
 import { withRouter } from 'react-router-dom';
 import reqwest from 'reqwest';
+import {_getCookie} from '../../../utils/Session';
 const { TextArea } = Input;
 
 const CollectionCreateForm = Form.create()(
@@ -34,11 +35,15 @@ const CollectionCreateForm = Form.create()(
                 formData.append('app', this.props.app);
                 formData.append('version', values.version);
                 formData.append('comment', values.comment);
+                const token = _getCookie('csrf_auth_token') || '';
                 reqwest({
                     url: '/api/applications_versions_create',
                     method: 'post',
                     processData: false,
                     data: formData,
+                    headers: {
+                        'X-Frappe-CSRF-Token': token
+                    },
                     success: () => {
                         this.setState({
                             fileList: [],
