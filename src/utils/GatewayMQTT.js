@@ -3,7 +3,7 @@ import Cookie from 'mobx-cookie'
 import mqtt from 'mqtt';
 import {message} from 'antd'
 import { getLocalTime } from './time'
-
+import path from '../assets/path';
 
 function makeid () {
     var text = '';
@@ -530,7 +530,7 @@ class GatewayMQTT {
             }
             return
         }
-        const url = flag ? 'ws://127.0.0.1:7884/mqtt' : 'wss://cloud.thingsroot.com/ws';
+        const url = flag ? path.mqtt_local_path : path.mqtt_cloud_path;
         this.client = mqtt.connect(url, options)
         this.client.on('connect', ()=>{
             if (window.location.pathname.indexOf('vnet') === -1 && window.location.pathname.indexOf('vserial') === -1) {

@@ -5,6 +5,7 @@ import Description from '../AppDetails/Description';
 import Comments from './Comments';
 import Issues from './Issues';
 import {_getCookie} from '../../utils/Session';
+import path from '../../assets/path';
 import './style.scss';
 const { TabPane } = Tabs;
 class AppItems extends PureComponent {
@@ -129,7 +130,7 @@ class AppItems extends PureComponent {
                 </div>
                 <div className="app_title">
                     <div className="app_logo">
-                        <img src={'http://ioe.thingsroot.com' + data.icon_image}/>
+                        <img src={path.store_assets_path + data.icon_image}/>
                     </div>
                     <div className="app_simple_info">
                         <p>{data.app_name}</p>

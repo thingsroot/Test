@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { Tag, Input, Icon, Rate, Button, Select } from 'antd';
 import './style.scss';
 import http from '../../utils/Server';
+import path from '../../assets/path';
 import { _getCookie } from '../../utils/Session';
 const { Search } = Input;
 const { Option } = Select;
@@ -294,7 +295,7 @@ class AppStore extends Component {
                                     }}
                                 >
                                     <img
-                                        src={'http://ioe.thingsroot.com' + val.icon_image}
+                                        src={path.store_assets_path + val.icon_image}
                                         alt=""
                                     />
                                     <div className="app_title_and_developer">

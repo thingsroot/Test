@@ -6,7 +6,7 @@ const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMi
 const ignoredFiles = require('react-dev-utils/ignoredFiles');
 const paths = require('./paths');
 const fs = require('fs');
-
+const path = require('../src/assets/path');
 const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
 const host = process.env.HOST || '0.0.0.0';
 
@@ -83,7 +83,7 @@ module.exports = function(proxy, allowedHost) {
     public: allowedHost,
     proxy: {
       '/apis': {
-        target: 'http://ioe.thingsroot.com',
+        target: path.apis_path,
         changeOrigin: true,
         secure: false,
         pathRewrite: {
@@ -91,7 +91,7 @@ module.exports = function(proxy, allowedHost) {
         }
       },
       '/api/*': {
-        target: 'http://127.0.0.1:8881',
+        target: path.api_path,
         changeOrigin: true,
         secure: false,
         pathRewrite: {
@@ -99,7 +99,7 @@ module.exports = function(proxy, allowedHost) {
         }
       },
       '/store_assets/*': {
-        target: 'http://ioe.thingsroot.com',
+        target: path.store_assets_path,
         changeOrigin: true,
         secure: false,
         pathRewrite: {

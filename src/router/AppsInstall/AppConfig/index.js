@@ -254,8 +254,7 @@ class AppConfig extends Component {
 
     refreshTemplateList = () => {
         this.setState({appTemplateList: [], loading: true})
-        let app = this.state.app_info ? this.state.app_info.name : undefined
-        console.log(app)
+        let app = this.state.app_info ? this.state.app_info.name : undefined;
         if (app === undefined) {
             return
         }
@@ -370,7 +369,6 @@ class AppConfig extends Component {
                         child: [v]
                     }
                     sections.push(cur_section);
-                    console.log(sections, 'sections')
                 } else if (v.type === 'table') {
                     v.cols = v.cols === undefined ? [] : v.cols
                     // if (cur_section.type === 'section') {

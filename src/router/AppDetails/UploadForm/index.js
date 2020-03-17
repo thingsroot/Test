@@ -60,7 +60,8 @@ const CollectionCreateForm = Form.create()(
                             this.props.onSuccess()
                         } else {
                             this.setState({
-                                uploading: false
+                                uploading: false,
+                                fileList: []
                           });
                           message.error('上传失败，请重试。');
                         }
