@@ -124,7 +124,7 @@ class CreateCompanies extends PureComponent {
                 })
             }
         })
-        http.get('api/user_read?name' + _getCookie('user_id')).then(result=>{
+        http.get('/api/user_read?name=' + _getCookie('user_id')).then(result=>{
                 http.get('/api/companies_requisition_list').then(res=>{
                     if (res.ok && res.data.length > 0) {
                         res.data.map(item=>{
