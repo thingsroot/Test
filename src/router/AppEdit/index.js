@@ -44,9 +44,7 @@ class AppEdit extends Component {
             app,
             imgSrc: '/assets/app_center/img/logo.png'
         }, () => {
-            if (!this.state.is_new) {
                 this.getDetails();
-            }
         })
     }
     prettyJson (str) {
@@ -82,6 +80,9 @@ class AppEdit extends Component {
                 })
             }
         })
+        if (!this.state.app) {
+            return false;
+        }
         http.get('/api/applications_details?name=' + this.state.app).then(res=>{
             if (!res.ok) {
                 message.error('获取应用信息失败:' + res.error)
@@ -510,7 +511,6 @@ class AppEdit extends Component {
                     title={<span><Icon type="info-circle" /> 编辑标签</span>}
                     visible={visible_tags}
                     onOk={this.saveTags}
-                    // confirmLoading={confirmLoading}
                     onCancel={()=>{
                         this.setState({
                             select_the_label: []

@@ -5,7 +5,6 @@ import { _getCookie, isAuthenticated } from './Session';
 isAuthenticated;
 
 // 创建axios默认请求
-// axios.defaults.baseURL = 'http://iot.symgrid.com';
 // 配置超时时间
 axios.defaults.timeout = 100000;
 
