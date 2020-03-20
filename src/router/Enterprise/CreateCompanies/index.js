@@ -125,6 +125,7 @@ class CreateCompanies extends PureComponent {
             }
         })
         http.get('/api/user_read?name=' + _getCookie('user_id')).then(result=>{
+            if (result.ok) {
                 http.get('/api/companies_requisition_list').then(res=>{
                     if (res.ok && res.data.length > 0) {
                         res.data.map(item=>{
@@ -158,6 +159,7 @@ class CreateCompanies extends PureComponent {
                         })
                     }
                 })
+            }
         })
     }
     addcompany = (name, company)=>{

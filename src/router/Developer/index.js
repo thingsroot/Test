@@ -36,6 +36,7 @@ class Developer extends Component {
 
     componentDidMount (){
         let user = this.props.store.session.user_id
+        console.log(this.props.store.session, 'session')
         http.get('/api/applications_list').then(res=>{
             let formData = [];
             let myData = [];
