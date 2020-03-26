@@ -59,7 +59,9 @@ class MyGatesAppsInstall extends Component {
         }, () => {
             if (install_step === 'install') {
                 http.get('/api/applications_details?name=' + this.state.app).then(res=>{
-                    this.setState({app_info: res.data})
+                    if (res.ok) {
+                        this.setState({app_info: res.data})
+                    }
                 })
             } else {
                this.fetchStoreApps()
@@ -68,16 +70,18 @@ class MyGatesAppsInstall extends Component {
     }
     fetchStoreApps () {
         http.get('/api/store_list').then(res=>{
-            this.setState({
-                app_list: res.data,
-                app_show: res.data
-            })
-            if (this.state.app && this.state.install_step === 'view') {
-                let item = res.data.find(item => item.name === this.state.app)
-                if (item) {
-                    this.setState({
-                        app_info: item
-                    })
+            if (res.ok) {
+                this.setState({
+                    app_list: res.data,
+                    app_show: res.data
+                })
+                if (this.state.app && this.state.install_step === 'view') {
+                    let item = res.data.find(item => item.name === this.state.app)
+                    if (item) {
+                        this.setState({
+                            app_info: item
+                        })
+                    }
                 }
             }
         });
@@ -125,6 +129,7 @@ class MyGatesAppsInstall extends Component {
         }
         let version = 0;
         http.get(url + app).then(res=> {
+           if (res.ok) {
             version = res.data;
             if (version > 0) {
                 if (enable_beta === 1) {
@@ -146,6 +151,7 @@ class MyGatesAppsInstall extends Component {
                 message.error('应用暂时没有版本，无法安装！');
                 this.setState({ installing: false })
             }
+           }
         }).catch(err=> {
             err;
             message.error('安装应用最新版本失败!')

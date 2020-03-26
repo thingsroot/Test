@@ -199,7 +199,8 @@ class AppDetails extends Component {
     };
     showModal = () => {
         this.setState({
-          visible: true
+          visible: true,
+          ModalText: '确认删除此应用？'
         });
       };
       handleOk = () => {

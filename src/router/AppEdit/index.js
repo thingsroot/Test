@@ -136,7 +136,8 @@ class AppEdit extends Component {
                 }
                 if (this.state.is_new) {
                     http.post('/api/applications_create', params).then(res=>{
-                        if (res.ok === true) {
+                        if (res.ok) {
+                            message.success('应用创建成功！');
                             let formData = new FormData();
                             const token = _getCookie('csrf_auth_token') || '';
                             formData.append('name', res.data.name);
@@ -149,16 +150,13 @@ class AppEdit extends Component {
                                 },
                                 processData: false,
                                 data: formData,
-                                success: (res) => {
-                                    if (res.ok) {
-                                        message.success('应用创建成功！');
-                                    } else {
-                                        message.error('应用创建失败！')
-                                    }
+                                success: () => {
+
                                 }
                             });
                             setTimeout(()=>{
-                                window.location.href = '/developer'
+                                this.props.history.push('/developer')
+                                // window.location.href = '/developer'
                             }, 1500)
                         } else {
                             message.error('应用创建失败！')
@@ -254,13 +252,29 @@ class AppEdit extends Component {
     getTags = () => {
         http.get('/api/store_tags_list').then(res=>{
             if (res.ok) {
-                const tags_list = this.state.app_info.tags.length > 0 ? this.state.app_info.tags.split(',') : [];
-                const select_the_label = this.state.select_the_label.concat(tags_list)
+                const tags_list_unique = this.state.app_info.tags.length > 0 ? this.state.app_info.tags.split(',') : [];
+                const select_the_label_unique = this.state.select_the_label.concat(tags_list_unique)
+                // 标签列表去重
+                const unique = (arr) => {
+                    if (!Array.isArray(arr)) {
+                        return false;
+                    }
+                    arr = arr.sort()
+                    var arrry = [arr[0]];
+                    for (var i = 1; i < arr.length; i++) {
+                        if (arr[i] !== arr[i - 1]) {
+                            arrry.push(arr[i]);
+                        }
+                    }
+                    return arrry;
+                }
                 if (res.data.length > 0) {
                     res.data.map(item=>{
-                        tags_list.push(item[0])
+                        tags_list_unique.push(item[0])
                     })
                 }
+                const tags_list = unique(tags_list_unique)
+                const select_the_label = unique(select_the_label_unique)
                 this.setState({
                     tags_list,
                     select_the_label
@@ -450,6 +464,7 @@ class AppEdit extends Component {
                                                 type="link"
                                                 className="app_details_tags_set"
                                                 onClick={this.getTags}
+                                                style={{zIndex: 999}}
                                               >修改</span>
                                             : ''
                                         }
@@ -518,7 +533,7 @@ class AppEdit extends Component {
                             this.setVisibleTags()
                         })
                     }}
-                    cancelText="取消所有"
+                    cancelText="关闭"
                     okText="确定"
                 >
                     <div>
