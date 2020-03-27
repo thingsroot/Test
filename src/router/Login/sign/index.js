@@ -27,7 +27,7 @@ class Sign extends PureComponent {
                     if (res.ok) {
                         authenticateSuccess(res.data)
                         message.success('登录成功，正在跳转, 请稍后...', 3).then(()=>{
-                            location.href = '/developer';
+                            location.href = '/dashboard';
                         })
                     } else {
                         if (res.message === 'Incorrect password') {

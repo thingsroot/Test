@@ -280,8 +280,6 @@ class Dashboard extends PureComponent {
                 let data = [];
                 let t = getBeforeDate(0);
                 res.message.map((v)=>{
-                    console.log(v.today, t)
-                    console.log(v.total, t, 't')
                     if (v.today !== '0' && v.last_updated.indexOf(t) !== -1){
                         data.push(v)
                     }
