@@ -259,6 +259,7 @@ class AppEdit extends Component {
                     if (!Array.isArray(arr)) {
                         return false;
                     }
+                    console.log(tags_list_unique, 'tags_list_unique')
                     arr = arr.sort()
                     var arrry = [arr[0]];
                     for (var i = 1; i < arr.length; i++) {

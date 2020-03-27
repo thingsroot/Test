@@ -23,20 +23,20 @@ axios.defaults.timeout = 100000;
 // */
 
 // 添加响应拦截器
-axios.interceptors.response.use(
-  function (response) {
-    console.log(response, 'res')
+// axios.interceptors.response.use(
+  // function (response) {
+    // console.log(response, 'res')
 //     console.log(response)
 // //     if (!isAuthenticated() || response.data.error && response.data.error === 'auth_code_missing'){
 // //       window.location.href = '/login'
 // //     }
-    return response;
+    // return response;
 // //   },
 // //   function (error) {
 // //     // 对响应错误做点什么
 // //     return Promise.reject(error);
-  }
-);
+  // }
+// );
 /**
  * get请求
  * @method get
