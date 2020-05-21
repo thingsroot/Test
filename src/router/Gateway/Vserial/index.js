@@ -389,8 +389,8 @@ class Vserial extends Component {
         // const { PortLength} = mqtt.vserial_channel;
         // let SerialPort = this.state.SerialPort;
         const params = {
-            gateway: '2-30002-001820-00001',
-            name: '2-30002-001820-00001.freeioe_Vserial1',
+            gateway: this.state.gateway,
+            name: this.state.gateway + '.freeioe_Vserial1',
             command: 'start',
             param: {
                 port: GetSerialListBySN(this.state.gateway) + this.state.SerialPort,
@@ -399,12 +399,12 @@ class Vserial extends Component {
                     server_port: '1699'
                 }
             },
-            id: 'send_command/2-30002-001820-00001.freeioe_Vserial1/start/' + + new Date() * 1
+            id: 'send_command/' + this.state.gateway + '.freeioe_Vserial1/start/' + + new Date() * 1
         }
         const params1 = {
-            gateway: '2-30002-001820-00001',
-            id: 'send_output/2-30002-001820-00001.freeioe_Vserial1/enable_heartbeat/' + new Date() * 1,
-            name: '2-30002-001820-00001.freeioe_Vserial1',
+            gateway: this.state.gateway,
+            id: 'send_output/' + this.state.gateway + '.freeioe_Vserial1/enable_heartbeat/' + new Date() * 1,
+            name: this.state.gateway + '.freeioe_Vserial1',
             output: 'enable_heartbeat',
             prop: 'value',
             value: '0'
@@ -442,10 +442,10 @@ class Vserial extends Component {
         const {addPortData} = mqtt.vserial_channel;
         // const {SerialPort} = this.state;
         const params = {
-            gateway: '2-30002-001820-00001',
-            name: '2-30002-001820-00001.freeioe_Vserial1',
+            gateway: this.state.gateway,
+            name: this.state.gateway + '.freeioe_Vserial1',
             command: 'stop',
-            id: 'send_command/2-30002-001820-00001.freeioe_Vserial1/stop/' + + new Date() * 1,
+            id: 'send_command/' + this.state.gateway + '.freeioe_Vserial1/stop/' + + new Date() * 1,
             param: {}
         }
         http.post('/api/gateways_dev_commands', params)
