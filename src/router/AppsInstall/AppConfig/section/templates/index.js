@@ -141,6 +141,9 @@ class EditorTemplates extends React.Component {
                     }}
                     style={{margin: '0 10px'}}
                 >
+                  {/* {
+                    console.log(this.props.configStore.templatesList.filter(item=>item.name === record.id), record, 'recird,ud')
+                  } */}
                     升级最新
                 </Button>
                 <Popconfirm title="Sure to delete?"

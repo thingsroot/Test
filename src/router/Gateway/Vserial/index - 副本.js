@@ -8,35 +8,21 @@ import http from '../../../utils/Server';
 import './style.scss';
 import {_getCookie} from '../../../utils/Session';
 const Option = Select.Option;
-// const cloums = [
-//     {
-//         title: '服务名称',
-//         dataIndex: 'name',
-//         key: 'name'
-//     }, {
-//         title: '服务描述',
-//         dataIndex: 'desc',
-//         key: 'desc'
-//     }, {
-//         title: '服务状态',
-//         dataIndex: 'status',
-//         key: 'status'
-//     }
-// ]
-export function GetSerialListBySN (sn) {
-    let tty_list = ''
-    if (/2-30002.+/.test(sn)) {
-        // Q102
-        tty_list = '/dev/ttymxc'
-    } else if (/2-30102.+/.test(sn)) {
-        // Q204
-        tty_list = '/dev/ttymxc'
-    } else if (/TRTX01.+/.test(sn)) {
-        // TLink X1
-        tty_list = '/dev/ttyS'
+const cloums = [
+    {
+        title: '服务名称',
+        dataIndex: 'name',
+        key: 'name'
+    }, {
+        title: '服务描述',
+        dataIndex: 'desc',
+        key: 'desc'
+    }, {
+        title: '服务状态',
+        dataIndex: 'status',
+        key: 'status'
     }
-    return tty_list
-}
+]
 function showConfirm (name, path) {
     Modal.warning({
       title: '串口关闭警告',
@@ -84,12 +70,11 @@ class Vserial extends Component {
     state = {
         gateway: '',
         mqtt_topic: 'v1/vspax/#',
-        SerialPort: '1',
+        SerialPort: 'com1',
         BaudRate: '9600',
         StopBit: '1',
         DataBits: '8',
         Check: 'NONE',
-        current_com_params: '',
         port: 0,
         timer: false,
         flag: false,
@@ -267,7 +252,7 @@ class Vserial extends Component {
                 // console.log(JSON.stringify(addPortData[0]))
                 const data = addPortData[0].info.com_cfg;
                 this.setState({
-                    SerialPort: data.serial[data.serial.length - 1],
+                    SerialPort: data.serial,
                     BaudRate: data.baudrate,
                     StopBit: data.stopbit,
                     DataBits: data.databit,
@@ -296,7 +281,7 @@ class Vserial extends Component {
     keepAlive = () =>{
         let params = {
             gateway: this.props.gateway,
-            name: this.props.gateway + '.freeioe_Vserial1',
+            name: this.props.gateway + '.freeioe_Vserial',
             output: 'heartbeat_timeout',
             value: 60,
             prop: 'value',
@@ -312,7 +297,7 @@ class Vserial extends Component {
         this.props.mqtt.connected && this.props.mqtt.client.publish('v1/vspax/api/keep_alive', JSON.stringify(message))
     }
     sendAjax = ()=>{
-        http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vserial1').then(res=>{
+        http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vserial').then(res=>{
             if (res.ok && res.data && res.data.length > 0) {
                 let obj = {
                                 name: '-----',
@@ -320,21 +305,10 @@ class Vserial extends Component {
                                 status: ''
                             }
                 res.data.map((item) =>{
-                    if (item.name === 'frpc_status') {
+                    if (item.name === 'com_to_net_run') {
                         obj.status = item.pv;
                     }
-                    if (item.name === 'current_com_params') {
-                        const pv = JSON.parse(item.pv)
-                        const str = pv.baudrate + '/' + pv.data_bits + '/' + pv.parity + '/' + pv.stop_bits;
-                        this.setState({
-                            current_com_params: str,
-                            BaudRate: pv.baudrate,
-                            StopBit: pv.stop_bits,
-                            DataBits: pv.data_bits,
-                            Check: pv.parity
-                        })
-                    }
-                    if (item.name === 'com_to_frps_mapport') {
+                    if (item.name === 'com_to_net_mapport') {
                         this.setState({port: parseInt(item.pv.split(':')[1])})
                     }
                     if (item.name === 'current_com') {
@@ -349,13 +323,13 @@ class Vserial extends Component {
     }
     loop = () => {
         const {mqtt} = this.props;
-        const { SerialPort} = this.state;
+        const { SerialPort, BaudRate, DataBits, Check, StopBit } = this.state;
         this.sendAjax()
         if (this.state.port > 0){
             const datas = {
                 id: 'add_local_com' + new Date() * 1,
                 by_name: 1,
-                name: GetSerialListBySN(this.state.gateway) + SerialPort,
+                name: SerialPort.toUpperCase(),
                 peer: {
                     type: 'tcp_client',
                     host: mqtt.vserial_channel.Proxy,
@@ -365,11 +339,11 @@ class Vserial extends Component {
                         com_cfg: {
                             user_id: _getCookie('user_id'),
                             server_addr: mqtt.vserial_channel.Proxy,
-                            serial: GetSerialListBySN(this.state.gateway) + SerialPort
-                            // baudrate: BaudRate,
-                            // databit: DataBits,
-                            // stopbit: StopBit,
-                            // parity: Check
+                            serial: SerialPort,
+                            baudrate: BaudRate,
+                            databit: DataBits,
+                            stopbit: StopBit,
+                            parity: Check
                         },
                         serial_driver: 'vspax'
                     }
@@ -385,41 +359,47 @@ class Vserial extends Component {
     }
     openVserial = () => {
         const { mqtt } = this.props;
-        // const { BaudRate, DataBits, Check, StopBit } = this.state;
+        const { BaudRate, DataBits, Check, StopBit } = this.state;
         // const { PortLength} = mqtt.vserial_channel;
-        // let SerialPort = this.state.SerialPort;
-        const params = {
-            gateway: '2-30002-001820-00001',
-            name: '2-30002-001820-00001.freeioe_Vserial1',
-            command: 'start',
-            param: {
-                port: GetSerialListBySN(this.state.gateway) + this.state.SerialPort,
-                frps: {
-                    server_addr: mqtt.vserial_channel.Proxy,
-                    server_port: '1699'
-                }
-            },
-            id: 'send_command/2-30002-001820-00001.freeioe_Vserial1/start/' + + new Date() * 1
-        }
-        const params1 = {
-            gateway: '2-30002-001820-00001',
-            id: 'send_output/2-30002-001820-00001.freeioe_Vserial1/enable_heartbeat/' + new Date() * 1,
-            name: '2-30002-001820-00001.freeioe_Vserial1',
-            output: 'enable_heartbeat',
+        let SerialPort = this.state.SerialPort;
+        // if (PortLength.indexOf(SerialPort.toUpperCase()) !== -1) {
+        //     SerialPort = 'COM' + (parseInt(SerialPort[SerialPort.length - 1]) + 1)
+        // }
+        let params = {
+            gateway: this.props.gateway,
+            name: this.props.gateway + '.freeioe_Vserial',
+            output: 'heartbeat_timeout',
+            value: 60,
             prop: 'value',
-            value: '0'
+            id: 'send_output/' + this.props.gateway + '/ heartbeat_timeout/60/' + new Date() * 1
+            }
+        const params1 = {
+            gateway: this.props.gateway,
+            name: this.props.gateway + '.freeioe_Vserial',
+            output: 'serial_config',
+            prop: 'value',
+            value: {
+                baudrate: BaudRate,
+                databit: DataBits,
+                parity: Check,
+                serial: SerialPort,
+                server_addr: mqtt.vserial_channel.Proxy,
+                user_id: _getCookie('user_id'),
+                stopbit: StopBit
+            },
+            id: `send_output/ ${this.props.gateway}.freeioe_Vserial/ serial_config/${new Date() * 1}`
         }
-        http.post('/api/gateways_dev_commands', params).then(res=>{
+        http.post('/api/gateways_dev_outputs', params1).then(res=>{
             let output_record = {};
             if (res.ok){
                 output_record.action_tm = formatTime(new Date(), 'hh:mm:ss S')
-                this.props.store.action.pushAction(res.data, '设备数据下置执行', '', params, 10000, (result, data)=>{
+                this.props.store.action.pushAction(res.data, '设备数据下置执行', '', params1, 10000, (result, data)=>{
                     if (result) {
-                        // let output_record1 = {};
-                        http.post('/api/gateways_dev_outputs', params1).then(respones=>{
+                        let output_record1 = {};
+                        http.post('/api/gateways_dev_outputs', params).then(respones=>{
                             if (respones.ok){
-                                // output_record1.action_tm = formatTime(new Date(), 'hh:mm:ss S')
-                                // this.props.store.action.pushAction(respones.data, '设备数据下置执行', '', params1, 10000)
+                                output_record1.action_tm = formatTime(new Date(), 'hh:mm:ss S')
+                                this.props.store.action.pushAction(respones.data, '设备数据下置执行', '', params, 10000)
                                 this.loop()
                             } else {
                                 this.setState({openLoading: false})
@@ -440,19 +420,22 @@ class Vserial extends Component {
     stopVserial = () => {
         const { mqtt } = this.props;
         const {addPortData} = mqtt.vserial_channel;
-        // const {SerialPort} = this.state;
+        const {SerialPort} = this.state;
         const params = {
-            gateway: '2-30002-001820-00001',
-            name: '2-30002-001820-00001.freeioe_Vserial1',
-            command: 'stop',
-            id: 'send_command/2-30002-001820-00001.freeioe_Vserial1/stop/' + + new Date() * 1,
-            param: {}
+            gateway: this.props.gateway,
+            name: this.props.gateway + '.freeioe_Vserial',
+            output: 'serial_stop',
+            prop: 'value',
+            value: {
+                serial: SerialPort
+            },
+            id: `send_output/ ${this.props.gateway}.freeioe_Vserial/ serial_stop/${new Date() * 1}`
         }
-        http.post('/api/gateways_dev_commands', params)
+        http.post('/api/gateways_dev_outputs', params)
         const data = {
             id: 'api/remove/' + new Date() * 1,
             by_name: 1,
-            name: addPortData[0].name
+            name: addPortData[0].name.toUpperCase()
         }
         mqtt.connected && mqtt.client.publish('v1/vspax/api/remove', JSON.stringify(data))
         setTimeout(() => {
@@ -492,7 +475,7 @@ class Vserial extends Component {
                 />
                 <div className="vserialPort">
                     <div>
-                        <p className="vserial_title">网关串口：COM{SerialPort[SerialPort.length - 1]}</p>
+                        <p className="vserial_title">网关串口：{SerialPort}</p>
                         <div className="selectWrap">
                             <div className="selectChild">
                                 <p>串口:</p>
@@ -504,23 +487,83 @@ class Vserial extends Component {
                                         this.changeStatus(value, 'SerialPort')
                                     }}
                                 >
-                                    <Option value="1">com1</Option>
-                                    <Option value="2">com2</Option>
+                                    <Option value="com1">com1</Option>
+                                    <Option value="com2">com2</Option>
                                 </Select>
-                                <p>串口信息:</p>
-                                <span>{this.state.current_com_params}</span>
-                                <p>服务状态:</p>
-                                <span>
-                                    {serviceName[0] ? serviceName[0].status : ''}
-                                </span>
+                            </div>
+                            <div className="selectChild">
+                                <p>波特率:</p>
+                                <Select
+                                    disabled={!flag}
+                                    value={this.state.BaudRate}
+                                    style={{width: 120}}
+                                    onChange={(value)=>{
+                                        this.changeStatus(value, 'BaudRate')
+                                    }}
+                                >
+                                    <Option value="300">300</Option>
+                                    <Option value="600">600</Option>
+                                    <Option value="1200">1200</Option>
+                                    <Option value="2400">2400</Option>
+                                    <Option value="4800">4800</Option>
+                                    <Option value="9600">9600</Option>
+                                    <Option value="19200">19200</Option>
+                                    <Option value="38400">38400</Option>
+                                    <Option value="56000">56000</Option>
+                                    <Option value="57600">57600</Option>
+                                    <Option value="115200">115200</Option>
+                                </Select>
+                            </div>
+                            <div className="selectChild">
+                                <p>停止位:</p>
+                                <Select
+                                    disabled={!flag}
+                                    value={this.state.StopBit}
+                                    style={{width: 120}}
+                                    onChange={(value)=>{
+                                        this.changeStatus(value, 'StopBit')
+                                    }}
+                                >
+                                    <Option value="1">1</Option>
+                                    <Option value="2">2</Option>
+                                </Select>
+                            </div>
+                            <div className="selectChild">
+                                <p>数据位:</p>
+                                <Select
+                                    disabled={!flag}
+                                    value={this.state.DataBits}
+                                    style={{width: 120}}
+                                    onChange={(value)=>{
+                                        this.changeStatus(value, 'DataBits')
+                                    }}
+                                >
+                                    <Option value="8">8</Option>
+                                    <Option value="7">7</Option>
+                                </Select>
+                            </div>
+                            <div className="selectChild">
+                                <p>校验:</p>
+                                <Select
+                                    disabled={!flag}
+                                    value={this.state.Check}
+                                    style={{width: 120}}
+                                    onChange={(value)=>{
+                                        this.changeStatus(value, 'Check')
+                                    }}
+                                >
+                                    <Option value="NONE">NONE</Option>
+                                    <Option value="EVEN">EVEN</Option>
+                                    <Option value="ODD">ODD</Option>
+                                </Select>
                             </div>
                         </div>
-                        {/* <Table
+                        <Table
                             rowKey="name"
                             columns={cloums}
                             dataSource={serviceName}
                             pagination={false}
-                        /> */}
+                        />
                         <div className="vserialBtn">
                             {
                                 addPortData[0] && Object.keys(addPortData[0]).length === 0

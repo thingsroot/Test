@@ -561,7 +561,6 @@ class GatewayMQTT {
         })
 
         this.client.on('message', (msg_topic, msg)=>{
-            // console.log(msg_topic, JSON.parse(msg.toString()))
             if (msg_topic === this.gateway + '/comm') {
                 const data = JSON.parse(msg.toString());
                 this.onReceiveCommMsg(data)

@@ -5,10 +5,20 @@
         display: flex;
         width: 33%;
         padding:5px 20px;
-        >p{
+        >p:nth-child(1){
             min-width: 50px;
             line-height:2;
             text-align: right;
+        }
+        >p:nth-of-type(2), >p:nth-of-type(3){
+            min-width: 100px;
+            line-height:2;
+            text-align: right;
+        }
+        >span{
+            line-height:2;
+            text-align: right;
+            margin-left: 10px;
         }
         >div{
             margin-left: 20px;
