@@ -88,7 +88,7 @@ class MyGatesDevices extends Component {
                     gatewayInfo.setApps(res.data);
                     const { pathname } = this.props.location;
                     res.data && res.data.length > 0 && res.data.map(item=>{
-                        if (item.name === 'APP00000130' && item.status !== 'running' && pathname.indexOf('vserial') !== -1) {
+                        if (item.name === 'APP00000377' && item.status !== 'running' && pathname.indexOf('vserial') !== -1) {
                             if (this.state.warning) {
                                 this.warning()
                             }

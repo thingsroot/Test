@@ -1,5 +1,5 @@
-import { Button, Select, Table, message, Modal, Tooltip } from 'antd';
-import React, { Component } from 'react';
+import { Button, Select, Table, message, Modal, Tooltip, Row, Col } from 'antd';
+import React, { Component, Fragment } from 'react';
 import { withRouter } from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
 import ServiceState from '../../../common/ServiceState';
@@ -30,6 +30,7 @@ export function GetSerialListBySN (sn) {
         tty_list = '/dev/ttymxc'
     } else if (/2-30102.+/.test(sn)) {
         // Q204
+        // 4串口
         tty_list = '/dev/ttymxc'
     } else if (/TRTX01.+/.test(sn)) {
         // TLink X1
@@ -296,7 +297,7 @@ class Vserial extends Component {
     keepAlive = () =>{
         let params = {
             gateway: this.props.gateway,
-            name: this.props.gateway + '.freeioe_Vserial1',
+            name: this.props.gateway + '.freeioe_Vserial',
             output: 'heartbeat_timeout',
             value: 60,
             prop: 'value',
@@ -312,7 +313,7 @@ class Vserial extends Component {
         this.props.mqtt.connected && this.props.mqtt.client.publish('v1/vspax/api/keep_alive', JSON.stringify(message))
     }
     sendAjax = ()=>{
-        http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vserial1').then(res=>{
+        http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vserial').then(res=>{
             if (res.ok && res.data && res.data.length > 0) {
                 let obj = {
                                 name: '-----',
@@ -390,7 +391,7 @@ class Vserial extends Component {
         // let SerialPort = this.state.SerialPort;
         const params = {
             gateway: this.state.gateway,
-            name: this.state.gateway + '.freeioe_Vserial1',
+            name: this.state.gateway + '.freeioe_Vserial',
             command: 'start',
             param: {
                 port: GetSerialListBySN(this.state.gateway) + this.state.SerialPort,
@@ -399,12 +400,12 @@ class Vserial extends Component {
                     server_port: '1699'
                 }
             },
-            id: 'send_command/' + this.state.gateway + '.freeioe_Vserial1/start/' + + new Date() * 1
+            id: 'send_command/' + this.state.gateway + '.freeioe_Vserial/start/' + + new Date() * 1
         }
         const params1 = {
             gateway: this.state.gateway,
-            id: 'send_output/' + this.state.gateway + '.freeioe_Vserial1/enable_heartbeat/' + new Date() * 1,
-            name: this.state.gateway + '.freeioe_Vserial1',
+            id: 'send_output/' + this.state.gateway + '.freeioe_Vserial/enable_heartbeat/' + new Date() * 1,
+            name: this.state.gateway + '.freeioe_Vserial',
             output: 'enable_heartbeat',
             prop: 'value',
             value: '0'
@@ -415,11 +416,11 @@ class Vserial extends Component {
                 output_record.action_tm = formatTime(new Date(), 'hh:mm:ss S')
                 this.props.store.action.pushAction(res.data, '设备数据下置执行', '', params, 10000, (result, data)=>{
                     if (result) {
-                        // let output_record1 = {};
+                        let output_record1 = {};
                         http.post('/api/gateways_dev_outputs', params1).then(respones=>{
                             if (respones.ok){
-                                // output_record1.action_tm = formatTime(new Date(), 'hh:mm:ss S')
-                                // this.props.store.action.pushAction(respones.data, '设备数据下置执行', '', params1, 10000)
+                                output_record1.action_tm = formatTime(new Date(), 'hh:mm:ss S')
+                                this.props.store.action.pushAction(respones.data, '设备数据下置执行', '', params1, 10000)
                                 this.loop()
                             } else {
                                 this.setState({openLoading: false})
@@ -443,9 +444,9 @@ class Vserial extends Component {
         // const {SerialPort} = this.state;
         const params = {
             gateway: this.state.gateway,
-            name: this.state.gateway + '.freeioe_Vserial1',
+            name: this.state.gateway + '.freeioe_Vserial',
             command: 'stop',
-            id: 'send_command/' + this.state.gateway + '.freeioe_Vserial1/stop/' + + new Date() * 1,
+            id: 'send_command/' + this.state.gateway + '.freeioe_Vserial/stop/' + + new Date() * 1,
             param: {}
         }
         http.post('/api/gateways_dev_commands', params)
@@ -481,7 +482,7 @@ class Vserial extends Component {
                         icon="question-circle"
                         // style={{marginLeft: '27px', marginBottom: '4px'}}
                         onClick={()=>{
-                            window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000130', '_blank')
+                            window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000377', '_blank')
                         }}
                     >帮助</Button>
                 </div>
@@ -495,24 +496,37 @@ class Vserial extends Component {
                         <p className="vserial_title">网关串口：COM{SerialPort[SerialPort.length - 1]}</p>
                         <div className="selectWrap">
                             <div className="selectChild">
-                                <p>串口:</p>
-                                <Select
-                                    disabled={!flag}
-                                    value={this.state.SerialPort}
-                                    style={{width: 120}}
-                                    onChange={(value)=>{
-                                        this.changeStatus(value, 'SerialPort')
-                                    }}
-                                >
-                                    <Option value="1">com1</Option>
-                                    <Option value="2">com2</Option>
-                                </Select>
-                                <p>串口信息:</p>
-                                <span>{this.state.current_com_params}</span>
-                                <p>服务状态:</p>
-                                <span>
-                                    {serviceName[0] ? serviceName[0].status : ''}
-                                </span>
+                            <Row>
+                                <Col span={8}><p>串口:</p>
+                                    <Select
+                                        disabled={!flag}
+                                        value={this.state.SerialPort}
+                                        style={{width: 120, marginLeft: 10}}
+                                        onChange={(value)=>{
+                                            this.changeStatus(value, 'SerialPort')
+                                        }}
+                                    >
+                                        <Option value="1">com1</Option>
+                                        <Option value="2">com2</Option>
+                                        {
+                                            /2-30102.+/.test(this.state.gateway)
+                                            ? <Fragment><Option value="3">com3</Option>
+                                            <Option value="4">com4</Option></Fragment>
+                                            : ''
+                                        }
+                                    </Select>
+                                </Col>
+                                <Col span={8}>
+                                    <p>串口信息:</p>
+                                    <span className="vserialInfo">{this.state.current_com_params}</span>
+                                </Col>
+                                <Col span={8}>
+                                    <p>服务状态:</p>
+                                    <span className="vserialInfo">
+                                        {serviceName[0] ? serviceName[0].status : ''}
+                                    </span>
+                                </Col>
+                            </Row>
                             </div>
                         </div>
                         {/* <Table

@@ -3,19 +3,23 @@
     flex-wrap: wrap;
     .selectChild{
         display: flex;
-        width: 33%;
+        width: 100%;
         padding:5px 20px;
-        >p:nth-child(1){
-            min-width: 50px;
-            line-height:2;
-            text-align: right;
+        .ant-col{
+            display: flex;
+            line-height: 2;
         }
-        >p:nth-of-type(2), >p:nth-of-type(3){
-            min-width: 100px;
-            line-height:2;
-            text-align: right;
-        }
-        >span{
+        // >p:nth-child(1){
+        //     min-width: 50px;
+        //     line-height:2;
+        //     text-align: right;
+        // }
+        // >p:nth-of-type(2), >p:nth-of-type(3){
+        //     min-width: 100px;
+        //     line-height:2;
+        //     text-align: right;
+        // }
+        .vserialInfo{
             line-height:2;
             text-align: right;
             margin-left: 10px;

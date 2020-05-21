@@ -595,8 +595,9 @@ class GatewayMQTT {
                 }
                 if (data.id.indexOf('get_new_version') !== -1 && data.result){
                     this.new_version = parseInt(data.data.new_version);
+                    this.version = parseInt(data.data.version);
                     this.onReceiveVserialVersionMsg(data.data)
-                    if (parseInt(data.data.new_version) === parseInt(data.data.version)){
+                    if (parseInt(data.data.new_version) <= parseInt(data.data.version)){
                         this.onReceiveLocalVersionMsg(true)
                     }
                     if (parseInt(data.data.new_version) > parseInt(data.data.version)){

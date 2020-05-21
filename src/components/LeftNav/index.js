@@ -120,7 +120,7 @@ class LeftNav extends Component {
       }
     enableVSERIAL (enable) {
         if (enable) {
-            return this.installApp('freeioe_Vserial', 'APP00000130', '开启远程串口功能')
+            return this.installApp('freeioe_Vserial', 'APP00000377', '开启远程串口功能')
         } else {
             return this.removeApp('freeioe_Vserial', '关闭虚拟网络功能')
         }

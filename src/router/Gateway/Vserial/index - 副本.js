@@ -464,7 +464,7 @@ class Vserial extends Component {
                         icon="question-circle"
                         // style={{marginLeft: '27px', marginBottom: '4px'}}
                         onClick={()=>{
-                            window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000130', '_blank')
+                            window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000377', '_blank')
                         }}
                     >帮助</Button>
                 </div>
