@@ -355,7 +355,7 @@ class Vserial extends Component {
             const datas = {
                 id: 'add_local_com' + new Date() * 1,
                 by_name: 1,
-                name: GetSerialListBySN(this.state.gateway) + SerialPort,
+                name: 'COM' + SerialPort,
                 peer: {
                     type: 'tcp_client',
                     host: mqtt.vserial_channel.Proxy,
