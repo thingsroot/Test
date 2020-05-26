@@ -94,7 +94,7 @@ class ServiceState extends Component {
                             this.setState({appVersion: item.version, the_old_version: 'the_old_version', app_name: 'isVserial'})
                             flag = true;
                         }
-                        if (item.name === 'APP00000377' && pathname.indexOf('vserial') !== -1){
+                        if (item.name === 'APP00000377' && pathname.indexOf('vserial') !== -1 && item.inst_name === 'freeioe_Vserial'){
                             this.setState({appVersion: item.version, app_name: 'isVserial'})
                         }
                         if (item.name === 'APP00000135' && pathname.indexOf('vnet') !== -1) {

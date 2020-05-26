@@ -1,5 +1,5 @@
 import { Button, Select, Table, message, Modal, Tooltip, Row, Col } from 'antd';
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
 import ServiceState from '../../../common/ServiceState';
@@ -255,6 +255,8 @@ class Vserial extends Component {
         serviceName: []
     }
     componentDidMount () {
+        const {apps} = this.props.gatewayInfo;
+        console.log(apps, 'apps')
         this.setState({ gateway: this.props.gateway })
         const { mqtt } = this.props;
         this.sendAjax()
@@ -299,6 +301,7 @@ class Vserial extends Component {
         clearInterval(this.keep)
     }
     keepAlive = () =>{
+        console.log(this, 'this')
         let params = {
             gateway: this.props.gateway,
             name: this.props.gateway + '.freeioe_Vserial',
@@ -357,7 +360,9 @@ class Vserial extends Component {
         const {mqtt} = this.props;
         const { SerialPort} = this.state;
         this.sendAjax()
+        console.log(this.state.port, 'port')
         if (this.state.port > 0){
+
             const datas = {
                 id: 'add_local_com' + new Date() * 1,
                 by_name: 1,
@@ -511,10 +516,14 @@ class Vserial extends Component {
                                         <Option value="1">com1</Option>
                                         <Option value="2">com2</Option>
                                         {
-                                            /2-30102.+/.test(this.state.gateway)
-                                            ? <Fragment><Option value="3">com3</Option>
-                                            <Option value="4">com4</Option></Fragment>
-                                            : ''
+                                            /2-30102.+/.test(this.state.gateway) || /2-30100.+/.test(this.state.gateway)
+                                            ? <Option value="3">com3</Option>
+                                            : null
+                                        }
+                                        {
+                                            /2-30100.+/.test(this.state.gateway) || /2-30100.+/.test(this.state.gateway)
+                                            ?  <Option value="4">com4</Option>
+                                            : null
                                         }
                                     </Select>
                                 </Col>

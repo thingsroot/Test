@@ -126,7 +126,7 @@ class GatewayInfo {
         let vnet = false;
         let net_info = false;
         value && value.length > 0 && value.map(item=>{
-            if ((item.name === 'APP00000377' && item.status === 'running') || (item.name === 'APP00000130' && item.status === 'running')) {
+            if ((item.name === 'APP00000377' && item.status === 'running' && item.inst_name === 'freeioe_Vserial') || (item.name === 'APP00000130' && item.status === 'running' && item.inst_name === 'freeioe_Vserial')) {
                 this.isVserial = true;
                 vserial = true;
             }
