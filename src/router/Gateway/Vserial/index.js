@@ -35,6 +35,10 @@ export function GetSerialListBySN (sn) {
     } else if (/TRTX01.+/.test(sn)) {
         // TLink X1
         tty_list = '/dev/ttyS'
+    } else if (/2-30100.+/.test(sn)) {
+        // Q204 无4G模块
+        // 4串口
+        tty_list = '/dev/ttymxc'
     }
     return tty_list
 }
@@ -313,7 +317,8 @@ class Vserial extends Component {
         this.props.mqtt.connected && this.props.mqtt.client.publish('v1/vspax/api/keep_alive', JSON.stringify(message))
     }
     sendAjax = ()=>{
-        http.get('/api/gateway_devf_data?gateway=' + this.props.gateway + '&name=' + this.props.gateway + '.freeioe_Vserial').then(res=>{
+        const { gateway } = this.props;
+        http.get(`/api/gateway_devf_data?gateway=${gateway}&name=${gateway}.freeioe_Vserial`).then(res=>{
             if (res.ok && res.data && res.data.length > 0) {
                 let obj = {
                                 name: '-----',
@@ -367,15 +372,12 @@ class Vserial extends Component {
                             user_id: _getCookie('user_id'),
                             server_addr: mqtt.vserial_channel.Proxy,
                             serial: GetSerialListBySN(this.state.gateway) + SerialPort
-                            // baudrate: BaudRate,
-                            // databit: DataBits,
-                            // stopbit: StopBit,
-                            // parity: Check
                         },
                         serial_driver: 'vspax'
                     }
                 }
             }
+            console.log(datas, 'datas')
             mqtt.client && mqtt.client.publish('v1/vspax/api/', JSON.stringify({id: 'vspax/api/list' + new Date() * 1}))
             mqtt.client && mqtt.client.publish('v1/vspax/api/add', JSON.stringify(datas))
         } else {

@@ -4,7 +4,6 @@ import { inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
 import './style.scss';
-const { confirm } = Modal;
 const Option = Select.Option;
 @withRouter
 @inject('store')
@@ -19,7 +18,9 @@ class ServiceState extends Component {
         settimer: undefined,
         app_name: '',
         the_old_version: undefined,
-        showConfirm: false
+        showConfirm: false,
+        upgradeButton: false,
+        upgradeStatus: false
     }
     componentDidMount (){
         const { mqtt } = this.props;
@@ -38,7 +39,7 @@ class ServiceState extends Component {
                     this.showConfirm()
                 })
             }
-            if (mqtt.version && this.state.appVersion && (this.state.the_old_version === 'false' || (this.state.the_old_version === 'the_old_version'))) {
+            if (mqtt && mqtt.version && this.state.appVersion && (this.state.the_old_version === 'false' || (this.state.the_old_version === 'the_old_version'))) {
                 clearInterval(this.test_version)
             }
         }, 100);
@@ -75,6 +76,11 @@ class ServiceState extends Component {
         const pathname = nextprops.location.pathname.toLowerCase();
         if (nextprops.mqtt.upgrade_status === 'failed' && this.t1) {
             clearInterval(this.t1)
+            if (this.state.upgradeStatus) {
+                this.setState({
+                    upgradeStatus: false
+                })
+            }
         }
         if (nextprops.store.gatewayInfo.apps !== this.state.apps){
             this.setState({
@@ -113,26 +119,35 @@ class ServiceState extends Component {
         this.props.mqtt.disconnect()
     }
     showConfirm = () => {
-        confirm({
-          title: '应用版本过低，是否升级?',
+        Modal.info({
+          title: '应用版本过低，请升级！',
         //   icon: <ExclamationCircleOutlined />,
-          content: '应用版本过低，请升级后再使用，如选择不升级，将无法使用此功能！',
-          okText: '升级应用',
-          cancelText: '放弃升级',
+          content: '应用版本过低，请升级后再使用，如不升级，将无法使用此功能！',
+          okText: '升级',
+        //   cancelText: '放弃升级',
           onOk: () => {
             if (this.state.the_old_version === 'the_old_version') {
                 this.upgradeApp()
             }
             if (this.props.mqtt.version < 200519) {
                 this.upgradeRprogramming()
+                this.setState({
+                    upgradeButton: true
+                }, ()=>{
+                    setTimeout(() => {
+                        this.setState({
+                            upgradeButton: false
+                        })
+                    }, 5000);
+                })
             }
             return new Promise((resolve, reject) => {
               setTimeout(Math.random() > 0.5 ? resolve : reject, 5000);
-            }).catch(() => console.log('Oops errors!'));
-          },
-          onCancel: () => {
-            this.props.history.push(`/gateway/${this.props.match.params.sn}/devices`)
+            }).catch((err) => console.log('Oops errors!' + err));
           }
+        //   onCancel: () => {
+        //     this.props.history.push(`/gateway/${this.props.match.params.sn}/devices`)
+        //   }
         });
       }
     getGateywayInfo = () => {
@@ -187,7 +202,9 @@ class ServiceState extends Component {
             }
             http.post('/api/gateways_applications_upgrade', data).then(res=>{
                 if (res.ok) {
-                    this.props.store.action.pushAction(res.data, '应用升级', '', data, 10000)
+                    this.props.store.action.pushAction(res.data, '应用升级', '', data, 10000, (result) =>{
+                        console.log(result)
+                    })
                 } else {
                     message.error(res.error)
                 }
@@ -244,12 +261,15 @@ class ServiceState extends Component {
             'new_version': newVersionMsg.new_version,
             'new_version_filename': newVersionMsg.new_version_filename
         }
-        mqtt.client.publish('v1/update/api/update', JSON.stringify(data))
+        mqtt && mqtt.client && mqtt.client.publish('v1/update/api/update', JSON.stringify(data))
         const datas = {
             id: 'get_upgrade_status/' + new Date() * 1
         }
+        this.setState({
+            upgradeStatus: true
+        })
         this.t1 = setInterval(() => {
-            mqtt.client.publish('v1/update/api/update_status', JSON.stringify(datas))
+            mqtt && mqtt.client && mqtt.client.publish('v1/update/api/update_status', JSON.stringify(datas))
         }, 3000);
     }
     handleChange = (value)=>{
@@ -280,11 +300,15 @@ class ServiceState extends Component {
                                     ? '已是最新版本！'
                                     : <div>
                                         请升级到最新版本！&nbsp;&nbsp;&nbsp;&nbsp;
-                                        <Button
-                                            type="primary"
-                                            loading={mqtt.versionMsg}
-                                            onClick={this.upgradeRprogramming}
-                                        >升级</Button>
+                                        {
+                                            !this.state.upgradeButton
+                                            ? <Button
+                                                type="primary"
+                                                loading={this.state.upgradeStatus}
+                                                onClick={this.upgradeRprogramming}
+                                              >升级</Button>
+                                            : ''
+                                        }
                                     </div>
                                     : ''
                                 }

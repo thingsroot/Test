@@ -118,57 +118,100 @@ class LeftNav extends Component {
           )
         });
       }
+    JudgeState (app) {
+        let data = {};
+        this.props.store.gatewayInfo.apps.map(item => {
+            if (item.name === app && item.status === 'stoped') {
+                data = {
+                    gateway: this.props.gateway,
+                    id: 'gateways/start/' + this.props.gateway + '/1590397188921',
+                    inst: item.inst_name
+                }
+            }
+        })
+        return data;
+    }
     enableVSERIAL (enable) {
         if (enable) {
-            return this.installApp('freeioe_Vserial', 'APP00000377', '开启远程串口功能')
+            const data = this.JudgeState('APP00000377')
+            if (JSON.stringify(data) !== '{}') {
+                return this.installApp('freeioe_Vserial', 'APP00000377', '开启远程串口功能', data)
+            } else {
+                return this.installApp('freeioe_Vserial', 'APP00000377', '开启远程串口功能')
+            }
         } else {
             return this.removeApp('freeioe_Vserial', '关闭虚拟网络功能')
         }
     }
     enableVNET (enable) {
         if (enable) {
-            return this.installApp('freeioe_Vnet', 'APP00000135', '开启远程编程网络功能')
+            const data = this.JudgeState('APP00000135')
+            if (JSON.stringify(data) !== '{}') {
+                return this.installApp('freeioe_Vnet', 'APP00000135', '开启远程编程网络功能', data)
+            } else {
+                return this.installApp('freeioe_Vnet', 'APP00000135', '开启远程编程网络功能')
+            }
         } else {
             return this.removeApp('freeioe_Vnet', '关闭虚拟网络功能')
         }
     }
     enableIOENetwork (enable){
         if (enable) {
-            return this.installApp('net_info', 'APP00000115', '开启虚拟网络功能')
+            const data = this.JudgeState('APP00000115')
+            if (JSON.stringify(data) !== '{}') {
+                return this.installApp('net_info', 'APP00000115', '开启虚拟网络功能', data)
+            } else {
+                return this.installApp('net_info', 'APP00000115', '开启虚拟网络功能')
+            }
         } else {
             return this.removeApp('net_info', '关闭虚拟网络功能')
         }
     }
-    installApp (inst_name, app_name, title){
+    installApp (inst_name, app_name, title, data){
         return new Promise((resolve, reject) => {
             const { gateway } = this.props;
-            let params = {
-                gateway: gateway,
-                inst: inst_name,
-                app: app_name,
-                version: 'latest',
-                from_web: '1',
-                conf: {
-                    auto_start: true,
-                    enable_web: true
-                },
-                id: `installapp/${gateway}/${inst_name}/${new Date() * 1}`
-            }
-            http.post('/api/gateways_applications_install', params).then(res=>{
-                if (res.ok) {
-                    message.info(title + '请求成功. 等待网关响应!')
-                    this.props.store.action.pushAction(res.data, title, '', params, 30000,  (result)=> {
-                        resolve(result, 60000)
-                        this.props.refreshGatewayData();
-                    })
-                } else {
-                    resolve(false)
-                    message.error(res.error)
+            if (data) {
+                http.post('/api/gateways_applications_start', data).then(res=>{
+                    if (res.ok) {
+                        this.props.store.action.pushAction(res.data, '应用启动', '', data, 10000, (result)=> {
+                            resolve(result, 60000)
+                            // this.props.refreshGatewayData();
+                        })
+                    }
+                }).catch(err=>{
+                    reject(err)
+                    message.error(title + '发送请求失败：' + err)
+                })
+                return false;
+            } else {
+                let params = {
+                    gateway: gateway,
+                    inst: inst_name,
+                    app: app_name,
+                    version: 'latest',
+                    from_web: '1',
+                    conf: {
+                        auto_start: true,
+                        enable_web: true
+                    },
+                    id: `installapp/${gateway}/${inst_name}/${new Date() * 1}`
                 }
-            }).catch(err=>{
-                reject(err)
-                message.error(title + '发送请求失败：' + err)
-            })
+                http.post('/api/gateways_applications_install', params).then(res=>{
+                    if (res.ok) {
+                        message.info(title + '请求成功. 等待网关响应!')
+                        this.props.store.action.pushAction(res.data, title, '', params, 30000,  (result)=> {
+                            resolve(result, 60000)
+                            // this.props.refreshGatewayData();
+                        })
+                    } else {
+                        resolve(false)
+                        message.error(res.error)
+                    }
+                }).catch(err=>{
+                    reject(err)
+                    message.error(title + '发送请求失败：' + err)
+                })
+            }
         })
     }
     removeApp (inst_name, title) {
@@ -184,7 +227,7 @@ class LeftNav extends Component {
                     message.info(title + '请求成功. 等待网关响应!')
                     this.props.store.action.pushAction(res.data, title, '', params, 10000,  (result)=> {
                         resolve(result, 60000)
-                        this.props.refreshGatewayData();
+                        // this.props.refreshGatewayData();
                     })
                 } else {
                     resolve(false)
