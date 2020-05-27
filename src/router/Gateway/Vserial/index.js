@@ -255,8 +255,6 @@ class Vserial extends Component {
         serviceName: []
     }
     componentDidMount () {
-        const {apps} = this.props.gatewayInfo;
-        console.log(apps, 'apps')
         this.setState({ gateway: this.props.gateway })
         const { mqtt } = this.props;
         this.sendAjax()
@@ -301,7 +299,6 @@ class Vserial extends Component {
         clearInterval(this.keep)
     }
     keepAlive = () =>{
-        console.log(this, 'this')
         let params = {
             gateway: this.props.gateway,
             name: this.props.gateway + '.freeioe_Vserial',
@@ -360,9 +357,10 @@ class Vserial extends Component {
         const {mqtt} = this.props;
         const { SerialPort} = this.state;
         this.sendAjax()
-        console.log(this.state.port, 'port')
         if (this.state.port > 0){
-
+            if (this.timeout) {
+                clearTimeout(this.timeout)
+            }
             const datas = {
                 id: 'add_local_com' + new Date() * 1,
                 by_name: 1,
@@ -382,13 +380,15 @@ class Vserial extends Component {
                     }
                 }
             }
-            console.log(datas, 'datas')
             mqtt.client && mqtt.client.publish('v1/vspax/api/', JSON.stringify({id: 'vspax/api/list' + new Date() * 1}))
             mqtt.client && mqtt.client.publish('v1/vspax/api/add', JSON.stringify(datas))
         } else {
             setTimeout(() => {
                 this.loop()
             }, 2000);
+            this.timeout = setTimeout(() => {
+                this.stopVserial()
+            }, 20000);
         }
     }
     openVserial = () => {
@@ -431,9 +431,12 @@ class Vserial extends Component {
                                 this.loop()
                             } else {
                                 this.setState({openLoading: false})
+                                this.stopVserial()
                             }
                         })
                     } else {
+                        this.setState({openLoading: false})
+                        this.stopVserial()
                         output_record.result = data.message
                         output_record.result_tm = formatTime(new Date(data.timestamp * 1000), 'hh:mm:ss S')
                     }
@@ -442,6 +445,7 @@ class Vserial extends Component {
             } else {
                 message.error(res.error)
                 this.setState({openLoading: false})
+                this.stopVserial()
             }
         })
     }
