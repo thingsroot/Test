@@ -402,6 +402,7 @@ class Vserial extends Component {
             command: 'start',
             param: {
                 port: GetSerialListBySN(this.state.gateway) + this.state.SerialPort,
+                user_id: _getCookie('user_id'),
                 frps: {
                     server_addr: mqtt.vserial_channel.Proxy,
                     server_port: '1699'
@@ -415,7 +416,7 @@ class Vserial extends Component {
             name: this.state.gateway + '.freeioe_Vserial',
             output: 'enable_heartbeat',
             prop: 'value',
-            value: '0'
+            value: '1'
         }
         http.post('/api/gateways_dev_commands', params).then(res=>{
             let output_record = {};
