@@ -358,9 +358,6 @@ class Vserial extends Component {
         const { SerialPort} = this.state;
         this.sendAjax()
         if (this.state.port > 0){
-            if (this.timeout) {
-                clearTimeout(this.timeout)
-            }
             const datas = {
                 id: 'add_local_com' + new Date() * 1,
                 by_name: 1,
@@ -386,9 +383,6 @@ class Vserial extends Component {
             setTimeout(() => {
                 this.loop()
             }, 2000);
-            this.timeout = setTimeout(() => {
-                this.stopVserial()
-            }, 20000);
         }
     }
     openVserial = () => {
