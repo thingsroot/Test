@@ -258,7 +258,7 @@ class GatewaySettings extends Component {
                 this.setState({skynet_latest_version: undefined}, ()=>{
                     this.fetchSkynetVersion()
                 })
-                this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 3000,  (result)=> {
+                this.props.store.action.pushAction(res.data, '网关固件升级', '', data, 10000,  (result)=> {
                     this.fetchSkynetVersion()
                     if (result.ok){
                         this.setState({showUpgrade: false, skynet_latest_version: undefined})

@@ -185,20 +185,23 @@ class ServiceState extends Component {
     upgradeApp = () =>{
         const pathname = this.props.location.pathname.toLowerCase();
         let app = '';
+        let inst = '';
         if (pathname.indexOf('vserial') !== -1) {
-            app = 'APP00000377'
+            app = 'APP00000377';
+            inst = 'freeioe_Vserial'
         }
         if (pathname.indexOf('vnet') !== -1) {
-            app = 'APP00000135'
+            app = 'APP00000135';
+            inst = 'freeioe_Vnet'
         }
         if (this.state.instName) {
             const data = {
                 app: app,
-                inst: 'freeioe_Vserial',
+                inst: inst,
                 gateway: this.props.gateway,
                 version: this.state.latestVersion,
                 fork: true,
-                id: `vserial/upgrade/${this.props.match.params.sn}/${new Date() * 1}`
+                id: `${inst}/upgrade/${this.props.match.params.sn}/${new Date() * 1}`
             }
             http.post('/api/gateways_applications_upgrade', data).then(res=>{
                 if (res.ok) {

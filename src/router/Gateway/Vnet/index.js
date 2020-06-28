@@ -96,6 +96,7 @@ class VPN extends Component {
                     server_addr: this.props.mqtt.vserial_channel.Proxy
                 }
             }
+            console.log(data.vnet_cfg.net_mode, 'data')
             // const postData = {
             //     id: 'post_gate/' + new Date() * 1,
             //     auth_code: this.state.auth_code,
