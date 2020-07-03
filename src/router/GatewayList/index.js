@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import http from '../../utils/Server';
-import { Table, Tabs, Button, Popconfirm, message, Input, Icon, Menu, Dropdown, Tag } from 'antd';
+import { Table, Tabs, Button, Popconfirm, message, Input, Icon, Menu, Dropdown, Tag, Spin } from 'antd';
 import './style.scss';
 import { inject, observer } from 'mobx-react';
 import { Link, withRouter } from 'react-router-dom';
 import GatewayForm from './GatewayForm'
-
+import { _getCookie } from '../../utils/Session';
 const Search = Input.Search;
 const TabPane = Tabs.TabPane;
 let timer;
@@ -41,9 +41,16 @@ class MyGates extends Component {
                             className="dev_name"
                         >
                             <div style={{lineHeight: '30px'}}>
-                                {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >公司</Tag> : null}
+                                {
+                                    record.owner_type === 'Cloud Company Group' && record.company === _getCookie('companies')
+                                    ? <Tag color="cyan" >公司</Tag>
+                                    : record.owner_type === 'User' && record.owner_id === _getCookie('user_id')
+                                        ? <Tag color="lime" >个人</Tag>
+                                        : JSON.stringify(this.state.data) === '{}' ? <Spin /> : <Tag color="orange" >分享</Tag>
+                                }
+                                {/* {!record.is_shared && record.owner_type === 'Cloud Company Group' ? <Tag color="cyan" >公司</Tag> : null}
                                 {!record.is_shared && record.owner_type === 'User' ? <Tag color="lime" >个人</Tag> : null}
-                                {record.is_shared ? <Tag color="orange" >分享</Tag> : null}
+                                {record.is_shared ? <Tag color="orange" >分享</Tag> : null} */}
                             </div>
                             <div
                                 style={{fontSize: '14px'}}
