@@ -10,6 +10,15 @@ export function GetSerialListBySN (sn) {
     } else if (/TRTX01.+/.test(sn)) {
         // T1-3000
         tty_list = ['/dev/ttyS1', '/dev/ttyS2']
+    } else if (/TRTC01.+/.test(sn)) {
+        // C1-1100
+        tty_list = ['/dev/ttyS1'] /* S1: RS485 */
+    } else if (/TRTC02.+/.test(sn)) {
+        // C1-1200
+        tty_list = ['/dev/ttyS1', '/dev/ttyS3'] /* S1: RS232, S3: RS485 */
+    } else if (/TRTC03.+/.test(sn)) {
+        // C1-1300
+        tty_list = ['/dev/ttyS0', '/dev/ttyS1'] /* S0: RS232, S1: RS485 */
     }
     return tty_list
 }
@@ -39,7 +48,32 @@ export function GetInfoBySN (sn) {
             ram: '256M',
             rom: '4GB'
         }
+    } else if (/TRTC01.+/.test(sn)) {
+        // C1-1100
+        return {
+            model: 'C1-1100',
+            cpu: 'MediaTek MT7688 (MIPS® 24KEc)',
+            ram: '128M',
+            rom: '16M'
+        }
+	} else if (/TRTC02.+/.test(sn)) {
+        // C1-1200
+        return {
+            model: 'C1-1200',
+            cpu: 'MediaTek MT7688 (MIPS® 24KEc)',
+            ram: '128M',
+            rom: '32M'
+        }
+	} else if (/TRTC03.+/.test(sn)) {
+        // C1-1300
+        return {
+            model: 'C1-1300',
+            cpu: 'MediaTek MT7688 (MIPS® 24KEc)',
+            ram: '128M',
+            rom: '32M'
+        }
     }
+
     return {
         cpu: 'UNKNOWN',
         ram: 'UNKNOWN',
