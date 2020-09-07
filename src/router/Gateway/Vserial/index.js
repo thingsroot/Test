@@ -39,6 +39,15 @@ export function GetSerialListBySN (sn) {
         // Q204 无4G模块
         // 4串口
         tty_list = '/dev/ttymxc'
+    } else if (/TRTC01.+/.test(sn)) {
+        // C1-1100
+        tty_list = '/dev/ttyS'
+    } else if (/TRTC02.+/.test(sn)) {
+        // C1-1200
+        tty_list = '/dev/ttyS'
+    } else if (/TRTC01.+/.test(sn)) {
+        // C1-1300
+        tty_list = '/dev/ttyS'
     }
     return tty_list
 }

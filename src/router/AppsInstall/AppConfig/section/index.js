@@ -226,7 +226,7 @@ class AppConfigSection extends Component {
                 <div style={{lineHeight: '50px'}}>
                     <span className="spanStyle">{config.desc}：</span>
                     <Select
-                        value={config.value}
+                        value={typeof(config.value) !== 'object' ? config.value : config.value.value}
                         style={{width: 300}}
                         onChange={(value)=>{
                             config.depends && config.depends.length > 0 && config.depends.map( (dep, dep_key) => {
@@ -242,7 +242,14 @@ class AppConfigSection extends Component {
                         }}
                     >
                         {config.values && config.values.length > 0 && config.values.map(w => {
-                            return (<Option key={typeof(w) !== 'object' ? w : w.value}>{typeof(w) !== 'object' ? w : w.name}</Option>)
+                            return (
+                                <Option
+                                    key={typeof(w) !== 'object' ? w : w.value}
+                                    value={typeof(w) !== 'object' ? w : w.value}
+                                >
+                                    {typeof(w) !== 'object' ? w : w.name}
+                                </Option>
+                            )
                         } )}
                     </Select>
                     <Input

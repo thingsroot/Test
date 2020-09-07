@@ -126,7 +126,8 @@ function get_serial_childs (sn) {
             'name': 'port',
             'desc': '端口',
             'type': 'dropdown',
-            'values': tty_list
+            'values': tty_list,
+            'value': tty_list[0].name
         },
         {
             'name': 'baudrate',
@@ -251,7 +252,6 @@ class AppConfig extends Component {
         }
         return JSON.stringify(data, null, 4)
     }
-
     refreshTemplateList = () => {
         this.setState({appTemplateList: [], loading: true})
         let app = this.state.app_info ? this.state.app_info.name : undefined;
@@ -413,7 +413,6 @@ class AppConfig extends Component {
                     cur_section.child.push(v);
                 }
             });
-
             this.setState({
                 errorCode: errorCode,
                 uiEnabled: !errorCode,
