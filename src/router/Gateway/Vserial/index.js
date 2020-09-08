@@ -7,50 +7,8 @@ import Logviewer from './Logview';
 import http from '../../../utils/Server';
 import './style.scss';
 import {_getCookie} from '../../../utils/Session';
+import {GetInfoBySN} from '../../../utils/hardwares';
 const Option = Select.Option;
-// const cloums = [
-//     {
-//         title: '服务名称',
-//         dataIndex: 'name',
-//         key: 'name'
-//     }, {
-//         title: '服务描述',
-//         dataIndex: 'desc',
-//         key: 'desc'
-//     }, {
-//         title: '服务状态',
-//         dataIndex: 'status',
-//         key: 'status'
-//     }
-// ]
-export function GetSerialListBySN (sn) {
-    let tty_list = ''
-    if (/2-30002.+/.test(sn)) {
-        // Q102
-        tty_list = '/dev/ttymxc'
-    } else if (/2-30102.+/.test(sn)) {
-        // Q204
-        // 4串口
-        tty_list = '/dev/ttymxc'
-    } else if (/TRTX01.+/.test(sn)) {
-        // TLink X1
-        tty_list = '/dev/ttyS'
-    } else if (/2-30100.+/.test(sn)) {
-        // Q204 无4G模块
-        // 4串口
-        tty_list = '/dev/ttymxc'
-    } else if (/TRTC01.+/.test(sn)) {
-        // C1-1100
-        tty_list = '/dev/ttyS'
-    } else if (/TRTC02.+/.test(sn)) {
-        // C1-1200
-        tty_list = '/dev/ttyS'
-    } else if (/TRTC01.+/.test(sn)) {
-        // C1-1300
-        tty_list = '/dev/ttyS'
-    }
-    return tty_list
-}
 function showConfirm (name, path) {
     Modal.warning({
       title: '串口关闭警告',
@@ -98,13 +56,14 @@ class Vserial extends Component {
     state = {
         gateway: '',
         mqtt_topic: 'v1/vspax/#',
-        SerialPort: '1',
+        SerialPort: '',
         BaudRate: '9600',
         StopBit: '1',
         DataBits: '8',
         Check: 'NONE',
         current_com_params: '',
         port: 0,
+        PortName: '',
         timer: false,
         flag: false,
         connect_flag: false,
@@ -281,7 +240,7 @@ class Vserial extends Component {
                 // console.log(JSON.stringify(addPortData[0]))
                 const data = addPortData[0].info.com_cfg;
                 this.setState({
-                    SerialPort: data.serial[data.serial.length - 1],
+                    SerialPort: data.serial,
                     BaudRate: data.baudrate,
                     StopBit: data.stopbit,
                     DataBits: data.databit,
@@ -370,7 +329,7 @@ class Vserial extends Component {
             const datas = {
                 id: 'add_local_com' + new Date() * 1,
                 by_name: 1,
-                name: 'COM' + SerialPort,
+                name: SerialPort,
                 peer: {
                     type: 'tcp_client',
                     host: mqtt.vserial_channel.Proxy,
@@ -380,7 +339,7 @@ class Vserial extends Component {
                         com_cfg: {
                             user_id: _getCookie('user_id'),
                             server_addr: mqtt.vserial_channel.Proxy,
-                            serial: GetSerialListBySN(this.state.gateway) + SerialPort
+                            serial: SerialPort
                         },
                         serial_driver: 'vspax'
                     }
@@ -404,7 +363,7 @@ class Vserial extends Component {
             name: this.state.gateway + '.freeioe_Vserial',
             command: 'start',
             param: {
-                port: GetSerialListBySN(this.state.gateway) + this.state.SerialPort,
+                port: this.state.SerialPort,
                 user_id: _getCookie('user_id'),
                 frps: {
                     server_addr: mqtt.vserial_channel.Proxy,
@@ -486,7 +445,8 @@ class Vserial extends Component {
         })
     }
     render () {
-        const { SerialPort, serviceName, flag, openLoading, stopLoading, logFlag } = this.state;
+        const { SerialPort, serviceName, flag, openLoading, stopLoading, logFlag, PortName } = this.state;
+        const {tty_list} = GetInfoBySN(this.state.gateway)
         const { mqtt } = this.props;
         const {  addPortData } = mqtt.vserial_channel;
         return (
@@ -508,31 +468,44 @@ class Vserial extends Component {
                 />
                 <div className="vserialPort">
                     <div>
-                        <p className="vserial_title">网关串口：COM{SerialPort[SerialPort.length - 1]}</p>
+                        <p className="vserial_title">网关串口：{PortName ? PortName : tty_list && tty_list.length > 0 ? tty_list[0].name : ''}</p>
                         <div className="selectWrap">
                             <div className="selectChild">
                             <Row>
                                 <Col span={8}><p>串口:</p>
                                     <Select
                                         disabled={!flag}
-                                        value={this.state.SerialPort}
+                                        value={SerialPort ? SerialPort : tty_list && tty_list.length > 0 ? tty_list[0].name : ''}
                                         style={{width: 120, marginLeft: 10}}
-                                        onChange={(value)=>{
-                                            this.changeStatus(value, 'SerialPort')
+                                        onChange={(value, event)=>{
+                                            value;
+                                            this.changeStatus(event.props.value, 'SerialPort')
+                                            this.changeStatus(event.props.children, 'PortName')
                                         }}
                                     >
-                                        <Option value="1">com1</Option>
-                                        <Option value="2">com2</Option>
+                                        {
+                                            tty_list && tty_list.length > 0 && tty_list.map((item, key)=>{
+                                                return (
+                                                    <Option
+                                                        value={item.value}
+                                                        key={key}
+                                                    >{item.name}</Option>
+                                                )
+                                            })
+                                        }
+                                        {/* <Option value="2">COM2</Option> */}
+                                        {/* <Option value="1">COM1</Option>
+                                        <Option value="2">COM2</Option>
                                         {
                                             /2-30102.+/.test(this.state.gateway) || /2-30100.+/.test(this.state.gateway)
-                                            ? <Option value="3">com3</Option>
+                                            ? <Option value="3">COM3</Option>
                                             : null
                                         }
                                         {
-                                            /2-30100.+/.test(this.state.gateway) || /2-30100.+/.test(this.state.gateway)
-                                            ?  <Option value="4">com4</Option>
+                                            /2-30102.+/.test(this.state.gateway) || /2-30100.+/.test(this.state.gateway)
+                                            ?  <Option value="4">COM4</Option>
                                             : null
-                                        }
+                                        } */}
                                     </Select>
                                 </Col>
                                 <Col span={8}>

@@ -4,6 +4,7 @@ import { Link, withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import EditSwitch from '../../router/Gateway/Settings/Edit/switch';
 import http from '../../utils/Server';
+import { GetInfoBySN} from '../../utils/hardwares';
 import './style.scss';
 // import {IconIOT} from '../../utils/iconfont';
 // const IconFont = Icon.createFromIconfontCN({
@@ -414,7 +415,7 @@ class LeftNav extends Component {
                             gateway={gateway}
                             onChange={(checked, onResult)=>{
                                 const { sn } = this.props.match.params;
-                                if (sn.indexOf('TRTX') === -1 && sn.indexOf('-') === -1) {
+                                if (!GetInfoBySN(sn).tty_list) {
                                     this.handleCancel()
                                     this.info()
                                     return false;
@@ -436,7 +437,8 @@ class LeftNav extends Component {
                                 gateway={gateway}
                                 onChange={(checked, onResult)=>{
                                     const { sn } = this.props.match.params;
-                                    if (sn.indexOf('TRTX') === -1 && sn.indexOf('-') === -1) {
+
+                                    if (!GetInfoBySN(sn).tty_list) {
                                         this.handleCancel()
                                         this.info()
                                         return false;
