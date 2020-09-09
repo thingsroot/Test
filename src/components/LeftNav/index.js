@@ -114,7 +114,7 @@ class LeftNav extends Component {
           title: '提示：',
           content: (
             <div>
-              <p>该设备为虚拟设备,暂不支持此项功能！请更换设备后重试！</p>
+              <p>该设备暂不支持此项功能！请更换设备后重试！</p>
             </div>
           )
         });
@@ -415,7 +415,7 @@ class LeftNav extends Component {
                             gateway={gateway}
                             onChange={(checked, onResult)=>{
                                 const { sn } = this.props.match.params;
-                                if (!GetInfoBySN(sn).tty_list) {
+                                if (GetInfoBySN(sn).Disable_extension) {
                                     this.handleCancel()
                                     this.info()
                                     return false;
@@ -438,7 +438,7 @@ class LeftNav extends Component {
                                 onChange={(checked, onResult)=>{
                                     const { sn } = this.props.match.params;
 
-                                    if (!GetInfoBySN(sn).tty_list) {
+                                    if (GetInfoBySN(sn).Disable_extension) {
                                         this.handleCancel()
                                         this.info()
                                         return false;

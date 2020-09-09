@@ -12,7 +12,8 @@ export function GetInfoBySN (sn) {
             }, {
                 name: '串口2',
                 value: '/dev/ttymxc1'
-            }]
+            }],
+            Disable_extension: false
         }
     } else if (/2-30102.+/.test(sn)) {
         // Q204
@@ -33,7 +34,8 @@ export function GetInfoBySN (sn) {
             }, {
                 name: '串口4',
                 value: '/dev/ttymxc3'
-            }]
+            }],
+            Disable_extension: false
         }
     } else if (/TRTX01.+/.test(sn)) {
         // T1-3000
@@ -48,7 +50,8 @@ export function GetInfoBySN (sn) {
             }, {
                 name: '串口2',
                 value: '/dev/ttyS2'
-            }]
+            }],
+            Disable_extension: false
         }
     } else if (/TRTC01.+/.test(sn)) {
         // C1-1100
@@ -60,7 +63,8 @@ export function GetInfoBySN (sn) {
             tty_list: [{
                 name: 'RS485',
                 value: '/dev/ttyS1'
-            }] /* S1: RS485 */
+            }],
+            Disable_extension: true  /* S1: RS485 */
         }
 	} else if (/TRTC02.+/.test(sn)) {
         // C1-1200
@@ -75,7 +79,9 @@ export function GetInfoBySN (sn) {
             }, {
                 name: 'RS485',
                 value: '/dev/ttyS3'
-            }] /* S1: RS232, S3: RS485 */
+            }],
+            Disable_extension: false
+            /* S1: RS232, S3: RS485 */
         }
 	} else if (/TRTC03.+/.test(sn)) {
         // C1-1300
@@ -90,7 +96,9 @@ export function GetInfoBySN (sn) {
             }, {
                 name: 'RS485',
                 value: '/dev/ttyS1'
-            }] /* S0: RS232, S1: RS485 */
+            }],
+            Disable_extension: false
+            /* S0: RS232, S1: RS485 */
         }
     }
 
