@@ -31,6 +31,8 @@ class Retrieve extends PureComponent {
                         if (res.info === 'password_reset_email_sent'){
                             message.info('申请重置成功，请登录邮箱' + values.password + '完成密码重置')
                         }
+                    } else {
+                            message.error('邮件发送失败，请联系系统管理员。')
                     }
                 }).catch(function (error){
                     if (error){
