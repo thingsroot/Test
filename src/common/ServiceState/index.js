@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Select, message, Button} from 'antd';
+import { Input, Select, message, Button, Modal} from 'antd';
 import { inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
@@ -17,7 +17,11 @@ class ServiceState extends Component {
         latestVersion: 0,
         instName: '',
         settimer: undefined,
-        app_name: ''
+        app_name: '',
+        the_old_version: undefined,
+        showConfirm: false,
+        upgradeButton: false,
+        upgradeStatus: false
     }
     componentDidMount (){
         const { mqtt } = this.props;
@@ -25,6 +29,21 @@ class ServiceState extends Component {
         this.setintervalGayewayInfo = setInterval(() => {
             this.getGateywayInfo()
         }, 5000);
+        this.test_version = setInterval(() => {
+            if (((mqtt.version && mqtt.version < 200519) || this.state.the_old_version === 'the_old_version') && this.props.location.pathname.indexOf('vnet') === -1) {
+                if (this.state.showConfirm) {
+                    return false;
+                }
+                this.setState({
+                    showConfirm: true
+                }, () =>{
+                    this.showConfirm()
+                })
+            }
+            if (mqtt && mqtt.version && this.state.appVersion && (this.state.the_old_version === 'false' || (this.state.the_old_version === 'the_old_version'))) {
+                clearInterval(this.test_version)
+            }
+        }, 100);
         this.t1 = setInterval(() => {
             mqtt && mqtt.client && mqtt.connected && mqtt.client.publish('v1/update/api/servers_list', JSON.stringify({'id': 'server_list/' + new Date() * 1}))
             mqtt && mqtt.client && mqtt.connected && mqtt.client.publish('v1/update/api/version', JSON.stringify({'id': 'get_new_version/' + new Date() * 1}))
@@ -58,20 +77,36 @@ class ServiceState extends Component {
         const pathname = nextprops.location.pathname.toLowerCase();
         if (nextprops.mqtt.upgrade_status === 'failed' && this.t1) {
             clearInterval(this.t1)
+            if (this.state.upgradeStatus) {
+                this.setState({
+                    upgradeStatus: false
+                })
+            }
         }
         if (nextprops.store.gatewayInfo.apps !== this.state.apps){
             this.setState({
                 apps: nextprops.store.gatewayInfo.apps
             }, ()=>{
                 if (this.state.apps && this.state.apps.length > 0){
+                    let flag = false;
                     this.state.apps.map(item=>{
-                        if (item.name === 'APP00000130' && pathname.indexOf('vserial') !== -1){
+
+                        if (item.name === 'APP00000130'){
+                            this.setState({appVersion: item.version, the_old_version: 'the_old_version', app_name: 'isVserial'})
+                            flag = true;
+                        }
+                        if (item.name === 'APP00000377' && pathname.indexOf('vserial') !== -1 && item.inst_name === 'freeioe_Vserial'){
                             this.setState({appVersion: item.version, app_name: 'isVserial'})
                         }
                         if (item.name === 'APP00000135' && pathname.indexOf('vnet') !== -1) {
                             this.setState({appVersion: item.version, app_name: 'isVnet'})
                         }
                     })
+                    if (!flag) {
+                        this.setState({
+                            the_old_version: 'false'
+                        })
+                    }
                 }
             })
         }
@@ -84,6 +119,38 @@ class ServiceState extends Component {
         this.props.mqtt.vserial_channel.setProxy(null)
         this.props.mqtt.disconnect()
     }
+    showConfirm = () => {
+        Modal.info({
+          title: '应用版本过低，请升级！',
+        //   icon: <ExclamationCircleOutlined />,
+          content: '应用版本过低，请升级后再使用，如不升级，将无法使用此功能！',
+          okText: '升级',
+        //   cancelText: '放弃升级',
+          onOk: () => {
+            if (this.state.the_old_version === 'the_old_version') {
+                this.upgradeApp()
+            }
+            if (this.props.mqtt.version < 200519) {
+                this.upgradeRprogramming()
+                this.setState({
+                    upgradeButton: true
+                }, ()=>{
+                    setTimeout(() => {
+                        this.setState({
+                            upgradeButton: false
+                        })
+                    }, 5000);
+                })
+            }
+            return new Promise((resolve, reject) => {
+              setTimeout(Math.random() > 0.5 ? resolve : reject, 5000);
+            }).catch((err) => console.log('Oops errors!' + err));
+          }
+        //   onCancel: () => {
+        //     this.props.history.push(`/gateway/${this.props.match.params.sn}/devices`)
+        //   }
+        });
+      }
     getGateywayInfo = () => {
         http.get('/api/gateways_read?name=' + this.props.gateway).then(res=>{
             if (res.ok) {
@@ -119,23 +186,29 @@ class ServiceState extends Component {
     upgradeApp = () =>{
         const pathname = this.props.location.pathname.toLowerCase();
         let app = '';
+        let inst = '';
         if (pathname.indexOf('vserial') !== -1) {
-            app = 'APP00000130'
+            app = 'APP00000377';
+            inst = 'freeioe_Vserial'
         }
         if (pathname.indexOf('vnet') !== -1) {
-            app = 'APP00000135'
+            app = 'APP00000135';
+            inst = 'freeioe_Vnet'
         }
         if (this.state.instName) {
             const data = {
                 app: app,
-                inst: this.state.instName,
+                inst: inst,
                 gateway: this.props.gateway,
                 version: this.state.latestVersion,
-                id: `vserial/upgrade/${this.props.match.params.sn}/${new Date() * 1}`
+                fork: true,
+                id: `${inst}/upgrade/${this.props.match.params.sn}/${new Date() * 1}`
             }
             http.post('/api/gateways_applications_upgrade', data).then(res=>{
                 if (res.ok) {
-                    this.props.store.action.pushAction(res.data, intl.get('gateway.application_upgrade'), '', data, 10000)
+                    this.props.store.action.pushAction(res.data, intl.get('gateway.application_upgrade'), '', data, 10000, (result) =>{
+                        console.log(result)
+                    })
                 } else {
                     message.error(res.error)
                 }
@@ -149,7 +222,7 @@ class ServiceState extends Component {
         const pathname = this.props.location.pathname.toLowerCase();
         let app = '';
         if (pathname.indexOf('vserial') !== -1) {
-            app = 'APP00000130'
+            app = 'APP00000377'
         }
         if (pathname.indexOf('vnet') !== -1) {
             app = 'APP00000135'
@@ -166,7 +239,7 @@ class ServiceState extends Component {
                 if (res.ok){
                     if (res.data && res.data.length > 0){
                         res.data.map((item)=>{
-                            if (item.name === 'APP00000130' && this.props.location.pathname.indexOf('vserial') !== -1){
+                            if ((item.name === 'APP00000377' || item.name === 'APP00000130') && this.props.location.pathname.indexOf('vserial') !== -1){
                                 this.setState({instName: item.inst_name})
                             }
                             if (item.name === 'APP00000135' && this.props.location.pathname.indexOf('vnet') !== -1){
@@ -192,12 +265,15 @@ class ServiceState extends Component {
             'new_version': newVersionMsg.new_version,
             'new_version_filename': newVersionMsg.new_version_filename
         }
-        mqtt.client.publish('v1/update/api/update', JSON.stringify(data))
+        mqtt && mqtt.client && mqtt.client.publish('v1/update/api/update', JSON.stringify(data))
         const datas = {
             id: 'get_upgrade_status/' + new Date() * 1
         }
+        this.setState({
+            upgradeStatus: true
+        })
         this.t1 = setInterval(() => {
-            mqtt.client.publish('v1/update/api/update_status', JSON.stringify(datas))
+            mqtt && mqtt.client && mqtt.client.publish('v1/update/api/update_status', JSON.stringify(datas))
         }, 3000);
     }
     handleChange = (value)=>{
@@ -227,12 +303,16 @@ class ServiceState extends Component {
                                     ? mqtt.vserial_channel.Active && mqtt.versionMsg
                                     ? intl.get('gateway.Its_the_latest_version')
                                     : <div>
-                                        {intl.get('gateway.Please_upgrade')}！&nbsp;&nbsp;&nbsp;&nbsp;
-                                        <Button
-                                            type="primary"
-                                            loading={mqtt.versionMsg}
-                                            onClick={this.upgradeRprogramming}
-                                        >{intl.get('gateway.upgrade')}</Button>
+                                        {intl.get('gateway.Please_upgrade')}!&nbsp;&nbsp;&nbsp;&nbsp;
+                                        {
+                                            !this.state.upgradeButton
+                                            ? <Button
+                                                type="primary"
+                                                loading={this.state.upgradeStatus}
+                                                onClick={this.upgradeRprogramming}
+                                              >{intl.get('gateway.upgrade')}</Button>
+                                            : ''
+                                        }
                                     </div>
                                     : ''
                                 }
@@ -276,6 +356,9 @@ class ServiceState extends Component {
                     <div className="flex">
                         <p>{intl.get('gateway.Service_node')}:</p>
                         <div>
+                            {
+                                console.log(serviceNode, 'serviceNode')
+                            }
                             {
                             serviceNode && serviceNode.length > 0 &&
                             <Select

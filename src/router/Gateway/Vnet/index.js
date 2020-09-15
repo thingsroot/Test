@@ -97,15 +97,7 @@ class VPN extends Component {
                     server_addr: this.props.mqtt.vserial_channel.Proxy
                 }
             }
-            // const postData = {
-            //     id: 'post_gate/' + new Date() * 1,
-            //     auth_code: this.state.auth_code,
-            //     output: 'vnet_config'
-            // }
             mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/service_start', JSON.stringify(data))
-            // setTimeout(() => {
-            //     mqtt && mqtt.client && mqtt.client.publish('v1/vnet/api/post_gate', JSON.stringify(postData))
-            // }, 5000);
         } else {
             message.warning(intl.get('gateway.your_account_does_not_have_an_accessKey_at_present'), 3)
             http.post('/api/user_token_create').then(res=>{
@@ -242,7 +234,6 @@ class VPN extends Component {
                 <div className="help_button">
                     <Button
                         icon="question-circle"
-                        // style={{marginLeft: '27px', marginBottom: '4px'}}
                         onClick={()=>{
                             window.open('https://wiki.freeioe.org/doku.php?id=apps:APP00000135', '_blank')
                         }}
@@ -394,12 +385,6 @@ class VPN extends Component {
                     }
                 </div>
                 <div className="VPNRight">
-                    {/* <div className="VPNlist">
-                        <p>
-                            本地运行环境：
-                        </p>
-                        <span>{mqtt.connected ? '运行环境正常' : '运行环境异常'}</span>
-                    </div> */}
                     <p className="vnet_title">{intl.get('gateway.running_state')}</p>
                     <div className="VPNlist">
                         <p>

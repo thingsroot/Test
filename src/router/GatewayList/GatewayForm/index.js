@@ -118,8 +118,6 @@ class GatewayForm extends Component {
             <Modal
                 title={type === 'create' ? intl.get('gateway.add_the_gateway') : intl.get('gateway.setting_gateway')}
                 visible={visible}
-                // okText="确定"
-                // cancelText="取消"
                 maskClosable={false}
                 onOk={()=>{
                     this.handleOk('create')

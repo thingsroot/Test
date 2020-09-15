@@ -125,7 +125,8 @@ class CreateCompanies extends PureComponent {
                 })
             }
         })
-        http.get('api/user_read?name' + _getCookie('user_id')).then(result=>{
+        http.get('/api/user_read?name=' + _getCookie('user_id')).then(result=>{
+            if (result.ok) {
                 http.get('/api/companies_requisition_list').then(res=>{
                     if (res.ok && res.data.length > 0) {
                         res.data.map(item=>{
@@ -159,6 +160,7 @@ class CreateCompanies extends PureComponent {
                         })
                     }
                 })
+            }
         })
     }
     addcompany = (name, company)=>{
@@ -227,18 +229,26 @@ class CreateCompanies extends PureComponent {
                     formData.append(item, values[item]);
                 }
             })
+            const token = _getCookie('csrf_auth_token') || '';
             reqwest({
                 url: '/api/companies_requisition_create',
                 method: 'post',
+                headers: {
+                    'X-Frappe-CSRF-Token': token
+                },
                 processData: false,
                 data: formData,
-                success: () => {
-                    message.success(intl.get('company.The_materials_are_submitted_successfully._Please_wait_patiently_for_the_background_review._It_is_expected_to_take_1-3_working_days'));
-                    this.setState({
-                      visible: false,
-                      status: 'processing',
-                      loading: false
-                    })
+                success: (res) => {
+                    if (res.ok) {
+                        message.success(intl.get('company.The_materials_are_submitted_successfully._Please_wait_patiently_for_the_background_review._It_is_expected_to_take_1-3_working_days'));
+                        this.setState({
+                          visible: false,
+                          status: 'processing',
+                          loading: false
+                        })
+                    } else {
+                        message.error(intl.get('company.Data_submission_failed,_please_try_again'));
+                    }
                 },
                 error: () => {
                   message.error(intl.get('company.Data_submission_failed,_please_try_again'));
@@ -311,7 +321,7 @@ class CreateCompanies extends PureComponent {
                                     this.props.history.go(-1)
                                   }}
                               >
-                                  点击返回
+                                  {intl.get('login.return')}
                               </Button>
                             }
                         />

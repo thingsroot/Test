@@ -4,7 +4,6 @@ import { _getCookie, isAuthenticated } from './Session';
 isAuthenticated;
 
 // 创建axios默认请求
-// axios.defaults.baseURL = 'http://iot.symgrid.com';
 // 配置超时时间
 axios.defaults.timeout = 100000;
 
@@ -23,24 +22,20 @@ axios.interceptors.request.use((config) => {
 */
 
 // 添加响应拦截器
-axios.interceptors.response.use(
-  function (response) {
-    console.log(response)
-    console.log(response.headers, 'headers')
-    if (response['set-cookie'] === undefined) {
-      console.log('meiyoumeiyoumeiyou')
-    }
-    console.log(response.headers['set-cookie'])
+// axios.interceptors.response.use(
+  // function (response) {
+    // console.log(response, 'res')
+//     console.log(response)
 // //     if (!isAuthenticated() || response.data.error && response.data.error === 'auth_code_missing'){
 // //       window.location.href = '/login'
 // //     }
-    return response;
+    // return response;
 // //   },
 // //   function (error) {
 // //     // 对响应错误做点什么
 // //     return Promise.reject(error);
-  }
-);
+  // }
+// );
 /**
  * get请求
  * @method get
@@ -86,12 +81,13 @@ var postNoToken = function (url, data) {
       }).then(res=>{
           resolve(res.data)
       }).catch(err=>{
-        reject(err)
+          reject(err)
       })
   });
 };
 var form = function (url, data) {
     return new Promise((resolve, reject) => {
+      const token = _getCookie('csrf_auth_token') || '';
         // qs.stringify(data)
         axios(url, {
             method: 'post',
@@ -99,7 +95,8 @@ var form = function (url, data) {
             headers: {
                 Accept: 'application/x-www-form-urlencoded; charset=UTF-8',
                 'Content-Type': false,
-                'dataType': 'json'
+                'dataType': 'json',
+                'X-Frappe-CSRF-Token': token
             }
         }).then(res=>{
             resolve(res.data)

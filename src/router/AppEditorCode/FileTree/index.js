@@ -288,12 +288,6 @@ class MyTree extends Component {
                     message.error(intl.get('appeditorcode.failed_to_create_file'))
                 }
             });
-        // this.findChild(this.state.root[0], new_id).then(node=>{
-        //     if (node) {
-        //         message.error('文件夹名称重复');
-        //         return;
-        //     }
-        // })
     };
     //删除节点
     showConfirm = (content)=>{

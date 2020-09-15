@@ -57,7 +57,7 @@ class Login extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                        产品介绍
+                        {intl.get('header.Product_introduction')}
                     </span>
                 </Menu.Item>
                 <Menu.Item
@@ -71,7 +71,7 @@ class Login extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                        用户指南
+                        {intl.get('header.The_user_guide')}
                     </span>
                 </Menu.Item>
                 <Menu.Item
@@ -85,7 +85,7 @@ class Login extends PureComponent {
                 >
                     <Icon type="read" />
                     <span>
-                        管理员指南
+                        {intl.get('header.Manager_s_guide')}
                     </span>
                 </Menu.Item>
                 <Menu.Divider />

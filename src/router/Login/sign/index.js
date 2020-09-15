@@ -28,7 +28,7 @@ class Sign extends PureComponent {
                     if (res.ok) {
                         authenticateSuccess(res.data)
                         message.success(intl.get('login.login_succeeded'), 3).then(()=>{
-                            location.href = '/';
+                            location.href = '/dashboard';
                         })
                     } else {
                         if (res.message === 'Incorrect password') {

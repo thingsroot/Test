@@ -46,7 +46,6 @@ class Password extends PureComponent {
             if (value && value !== getFieldValue('password')) {
                 callback(intl.get('login.the_two_inputs_are_inconsistent'))
             }
-
             // 必须总是返回一个 callback，否则 validateFields 无法响应
             callback();
         };

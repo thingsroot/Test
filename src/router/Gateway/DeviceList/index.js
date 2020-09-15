@@ -15,46 +15,28 @@ const columns = [{
         dataIndex: 'meta.inst',
         key: 'meta.inst',
         className: 'cursor'
-        // sorter: true
     }, {
         title: intl.get('common.desc'),
         dataIndex: 'meta.description',
         key: 'meta.description',
         className: 'cursor'
-        // sorter: true
     }, {
         title: 'I/O/C',
         dataIndex: 'meta.ioc',
         key: 'meta.ioc',
         className: 'cursor'
-        // sorter: true
     }, {
         title: intl.get('gateway.equipment_serial_number'),
         key: 'meta.sn',
         dataIndex: 'meta.sn',
         width: '30%',
         className: 'cursor'
-        // sorter: true
     }, {
         title: intl.get('gateway.examples'),
         key: 'meta.app_inst',
         dataIndex: 'meta.app_inst',
         className: 'cursor'
-        // sorter: true
     }
-    //   , {
-    //   title: 'Action',
-    //   key: 'action',
-    //   render: (record) => {
-    //     return (<span>
-    //       <Link
-    //           disabled={record.set_data ? false : true}
-    //           to={`/MyGatesDevicesOutputs/${record.gateway}/${record.sn}`}
-    //           key="1"
-    //       >数据下置</Link>
-    //     </span>)
-    //   }
-    // }
 ];
 
 @withRouter
@@ -224,23 +206,6 @@ class DevicesList extends Component {
                                     />{this.state.uploadOneShort ? intl.get('gateway.stop_temporary_data_upload') : intl.get('gateway.enable_temporary_data_upload')}
                                 </Button>
                         }
-                        {/* <Tooltip
-                            placement="topLeft"
-                            title="请求网关数据快照"
-                        >
-                            <Button
-                                disabled={!this.state.dataSanpshotEnable}
-                                onClick={()=>{
-                                    this.setState({dataSanpshotEnable: false})
-                                    this.dataSnapshot()
-                                    setTimeout(()=>{
-                                        this.setState({dataSanpshotEnable: true})
-                                    }, 1000)
-                                }}
-                            >
-                                <IconIOT type="icon-APIshuchu"/>获取数据快照
-                            </Button>
-                        </Tooltip> */}
                         <Tooltip
                             placement="bottom"
                             title={intl.get('gateway.force_the_gateway_to_send_the_latest_data')}
@@ -258,22 +223,6 @@ class DevicesList extends Component {
                                 <IconIOT type="icon-APIshuchu"/>{intl.get('devece_list.Forced_to_refresh')}
                             </Button>
                         </Tooltip>
-                        {/* <Tooltip
-                            placement="topLeft"
-                            title="刷新设备列表"
-                        >
-                            <Icon
-                                style={{fontSize: 18, margin: '0 0 0 15px'}}
-                                type="reload"
-                                onClick={()=>{
-                                    this.setState({
-                                        loading: true,
-                                        sign: true
-                                    });
-                                    this.getData()
-                                }}
-                            />
-                        </Tooltip> */}
                     </p>
                 </div>
                 <Table

@@ -115,11 +115,6 @@ class Editable extends Component {
                 }
             ],
             columnsUser: [
-                // {
-                //     title: '序号',
-                //     dataIndex: 'idx',
-                //     width: '100px'
-                // },
                 {
                     title: intl.get('sharegroup.user_ID'),
                     dataIndex: 'user',
@@ -183,11 +178,6 @@ class Editable extends Component {
             ],
             count: 0,
             columnsDevice: [
-                // {
-                //     title: '序号',
-                //     dataIndex: 'idx',
-                //     width: '100px'
-                // },
                 {
                     title: intl.get('sharegroup.gateway_serial_number'),
                     dataIndex: 'device',

@@ -263,7 +263,7 @@ class GatewaySettings extends Component {
                 this.setState({skynet_latest_version: undefined}, ()=>{
                     this.fetchSkynetVersion()
                 })
-                this.props.store.action.pushAction(res.data, intl.get('gateway.gateway_firmware_upgrade'), '', data, 3000,  (result)=> {
+                this.props.store.action.pushAction(res.data, intl.get('gateway.gateway_firmware_upgrade'), '', data, 10000,  (result)=> {
                     this.fetchSkynetVersion()
                     if (result.ok){
                         this.setState({showUpgrade: false, skynet_latest_version: undefined})
@@ -295,21 +295,6 @@ class GatewaySettings extends Component {
                         className="linkstatus"
                     >
                         <div className="setbutton">
-                            {/*
-                                freeioe_upgradable || skynet_upgradable
-                                ? <Button
-                                    type="primary"
-                                    ghost
-                                    onClick={()=>{
-                                        this.setState({showUpgrade: true})
-                                    }}
-                                  >
-                                    <Icon type="thunderbolt"
-                                        theme="filled"
-                                    />
-                                    升级固件
-                                </Button> : null
-                                */}
                             <span style={{padding: '0 5px'}}> </span>
                             <Button
                                 disabled={!gatewayInfo.actionEnable}

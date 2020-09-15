@@ -4,6 +4,7 @@ import { Link, withRouter } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import EditSwitch from '../../router/Gateway/Settings/Edit/switch';
 import http from '../../utils/Server';
+import { GetInfoBySN} from '../../utils/hardwares';
 import './style.scss';
 import intl from 'react-intl-universal'
 // import {IconIOT} from '../../utils/iconfont';
@@ -119,57 +120,100 @@ class LeftNav extends Component {
           )
         });
       }
+    JudgeState (app) {
+        let data = {};
+        this.props.store.gatewayInfo.apps.map(item => {
+            if (item.name === app && item.status === 'stoped') {
+                data = {
+                    gateway: this.props.gateway,
+                    id: 'gateways/start/' + this.props.gateway + '/1590397188921',
+                    inst: item.inst_name
+                }
+            }
+        })
+        return data;
+    }
     enableVSERIAL (enable) {
         if (enable) {
-            return this.installApp('freeioe_Vserial', 'APP00000130', intl.get('devece_list.Enable_remote_serial_port_function'))
+            const data = this.JudgeState('APP00000377')
+            if (JSON.stringify(data) !== '{}') {
+                return this.installApp('freeioe_Vserial', 'APP00000377', intl.get('devece_list.Enable_remote_serial_port_function'), data)
+            } else {
+                return this.installApp('freeioe_Vserial', 'APP00000377', intl.get('devece_list.Enable_remote_serial_port_function'))
+            }
         } else {
             return this.removeApp('freeioe_Vserial', intl.get('devece_list.Turn_off_remote_serial_port_function'))
         }
     }
     enableVNET (enable) {
         if (enable) {
-            return this.installApp('freeioe_Vnet', 'APP00000135', intl.get('devece_list.Enable_remote_programming_network_function'))
+            const data = this.JudgeState('APP00000135')
+            if (JSON.stringify(data) !== '{}') {
+                return this.installApp('freeioe_Vnet', 'APP00000135', intl.get('devece_list.Enable_remote_programming_network_function'), data)
+            } else {
+                return this.installApp('freeioe_Vnet', 'APP00000135', intl.get('devece_list.Enable_remote_programming_network_function'))
+            }
         } else {
             return this.removeApp('freeioe_Vnet', intl.get('devece_list.Turn_off_remote_programming_network_functionality'))
         }
     }
     enableIOENetwork (enable){
         if (enable) {
-            return this.installApp('net_info', 'APP00000115', intl.get('devece_list.Enable_virtual_network_function'))
+            const data = this.JudgeState('APP00000115')
+            if (JSON.stringify(data) !== '{}') {
+                return this.installApp('net_info', 'APP00000115', intl.get('devece_list.Enable_virtual_network_function'), data)
+            } else {
+                return this.installApp('net_info', 'APP00000115', intl.get('devece_list.Enable_virtual_network_function'))
+            }
         } else {
             return this.removeApp('net_info', intl.get('devece_list.Turn_off_the_virtual_network_function'))
         }
     }
-    installApp (inst_name, app_name, title){
+    installApp (inst_name, app_name, title, data){
         return new Promise((resolve, reject) => {
             const { gateway } = this.props;
-            let params = {
-                gateway: gateway,
-                inst: inst_name,
-                app: app_name,
-                version: 'latest',
-                from_web: '1',
-                conf: {
-                    auto_start: true,
-                    enable_web: true
-                },
-                id: `installapp/${gateway}/${inst_name}/${new Date() * 1}`
-            }
-            http.post('/api/gateways_applications_install', params).then(res=>{
-                if (res.ok) {
-                    message.info(title + intl.get('gateway.send_request_successfully') + '. ' + intl.get('gateway.wait_for_gateway_response') + '!')
-                    this.props.store.action.pushAction(res.data, title, '', params, 30000,  (result)=> {
-                        resolve(result, 60000)
-                        this.props.refreshGatewayData();
-                    })
-                } else {
-                    resolve(false)
-                    message.error(res.error)
+            if (data) {
+                http.post('/api/gateways_applications_start', data).then(res=>{
+                    if (res.ok) {
+                        this.props.store.action.pushAction(res.data, intl.get('gateway.app_star'), '', data, 10000, (result)=> {
+                            resolve(result, 60000)
+                            // this.props.refreshGatewayData();
+                        })
+                    }
+                }).catch(err=>{
+                    reject(err)
+                    message.error(title + intl.get('gateway.send_request_failed') + err)
+                })
+                return false;
+            } else {
+                let params = {
+                    gateway: gateway,
+                    inst: inst_name,
+                    app: app_name,
+                    version: 'latest',
+                    from_web: '1',
+                    conf: {
+                        auto_start: true,
+                        enable_web: true
+                    },
+                    id: `installapp/${gateway}/${inst_name}/${new Date() * 1}`
                 }
-            }).catch(err=>{
-                reject(err)
-                message.error(title + + intl.get('gateway.request_send_failed') + '：' + err)
-            })
+                http.post('/api/gateways_applications_install', params).then(res=>{
+                    if (res.ok) {
+                        message.info(title + intl.get('gateway.request_succeeded') + intl.get('gateway.wait_for_gateway_response') + '!')
+                        this.props.store.action.pushAction(res.data, title, '', params, 30000,  (result)=> {
+                            resolve(result, 60000)
+                            // this.props.refreshGatewayData();
+                        })
+                    } else {
+                        resolve(false)
+                        message.error(res.error)
+                    }
+                }).catch(err=>{
+                    reject(err)
+                    message.error(title + intl.get('gateway.send_request_failed') + err)
+                })
+            }
         })
     }
     removeApp (inst_name, title) {
@@ -185,7 +229,7 @@ class LeftNav extends Component {
                     message.info(title + intl.get('gateway.send_request_successfully') + '. ' + intl.get('gateway.wait_for_gateway_response') + '!')
                     this.props.store.action.pushAction(res.data, title, '', params, 10000,  (result)=> {
                         resolve(result, 60000)
-                        this.props.refreshGatewayData();
+                        // this.props.refreshGatewayData();
                     })
                 } else {
                     resolve(false)
@@ -404,7 +448,7 @@ class LeftNav extends Component {
                             gateway={gateway}
                             onChange={(checked, onResult)=>{
                                 const { sn } = this.props.match.params;
-                                if (sn.indexOf('TRTX') === -1 && sn.indexOf('-') === -1) {
+                                if (GetInfoBySN(sn).Disable_extension) {
                                     this.handleCancel()
                                     this.info()
                                     return false;
@@ -426,7 +470,8 @@ class LeftNav extends Component {
                                 gateway={gateway}
                                 onChange={(checked, onResult)=>{
                                     const { sn } = this.props.match.params;
-                                    if (sn.indexOf('TRTX') === -1 && sn.indexOf('-') === -1) {
+
+                                    if (GetInfoBySN(sn).Disable_extension) {
                                         this.handleCancel()
                                         this.info()
                                         return false;

@@ -10,7 +10,6 @@ class GatewayEvents extends Component {
         limitTime: 24
     };
     componentDidMount (){
-        //const pathname = this.props.location.pathname.toLowerCase();
         this.setState({
             gateway: this.props.match.params.gateway,
             limitTime: this.props.match.params.limitTime

@@ -93,12 +93,6 @@ class Companies extends PureComponent {
                         >
                             {intl.get('header.Shared_group_management')}
                         </li></Link>
-                    {/* <li
-                        className={index === 3 ? 'actives' : ''}
-                        onClick={()=>{
-                            this.setIndex(3)
-                        }}
-                    ><Link to={`${path}/invited`}>邀请记录</Link></li> */}
                     <Link to={`${path}/companiesinfo`}>
                         <li
                             className={index === 4 ? 'actives' : ''}

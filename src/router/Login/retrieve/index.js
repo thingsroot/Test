@@ -33,6 +33,8 @@ class Retrieve extends PureComponent {
                         if (res.info === 'password_reset_email_sent'){
                             message.info(intl.get('login.application_for_reset_succeeded') + values.password + intl.get('login.complete_password_reset'))
                         }
+                    } else {
+                            message.error(intl.get('login.The_email_failed_to_send'))
                     }
                 }).catch(function (error){
                     if (error){

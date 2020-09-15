@@ -98,13 +98,6 @@ class BrowsingHistory extends Component {
         }, () =>{
           this.fetch();
         })
-        // this.setState({
-        //   gateway: this.props.match.params.sn,
-        //   device_sn: this.props.match.params.vsn,
-        //   input: this.props.match.params.input
-        // }, () =>{
-        //   this.fetch();
-        // })
         this.props.store.timer.setGateStatusLast(0)
       }
       UNSAFE_componentWillReceiveProps (nextProps){

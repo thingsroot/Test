@@ -53,17 +53,10 @@ class MyTemplateDetails extends PureComponent {
     UpdateFetchData = () => {
         let app = this.props.match.params.app;
         let conf = this.props.match.params.name;
-        // let version = this.props.match.params.version
         let action = this.props.match.params.action;
-        // if (version === undefined) {
-        //     version = 0
-        // } else {
-        //     version = Number(version) ? Number(version) : 0
-        // }
         this.setState({
             app: app,
             conf: conf,
-            // show_version: version,
             action: action
         }, ()=>{
             this.fetchInfo();
@@ -448,7 +441,7 @@ class MyTemplateDetails extends PureComponent {
                             type="link"
                             onClick={this.closeWps}
                         >
-                            关闭
+                            {intl.get('gateway.close')}
                         </Button>
                         <Wps
                             version={this.state.maxVersion}

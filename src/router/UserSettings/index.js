@@ -22,17 +22,19 @@ class UserSettings extends PureComponent {
             isAdmin: is_admin
         });
         http.get('/api/user_read?name=' + user_id).then(res=>{
-            let role = '';
-            let groups = res.data.groups;
-            groups && groups.length > 0 && groups.map((v, key)=>{
-                key;
-                role = v.role;
-            });
-            this.setState({
-                info: res.data,
-                company: res.data.companies[0],
-                isAdmin: role
-            })
+            if (res.ok) {
+                let role = '';
+                let groups = res.data.groups;
+                groups && groups.length > 0 && groups.map((v, key)=>{
+                    key;
+                    role = v.role;
+                });
+                this.setState({
+                    info: res.data,
+                    company: res.data.companies[0],
+                    isAdmin: role
+                })
+            }
         })
     }
     showModal = () => {
@@ -60,7 +62,6 @@ class UserSettings extends PureComponent {
                 this.props.store.session.setSid('Guest')
                 this.props.store.session.setCSRFToken('')
                 message.success(intl.get('usersettings.password_change_succeeded'), 1.5).then(()=>{
-                    console.log('Logout')
                     location.href = '/';
                 })
             }).catch(err=>{

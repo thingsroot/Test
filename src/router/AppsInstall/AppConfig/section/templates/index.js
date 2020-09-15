@@ -129,7 +129,7 @@ class EditorTemplates extends React.Component {
                       window.open(`/template/${this.props.match.params.app}/${record.id}/${record.ver}`, '_blank')
                     }}
                 >
-                    查看
+                    {intl.get('appdetails.see')}
                 </Button>
                 <Button
                     disabled={

@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import reqwest from 'reqwest';
 import intl from 'react-intl-universal';
 
+import {_getCookie} from '../../../utils/Session';
 const { TextArea } = Input;
 
 const CollectionCreateForm = Form.create()(
@@ -33,30 +34,45 @@ const CollectionCreateForm = Form.create()(
                 if (err) {
                     return;
                 }
+                this.setState({
+                    uploading: true
+                })
                 formData.append('app', this.props.app);
                 formData.append('version', values.version);
                 formData.append('comment', values.comment);
+                const token = _getCookie('csrf_auth_token') || '';
                 reqwest({
                     url: '/api/applications_versions_create',
                     method: 'post',
                     processData: false,
                     data: formData,
-                    success: () => {
-                        this.setState({
-                            fileList: [],
-                            uploading: false
-                        });
-                        message.success(`${intl.get('appdetails.uploaded_successfully')}.`);
-                        this.setState({
-                            initialVersion: values.version + 1
-                        })
-                        this.props.onSuccess()
+                    headers: {
+                        'X-Frappe-CSRF-Token': token
+                    },
+                    success: (res) => {
+                        if (res.ok) {
+                            this.setState({
+                                fileList: [],
+                                uploading: false
+                            });
+                            message.success(intl.get('appdetails.uploaded_successfully') + '。');
+                            this.setState({
+                                initialVersion: values.version + 1
+                            })
+                            this.props.onSuccess()
+                        } else {
+                            this.setState({
+                                uploading: false,
+                                fileList: []
+                          });
+                          message.error(intl.get('appdetails.upload_failure') + '，' + intl.get('appdetails.please_try_again') + '。');
+                        }
                     },
                     error: () => {
                       this.setState({
                             uploading: false
                       });
-                      message.error(`${intl.get('appdetails.upload_failure')}.`);
+                      message.error(intl.get('appdetails.upload_failure') + '，' + intl.get('appdetails.please_try_again') + '。');
                     }
                   });
                 form.resetFields();
@@ -108,6 +124,7 @@ const CollectionCreateForm = Form.create()(
                     maskClosable={false}
                     onCancel={onCancel}
                     onOk={this.handleCreate}
+                    confirmLoading={this.state.uploading}
                 >
                     <Form layout="vertical">
                         <Form.Item label={intl.get('appdetails.version')}>

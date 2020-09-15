@@ -224,12 +224,6 @@ class Edituser extends React.Component {
         return (
             <div className="company-name">
                 <span>{title}</span>
-                {/* <span
-                    className="add-user"
-                    onClick={this.addGroup}
-                >
-                    <Icon type="usergroup-add" />
-                </span> */}
             </div>
         )
     }
@@ -251,7 +245,6 @@ class Edituser extends React.Component {
                 ...col,
                 onCell: record => ({
                     record,
-                    // inputType: col.dataIndex === 'age' ? 'number' : 'text',
                     inputType: 'text',
                     dataIndex: col.dataIndex,
                     title: col.title,

@@ -201,7 +201,8 @@ class AppDetails extends Component {
     };
     showModal = () => {
         this.setState({
-          visible: true
+          visible: true,
+          ModalText: intl.get('appdetails.confirm_to_delete_this_app') + '?'
         });
       };
       handleOk = () => {

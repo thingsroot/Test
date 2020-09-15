@@ -254,7 +254,6 @@ class GatewaySettingsEdit extends Component {
                     <Button
                         onClick={onClose}
                     >X</Button>}
-                // loading={loading}
                 style={{ width: '100%' }}
             >
                 <div className="list">

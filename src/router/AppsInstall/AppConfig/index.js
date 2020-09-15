@@ -4,7 +4,7 @@ import {Button, Tabs, message, Divider} from 'antd';
 import {withRouter} from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
-import { GetSerialListBySN } from '../../../utils/hardwares';
+import { GetInfoBySN } from '../../../utils/hardwares';
 import AppConfigSection from './section';
 import AceEditor from 'react-ace';
 import 'brace/mode/json';
@@ -79,7 +79,7 @@ const tcp_server_childs = [
 ];
 
 function get_serial_childs (sn) {
-    let tty_list = GetSerialListBySN(sn)
+    let {tty_list} = GetInfoBySN(sn)
     if (tty_list.length === 0) {
         return [
             {
@@ -127,7 +127,8 @@ function get_serial_childs (sn) {
             'name': 'port',
             'desc': intl.get('appsinstall.port'),
             'type': 'dropdown',
-            'values': tty_list
+            'values': tty_list,
+            'value': tty_list[0].name
         },
         {
             'name': 'baudrate',
@@ -252,11 +253,9 @@ class AppConfig extends Component {
         }
         return JSON.stringify(data, null, 4)
     }
-
     refreshTemplateList = () => {
         this.setState({appTemplateList: [], loading: true})
-        let app = this.state.app_info ? this.state.app_info.name : undefined
-        console.log(app)
+        let app = this.state.app_info ? this.state.app_info.name : undefined;
         if (app === undefined) {
             return
         }
@@ -371,7 +370,6 @@ class AppConfig extends Component {
                         child: [v]
                     }
                     sections.push(cur_section);
-                    console.log(sections, 'sections')
                 } else if (v.type === 'table') {
                     v.cols = v.cols === undefined ? [] : v.cols
                     // if (cur_section.type === 'section') {
@@ -416,7 +414,6 @@ class AppConfig extends Component {
                     cur_section.child.push(v);
                 }
             });
-
             this.setState({
                 errorCode: errorCode,
                 uiEnabled: !errorCode,

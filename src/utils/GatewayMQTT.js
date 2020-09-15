@@ -3,7 +3,7 @@ import Cookie from 'mobx-cookie'
 import mqtt from 'mqtt';
 import {message} from 'antd'
 import { getLocalTime } from './time'
-
+import path from '../assets/path';
 
 function makeid () {
     var text = '';
@@ -530,7 +530,7 @@ class GatewayMQTT {
             }
             return
         }
-        const url = flag ? 'ws://127.0.0.1:7884/mqtt' : 'wss://cloud.thingsroot.com/ws';
+        const url = flag ? path.mqtt_local_path : path.mqtt_cloud_path;
         this.client = mqtt.connect(url, options)
         this.client.on('connect', ()=>{
             if (window.location.pathname.indexOf('vnet') === -1 && window.location.pathname.indexOf('vserial') === -1) {
@@ -561,7 +561,6 @@ class GatewayMQTT {
         })
 
         this.client.on('message', (msg_topic, msg)=>{
-            // console.log(msg_topic, JSON.parse(msg.toString()))
             if (msg_topic === this.gateway + '/comm') {
                 const data = JSON.parse(msg.toString());
                 this.onReceiveCommMsg(data)
@@ -596,8 +595,9 @@ class GatewayMQTT {
                 }
                 if (data.id.indexOf('get_new_version') !== -1 && data.result){
                     this.new_version = parseInt(data.data.new_version);
+                    this.version = parseInt(data.data.version);
                     this.onReceiveVserialVersionMsg(data.data)
-                    if (parseInt(data.data.new_version) === parseInt(data.data.version)){
+                    if (parseInt(data.data.new_version) <= parseInt(data.data.version)){
                         this.onReceiveLocalVersionMsg(true)
                     }
                     if (parseInt(data.data.new_version) > parseInt(data.data.version)){

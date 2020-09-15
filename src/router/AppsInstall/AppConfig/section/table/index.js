@@ -323,7 +323,7 @@ class EditableTable extends React.Component {
                 type="primary"
                 style={{ margin: '10px 0' }}
             >
-                添加
+                {intl.get('appsinstall_add')}
             </Button>
         </div>
         );

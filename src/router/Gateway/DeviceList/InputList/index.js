@@ -273,12 +273,6 @@ class ExpandedRowRender extends PureComponent {
                     this.state.Moreandmore
                     ? <div
                         className="modal_browsinghistory"
-                        // onClick={()=>{
-                        //     this.setState({
-                        //         Moreandmore: false,
-                        //         visible: true
-                        //     })
-                        // }}
                       >
                         <Browsinghistory
                             closewindows={this.closewindows}

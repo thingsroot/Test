@@ -181,7 +181,7 @@ class Developer extends Component {
                                             return (
                                                 <li key={key}>
                                                     <div className="appImg">
-                                                        <Link to={`/appdetails/${v.name}`}>
+                                                        <Link to={`/appdetails/${v.name.replace(/\//g, '*')}`}>
                                                             <img
                                                                 src={`/store_assets${v.icon_image}`}
                                                                 alt=""
@@ -221,57 +221,74 @@ class Developer extends Component {
                                 </div>
                             }
                     </TabPane>
-                    <TabPane
-                        tab={intl.get('developer.clone_application')}
-                        key="2"
-                    >
-                        <div
-                            style={this.state.loading === false ? block : none}
+                        <TabPane
+                            tab={intl.get('developer.clone_application')}
+                            key="2"
                         >
-                            <ul>
-                                {
-                                    forkList && forkList.length > 0
-                                    ? forkList.map((v, key)=>{
-                                        return <li key={key}>
-                                            <div className="appImg">
-                                                <Link to={`/appdetails/${v.name}`}>
-                                                    <img
-                                                        src={`/store_assets${v.icon_image}`}
-                                                        alt=""
-                                                    />
-                                                </Link>
-                                            </div>
-                                            <div className="appInfo">
-                                                <p className="appName">{v.app_name}</p>
-                                                <p className="info">
-                                                    <span>{intl.get('developer.the_date_of_production')}：{v.modified.substr(0, 11)}</span>
-                                                    <span>{intl.get('developer.application_of_classification')}：{v.category === null ? '----' : v.category}</span><br/>
-                                                    <span>{intl.get('developer.communication_protocol')}：{v.protocol === null ? '----' : v.protocol}</span>
-                                                    <span>{intl.get('developer.equipment_manufacturers')}：{v.device_supplier === null ? '----' : v.device_supplier}</span>
-                                                </p>
-                                            </div>
-                                        </li>
-                                    })
-                                    : <Result
-                                        icon={
-                                            <Icon
-                                                type="smile"
-                                                theme="twoTone"
-                                            />
-                                        }
-                                        title={intl.get('appedit.You_have_not_yet_cloned_the_application,_click_jump_to_the_application_market')}
-                                        extra={
-                                        <Link to={'/appstore'}>
-                                            <Button
-                                                type="primary"
-                                                style={{margin: '0 20px'}}
-                                            >{intl.get('header.app_store')}</Button>
-                                        </Link>}
-                                      />
-                                }
-                            </ul>
-                        </div>
-                    </TabPane>
+                            {
+                                 Number(_getCookie('is_developer')) !== 1
+                                 ? <Result
+                                     title={intl.get('developer.Please_apply_to_be_a_developer_first') + '!'}
+                                     extra={
+                                         <Button
+                                             type="primary"
+                                             key="console"
+                                             onClick={()=>{
+                                                 this.props.history.push('/appdeveloper')
+                                             }}
+                                         >
+                                             {intl.get('developer.apply_to_be_a_developer')}
+                                         </Button>
+                                     }
+                                   />
+                                : <div
+                                    style={this.state.loading === false ? block : none}
+                                  >
+                                 <ul>
+                                     {
+                                        forkList && forkList.length > 0
+                                        ? forkList.map((v, key)=>{
+                                            return <li key={key}>
+                                                <div className="appImg">
+                                                    <Link to={`/appdetails/${v.name.replace(/\//g, '*')}`}>
+                                                        <img
+                                                            src={`/store_assets${v.icon_image}`}
+                                                            alt=""
+                                                        />
+                                                    </Link>
+                                                </div>
+                                                <div className="appInfo">
+                                                    <p className="appName">{v.app_name}</p>
+                                                    <p className="info">
+                                                            <span>{intl.get('developer.the_date_of_production')}：{v.modified.substr(0, 11)}</span>
+                                                            <span>{intl.get('developer.application_of_classification')}：{v.category === null ? '----' : v.category}</span><br/>
+                                                            <span>{intl.get('developer.communication_protocol')}：{v.protocol === null ? '----' : v.protocol}</span>
+                                                            <span>{intl.get('developer.equipment_manufacturers')}：{v.device_supplier === null ? '----' : v.device_supplier}</span>
+                                                    </p>
+                                                </div>
+                                            </li>
+                                        })
+                                        : <Result
+                                            icon={
+                                                <Icon
+                                                    type="smile"
+                                                    theme="twoTone"
+                                                />
+                                            }
+                                            title={intl.get('appedit.You_have_not_yet_cloned_the_application,_click_jump_to_the_application_market')}
+                                            extra={
+                                            <Link to={'/appstore'}>
+                                                <Button
+                                                    type="primary"
+                                                    style={{margin: '0 20px'}}
+                                                >{intl.get('header.app_store')}</Button>
+                                            </Link>}
+                                          />
+                                     }
+                                 </ul>
+                             </div>
+                            }
+                        </TabPane>
                     <TabPane
                         tab={intl.get('developer.collect_applied')}
                         key="3"
@@ -283,7 +300,7 @@ class Developer extends Component {
                                    ? collectList.map((v, key)=>{
                                        return <li key={key}>
                                            <div className="appImg">
-                                               <Link to={`/appdetails/${v.name}`}>
+                                               <Link to={`/appdetails/${v.name.replace(/\//g, '*')}`}>
                                                    <img
                                                        src={`/store_assets${v.icon_image}`}
                                                        alt=""
@@ -323,34 +340,6 @@ class Developer extends Component {
                     </TabPane>
                 </Tabs>
                 }
-                {/* <div
-                    style={this.state.loading ? none : block}
-                >
-                    {
-                        Number(_getCookie('is_developer')) !== 1
-                        ? <Result
-                            title={intl.get('developer.Please_apply_to_be_a_developer_first') + '!'}
-                            extra={
-                                <Button
-                                    type="primary"
-                                    key="console"
-                                    onClick={()=>{
-                                        console.log(this)
-                                        this.props.history.push('/appdeveloper')
-                                    }}
-                                >
-                                    {intl.get('developer.apply_to_be_a_developer')}
-                                </Button>
-                            }
-                          />
-                        : <p
-                            className="empty"
-                            style={appList && appList.length === 0 ? block : none}
-                          >
-                            {intl.get('developer.temporarily_not_applied')}!
-                        </p>
-                    }
-                </div> */}
             </div>
         )
     }

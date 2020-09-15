@@ -85,7 +85,6 @@ class Collapses extends Component {
                 <Collapse
                     destroyInactivePanel
                     defaultActiveKey={['1']}
-                    // onChange={callback}
                 >
                     <Panel
                         header={

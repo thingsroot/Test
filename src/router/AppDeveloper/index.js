@@ -3,7 +3,6 @@ import {Form, Input, Button, message, Result, Skeleton, Modal} from 'antd';
 import http from '../../utils/Server';
 import './style.scss';
 import intl from 'react-intl-universal';
-// import { _getCookie } from '../../utils/Session';
 
 import { _getCookie, _setCookie } from '../../utils/Session';
 const formItemLayout = {
@@ -203,9 +202,6 @@ class DynamicRule extends PureComponent {
                         : ''
                         }
                       />
-                    // status === 0
-                    //     ? '申请中'
-                    //     : '被拒绝'
                     : ''
         }
       </div>

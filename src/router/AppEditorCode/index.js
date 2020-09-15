@@ -206,8 +206,6 @@ class AppEditorCode extends Component {
                         onChange={this.onContentChange}
                     />
                 </div>
-
-
             </div>
             </div>
         );

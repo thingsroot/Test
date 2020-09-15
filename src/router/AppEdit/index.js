@@ -5,7 +5,9 @@ import EditorCode from './editorCode';
 import EditorDesc from './editorDesc';
 import { withRouter } from 'react-router-dom';
 import http from '../../utils/Server';
+import {_getCookie} from '../../utils/Session';
 import reqwest from 'reqwest';
+
 import TagEdit from '../../common/TagsEdit';
 import intl from 'react-intl-universal';
 import './style.scss';
@@ -44,9 +46,7 @@ class AppEdit extends Component {
             app,
             imgSrc: '/assets/app_center/img/logo.png'
         }, () => {
-            if (!this.state.is_new) {
                 this.getDetails();
-            }
         })
     }
     prettyJson (str) {
@@ -82,6 +82,9 @@ class AppEdit extends Component {
                 })
             }
         })
+        if (!this.state.app) {
+            return false;
+        }
         http.get('/api/applications_details?name=' + this.state.app).then(res=>{
             if (!res.ok) {
                 message.error(intl.get('appedit.failed_to_get_application_information') + ':' + res.error)
@@ -135,22 +138,25 @@ class AppEdit extends Component {
                 }
                 if (this.state.is_new) {
                     http.post('/api/applications_create', params).then(res=>{
-                        if (res.ok === true) {
+                        if (res.ok) {
+                            message.success(intl.get('appedit.application_created_successfully'));
                             let formData = new FormData();
+                            const token = _getCookie('csrf_auth_token') || '';
                             formData.append('name', res.data.name);
                             formData.append('file', this.state.imageUrl);
                             reqwest({
                                 url: '/api/applications_icon',
                                 method: 'post',
+                                headers: {
+                                    'X-Frappe-CSRF-Token': token
+                                },
                                 processData: false,
                                 data: formData,
-                                success: (res) => {
-                                    res;
-                                    message.success(intl.get('appedit.application_created_successfully'));
-                                }
+                                success: () => {}
                             });
                             setTimeout(()=>{
-                                window.location.href = '/developer'
+                                this.props.history.push('/developer')
+                                // window.location.href = '/developer'
                             }, 1500)
                         } else {
                             message.error(intl.get('appedit.application_creation_failed'))
@@ -246,13 +252,29 @@ class AppEdit extends Component {
     getTags = () => {
         http.get('/api/store_tags_list').then(res=>{
             if (res.ok) {
-                const tags_list = this.state.app_info.tags.length > 0 ? this.state.app_info.tags.split(',') : [];
-                const select_the_label = this.state.select_the_label.concat(tags_list)
+                const tags_list_unique = this.state.app_info.tags.length > 0 ? this.state.app_info.tags.split(',') : [];
+                const select_the_label_unique = this.state.select_the_label.concat(tags_list_unique)
+                // 标签列表去重
+                const unique = (arr) => {
+                    if (!Array.isArray(arr)) {
+                        return false;
+                    }
+                    arr = arr.sort()
+                    var arrry = [arr[0]];
+                    for (var i = 1; i < arr.length; i++) {
+                        if (arr[i] !== arr[i - 1]) {
+                            arrry.push(arr[i]);
+                        }
+                    }
+                    return arrry;
+                }
                 if (res.data.length > 0) {
                     res.data.map(item=>{
-                        tags_list.push(item[0])
+                        tags_list_unique.push(item[0])
                     })
                 }
+                const tags_list = unique(tags_list_unique)
+                const select_the_label = unique(select_the_label_unique)
                 this.setState({
                     tags_list,
                     select_the_label
@@ -385,7 +407,7 @@ class AppEdit extends Component {
                                 <Form.Item label={intl.get('developer.application_of_classification')}>
                                     {getFieldDecorator('category', {
                                         rules: [{ required: true, message: intl.get('appedit.cannot_be_empty') }],
-                                        initialValue: app_info.category !== null ? app_info.category : '默认分类'
+                                        initialValue: app_info.category ? app_info.category : intl.get('appedit.The_default_classification')
                                     })(
                                         <Select
                                             style={{ width: 240 }}
@@ -442,6 +464,7 @@ class AppEdit extends Component {
                                                 type="link"
                                                 className="app_details_tags_set"
                                                 onClick={this.getTags}
+                                                style={{zIndex: 999}}
                                               >{intl.get('appedit.modify')}</span>
                                             : ''
                                         }
@@ -460,6 +483,9 @@ class AppEdit extends Component {
 
                 <Tabs
                     type="card"
+                    style={{
+                        marginTop: 30
+                    }}
                 >
                     <TabPane
                         tab={intl.get('common.desc')}

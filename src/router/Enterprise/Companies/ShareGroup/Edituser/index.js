@@ -252,7 +252,6 @@ class Edituser extends React.Component {
                 ...col,
                 onCell: record => ({
                     record,
-                    // inputType: col.dataIndex === 'age' ? 'number' : 'text',
                     inputType: 'text',
                     dataIndex: col.dataIndex,
                     title: col.title,

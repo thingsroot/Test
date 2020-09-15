@@ -228,7 +228,7 @@ class AppConfigSection extends Component {
                 <div style={{lineHeight: '50px'}}>
                     <span className="spanStyle">{config.desc}：</span>
                     <Select
-                        value={config.value}
+                        value={typeof(config.value) !== 'object' ? config.value : config.value.value}
                         style={{width: 300}}
                         onChange={(value)=>{
                             config.depends && config.depends.length > 0 && config.depends.map( (dep, dep_key) => {
@@ -244,7 +244,14 @@ class AppConfigSection extends Component {
                         }}
                     >
                         {config.values && config.values.length > 0 && config.values.map(w => {
-                            return (<Option key={typeof(w) !== 'object' ? w : w.value}>{typeof(w) !== 'object' ? w : w.name}</Option>)
+                            return (
+                                <Option
+                                    key={typeof(w) !== 'object' ? w : w.value}
+                                    value={typeof(w) !== 'object' ? w : w.value}
+                                >
+                                    {typeof(w) !== 'object' ? w : w.name}
+                                </Option>
+                            )
                         } )}
                     </Select>
                     <Input
@@ -301,69 +308,6 @@ class AppConfigSection extends Component {
             </div>
         )
     }
-    // render_template (key, config, templatesSource) {
-    //     return (
-    //         <div
-    //             id={config.name}
-    //             key={key}
-    //             style={config.hide === true ? none : block}
-    //         >
-    //            <div style={{lineHeight: '50px'}}>
-    //                 <span className="spanStyle">{config.desc}：</span>
-    //                 <Select
-    //                     showSearch
-    //                     value={config.value}
-    //                     style={{width: 300}}
-    //                     placeholder="选择模板"
-    //                     optionFilterProp="children"
-    //                     onChange={(value)=>{
-    //                         config.setValue(value)
-    //                         this.props.onChange()
-    //                     }}
-    //                     onFocus={()=>{}}
-    //                     onBlur={()=>{}}
-    //                     onSearch={()=>{}}
-    //                     // filterOption={(input, option) =>
-    //                     //   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-    //                     // }
-    //                     dropdownRender={menu => (
-    //                         <div>
-    //                             {menu}
-    //                             <Divider style={{ margin: '4px 0' }} />
-    //                             <div style={{ padding: '8px', cursor: 'pointer' }}
-    //                                 onClick={()=>{
-    //                                     this.onCreateNewTemplate()
-    //                                 }}
-    //                             >
-    //                                 <Icon type="plus" /> 新建模板
-    //                             </div>
-    //                             <div style={{ padding: '8px', cursor: 'pointer' }}
-    //                                 onClick={()=>{
-    //                                     this.props.refreshTemplateList()
-    //                                 }}
-    //                             >
-    //                                 <Icon type="reload" /> 刷新模板列表
-    //                             </div>
-    //                         </div>
-    //                     )}
-    //                 >
-    //                     {templatesSource && templatesSource.length > 0 && templatesSource.map(w => {
-    //                         return (
-    //                         <Option key={w.name}
-    //                             title={w.name + ' : ' + w.latest_version}
-    //                         > {w.conf_name} - {w.last_version} - <i> {w.description} </i> </Option>
-    //                         )
-    //                     } )}
-    //                 </Select>
-    //                 <Input
-    //                     type="hidden"
-    //                     value={config.default ? config.value[0] : ''}
-    //                     ref={config.name}
-    //                 />
-    //             </div>
-    //         </div>
-    //     )
-    // }
     render_templates (key, config, templates, templateStore) {
         const developer = this.props.app_info.developer ? this.props.app_info.developer : '';
         templateStore.sort(function (b, a) {

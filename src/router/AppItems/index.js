@@ -6,6 +6,7 @@ import Comments from './Comments';
 import Issues from './Issues';
 import {_getCookie} from '../../utils/Session';
 import intl from 'react-intl-universal';
+import path from '../../assets/path';
 import './style.scss';
 const { TabPane } = Tabs;
 class AppItems extends PureComponent {
@@ -81,8 +82,6 @@ class AppItems extends PureComponent {
         })
         const data = {
             app: this.state.data.name
-            // comment: '123',
-            // priority: ''v
         }
         const url = !this.state.favorites ? '/api/store_favorites_add' : '/api/store_favorites_remove'
         http.post(url, data).then(res=>{
@@ -132,7 +131,7 @@ class AppItems extends PureComponent {
                 </div>
                 <div className="app_title">
                     <div className="app_logo">
-                        <img src={'http://ioe.thingsroot.com' + data.icon_image}/>
+                        <img src={path.store_assets_path + data.icon_image}/>
                     </div>
                     <div className="app_simple_info">
                         <p>{data.app_name}</p>

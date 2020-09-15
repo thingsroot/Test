@@ -176,20 +176,6 @@ class AppsList extends Component {
         clearInterval(this.timer)
         gatewayInfo.setAppsIsShow(false)
     }
-    // handleTableChange = (pagination, filters) => {
-    //   const pager = { ...this.state.pagination };
-    //   pager.current = pagination.current;
-    //   this.setState({
-    //     pagination: pager
-    //   });
-    //   this.fetch({
-    //     results: pagination.pageSize,
-    //     page: pagination.current,
-    //     // sortField: sorter.field,
-    //     // sortOrder: sorter.order,
-    //     ...filters
-    //   });
-    // }
     fetch = () => {
         const {gatewayInfo} = this.props.store
         let enable_beta = gatewayInfo.data.enable_beta
@@ -297,22 +283,6 @@ class AppsList extends Component {
                                     <IconIOT type="icon-APIshuchu"/>{intl.get('devece_list.Forced_to_refresh')}
                                 </Button>
                             </Tooltip>
-                            {/* <Tooltip
-                                placement="topLeft"
-                                title="手动刷新列表"
-                            >
-                                <Icon
-                                    style={{fontSize: 18, margin: '0 0 0 15px'}}
-                                    type="reload"
-                                    onClick={()=>{
-                                        this.setState({
-                                            loading: true,
-                                            sign: true
-                                        });
-                                        this.fetch()
-                                    }}
-                                />
-                            </Tooltip> */}
                         </div>
                     </div>
                 <Table
@@ -360,7 +330,7 @@ class AppsList extends Component {
                             onClick={()=>{
                                 window.open('https://wiki.freeioe.org/doku.php?id=apps:' + this.state.edit_app_info.name, '_blank')
                             }}
-                        >帮助</Button>
+                        >{intl.get('header.help')}</Button>
                         <AppConfig
                             gateway_sn={gateway_sn}
                             configStore={configStore}

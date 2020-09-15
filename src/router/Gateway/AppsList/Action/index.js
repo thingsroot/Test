@@ -393,8 +393,8 @@ class Action extends Component {
                         onOk={()=>{
                             this.sendForkCreate(record)
                         }}
-                        okText="继续"
-                        cancelText="取消"
+                        okText={intl.get('gateway.Continue')}
+                        cancelText={intl.get('common.cancel')}
                         destroyOnClose
                         onCancel={()=>{
                             this.setState({appdebug: false, running_action: false})
