@@ -108,6 +108,7 @@ class MyGates extends Component {
                 key: 'action',
                 width: '240px',
                 render: (text, record, props) => {
+                    console.log(record)
                     props;
                   return (
                       <span>
@@ -153,20 +154,25 @@ class MyGates extends Component {
                                         >在线记录</span>
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item key="1">
-                                <span
+                                <Menu.Item
+                                    key="1"
                                     disabled={record.is_shared}
+                                >
+                                <span
                                     onClick={()=>{
-                                        this.setState({
-                                            record,
-                                            visibleEdit: true
-                                        })
+                                        if (!record.is_shared) {
+                                            this.setState({
+                                                record,
+                                                visibleEdit: true
+                                            })
+                                        }
                                     }}
                                 >网关属性</span>
                                 </Menu.Item>
                                 <Menu.Divider />
                                 <Menu.Item key="4">
                                     <Popconfirm
+                                        disabled={record.is_shared}
                                         title="你确定要删除这个网关吗?"
                                         onConfirm={()=>{
                                             this.confirm(record)
