@@ -152,14 +152,18 @@ class MyGates extends Component {
                                         >{intl.get('gateway.online_record')}</span>
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item key="1">
-                                <span
+                                <Menu.Item
+                                    key="1"
                                     disabled={record.is_shared}
+                                >
+                                <span
                                     onClick={()=>{
-                                        this.setState({
-                                            record,
-                                            visibleEdit: true
-                                        })
+                                        if (!record.is_shared) {
+                                            this.setState({
+                                                record,
+                                                visibleEdit: true
+                                            })
+                                        }
                                     }}
                                 >{intl.get('gateway.gateway_pro')}</span>
                                 </Menu.Item>
@@ -167,6 +171,7 @@ class MyGates extends Component {
                                 <Menu.Item key="4">
                                     <Popconfirm
                                         title={`${intl.get('slider.are_you_sure_you_want_to_delete_this_gateway')}?`}
+                                        disabled={record.is_shared}
                                         onConfirm={()=>{
                                             this.confirm(record)
                                         }}
