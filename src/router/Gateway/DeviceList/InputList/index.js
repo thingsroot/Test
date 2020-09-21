@@ -188,7 +188,7 @@ class ExpandedRowRender extends PureComponent {
             });
             } else if (this.state.record.vt === 'string') {
                 myCharts.style.textAlin = 'center'
-                myCharts.innerHTML = 'gateway.this_kind_of_data_is_not_supported_temporarily'
+                myCharts.innerHTML = intl.get('gateway.this_kind_of_data_is_not_supported_temporarily')
             } else {
                 myCharts.style.textAlin = 'center'
                 myCharts.innerHTML = intl.get('gateway.data_not_obtained_yet')

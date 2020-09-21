@@ -1,3 +1,4 @@
+import intl from 'react-intl-universal';
 export function GetInfoBySN (sn) {
     if (/2-30002.+/.test(sn)) {
         // Q102
@@ -7,10 +8,10 @@ export function GetInfoBySN (sn) {
             ram: '256M',
             rom: '4GB',
             tty_list: [{
-                name: '串口1',
+                name: intl.get('gateway.serial_port') + '1',
                 value: '/dev/ttymxc0'
             }, {
-                name: '串口2',
+                name: intl.get('gateway.serial_port') + '2',
                 value: '/dev/ttymxc1'
             }],
             Disable_extension: false
@@ -23,16 +24,16 @@ export function GetInfoBySN (sn) {
             ram: '512M',
             rom: '4GB',
             tty_list: [{
-                name: '串口1',
+                name: intl.get('gateway.serial_port') + '1',
                 value: '/dev/ttymxc0'
             }, {
-                name: '串口2',
+                name: intl.get('gateway.serial_port') + '2',
                 value: '/dev/ttymxc1'
             }, {
-                name: '串口3',
+                name: intl.get('gateway.serial_port') + '3',
                 value: '/dev/ttymxc2'
             }, {
-                name: '串口4',
+                name: intl.get('gateway.serial_port') + '4',
                 value: '/dev/ttymxc3'
             }],
             Disable_extension: false
@@ -45,10 +46,10 @@ export function GetInfoBySN (sn) {
             ram: '256M',
             rom: '4GB',
             tty_list: [{
-                name: '串口1',
+                name: intl.get('gateway.serial_port') + '1',
                 value: '/dev/ttyS1'
             }, {
-                name: '串口2',
+                name: intl.get('gateway.serial_port') + '2',
                 value: '/dev/ttyS2'
             }],
             Disable_extension: false
