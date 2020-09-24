@@ -51,7 +51,7 @@ class Retrieve extends PureComponent {
         const { getFieldDecorator } = this.props.form;
         return (
             <div>
-                <p className="title">{intl.get('')}</p>
+                <p className="title">{intl.get('login.retrieve_password')}</p>
                 <Form onSubmit={this.handleSubmit}
                     className="login-form"
                 >
