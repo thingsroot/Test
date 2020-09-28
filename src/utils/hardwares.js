@@ -60,11 +60,12 @@ export function GetInfoBySN (sn) {
             cpu: 'MediaTek MT7688 (MIPS® 24KEc)',
             ram: '128M',
             rom: '16M',
+            /* S1: RS485 */
             tty_list: [{
                 name: 'RS485',
                 value: '/dev/ttyS1'
             }],
-            Disable_extension: true  /* S1: RS485 */
+            Disable_extension: true
         }
 	} else if (/TRTC02.+/.test(sn)) {
         // C1-1200
@@ -73,6 +74,7 @@ export function GetInfoBySN (sn) {
             cpu: 'MediaTek MT7688 (MIPS® 24KEc)',
             ram: '128M',
             rom: '32M',
+            /* S1: RS232, S3: RS485 */
             tty_list: [{
                 name: 'RS232',
                 value: '/dev/ttyS1'
@@ -81,7 +83,6 @@ export function GetInfoBySN (sn) {
                 value: '/dev/ttyS3'
             }],
             Disable_extension: false
-            /* S1: RS232, S3: RS485 */
         }
 	} else if (/TRTC03.+/.test(sn)) {
         // C1-1300
@@ -90,6 +91,7 @@ export function GetInfoBySN (sn) {
             cpu: 'MediaTek MT7688 (MIPS® 24KEc)',
             ram: '128M',
             rom: '32M',
+            /* S0: RS232, S1: RS485 */
             tty_list: [{
                 name: 'RS232',
                 value: '/dev/ttyS0'
@@ -98,7 +100,23 @@ export function GetInfoBySN (sn) {
                 value: '/dev/ttyS1'
             }],
             Disable_extension: false
+        }
+	} else if (/TRTC31.+/.test(sn)) {
+        // C1-1350
+        return {
+            model: 'C1-1350',
+            cpu: 'MediaTek MT7688 (MIPS® 24KEc)',
+            ram: '128M',
+            rom: '32M',
             /* S0: RS232, S1: RS485 */
+            tty_list: [{
+                name: 'RS232',
+                value: '/dev/ttyS0'
+            }, {
+                name: 'RS485',
+                value: '/dev/ttyS1'
+            }],
+            Disable_extension: false
         }
     }
 
