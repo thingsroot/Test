@@ -183,9 +183,7 @@ class GatewaySettings extends Component {
                         })
                     }
                 });
-                window.addEventListener('resize', () => {
-                    this.resize()
-                }, 20);
+                window.addEventListener('resize', this.resize, 20);
                 }
         })
         http.get(`/api/gateways_historical_data?sn=${gateway}&vsn=${gateway}&tag=mem_used&vt=int&start=-10m&value_method=raw&_=${new Date() * 1}`).then(res=>{
@@ -218,9 +216,7 @@ class GatewaySettings extends Component {
                         })
                     }
                 });
-                window.addEventListener('resize', () => {
-                    this.resize()
-                }, 20);
+                window.addEventListener('resize', this.resize, 20);
                 }
         })
     }
