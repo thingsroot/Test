@@ -58,7 +58,7 @@ class GatewaySettings extends Component {
         window.removeEventListener('resize', this.resize, 20)
         clearInterval(this.timer)
     }
-    resize () {
+    resize  = () => {
         this.myFaultTypeChart1 && this.myFaultTypeChart1.resize();
         this.myFaultTypeChart2 && this.myFaultTypeChart2.resize();
     }
@@ -183,7 +183,9 @@ class GatewaySettings extends Component {
                         })
                     }
                 });
-                window.addEventListener('resize', this.resize, 20);
+                window.addEventListener('resize', () => {
+                    this.resize()
+                }, 20);
                 }
         })
         http.get(`/api/gateways_historical_data?sn=${gateway}&vsn=${gateway}&tag=mem_used&vt=int&start=-10m&value_method=raw&_=${new Date() * 1}`).then(res=>{
@@ -216,7 +218,9 @@ class GatewaySettings extends Component {
                         })
                     }
                 });
-                window.addEventListener('resize', this.resize, 20);
+                window.addEventListener('resize', () => {
+                    this.resize()
+                }, 20);
                 }
         })
     }
