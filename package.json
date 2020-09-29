@@ -34,7 +34,7 @@
     "mqtt": "^2.18.8",
     "node-sass": "^4.13.0",
     "nprogress": "^0.2.0",
-    "optimize-css-assets-webpack-plugin": "5.0.1",
+    "optimize-css-assets-webpack-plugin": "^3.2.0",
     "papaparse": "^4.6.3",
     "pnp-webpack-plugin": "1.2.1",
     "postcss-flexbugs-fixes": "4.1.0",
@@ -81,10 +81,9 @@
     "extends": "react-app"
   },
   "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
+    "last 2 versions",
+    "android 4",
+    "opera 12"
   ],
   "jest": {
     "collectCoverageFrom": [

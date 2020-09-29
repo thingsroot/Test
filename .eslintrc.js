@@ -107,6 +107,9 @@ module.exports = {
     "settings": {
       "import/ignore": [
         "node_modules"
-      ]
+      ],
+      react: {
+        version : "^16.12.0"
+      }
     }
   };
