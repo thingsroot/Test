@@ -34,7 +34,7 @@ class Action extends Component {
             http.post('/api/gateways_applications_remove', data).then(res=>{
                 if (res.data){
                     if (res.ok){
-                        let title = '卸载应用' + data.inst + '请求成功!'
+                        let title = '卸载应用' + data.inst + '请求'
                         message.info(title + '等待网关响应!')
                         this.props.store.action.pushAction(res.data, title, '', data, 10000,  ()=> {
                         this.props.update_app_list();
