@@ -106,7 +106,6 @@ class MyGates extends Component {
                 key: 'action',
                 width: '240px',
                 render: (text, record, props) => {
-                    console.log(record, 'record', record.is_shared)
                     props;
                   return (
                       <span>
