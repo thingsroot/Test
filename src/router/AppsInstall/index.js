@@ -246,6 +246,7 @@ class MyGatesAppsInstall extends Component {
         })
     };
     onChangeGateway = () => {
+        console.log('changechangechange')
         this.componentDidMount()
     }
 

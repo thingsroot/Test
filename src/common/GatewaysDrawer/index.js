@@ -47,6 +47,7 @@ class GatewaysDrawer extends Component {
     onClose = () => {
         this.updateGatewayList()
         this.props.store.timer.setGateStatusLast(0) // Force to update gateway status
+        console.log(this.props.onClose, 'this.onchanlose')
         setTimeout( ()=> {
             this.props.onChange()
             this.props.onClose()

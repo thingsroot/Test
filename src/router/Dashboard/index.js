@@ -204,11 +204,17 @@ class Dashboard extends PureComponent {
                 let data2 = [];
                 let data3 = [];
                 let data4 = [];
-                this.state.barData.map((v) =>{
-                    data1.push(v[intl.get('common.sym')]);
-                    data2.push(v[intl.get('gateway.equipment')]);
-                    data3.push(v[intl.get('common.communication')]);
-                    data4.push(v[intl.get('common.data')]);
+                let data5 = [];
+                this.state.barData.map((v) => {
+                    // data1.push(v[intl.get('common.sym')]);
+                    // data2.push(v[intl.get('gateway.equipment')]);
+                    // data3.push(v[intl.get('common.communication')]);
+                    // data4.push(v[intl.get('common.data')]);
+                    data1.push(v['系统']);
+                    data2.push(v['设备']);
+                    data3.push(v['通讯']);
+                    data4.push(v['数据']);
+                    data5.push(v['应用']);
                 });
 
                 this.myFaultTypeChart = echarts.init(faultTypeMain);
@@ -220,7 +226,8 @@ class Dashboard extends PureComponent {
                         }
                     },
                     legend: {
-                        data: [intl.get('common.sym'), intl.get('gateway.equipment'), intl.get('common.communication'), intl.get('common.data'), intl.get('common.applications')]
+                        // data: [intl.get('common.sym'), intl.get('gateway.equipment'), intl.get('common.communication'), intl.get('common.data'), intl.get('common.applications')]
+                        data: ['系统', '设备', '通讯', '数据', '应用']
                     },
                     xAxis: [{
                         type: 'category',
@@ -231,34 +238,44 @@ class Dashboard extends PureComponent {
                     }],
                     yAxis: {},
                     series: [{
-                        name: intl.get('common.sym'),
+                        // name: intl.get('common.sym'),
+                        name: '系统',
                         type: 'bar',
                         data: this.state.barData.map(function (item) {
-                            return [item.time.substr(0, 10), item[intl.get('common.sym')]];
+                            return [item.time.substr(0, 10), item['系统']];
+                            // return [item.time.substr(0, 10), item[intl.get('common.sym')]];
                         })
                     }, {
-                        name: intl.get('gateway.equipment'),
+                        // name: intl.get('gateway.equipment'),
+                        name: '设备',
                         type: 'bar',
                         data: this.state.barData.map(function (item) {
-                            return [item.time.substr(0, 10), item[intl.get('gateway.equipment')]];
+                            return [item.time.substr(0, 10), item['设备']];
+                            // return [item.time.substr(0, 10), item[intl.get('gateway.equipment')]];
                         })
                     }, {
-                        name: intl.get('common.communication'),
+                        // name: intl.get('common.communication'),
+                        name: '通讯',
                         type: 'bar',
                         data: this.state.barData.map(function (item) {
-                            return [item.time.substr(0, 10), item[intl.get('common.communication')]];
+                            return [item.time.substr(0, 10), item['通讯']];
+                            // return [item.time.substr(0, 10), item[intl.get('common.communication')]];
                         })
                     }, {
-                        name: intl.get('common.data'),
+                        // name: intl.get('common.data'),
+                        name: '数据',
                         type: 'bar',
                         data: this.state.barData.map(function (item) {
-                            return [item.time.substr(0, 10), item[intl.get('common.data')]];
+                            return [item.time.substr(0, 10), item['数据']];
+                            // return [item.time.substr(0, 10), item[intl.get('common.data')]];
                         })
                     }, {
-                        name: intl.get('common.applications'),
+                        // name: intl.get('common.applications'),
+                        name: '应用',
                         type: 'bar',
                         data: this.state.barData.map(function (item) {
-                            return [item.time.substr(0, 10), item[intl.get('common.applications')]];
+                            return [item.time.substr(0, 10), item['应用']];
+                            // return [item.time.substr(0, 10), item[intl.get('common.applications')]];
                         })
                     }]
                 });
