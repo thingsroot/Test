@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter} from 'react-router-dom';
-import {Button, Alert, Input, Select, Empty, Switch } from 'antd';
+import {Button, Alert, Input, Empty, Select, Switch } from 'antd';
 import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
 import './style.scss';

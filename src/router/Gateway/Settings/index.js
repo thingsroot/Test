@@ -59,7 +59,7 @@ class GatewaySettings extends Component {
         window.removeEventListener('resize', this.resize, 20)
         clearInterval(this.timer)
     }
-    resize () {
+    resize  = () => {
         this.myFaultTypeChart1 && this.myFaultTypeChart1.resize();
         this.myFaultTypeChart2 && this.myFaultTypeChart2.resize();
     }

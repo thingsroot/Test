@@ -392,7 +392,7 @@ class MyGates extends Component {
                             onChange={(value)=>{
                                 let status = value
                                 let data = this.state[status + 'data']
-                                let loading = data && data.length > 0 ? false : true
+                                let loading = this.state.filter_text !== '' ? true : data && data.length > 0 ? false : true
                                 this.setState({loading: loading, status: status}, ()=>{
                                     this.refreshDevicesList()
                                 })
@@ -405,7 +405,7 @@ class MyGates extends Component {
                                         this.state.columns
                                     }
                                 dataSource={
-                                    onlinedata && onlinedata.length > 0 ? onlinedata : []
+                                    onlinedata && onlinedata.length > 0 ? this.filterGatewayList(onlinedata, this.state.filter_text) : []
                                 }
                                 bordered
                                 loading={this.state.loading}
@@ -424,7 +424,7 @@ class MyGates extends Component {
                         >
                             <Table columns={this.state.columns}
                                 dataSource={
-                                    offlinedata && offlinedata.length > 0 ? offlinedata : []
+                                    offlinedata && offlinedata.length > 0 ? this.filterGatewayList(offlinedata, this.state.filter_text) : []
                                 }
                                 rowKey="sn"
                                 rowClassName={(record, index) => {
@@ -444,7 +444,7 @@ class MyGates extends Component {
                         >
                             <Table columns={this.state.columns}
                                 dataSource={
-                                    alldata && alldata.length > 0 ? alldata : []
+                                    alldata && alldata.length > 0 ? this.filterGatewayList(alldata, this.state.filter_text) : []
                                 }
                                 rowClassName={(record, index) => {
                                     let className = 'light-row';

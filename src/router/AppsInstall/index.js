@@ -45,6 +45,9 @@ class MyGatesAppsInstall extends Component {
     };
 
     componentDidMount (){
+        this.initlData()
+    }
+    initlData () {
         let app = this.props.match.params.app ? this.props.match.params.app.replace(/\*/g, '/') : ''
         let gateway_sn = this.props.match.params.sn;
         let install_step = this.props.match.params.step ? this.props.match.params.step : ''
@@ -246,8 +249,7 @@ class MyGatesAppsInstall extends Component {
         })
     };
     onChangeGateway = () => {
-        console.log('changechangechange')
-        this.componentDidMount()
+        this.initlData()
     }
 
     render () {

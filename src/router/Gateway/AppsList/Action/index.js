@@ -36,13 +36,13 @@ class Action extends Component {
             http.post('/api/gateways_applications_remove', data).then(res=>{
                 if (res.data){
                     if (res.ok){
-                        let title = intl.get('gateway.unloading_application') + data.inst + intl.get('gateway.request_succeeded!')
+                        let title = intl.get('gateway.unloading_application') + data.inst + intl.get('gateway.request')
                         message.info(title + `${intl.get('gateway.wait_for_gateway_response')}!`)
                         this.props.store.action.pushAction(res.data, title, '', data, 10000,  ()=> {
                         this.props.update_app_list();
                         })
                     } else {
-                        message.error(intl.get('gateway.unloading_application') + data.inst + intl.get('gateway.request_succeeded!'))
+                        message.error(intl.get('gateway.unloading_application') + data.inst + intl.get('gateway.request'))
                     }
                 }
             })

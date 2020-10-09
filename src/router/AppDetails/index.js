@@ -306,7 +306,7 @@ class AppDetails extends Component {
     }
     filterGateway = (e) => {
         const value = e.target.value.toLowerCase();
-        const data = this.state.filterDataSource.filter(item=> item.description.toLowerCase().indexOf(value) !== -1 || item.dev_name.toLowerCase().indexOf(value) !== -1 || item.name.indexOf(value) !== -1)
+        const data = this.state.filterDataSource.filter(item=> item.description.toLowerCase().indexOf(value) !== -1 || item.sn.toLowerCase().indexOf(value) !== -1 || item.dev_name.toLowerCase().indexOf(value) !== -1)
         this.setState({
             dataSource: data
         })
