@@ -273,6 +273,9 @@ class MyGates extends Component {
                 arr.push(item)
             }
         });
+        this.setState({
+            loading: false
+        })
         return arr;
     }
     changeFilter = (text)=>{
@@ -400,7 +403,7 @@ class MyGates extends Component {
                             onChange={(value)=>{
                                 let status = value
                                 let data = this.state[status + 'data']
-                                let loading = this.state.filter_text !== '' ? true : data && data.length > 0 ? false : true
+                                let loading = data && data.length > 0 ? false : true
                                 this.setState({loading: loading, status: status}, ()=>{
                                     this.refreshDevicesList()
                                 })
@@ -413,7 +416,7 @@ class MyGates extends Component {
                                         this.state.columns
                                     }
                                 dataSource={
-                                    onlinedata && onlinedata.length > 0 ? this.filterGatewayList(onlinedata, this.state.filter_text) : []
+                                    onlinedata && onlinedata.length > 0 ? onlinedata : []
                                 }
                                 bordered
                                 loading={this.state.loading}
@@ -432,7 +435,7 @@ class MyGates extends Component {
                         >
                             <Table columns={this.state.columns}
                                 dataSource={
-                                    offlinedata && offlinedata.length > 0 ? this.filterGatewayList(offlinedata, this.state.filter_text) : []
+                                    offlinedata && offlinedata.length > 0 ? offlinedata : []
                                 }
                                 rowKey="sn"
                                 rowClassName={(record, index) => {
@@ -452,7 +455,7 @@ class MyGates extends Component {
                         >
                             <Table columns={this.state.columns}
                                 dataSource={
-                                    alldata && alldata.length > 0 ? this.filterGatewayList(alldata, this.state.filter_text) : []
+                                    alldata && alldata.length > 0 ? alldata : []
                                 }
                                 rowClassName={(record, index) => {
                                     let className = 'light-row';
