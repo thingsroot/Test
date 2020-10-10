@@ -23,7 +23,7 @@ const CollectionCreateForm = Form.create()(
                 return
             }
             if (fileList.length === 0) {
-                message.error(intl.get('appdetails.Please select the file to upload'))
+                message.error(intl.get('appdetails.Please_select_the_file_to_upload'))
                 return
             }
             fileList.forEach((file) => {
