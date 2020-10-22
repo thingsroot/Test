@@ -79,7 +79,7 @@ const tcp_server_childs = [
 
 function get_serial_childs (sn) {
     let {tty_list} = GetInfoBySN(sn)
-    if (tty_list.length === 0) {
+    if (!tty_list || tty_list.length === 0) {
         return [
             {
                 'name': 'port',
@@ -127,7 +127,7 @@ function get_serial_childs (sn) {
             'desc': '端口',
             'type': 'dropdown',
             'values': tty_list,
-            'value': tty_list[0].name
+            'value': tty_list && tty_list[0].name
         },
         {
             'name': 'baudrate',
