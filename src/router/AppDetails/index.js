@@ -184,8 +184,18 @@ class AppDetails extends Component {
                 this.props.history.push('/myapps')
                 return
             }
-
-            this.setState({
+            const versionList = res.data.versionList;
+            versionList.sort((a, b) => {
+                return b.version - a.version
+            })
+            let flag = false;
+            versionList.map(item=>{
+                if (item.beta === 1 && !flag) {
+                    item.update = true;
+                    flag = true;
+                }
+            })
+         this.setState({
                 app_info: res.data.data,
                 versionList: res.data.versionList,
                 versionLatest: res.data.versionLatest,
@@ -235,8 +245,24 @@ class AppDetails extends Component {
     updateVersionList = ()=> {
         http.get('/api/versions_list?app=' + this.state.name).then(res=>{
             if (res.ok && res.data) {
+                const versionList = res.data;
+
+                versionList.sort((a, b) => {
+                    return b.version - a.version
+                })
+                let flag = false;
+                versionList.map(item=>{
+                    if (item.beta === 1 && !flag) {
+                        item.update = true;
+                        flag = true;
+                    }
+                })
                 this.setState({
-                    versionList: res.data
+                    versionList: []
+                }, ()=> {
+                    this.setState({
+                        versionList
+                    })
                 })
             }
         });

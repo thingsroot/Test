@@ -248,7 +248,6 @@ class Status extends Component {
                     data: res.data
                 })
                 if (res.data.sn !== this.state.gateway) {
-                    console.log('Delayed data arrived!!', res.data, this.state.gateway)
                     return
                 }
                 this.props.store.gatewayInfo.updateStatus(res.data);

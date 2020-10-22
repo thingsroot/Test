@@ -81,29 +81,64 @@
     }
   }
   .versionList{
-    >ul{
-      padding: 10px 0;
-      >li{
-        padding: 10px 0;
-        >div{
-          width: 100%;
-          line-height: 30px;
-          display: flex;
-          justify-content: space-between;
-          >p{
-            color: #999999;
-            .fontColor{
-              color: #333;
-            }
-          }
-        }
-      }
+    .version_list_detail{
+      margin-top: 50px;
     }
-    >p{
-      line-height: 40px;
-      padding: 40px;
-      text-align: center;
+    .ant-timeline-item-content{
+      left:170px;
     }
+    .ant-timeline-item-head-custom{
+      left:100px;
+    }
+    .ant-timeline-item-tail{
+      left:174px;
+    }
+    .version_list_detail_icon{
+      position: absolute;
+      left:-18px;
+      top:8px;
+      display: block;
+      width: 10px;
+      height:10px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #1890ff;
+
+    }
+    .version_list_detail_icon_red{
+      position: absolute;
+      left:-18px;
+      top:8px;
+      display: block;
+      width: 10px;
+      height:10px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #f5222d;
+    }
+    //>ul{
+    //  padding: 10px 0;
+    //  >li{
+    //    padding: 10px 0;
+    //    >div{
+    //      width: 100%;
+    //      line-height: 30px;
+    //      display: flex;
+    //      justify-content: space-between;
+    //      >p{
+    //        color: #999999;
+    //        .fontColor{
+    //          color: #333;
+    //        }
+    //      }
+    //    }
+    //  }
+    //}
+    //>p{
+    //  line-height: 40px;
+    //  padding: 40px;
+    //  text-align: center;
+    //}
   }
   .emptys{
     width: 100%;

@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
-import { Button } from 'antd';
+import { Button, Timeline, message } from 'antd';
 // import http from '../../../utils/Server';
 import UploadForm from '../UploadForm';
+import http from '../../../utils/Server';
 
 const block = {
     display: 'block',
@@ -29,7 +30,17 @@ class VersionList extends PureComponent {
         this.setState({visible: false})
         this.props.onUpdate()
     };
-
+    beta_upgrade = (item) => {
+        http.post('/api/applications_release', {
+            app: item.app,
+            version: item.version
+        }).then(res=>{
+            if (res.ok) {
+                message.success('发布为正式版本成功！')
+                this.props.onUpdate()
+            }
+        })
+    }
     render () {
         let { app, dataSource, onUpdate, initialVersion } = this.props;
         onUpdate;
@@ -50,26 +61,44 @@ class VersionList extends PureComponent {
                         app={app}
                     />
                 </div>
-                <ul>
-                    {
-                        dataSource && dataSource.length > 0 && dataSource.map((v, key)=>{
-                                return <li key={key}>
-                                    <div><p>版本号：<span className="fontColor">{v.version}</span>
+                <div className="version_list_detail">
+                    <Timeline mode="left">
+                        {
+                            dataSource && dataSource.length > 0 && dataSource.map((v, key)=>{
+                                return (
+                                    <Timeline.Item
+                                        dot={v.modified.substr(0, 19)}
+                                        key={key}
+                                        position="left"
+                                    >
                                         {
-                                            v.beta === 0 ? <span>(正式版)</span> : <span>(测试版)</span>
+                                            v.update && this.props.user
+                                            ? <Button
+                                                className="versionList_update_button"
+                                                type="primary"
+                                                onClick={()=>{
+                                                    this.beta_upgrade(v)
+                                                    }
+                                                }
+                                              >
+                                                升级为正式版
+                                            </Button>
+                                            : ''
                                         }
-                                    </p></div>
-                                    <div><p>更新时间：<span className="fontColor">{v.modified.substr(0, 19)}</span></p>
-                                        {
-                                            v.meta === 0 ? '' : <span style={this.state.user ? block : none}>发布为正式版本</span>
-                                        }
-                                    </div>
-                                    <div><p>更新日志：<span className="fontColor">{v.comment}</span></p></div>
-                                </li>
-                            })
+                                        <p>
 
-                    }
-                </ul>
+                                            版本号:<span className="fontColor">{v.version}</span>
+                                        </p>
+                                        <p>
+                                            更新日志：<span className="fontColor">{v.comment}</span>
+                                        </p>
+                                        <span className={v.beta === 1 ? 'version_list_detail_icon_red' : 'version_list_detail_icon'}></span>
+                                    </Timeline.Item>
+                                )
+                            })
+                        }
+                    </Timeline>
+                </div>
                 <p
                     className="empty"
                     style={dataSource.length > 0 ? none : block}
