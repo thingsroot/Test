@@ -128,7 +128,7 @@ function get_serial_childs (sn) {
             'desc': intl.get('appsinstall.port'),
             'type': 'dropdown',
             'values': tty_list,
-            'value': tty_list[0].name
+            'value': tty_list[0] && tty_list[0].name
         },
         {
             'name': 'baudrate',

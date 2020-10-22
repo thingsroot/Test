@@ -104,6 +104,7 @@ class Sign extends PureComponent {
                             className="login-form-button"
                             style={{width: '100%'}}
                         >{intl.get('login.login')}</Button>
+                        {console.log(OEM.Title, 'title', intl.get('login.winter_bamboo_shoots_cloud'), 'en')}
                         {
                             OEM.Title === intl.get('login.winter_bamboo_shoots_cloud')
                             ? <Link to="/login/register"

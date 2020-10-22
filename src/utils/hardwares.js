@@ -190,7 +190,7 @@ export function GetInfoBySN (sn) {
         cpu: 'UNKNOWN',
         ram: 'UNKNOWN',
         rom: 'UNKNOWN',
-        tty_list: null,
+        tty_list: [],
         Disable_extension: false
     }
 }

@@ -32,6 +32,7 @@ class App extends PureComponent {
     });
     }
     render () {
+        console.log(zh_CN)
         return (
             <ConfigProvider locale={this.state.antdLang}>
                 <div className="wrapper">
