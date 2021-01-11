@@ -12,7 +12,8 @@ import './style.scss';
 class GatewaysDrawer extends Component {
     state = {
         url: window.location.pathname,
-        gateways: []
+        gateways: [],
+        filtertext: ''
     };
     componentDidMount (){
         this.updateGatewayList()
@@ -31,8 +32,9 @@ class GatewaysDrawer extends Component {
         // FIXME: Save localStorage about user accessed gateways..
         http.get('/api/gateways_list?status=online').then(res=>{
             if (res.ok) {
+                const data = res.data.filter(item=> item.description.toLowerCase().indexOf(this.state.filtertext) !== -1 || item.dev_name.toLowerCase().indexOf(this.state.filtertext) !== -1 || item.name.indexOf(this.state.filtertext) !== -1)
                 this.setState({
-                    gateways: res.data,
+                    gateways: data,
                     filterDataSource: res.data
                 })
             }
@@ -52,10 +54,13 @@ class GatewaysDrawer extends Component {
         }, 500)
     }
     filterGateway = (e) => {
-        const value = e.target.value.toLowerCase();
-        const data = this.state.filterDataSource.filter(item=> item.description.toLowerCase().indexOf(value) !== -1 || item.dev_name.toLowerCase().indexOf(value) !== -1 || item.name.indexOf(value) !== -1)
         this.setState({
-            gateways: data
+            filtertext: e.target.value.toLowerCase()
+        }, () => {
+            const data = this.state.filterDataSource.filter(item=> item.description.toLowerCase().indexOf(this.state.filtertext) !== -1 || item.dev_name.toLowerCase().indexOf(this.state.filtertext) !== -1 || item.name.indexOf(this.state.filtertext) !== -1)
+            this.setState({
+                gateways: data
+            })
         })
     }
     render () {
