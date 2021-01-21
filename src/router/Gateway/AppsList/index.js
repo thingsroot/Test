@@ -12,7 +12,6 @@ import './style.scss';
 
 import {IconIOT, IconCloud} from '../../../utils/iconfont';
 
-
 @withRouter
 @inject('store')
 @observer
@@ -152,9 +151,6 @@ class AppsList extends Component {
                 this.setState({loading: false})
             }
             this.fetch();
-            this.timer = setInterval(() => {
-                this.fetch()
-            }, 3000);
         })
     }
     UNSAFE_componentWillReceiveProps (nextProps){
@@ -166,39 +162,32 @@ class AppsList extends Component {
                 close_after_submit: false,
                 gateway_sn: nextProps.gateway
             }, ()=>{
-                this.fetch();
+                this.props.store.gatewayInfo.setApps([])
+                clearTimeout(this.timer)
+                this.timerState = false
+                this.fetch(nextProps.gateway);
             })
         }
     }
     componentWillUnmount (){
         const { gatewayInfo } = this.props.store;
-        clearInterval(this.timer)
+        clearTimeout(this.timer)
+        this.timerState = false
         gatewayInfo.setAppsIsShow(false)
     }
-    // handleTableChange = (pagination, filters) => {
-    //   const pager = { ...this.state.pagination };
-    //   pager.current = pagination.current;
-    //   this.setState({
-    //     pagination: pager
-    //   });
-    //   this.fetch({
-    //     results: pagination.pageSize,
-    //     page: pagination.current,
-    //     // sortField: sorter.field,
-    //     // sortOrder: sorter.order,
-    //     ...filters
-    //   });
-    // }
-    fetch = () => {
+    fetch = (vsn) => {
+        const sn = vsn ? vsn : this.state.gateway_sn
         const {gatewayInfo} = this.props.store
         let enable_beta = gatewayInfo.data.enable_beta
         if (enable_beta === undefined) {
             enable_beta = 0
         }
-        http.get('/api/gateways_app_list?gateway=' + this.state.gateway_sn + '&beta=' + enable_beta).then(res=>{
+        http.get('/api/gateways_app_list?gateway=' + sn + '&beta=' + enable_beta).then(res=>{
             if (res.ok){
-                this.props.store.gatewayInfo.setApps(res.data)
-                this.setData(res.data)
+                if (this.props.location.pathname.indexOf(sn) !== -1) {
+                    this.props.store.gatewayInfo.setApps(res.data)
+                    this.setData(res.data)
+                }
             } else {
                 message.error(res.error)
             }
@@ -207,6 +196,12 @@ class AppsList extends Component {
                 sign: false
             })
         })
+        if (!this.timerState) {
+            this.timer = setInterval(() => {
+                this.fetch()
+            }, 5000);
+            this.timerState = true
+        }
     }
     setData = (apps)=> {
         const pagination = { ...this.state.pagination };
@@ -296,22 +291,6 @@ class AppsList extends Component {
                                     <IconIOT type="icon-APIshuchu"/>强制刷新
                                 </Button>
                             </Tooltip>
-                            {/* <Tooltip
-                                placement="topLeft"
-                                title="手动刷新列表"
-                            >
-                                <Icon
-                                    style={{fontSize: 18, margin: '0 0 0 15px'}}
-                                    type="reload"
-                                    onClick={()=>{
-                                        this.setState({
-                                            loading: true,
-                                            sign: true
-                                        });
-                                        this.fetch()
-                                    }}
-                                />
-                            </Tooltip> */}
                         </div>
                     </div>
                 <Table
