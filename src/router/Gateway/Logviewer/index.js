@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter} from 'react-router-dom';
-import {Button, Alert, Input, Select, Empty} from 'antd';
+import {Button, Alert, Input, Select, Empty, message} from 'antd';
 import {inject, observer} from 'mobx-react';
 import http from '../../../utils/Server';
 import './style.scss';
@@ -78,7 +78,13 @@ class Logviewer extends Component {
     tick (time){
         const { mqtt } = this.props;
         mqtt.tick(time)
-
+        if (mqtt.log_channel.Data.length >= 5000) {
+            this.stopChannel()
+            this.setState({
+                maxNum: true
+            })
+            return false
+        }
         const data = {
             duration: time || 60,
             name: this.state.gateway,
@@ -110,6 +116,10 @@ class Logviewer extends Component {
         }, 200)
     }
     startChannel =()=>{
+        if (this.props.mqtt.log_channel.Data.length >= 5000) {
+            message.error('日志最大数量五千条，请清除后再重新订阅！')
+            return false
+        }
         const { mqtt } = this.props;
         this.tick(60)
         this.t1 = setInterval(()=>this.tick(60), 59000);
@@ -161,6 +171,9 @@ class Logviewer extends Component {
                             type="danger"
                             onClick={()=>{
                                 mqtt.log_channel.clearData()
+                                this.setState({
+                                    maxNum: false
+                                })
                             }}
                         >清除</Button>
                         <span style={{padding: '0 5px'}} />
@@ -195,7 +208,7 @@ class Logviewer extends Component {
                     this.state.maxNum
                     ? <Alert
                         message="超出最大数量"
-                        description="日志最大数量一千条，请清除后再重新订阅！"
+                        description="日志最大数量五千条，请清除后再重新订阅！"
                         type="error"
                         closable
                         onClose={this.onClose}
